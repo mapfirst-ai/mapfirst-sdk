@@ -110,6 +110,7 @@ export class GoogleMapsMarkerManager {
         map: this.mapInstance,
         position: { lat: coords.lat, lng: coords.lon },
         content: element,
+        zIndex: item.kind === "primary" ? 20 : 10,
       });
 
       this.markerCache.set(item.key, {
