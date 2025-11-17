@@ -1,0 +1,16 @@
+{
+  "name": "@mapfirst/react",
+  "version": "0.0.1",
+  "main": "dist/index.cjs",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --clean"
+  },
+  "peerDependencies": {
+    "react": ">=17 || >=18"
+  },
+  "dependencies": {
+    "@mapfirst/core": "workspace:*"
+  }
+}

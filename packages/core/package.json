@@ -1,0 +1,10 @@
+{
+  "name": "@mapfirst/core",
+  "version": "0.0.1",
+  "main": "dist/index.cjs",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean"
+  }
+}
