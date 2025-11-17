@@ -28,15 +28,14 @@ export function createPrimaryMarkerElement(
   pill.style.display = "flex";
   pill.style.flexDirection = "column";
   pill.style.gap = "2px";
-  pill.style.minWidth = "140px";
-  pill.style.maxWidth = "220px";
   pill.style.whiteSpace = "nowrap";
   pill.style.overflow = "hidden";
   pill.style.textOverflow = "ellipsis";
+  pill.style.zIndex = "2";
   pill.title = item.marker.name ?? String(item.marker.tripadvisor_id);
 
   const title = document.createElement("span");
-  title.textContent = item.marker.name ?? `#${item.marker.tripadvisor_id}`;
+  title.textContent = item.marker.pricing?.offer?.displayPrice ?? "No Price";
   title.style.textAlign = "left";
   pill.appendChild(title);
 

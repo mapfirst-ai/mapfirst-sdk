@@ -37,7 +37,7 @@ export class MapLibreAdapter extends MapAdapter {
   }
 
   project(lngLat: [number, number]) {
-    return this.map.project;
+    return this.map.project({ lng: lngLat[0], lat: lngLat[1] });
   }
 
   on(event: string, handler: (...args: any[]) => void): void {

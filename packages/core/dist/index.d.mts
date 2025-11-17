@@ -1,63 +1,3 @@
-/**
- * Abstract base class for map adapters supporting different map libraries
- */
-declare abstract class MapAdapter {
-    protected map: any;
-    constructor(map: any);
-    /**
-     * Get the underlying map instance
-     * @returns {any} The native map instance
-     */
-    getMap(): any;
-    /**
-     * Get the current center coordinates of the map
-     * @returns {{ lng: number; lat: number }} [longitude, latitude]
-     */
-    abstract getCenter(): {
-        lng: number;
-        lat: number;
-    };
-    /**
-     * Get the current zoom level of the map
-     * @returns {number} Current zoom level
-     */
-    abstract getZoom(): number;
-    /**
-     * Get the current bearing (rotation) of the map
-     * @returns {number} Bearing in degrees
-     */
-    abstract getBearing(): number;
-    /**
-     * Get the current pitch (tilt) of the map
-     * @returns {number} Pitch in degrees
-     */
-    abstract getPitch(): number;
-    /**
-     * Get the current bounds of the map viewport
-     * @returns {MapBounds} Map bounds with southwest and northeast corners
-     */
-    abstract getMapBounds(): MapBounds;
-    /**
-     * Project a geographical coordinate to screen space
-     * @param {[number, number]} lngLat [longitude, latitude]
-     * @returns {{ x: number; y: number }} Screen coordinates
-     */
-    abstract project(lngLat: [number, number]): {
-        x: number;
-        y: number;
-    };
-}
-type MapBounds = {
-    sw: {
-        lat: number;
-        lng: number;
-    };
-    ne: {
-        lat: number;
-        lng: number;
-    };
-};
-
 type PriceLevel = "Mid Range" | "Fine Dining" | "Cheap Eats";
 type Offer = {
     availability: "available" | "unavailable" | "pending";
@@ -121,6 +61,70 @@ type MapLibreNamespace = {
         anchor?: string;
     }) => MapLibreMarkerHandle;
 };
+
+type GoogleMapsMarkerHandle = any;
+type GoogleMapsNamespace = any;
+
+/**
+ * Abstract base class for map adapters supporting different map libraries
+ */
+declare abstract class MapAdapter {
+    protected map: any;
+    constructor(map: any);
+    /**
+     * Get the underlying map instance
+     * @returns {any} The native map instance
+     */
+    getMap(): any;
+    /**
+     * Get the current center coordinates of the map
+     * @returns {{ lng: number; lat: number }} [longitude, latitude]
+     */
+    abstract getCenter(): {
+        lng: number;
+        lat: number;
+    };
+    /**
+     * Get the current zoom level of the map
+     * @returns {number} Current zoom level
+     */
+    abstract getZoom(): number;
+    /**
+     * Get the current bearing (rotation) of the map
+     * @returns {number} Bearing in degrees
+     */
+    abstract getBearing(): number;
+    /**
+     * Get the current pitch (tilt) of the map
+     * @returns {number} Pitch in degrees
+     */
+    abstract getPitch(): number;
+    /**
+     * Get the current bounds of the map viewport
+     * @returns {MapBounds} Map bounds with southwest and northeast corners
+     */
+    abstract getMapBounds(): MapBounds;
+    /**
+     * Project a geographical coordinate to screen space
+     * @param {[number, number]} lngLat [longitude, latitude]
+     * @returns {{ x: number; y: number }} Screen coordinates
+     */
+    abstract project(lngLat: [number, number]): {
+        x: number;
+        y: number;
+    };
+}
+type MapBounds = {
+    sw: {
+        lat: number;
+        lng: number;
+    };
+    ne: {
+        lat: number;
+        lng: number;
+    };
+};
+
 type BaseMapFirstOptions = {
     markers?: Property[];
     primaryType?: PropertyType;
@@ -139,7 +143,13 @@ type MapLibreOptions = BaseMapFirstOptions & {
     maplibregl: MapLibreNamespace;
     onMarkerClick?: (marker: Property) => void;
 };
-type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions;
+type GoogleMapsOptions = BaseMapFirstOptions & {
+    platform: "google";
+    mapInstance: any;
+    google: GoogleMapsNamespace;
+    onMarkerClick?: (marker: Property) => void;
+};
+type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOptions;
 type ClusterDisplayItem = {
     kind: "primary";
     marker: Property;
@@ -173,6 +183,7 @@ declare class MapFirstCore {
     private safeExtractViewState;
     private resolveCollisionOverrides;
     private attachMapLibreListeners;
+    private attachGoogleMapsListeners;
     private ensureAlive;
 }
 type ViewStateSnapshot = {
@@ -183,4 +194,4 @@ type ViewStateSnapshot = {
     pitch: number;
 };
 
-export { type ClusterDisplayItem, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type Property, type PropertyType };
+export { type ClusterDisplayItem, type GoogleMapsMarkerHandle, type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type Property, type PropertyType };

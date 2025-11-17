@@ -1,24 +1,29 @@
 import type { MapAdapter } from "./adapters";
 import { MapLibreAdapter } from "./adapters/maplibre";
-import { createDotMarkerElement } from "./dotmarket";
-import { createPrimaryMarkerElement } from "./marker";
+import { GoogleMapsAdapter } from "./adapters/google";
 import type { Property, PropertyType } from "./types";
+import {
+  MapLibreMarkerManager,
+  type MapLibreMarkerHandle,
+  type MapLibreNamespace,
+} from "./adapters/maplibre/markermanager";
+import {
+  GoogleMapsMarkerManager,
+  type GoogleMapsMarkerHandle,
+  type GoogleMapsNamespace,
+} from "./adapters/google/markermanager";
 
 export type { Property, PropertyType } from "./types";
 
-export type MapLibreMarkerHandle = {
-  setLngLat(lngLat: [number, number]): MapLibreMarkerHandle;
-  addTo(map: any): MapLibreMarkerHandle;
-  remove(): void;
-  getElement(): HTMLElement;
-};
+export type {
+  MapLibreMarkerHandle,
+  MapLibreNamespace,
+} from "./adapters/maplibre/markermanager";
 
-export type MapLibreNamespace = {
-  Marker: new (options?: {
-    element?: HTMLElement;
-    anchor?: string;
-  }) => MapLibreMarkerHandle;
-};
+export type {
+  GoogleMapsMarkerHandle,
+  GoogleMapsNamespace,
+} from "./adapters/google/markermanager";
 
 type BaseMapFirstOptions = {
   markers?: Property[];
@@ -44,7 +49,17 @@ type MapLibreOptions = BaseMapFirstOptions & {
   onMarkerClick?: (marker: Property) => void;
 };
 
-export type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions;
+type GoogleMapsOptions = BaseMapFirstOptions & {
+  platform: "google";
+  mapInstance: any; // google.maps.Map
+  google: GoogleMapsNamespace;
+  onMarkerClick?: (marker: Property) => void;
+};
+
+export type MapFirstOptions =
+  | AdapterDrivenOptions
+  | MapLibreOptions
+  | GoogleMapsOptions;
 
 const DEFAULT_PRIMARY_TYPE: PropertyType = "Accommodation";
 
@@ -64,7 +79,9 @@ export type ClusterDisplayItem =
 export class MapFirstCore {
   private readonly adapter: MapAdapter;
   private readonly cleanupFns: Array<() => void> = [];
-  private readonly markerRenderer?: MapLibreMarkerManager;
+  private readonly markerRenderer?:
+    | MapLibreMarkerManager
+    | GoogleMapsMarkerManager;
   private markers: Property[] = [];
   private primaryType?: PropertyType;
   private selectedMarkerId: number | null = null;
@@ -90,6 +107,20 @@ export class MapFirstCore {
         },
       });
       this.attachMapLibreListeners(options.mapInstance);
+    } else if (isGoogleMapsOptions(options)) {
+      const shouldAutoSelect = options.autoSelectOnClick ?? true;
+      this.adapter = new GoogleMapsAdapter(options.mapInstance);
+      this.markerRenderer = new GoogleMapsMarkerManager({
+        mapInstance: options.mapInstance,
+        google: options.google,
+        onMarkerClick: (marker) => {
+          if (shouldAutoSelect) {
+            this.setSelectedMarker(marker.tripadvisor_id);
+          }
+          options.onMarkerClick?.(marker);
+        },
+      });
+      this.attachGoogleMapsListeners(options.mapInstance);
     } else {
       this.adapter = options.adapter;
     }
@@ -144,7 +175,7 @@ export class MapFirstCore {
     this.clusterItems = clusterMarkers({
       primaryType,
       markers: this.markers,
-      map: this.adapter.getMap(),
+      map: this.adapter,
       selectedMarkerId: this.selectedMarkerId,
       zoom: viewState?.zoom ?? 0,
       collisionThresholdPx: collisionPx,
@@ -227,6 +258,33 @@ export class MapFirstCore {
     });
   }
 
+  private attachGoogleMapsListeners(mapInstance: any) {
+    const rerender = () => this.refresh();
+    const events = [
+      "center_changed",
+      "zoom_changed",
+      "drag",
+      "heading_changed",
+      "tilt_changed",
+    ];
+    const listeners: any[] = [];
+
+    events.forEach((eventName) => {
+      const listener = mapInstance.addListener(eventName, rerender);
+      listeners.push(listener);
+    });
+
+    this.cleanupFns.push(() => {
+      listeners.forEach((listener) => {
+        try {
+          listener.remove();
+        } catch {
+          // ignore
+        }
+      });
+    });
+  }
+
   private ensureAlive() {
     if (this.destroyed) {
       throw new Error("MapFirstCore instance has been destroyed");
@@ -263,6 +321,12 @@ function isMapLibreOptions(
   options: MapFirstOptions
 ): options is MapLibreOptions {
   return (options as MapLibreOptions).platform === "maplibre";
+}
+
+function isGoogleMapsOptions(
+  options: MapFirstOptions
+): options is GoogleMapsOptions {
+  return (options as GoogleMapsOptions).platform === "google";
 }
 
 function extractViewState(mapInstance: MapAdapter): ViewStateSnapshot {
@@ -484,73 +548,6 @@ function resolvePrice(marker: Property) {
       .replace(/,/g, "")
   );
   return Number.isNaN(numeric) ? -Infinity : numeric;
-}
-
-type MapLibreMarkerManagerOptions = {
-  mapInstance: any;
-  maplibregl: MapLibreNamespace;
-  onMarkerClick?: (marker: Property) => void;
-};
-
-class MapLibreMarkerManager {
-  private readonly mapInstance: any;
-  private readonly MarkerCtor?: MapLibreNamespace["Marker"];
-  private readonly onMarkerClick?: (marker: Property) => void;
-  private activeMarkers: MapLibreMarkerHandle[] = [];
-
-  constructor(options: MapLibreMarkerManagerOptions) {
-    this.mapInstance = options.mapInstance;
-    this.MarkerCtor = options.maplibregl?.Marker;
-    this.onMarkerClick = options.onMarkerClick;
-  }
-
-  render(items: ClusterDisplayItem[]) {
-    this.clear();
-    if (!this.MarkerCtor) {
-      return;
-    }
-    for (const item of items) {
-      const coords = safeLatLon(item.marker.location);
-      if (!coords) continue;
-      const element =
-        item.kind === "primary"
-          ? createPrimaryMarkerElement(item, this.onMarkerClick)
-          : createDotMarkerElement(item, this.onMarkerClick);
-      if (!element) continue;
-      const marker = new this.MarkerCtor({
-        element,
-        anchor: item.kind === "primary" ? "bottom" : "center",
-      })
-        .setLngLat([coords.lon, coords.lat])
-        .addTo(this.mapInstance);
-      this.activeMarkers.push(marker);
-    }
-  }
-
-  destroy() {
-    this.clear();
-  }
-
-  private clear() {
-    for (const marker of this.activeMarkers) {
-      try {
-        marker.remove();
-      } catch {
-        // swallow removal errors
-      }
-    }
-    this.activeMarkers = [];
-  }
-}
-
-function safeLatLon(location?: { lon?: number; lat?: number }) {
-  if (typeof location?.lon !== "number" || typeof location?.lat !== "number") {
-    return null;
-  }
-  if (Number.isNaN(location.lon) || Number.isNaN(location.lat)) {
-    return null;
-  }
-  return { lon: location.lon, lat: location.lat };
 }
 
 function metersToPixels(meters: number, latitude: number, zoom: number) {

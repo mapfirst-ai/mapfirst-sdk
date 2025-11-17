@@ -1,3 +1,15 @@
+export {
+  MapLibreMarkerManager,
+  type MapLibreMarkerHandle,
+  type MapLibreNamespace,
+} from "./maplibre/markermanager";
+
+export {
+  GoogleMapsMarkerManager,
+  type GoogleMapsMarkerHandle,
+  type GoogleMapsNamespace,
+} from "./google/markermanager";
+
 /**
  * Abstract base class for map adapters supporting different map libraries
  */
