@@ -49,6 +49,24 @@ type Property = {
     country?: string;
 };
 
+type ClusterDisplayItem = {
+    kind: "primary";
+    marker: Property;
+    key: string;
+} | {
+    kind: "dot";
+    marker: Property;
+    key: string;
+    parentId: number;
+};
+type ViewStateSnapshot = {
+    longitude: number;
+    latitude: number;
+    zoom: number;
+    bearing: number;
+    pitch: number;
+};
+
 type MapLibreMarkerHandle = {
     setLngLat(lngLat: [number, number]): MapLibreMarkerHandle;
     addTo(map: any): MapLibreMarkerHandle;
@@ -169,16 +187,6 @@ type MapboxOptions = BaseMapFirstOptions & {
     onMarkerClick?: (marker: Property) => void;
 };
 type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOptions | MapboxOptions;
-type ClusterDisplayItem = {
-    kind: "primary";
-    marker: Property;
-    key: string;
-} | {
-    kind: "dot";
-    marker: Property;
-    key: string;
-    parentId: number;
-};
 declare class MapFirstCore {
     private readonly options;
     private readonly adapter;
@@ -206,12 +214,5 @@ declare class MapFirstCore {
     private attachMapboxListeners;
     private ensureAlive;
 }
-type ViewStateSnapshot = {
-    longitude: number;
-    latitude: number;
-    zoom: number;
-    bearing: number;
-    pitch: number;
-};
 
-export { type ClusterDisplayItem, type GoogleMapsMarkerHandle, type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type MapboxMarkerHandle, type MapboxNamespace, type Property, type PropertyType };
+export { type GoogleMapsMarkerHandle, type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type MapboxMarkerHandle, type MapboxNamespace, type Property, type PropertyType };

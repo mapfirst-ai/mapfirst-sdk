@@ -1,5 +1,6 @@
-import type { ClusterDisplayItem, Property } from ".";
+import type { Property } from ".";
 import "./markers.css";
+import { ClusterDisplayItem } from "./utils/clustering";
 
 export function createDotMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "dot" }>,

@@ -1,7 +1,7 @@
-import type { ClusterDisplayItem } from "../../index";
 import type { Property } from "../../types";
 import { createDotMarkerElement } from "../../dotmarket";
 import { createPrimaryMarkerElement } from "../../marker";
+import { ClusterDisplayItem } from "../../utils/clustering";
 
 export type MapLibreMarkerHandle = {
   setLngLat(lngLat: [number, number]): MapLibreMarkerHandle;
