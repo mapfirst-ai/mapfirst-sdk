@@ -5,6 +5,11 @@ declare abstract class MapAdapter {
     protected map: any;
     constructor(map: any);
     /**
+     * Get the underlying map instance
+     * @returns {any} The native map instance
+     */
+    getMap(): any;
+    /**
      * Get the current center coordinates of the map
      * @returns {{ lng: number; lat: number }} [longitude, latitude]
      */

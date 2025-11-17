@@ -1,5 +1,7 @@
 import type { MapAdapter } from "./adapters";
 import { MapLibreAdapter } from "./adapters/maplibre";
+import { createDotMarkerElement } from "./dotmarket";
+import { createPrimaryMarkerElement } from "./marker";
 import type { Property, PropertyType } from "./types";
 
 export type { Property, PropertyType } from "./types";
@@ -12,8 +14,10 @@ export type MapLibreMarkerHandle = {
 };
 
 export type MapLibreNamespace = {
-  Marker: new (options?: { element?: HTMLElement; anchor?: string }) =>
-    MapLibreMarkerHandle;
+  Marker: new (options?: {
+    element?: HTMLElement;
+    anchor?: string;
+  }) => MapLibreMarkerHandle;
 };
 
 type BaseMapFirstOptions = {
@@ -140,17 +144,14 @@ export class MapFirstCore {
     this.clusterItems = clusterMarkers({
       primaryType,
       markers: this.markers,
-      map: this.adapter,
+      map: this.adapter.getMap(),
       selectedMarkerId: this.selectedMarkerId,
       zoom: viewState?.zoom ?? 0,
       collisionThresholdPx: collisionPx,
       dotCollisionThresholdPx: dotPx,
     });
 
-    this.markerRenderer?.render(this.clusterItems, {
-      primaryType,
-      selectedMarkerId: this.selectedMarkerId,
-    });
+    this.markerRenderer?.render(this.clusterItems);
 
     this.options.onClusterUpdate?.(this.clusterItems, viewState);
   }
@@ -332,18 +333,8 @@ function clusterMarkers({
     return [];
   }
 
-  const threshold =
-    typeof collisionThresholdPx === "number" &&
-    Number.isFinite(collisionThresholdPx) &&
-    collisionThresholdPx > 0
-      ? collisionThresholdPx
-      : resolveCollisionThreshold(zoom);
-  const dotThreshold =
-    typeof dotCollisionThresholdPx === "number" &&
-    Number.isFinite(dotCollisionThresholdPx) &&
-    dotCollisionThresholdPx > 0
-      ? dotCollisionThresholdPx
-      : resolveDotCollisionThreshold(zoom, threshold);
+  const threshold = resolveCollisionThreshold(zoom);
+  const dotThreshold = resolveDotCollisionThreshold(zoom);
   const parent = projected.map((_, idx) => idx);
 
   const find = (i: number): number => {
@@ -455,12 +446,9 @@ function distancePx(a: ProjectedMarker, b: ProjectedMarker) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-function resolveDotCollisionThreshold(zoom: number, base?: number) {
-  const fallback =
-    typeof base === "number" && Number.isFinite(base) && base > 0
-      ? base
-      : resolveCollisionThreshold(zoom);
-  return Math.max(48, fallback);
+function resolveDotCollisionThreshold(zoom: number) {
+  const base = resolveCollisionThreshold(zoom);
+  return Math.max(48, base);
 }
 
 function compareMarkers(a: Property, b: Property, primaryType: PropertyType) {
@@ -498,21 +486,6 @@ function resolvePrice(marker: Property) {
   return Number.isNaN(numeric) ? -Infinity : numeric;
 }
 
-function metersToPixels(meters: number, latitude: number, zoom: number) {
-  const metersPerPixel =
-    (Math.cos((latitude * Math.PI) / 180) * 2 * Math.PI * 6378137) /
-    (256 * 2 ** zoom);
-  if (!Number.isFinite(metersPerPixel) || metersPerPixel <= 0) {
-    return meters;
-  }
-  return meters / metersPerPixel;
-}
-
-type MarkerRenderContext = {
-  primaryType: PropertyType;
-  selectedMarkerId: number | null;
-};
-
 type MapLibreMarkerManagerOptions = {
   mapInstance: any;
   maplibregl: MapLibreNamespace;
@@ -531,16 +504,26 @@ class MapLibreMarkerManager {
     this.onMarkerClick = options.onMarkerClick;
   }
 
-  render(items: ClusterDisplayItem[], context: MarkerRenderContext) {
+  render(items: ClusterDisplayItem[]) {
     this.clear();
     if (!this.MarkerCtor) {
       return;
     }
     for (const item of items) {
-      const handle = this.createMarker(item, context);
-      if (handle) {
-        this.activeMarkers.push(handle);
-      }
+      const coords = safeLatLon(item.marker.location);
+      if (!coords) continue;
+      const element =
+        item.kind === "primary"
+          ? createPrimaryMarkerElement(item, this.onMarkerClick)
+          : createDotMarkerElement(item, this.onMarkerClick);
+      if (!element) continue;
+      const marker = new this.MarkerCtor({
+        element,
+        anchor: item.kind === "primary" ? "bottom" : "center",
+      })
+        .setLngLat([coords.lon, coords.lat])
+        .addTo(this.mapInstance);
+      this.activeMarkers.push(marker);
     }
   }
 
@@ -553,168 +536,11 @@ class MapLibreMarkerManager {
       try {
         marker.remove();
       } catch {
-        // ignore marker removal failures
+        // swallow removal errors
       }
     }
     this.activeMarkers = [];
   }
-
-  private createMarker(
-    item: ClusterDisplayItem,
-    context: MarkerRenderContext
-  ): MapLibreMarkerHandle | null {
-    if (typeof document === "undefined" || !this.MarkerCtor) {
-      return null;
-    }
-    const coords = safeLatLon(item.marker.location);
-    if (!coords) {
-      return null;
-    }
-
-    const element =
-      item.kind === "primary"
-        ? createPrimaryMarkerElement(item, context, this.onMarkerClick)
-        : createDotMarkerElement(item, context, this.onMarkerClick);
-    if (!element) {
-      return null;
-    }
-
-    const marker = new this.MarkerCtor({
-      element,
-      anchor: item.kind === "primary" ? "bottom" : "center",
-    })
-      .setLngLat([coords.lon, coords.lat])
-      .addTo(this.mapInstance);
-    return marker;
-  }
-}
-
-function createPrimaryMarkerElement(
-  item: Extract<ClusterDisplayItem, { kind: "primary" }>,
-  context: MarkerRenderContext,
-  onMarkerClick?: (marker: Property) => void
-) {
-  if (typeof document === "undefined") {
-    return null;
-  }
-  const { background, text } = resolveMarkerColors(item.marker, context);
-  const root = document.createElement("div");
-  root.style.display = "flex";
-  root.style.flexDirection = "column";
-  root.style.alignItems = "center";
-  root.style.pointerEvents = "auto";
-
-  const pill = document.createElement("button");
-  pill.type = "button";
-  pill.style.background = background;
-  pill.style.color = text;
-  pill.style.border = "none";
-  pill.style.borderRadius = "999px";
-  pill.style.padding = "6px 12px";
-  pill.style.fontSize = "12px";
-  pill.style.fontWeight = "600";
-  pill.style.fontFamily = "system-ui, -apple-system, sans-serif";
-  pill.style.boxShadow = "0 15px 30px rgba(15, 23, 42, 0.45)";
-  pill.style.cursor = "pointer";
-  pill.style.display = "flex";
-  pill.style.flexDirection = "column";
-  pill.style.gap = "2px";
-  pill.style.minWidth = "140px";
-  pill.style.maxWidth = "220px";
-  pill.style.whiteSpace = "nowrap";
-  pill.style.overflow = "hidden";
-  pill.style.textOverflow = "ellipsis";
-  pill.title = item.marker.name ?? String(item.marker.tripadvisor_id);
-
-  const title = document.createElement("span");
-  title.textContent = item.marker.name ?? `#${item.marker.tripadvisor_id}`;
-  title.style.textAlign = "left";
-  pill.appendChild(title);
-
-  const subtitle = formatMarkerSubtitle(item.marker);
-  if (subtitle) {
-    const subtitleEl = document.createElement("span");
-    subtitleEl.textContent = subtitle;
-    subtitleEl.style.fontSize = "11px";
-    subtitleEl.style.fontWeight = "500";
-    subtitleEl.style.opacity = "0.85";
-    subtitleEl.style.textAlign = "left";
-    pill.appendChild(subtitleEl);
-  }
-
-  pill.addEventListener("click", (evt) => {
-    evt.stopPropagation();
-    onMarkerClick?.(item.marker);
-  });
-
-  const pointer = document.createElement("span");
-  pointer.style.width = "0";
-  pointer.style.height = "0";
-  pointer.style.borderLeft = "6px solid transparent";
-  pointer.style.borderRight = "6px solid transparent";
-  pointer.style.borderTop = `8px solid ${background}`;
-  pointer.style.marginTop = "4px";
-
-  root.appendChild(pill);
-  root.appendChild(pointer);
-  return root;
-}
-
-function createDotMarkerElement(
-  item: Extract<ClusterDisplayItem, { kind: "dot" }>,
-  context: MarkerRenderContext,
-  onMarkerClick?: (marker: Property) => void
-) {
-  if (typeof document === "undefined") {
-    return null;
-  }
-  const { background } = resolveMarkerColors(item.marker, context);
-  const button = document.createElement("button");
-  button.type = "button";
-  button.style.width = "14px";
-  button.style.height = "14px";
-  button.style.borderRadius = "999px";
-  button.style.border = "2px solid #ffffff";
-  button.style.background = background;
-  button.style.boxShadow = "0 6px 16px rgba(15, 23, 42, 0.4)";
-  button.style.cursor = "pointer";
-  button.title = item.marker.name ?? String(item.marker.tripadvisor_id);
-
-  button.addEventListener("click", (evt) => {
-    evt.stopPropagation();
-    onMarkerClick?.(item.marker);
-  });
-
-  return button;
-}
-
-const TYPE_COLORS: Record<PropertyType, string> = {
-  Accommodation: "#2563eb",
-  "Eat & Drink": "#db2777",
-  Attraction: "#0f766e",
-};
-
-function resolveMarkerColors(
-  marker: Property,
-  context: MarkerRenderContext
-) {
-  const base = TYPE_COLORS[marker.type] ?? "#475569";
-  if (context.selectedMarkerId === marker.tripadvisor_id) {
-    return { background: "#f97316", text: "#0f172a" };
-  }
-  if (context.primaryType && marker.type !== context.primaryType) {
-    return { background: "#1f2937", text: "#f8fafc" };
-  }
-  return { background: base, text: "#ffffff" };
-}
-
-function formatMarkerSubtitle(marker: Property) {
-  const price = marker.pricing?.offer?.displayPrice;
-  const rating = formatRatingLabel(marker);
-  if (price && rating) {
-    return `${rating} · ${price}`;
-  }
-  return price ?? rating ?? marker.city ?? marker.type;
 }
 
 function safeLatLon(location?: { lon?: number; lat?: number }) {
@@ -727,10 +553,12 @@ function safeLatLon(location?: { lon?: number; lat?: number }) {
   return { lon: location.lon, lat: location.lat };
 }
 
-function formatRatingLabel(marker: Property) {
-  const rating = resolveRating(marker);
-  if (!Number.isFinite(rating) || rating <= 0) {
-    return null;
+function metersToPixels(meters: number, latitude: number, zoom: number) {
+  const metersPerPixel =
+    (Math.cos((latitude * Math.PI) / 180) * 2 * Math.PI * 6378137) /
+    (256 * 2 ** zoom);
+  if (!Number.isFinite(metersPerPixel) || metersPerPixel <= 0) {
+    return meters;
   }
-  return `${rating.toFixed(1)}★`;
+  return meters / metersPerPixel;
 }
