@@ -65,6 +65,19 @@ type MapLibreNamespace = {
 type GoogleMapsMarkerHandle = any;
 type GoogleMapsNamespace = any;
 
+type MapboxMarkerHandle = {
+    setLngLat(lngLat: [number, number]): MapboxMarkerHandle;
+    addTo(map: any): MapboxMarkerHandle;
+    remove(): void;
+    getElement(): HTMLElement;
+};
+type MapboxNamespace = {
+    Marker: new (options?: {
+        element?: HTMLElement;
+        anchor?: string;
+    }) => MapboxMarkerHandle;
+};
+
 /**
  * Abstract base class for map adapters supporting different map libraries
  */
@@ -149,7 +162,13 @@ type GoogleMapsOptions = BaseMapFirstOptions & {
     google: GoogleMapsNamespace;
     onMarkerClick?: (marker: Property) => void;
 };
-type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOptions;
+type MapboxOptions = BaseMapFirstOptions & {
+    platform: "mapbox";
+    mapInstance: any;
+    mapboxgl: MapboxNamespace;
+    onMarkerClick?: (marker: Property) => void;
+};
+type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOptions | MapboxOptions;
 type ClusterDisplayItem = {
     kind: "primary";
     marker: Property;
@@ -184,6 +203,7 @@ declare class MapFirstCore {
     private resolveCollisionOverrides;
     private attachMapLibreListeners;
     private attachGoogleMapsListeners;
+    private attachMapboxListeners;
     private ensureAlive;
 }
 type ViewStateSnapshot = {
@@ -194,4 +214,4 @@ type ViewStateSnapshot = {
     pitch: number;
 };
 
-export { type ClusterDisplayItem, type GoogleMapsMarkerHandle, type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type Property, type PropertyType };
+export { type ClusterDisplayItem, type GoogleMapsMarkerHandle, type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type MapboxMarkerHandle, type MapboxNamespace, type Property, type PropertyType };

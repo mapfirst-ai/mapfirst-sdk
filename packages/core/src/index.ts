@@ -1,6 +1,7 @@
 import type { MapAdapter } from "./adapters";
 import { MapLibreAdapter } from "./adapters/maplibre";
 import { GoogleMapsAdapter } from "./adapters/google";
+import { MapboxAdapter } from "./adapters/mapbox";
 import type { Property, PropertyType } from "./types";
 import {
   MapLibreMarkerManager,
@@ -12,6 +13,11 @@ import {
   type GoogleMapsMarkerHandle,
   type GoogleMapsNamespace,
 } from "./adapters/google/markermanager";
+import {
+  MapboxMarkerManager,
+  type MapboxMarkerHandle,
+  type MapboxNamespace,
+} from "./adapters/mapbox/markermanager";
 
 export type { Property, PropertyType } from "./types";
 
@@ -24,6 +30,11 @@ export type {
   GoogleMapsMarkerHandle,
   GoogleMapsNamespace,
 } from "./adapters/google/markermanager";
+
+export type {
+  MapboxMarkerHandle,
+  MapboxNamespace,
+} from "./adapters/mapbox/markermanager";
 
 type BaseMapFirstOptions = {
   markers?: Property[];
@@ -56,10 +67,18 @@ type GoogleMapsOptions = BaseMapFirstOptions & {
   onMarkerClick?: (marker: Property) => void;
 };
 
+type MapboxOptions = BaseMapFirstOptions & {
+  platform: "mapbox";
+  mapInstance: any;
+  mapboxgl: MapboxNamespace;
+  onMarkerClick?: (marker: Property) => void;
+};
+
 export type MapFirstOptions =
   | AdapterDrivenOptions
   | MapLibreOptions
-  | GoogleMapsOptions;
+  | GoogleMapsOptions
+  | MapboxOptions;
 
 const DEFAULT_PRIMARY_TYPE: PropertyType = "Accommodation";
 
@@ -81,7 +100,8 @@ export class MapFirstCore {
   private readonly cleanupFns: Array<() => void> = [];
   private readonly markerRenderer?:
     | MapLibreMarkerManager
-    | GoogleMapsMarkerManager;
+    | GoogleMapsMarkerManager
+    | MapboxMarkerManager;
   private markers: Property[] = [];
   private primaryType?: PropertyType;
   private selectedMarkerId: number | null = null;
@@ -121,6 +141,20 @@ export class MapFirstCore {
         },
       });
       this.attachGoogleMapsListeners(options.mapInstance);
+    } else if (isMapboxOptions(options)) {
+      const shouldAutoSelect = options.autoSelectOnClick ?? true;
+      this.adapter = new MapboxAdapter(options.mapInstance);
+      this.markerRenderer = new MapboxMarkerManager({
+        mapInstance: options.mapInstance,
+        mapboxgl: options.mapboxgl,
+        onMarkerClick: (marker) => {
+          if (shouldAutoSelect) {
+            this.setSelectedMarker(marker.tripadvisor_id);
+          }
+          options.onMarkerClick?.(marker);
+        },
+      });
+      this.attachMapboxListeners(options.mapInstance);
     } else {
       this.adapter = options.adapter;
     }
@@ -285,6 +319,22 @@ export class MapFirstCore {
     });
   }
 
+  private attachMapboxListeners(mapInstance: any) {
+    if (!mapInstance || typeof mapInstance.on !== "function") {
+      return;
+    }
+    const rerender = () => this.refresh();
+    const events = ["move", "zoom", "dragend", "pitch", "rotate"];
+    events.forEach((eventName) => {
+      mapInstance.on(eventName, rerender);
+      this.cleanupFns.push(() => {
+        if (typeof mapInstance.off === "function") {
+          mapInstance.off(eventName, rerender);
+        }
+      });
+    });
+  }
+
   private ensureAlive() {
     if (this.destroyed) {
       throw new Error("MapFirstCore instance has been destroyed");
@@ -327,6 +377,10 @@ function isGoogleMapsOptions(
   options: MapFirstOptions
 ): options is GoogleMapsOptions {
   return (options as GoogleMapsOptions).platform === "google";
+}
+
+function isMapboxOptions(options: MapFirstOptions): options is MapboxOptions {
+  return (options as MapboxOptions).platform === "mapbox";
 }
 
 function extractViewState(mapInstance: MapAdapter): ViewStateSnapshot {

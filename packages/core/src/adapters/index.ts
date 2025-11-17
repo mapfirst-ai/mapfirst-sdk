@@ -10,6 +10,12 @@ export {
   type GoogleMapsNamespace,
 } from "./google/markermanager";
 
+export {
+  MapboxMarkerManager,
+  type MapboxMarkerHandle,
+  type MapboxNamespace,
+} from "./mapbox/markermanager";
+
 /**
  * Abstract base class for map adapters supporting different map libraries
  */
