@@ -5,6 +5,6 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean"
+    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean --inject-style"
   }
 }

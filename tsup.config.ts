@@ -9,4 +9,8 @@ export default defineConfig({
   globalName: "MyUniversalLib", // window.MyUniversalLib in browsers
   minify: true,
   target: "es2019",
+  loader: {
+    ".css": "css",
+  },
+  injectStyle: true,
 });

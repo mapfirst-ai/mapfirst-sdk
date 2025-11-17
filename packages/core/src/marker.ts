@@ -1,4 +1,5 @@
 import type { ClusterDisplayItem, Property } from ".";
+import "./markers.css";
 
 const AWARD_SVG = `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 3.953a7.442 7.442 0 1 0 .001 14.884A7.442 7.442 0 0 0 12 3.953m0 14.05a6.61 6.61 0 1 1 0-13.218 6.61 6.61 0 0 1 0 13.219M10.343 11.9a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.821 0m5.134 0a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.82 0m.82-1.897.84-.913h-1.863A5.8 5.8 0 0 0 12 8.08a5.77 5.77 0 0 0-3.27 1.008H6.862l.84.913a2.567 2.567 0 1 0 3.475 3.78l.823.896.823-.895a2.568 2.568 0 1 0 3.474-3.78m-6.865 3.634a1.738 1.738 0 1 1 0-3.476 1.738 1.738 0 0 1 0 3.476M12 11.85c0-1.143-.832-2.124-1.929-2.543A5 5 0 0 1 12 8.92a5 5 0 0 1 1.928.386c-1.096.42-1.927 1.4-1.927 2.543m2.566 1.787a1.738 1.738 0 1 1 .001-3.476 1.738 1.738 0 0 1 0 3.476m-8.456 3.719s-.377-.946-1.396-1.903c-1.02-.957-2.303-1.132-2.303-1.132s.457 1.02 1.54 2.04c1.086 1.017 2.159.995 2.159.995m2.568 1.41s-.524-.511-1.479-.883-1.861-.191-1.861-.191.598.54 1.615.935c1.016.397 1.725.139 1.725.139m2.493.505s-.545-.224-1.357-.196-1.415.47-1.415.47.608.222 1.473.193 1.3-.467 1.3-.467m-6.186-4.203s-.175-1.008-.974-2.154c-.8-1.147-2.015-1.578-2.015-1.578s.238 1.098 1.089 2.319c.85 1.22 1.9 1.413 1.9 1.413m-1.003-3.071s.195-1.021-.134-2.393c-.328-1.371-1.294-2.21-1.294-2.21s-.17 1.128.18 2.589c.35 1.46 1.248 2.014 1.248 2.014"></path><path d="M17.887 17.355s.377-.946 1.396-1.903c1.02-.957 2.303-1.132 2.303-1.132s-.457 1.02-1.54 2.04c-1.086 1.017-2.159.995-2.159.995m-2.567 1.41s.524-.511 1.479-.883 1.861-.191 1.861-.191-.598.54-1.615.935c-1.016.397-1.725.139-1.725.139m-2.493.505s.545-.224 1.357-.196 1.415.47 1.415.47-.608.222-1.473.193-1.3-.467-1.3-.467m6.186-4.203s.175-1.008.974-2.154c.8-1.147 2.015-1.578 2.015-1.578s-.238 1.098-1.089 2.319c-.85 1.22-1.9 1.413-1.9 1.413m1.003-3.071s-.195-1.021.133-2.393c.33-1.371 1.293-2.21 1.293-2.21s.17 1.128-.18 2.589c-.349 1.46-1.246 2.014-1.246 2.014M12 20.047a.413.413 0 1 0 0-.827.413.413 0 0 0 0 .827"></path></svg>`;
 
@@ -31,84 +32,33 @@ export function createPrimaryMarkerElement(
   })();
 
   const root = document.createElement("div");
-  root.style.display = "flex";
-  root.style.zIndex = "20";
-  root.style.flexDirection = "column";
-  root.style.alignItems = "center";
-  root.style.pointerEvents = "auto";
+  root.className = "mapfirst-marker-root";
 
   const pill = document.createElement("button");
   pill.type = "button";
-  pill.style.border = "2px solid";
-  pill.style.borderRadius = "999px";
-  pill.style.padding = "8px 8px";
-  pill.style.fontSize = "16px";
-  pill.style.fontWeight = "600";
-  pill.style.fontFamily = "system-ui, -apple-system, sans-serif";
-  pill.style.boxShadow = "0 4px 6px rgba(107, 114, 128, 0.5)";
-  pill.style.display = "flex";
-  pill.style.alignItems = "center";
-  pill.style.justifyContent = "center";
-  pill.style.position = "relative";
-  pill.style.transition = "transform 0.2s";
-  pill.style.transformOrigin = "center bottom";
+  pill.className = isPending
+    ? "mapfirst-marker-pill mapfirst-marker-pill-pending"
+    : "mapfirst-marker-pill mapfirst-marker-pill-active";
   pill.title = marker.name ?? String(marker.tripadvisor_id);
-
-  if (isPending) {
-    pill.style.background = "rgba(255, 255, 255, 0.5)";
-    pill.style.backdropFilter = "blur(4px)";
-    pill.style.borderColor = "transparent";
-    pill.style.cursor = "default";
-  } else {
-    pill.style.background = "#012b11";
-    pill.style.borderColor = "#ffffff";
-    pill.style.color = "#ffffff";
-    pill.style.cursor = "pointer";
-  }
-
-  pill.addEventListener("mouseenter", () => {
-    if (!isPending) {
-      pill.style.transform = "scale(1.2)";
-    }
-  });
-
-  pill.addEventListener("mouseleave", () => {
-    pill.style.transform = "scale(1)";
-  });
 
   // Awards or Rating badge
   if (!isPending && (marker.awards?.length || ratingLabel)) {
     const badge = document.createElement("div");
-    badge.style.position = "absolute";
-    badge.style.top = "-12px";
-    badge.style.right = "-20px";
+    badge.className = "mapfirst-marker-badge";
 
     if (marker.awards?.length && marker.awards[0].type) {
       const awardContainer = document.createElement("div");
-      awardContainer.style.position = "relative";
-      awardContainer.style.width = "32px";
-      awardContainer.style.height = "32px";
+      awardContainer.className = "mapfirst-marker-award-container";
 
       const backLayer = document.createElement("div");
-      backLayer.style.position = "absolute";
-      backLayer.style.stroke = "#f5f5f5";
-      backLayer.style.strokeWidth = "2px";
+      backLayer.className = "mapfirst-marker-award-back";
       backLayer.innerHTML = AWARD_BACK_SVG;
 
       const colorDot = document.createElement("div");
-      colorDot.style.position = "absolute";
-      colorDot.style.top = "6.2px";
-      colorDot.style.left = "6.3px";
-      colorDot.style.width = "18.5px";
-      colorDot.style.height = "18.5px";
-      colorDot.style.borderRadius = "50%";
-      colorDot.style.background =
-        marker.awards[0].type === "1" ? "#00AA6C" : "#FFC107";
-      colorDot.style.zIndex = "1";
+      colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${marker.awards[0].type}`;
 
       const frontLayer = document.createElement("div");
-      frontLayer.style.position = "relative";
-      frontLayer.style.zIndex = "2";
+      frontLayer.className = "mapfirst-marker-award-front";
       frontLayer.innerHTML = AWARD_SVG;
 
       awardContainer.appendChild(backLayer);
@@ -116,18 +66,7 @@ export function createPrimaryMarkerElement(
       awardContainer.appendChild(frontLayer);
       badge.appendChild(awardContainer);
     } else if (ratingLabel) {
-      badge.style.display = "flex";
-      badge.style.alignItems = "center";
-      badge.style.justifyContent = "center";
-      badge.style.borderRadius = "999px";
-      badge.style.background = "#00AA6C";
-      badge.style.color = "#ffffff";
-      badge.style.fontSize = "12px";
-      badge.style.lineHeight = "1";
-      badge.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.2)";
-      badge.style.padding = "2px 6px";
-      badge.style.border = "2px solid #ffffff";
-      badge.style.fontWeight = "400";
+      badge.className = "mapfirst-marker-badge mapfirst-marker-rating-badge";
       badge.textContent = ratingLabel;
     }
 
@@ -136,16 +75,13 @@ export function createPrimaryMarkerElement(
 
   // Content
   const content = document.createElement("span");
+  content.className = "mapfirst-marker-content";
   if (isAccommodation) {
     content.textContent = marker.pricing?.offer?.displayPrice ?? "—";
   } else if (marker.type === "Eat & Drink") {
     content.innerHTML = EAT_DRINK_SVG;
-    content.style.display = "flex";
-    content.style.alignItems = "center";
   } else if (marker.type === "Attraction") {
     content.innerHTML = ATTRACTION_SVG;
-    content.style.display = "flex";
-    content.style.alignItems = "center";
   }
   pill.appendChild(content);
 

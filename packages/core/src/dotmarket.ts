@@ -1,4 +1,5 @@
 import type { ClusterDisplayItem, Property } from ".";
+import "./markers.css";
 
 export function createDotMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "dot" }>,
@@ -15,52 +16,14 @@ export function createDotMarkerElement(
 
   // Create container div to match primary marker structure
   const container = document.createElement("div");
-  container.style.display = "flex";
-  container.style.zIndex = "10";
-  container.style.alignItems = "center";
-  container.style.justifyContent = "center";
-  container.style.pointerEvents = "auto";
+  container.className = "mapfirst-dot-marker-container";
 
   const button = document.createElement("button");
   button.type = "button";
-  button.style.width = "20px";
-  button.style.height = "20px";
-  button.style.borderRadius = "999px";
-  button.style.border = "2px solid #ffffff";
-  button.style.boxShadow = "0 2px 4px rgba(107, 114, 128, 0.4)";
-  button.style.transition = "transform 0.2s";
-  button.style.outline = "none";
-  button.style.transformOrigin = "center center";
+  button.className = isPending
+    ? "mapfirst-dot-marker-button mapfirst-dot-marker-button-pending"
+    : "mapfirst-dot-marker-button mapfirst-dot-marker-button-active";
   button.title = marker.name ?? String(marker.tripadvisor_id);
-
-  if (isPending) {
-    button.style.background = "#d1d5db"; // gray-300
-    button.style.cursor = "default";
-  } else {
-    button.style.background = "#012b11";
-    button.style.cursor = "pointer";
-  }
-
-  button.addEventListener("mouseenter", () => {
-    if (!isPending) {
-      button.style.transform = "scale(1.2)";
-    }
-  });
-
-  button.addEventListener("mouseleave", () => {
-    button.style.transform = "scale(1)";
-  });
-
-  button.addEventListener("focus", () => {
-    if (!isPending) {
-      button.style.outline = "2px solid #ffffff";
-      button.style.outlineOffset = "2px";
-    }
-  });
-
-  button.addEventListener("blur", () => {
-    button.style.outline = "none";
-  });
 
   button.addEventListener("click", (evt) => {
     evt.stopPropagation();
