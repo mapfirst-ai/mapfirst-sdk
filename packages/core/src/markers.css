@@ -70,16 +70,17 @@
 }
 
 .mapfirst-marker-award-dot-type-0 {
-  background: #ffc107;
+  background: #ffef0e;
 }
 
 .mapfirst-marker-award-dot-type-1 {
-  background: #00aa6c;
+  background: #01ea5b;
 }
 
 .mapfirst-marker-award-front {
   position: relative;
   z-index: 2;
+  color: #012b11;
 }
 
 .mapfirst-marker-rating-badge {
@@ -87,7 +88,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: #00aa6c;
+  background: #03852e;
   color: #ffffff;
   font-size: 12px;
   line-height: 1;
