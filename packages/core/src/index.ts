@@ -198,16 +198,12 @@ export class MapFirstCore {
     const viewState = this.safeExtractViewState();
     const primaryType = this.resolvePrimaryType();
 
-    const { collisionPx, dotPx } = this.resolveCollisionOverrides(viewState);
-
     this.clusterItems = clusterMarkers({
       primaryType,
       markers: this.markers,
       map: this.adapter,
       selectedMarkerId: this.selectedMarkerId,
       zoom: viewState?.zoom ?? 0,
-      collisionThresholdPx: collisionPx,
-      dotCollisionThresholdPx: dotPx,
     });
 
     this.markerRenderer?.render(this.clusterItems);
@@ -247,27 +243,6 @@ export class MapFirstCore {
     } catch {
       return null;
     }
-  }
-
-  private resolveCollisionOverrides(viewState: ViewStateSnapshot | null) {
-    if (!viewState) {
-      return { collisionPx: undefined, dotPx: undefined };
-    }
-    const radiusMeters = this.options.clusterRadiusMeters;
-    if (!radiusMeters || !Number.isFinite(radiusMeters) || radiusMeters <= 0) {
-      return { collisionPx: undefined, dotPx: undefined };
-    }
-    const collisionPx = metersToPixels(
-      radiusMeters,
-      viewState.latitude,
-      viewState.zoom
-    );
-    if (!Number.isFinite(collisionPx) || collisionPx <= 0) {
-      return { collisionPx: undefined, dotPx: undefined };
-    }
-    const normalized = Math.max(32, Math.round(collisionPx));
-    const dotPx = Math.max(48, normalized);
-    return { collisionPx: normalized, dotPx };
   }
 
   private attachMapLibreListeners(mapInstance: any) {

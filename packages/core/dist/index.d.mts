@@ -208,7 +208,6 @@ declare class MapFirstCore {
     destroy(): void;
     private resolvePrimaryType;
     private safeExtractViewState;
-    private resolveCollisionOverrides;
     private attachMapLibreListeners;
     private attachGoogleMapsListeners;
     private attachMapboxListeners;
