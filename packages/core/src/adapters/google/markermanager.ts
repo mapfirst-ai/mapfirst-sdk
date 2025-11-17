@@ -33,7 +33,8 @@ export class GoogleMapsMarkerManager {
   }
 
   render(items: ClusterDisplayItem[]) {
-    if (!this.google?.maps?.marker?.AdvancedMarkerElement) {
+    if (!this.google?.marker?.AdvancedMarkerElement) {
+      console.warn("AdvancedMarkerElement not available");
       return;
     }
 
@@ -45,8 +46,8 @@ export class GoogleMapsMarkerManager {
       if (!newKeys.has(key)) {
         try {
           entry.marker.map = null;
-        } catch {
-          // swallow removal errors
+        } catch (error) {
+          console.error("Error removing marker", error);
         }
         this.markerCache.delete(key);
       }
@@ -62,16 +63,13 @@ export class GoogleMapsMarkerManager {
       if (existing) {
         // Update existing marker position if needed
         try {
-          existing.marker.position = new this.google.maps.LatLng(
-            coords.lat,
-            coords.lon
-          );
+          existing.marker.position = { lat: coords.lat, lng: coords.lon };
         } catch {
           // If update fails, remove and recreate
           try {
             existing.marker.map = null;
-          } catch {
-            // swallow
+          } catch (error) {
+            console.error("Error removing marker", error);
           }
           this.markerCache.delete(item.key);
           this.createAndAddMarker(item, coords);
@@ -87,8 +85,8 @@ export class GoogleMapsMarkerManager {
     for (const entry of this.markerCache.values()) {
       try {
         entry.marker.map = null;
-      } catch {
-        // swallow removal errors
+      } catch (error) {
+        console.error("Error removing marker", error);
       }
     }
     this.markerCache.clear();
@@ -98,7 +96,7 @@ export class GoogleMapsMarkerManager {
     item: ClusterDisplayItem,
     coords: { lon: number; lat: number }
   ) {
-    if (!this.google?.maps?.marker?.AdvancedMarkerElement) return;
+    if (!this.google?.marker?.AdvancedMarkerElement) return;
 
     const element =
       item.kind === "primary"
@@ -108,7 +106,7 @@ export class GoogleMapsMarkerManager {
     if (!element) return;
 
     try {
-      const marker = new this.google.maps.marker.AdvancedMarkerElement({
+      const marker = new this.google.marker.AdvancedMarkerElement({
         map: this.mapInstance,
         position: { lat: coords.lat, lng: coords.lon },
         content: element,
@@ -120,8 +118,8 @@ export class GoogleMapsMarkerManager {
         kind: item.kind,
         parentId: item.kind === "dot" ? item.parentId : undefined,
       });
-    } catch {
-      // swallow marker creation errors
+    } catch (error) {
+      console.error("Error creating marker", error);
     }
   }
 }
