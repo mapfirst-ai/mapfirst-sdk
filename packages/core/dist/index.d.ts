@@ -227,11 +227,26 @@ interface MapStateCallbacks {
     onActiveLocationChange?: (location: ActiveLocation) => void;
     onLoadingStateChange?: (loading: boolean) => void;
     onSearchingStateChange?: (searching: boolean) => void;
+    onPropertiesLoadError?: (error: unknown) => void;
 }
 type MapStateUpdate = Partial<MapState>;
 
+type Environment = "prod" | "test";
+declare class PropertiesFetchError extends Error {
+    status: number;
+    code?: string;
+    constructor({ message, status, code, }: {
+        message: string;
+        status: number;
+        code?: string;
+    });
+}
+type FetchPropertiesOptions = {
+    signal?: AbortSignal;
+};
+declare function fetchProperties<TBody = any, TResponse = any>(url: string, body: TBody, { signal }?: FetchPropertiesOptions): Promise<TResponse>;
 type BaseMapFirstOptions = {
-    markers?: Property[];
+    properties?: Property[];
     primaryType?: PropertyType;
     selectedMarkerId?: number | null;
     clusterRadiusMeters?: number;
@@ -239,6 +254,9 @@ type BaseMapFirstOptions = {
     onClusterUpdate?: (clusters: ClusterDisplayItem[], viewState: ViewStateSnapshot | null) => void;
     state?: Partial<MapState>;
     callbacks?: MapStateCallbacks;
+    environment?: Environment;
+    mfid?: string;
+    requestBody?: any;
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
     adapter: MapAdapter;
@@ -266,14 +284,19 @@ type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOption
 declare class MapFirstCore {
     private readonly options;
     private readonly adapter;
-    private markers;
+    private properties;
     private primaryType?;
     private selectedMarkerId;
     private destroyed;
     private clusterItems;
     private state;
     private callbacks;
+    private readonly environment;
+    private readonly apiUrl;
+    private readonly mfid?;
+    private readonly requestBody?;
     constructor(options: MapFirstOptions);
+    private autoLoadProperties;
     private createAdapter;
     private initializeAdapter;
     setMarkers(markers: Property[]): void;
@@ -292,6 +315,12 @@ declare class MapFirstCore {
     setLoading(loading: boolean): void;
     setSearching(searching: boolean): void;
     setFlyToAnimating(animating: boolean): void;
+    getFilters(): any;
+    loadProperties({ fetchFn, onSuccess, onError, }: {
+        fetchFn: () => Promise<Property[]>;
+        onSuccess?: (properties: Property[]) => void;
+        onError?: (error: unknown) => void;
+    }): Promise<void>;
     getClusters(): ClusterDisplayItem[];
     refresh(): void;
     destroy(): void;
@@ -300,4 +329,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type FilterState, type GoogleMapsNamespace, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Property, type PropertyType, type ViewState };
+export { type ActiveLocation, type Environment, type FilterState, type GoogleMapsNamespace, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };

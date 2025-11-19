@@ -41,8 +41,82 @@ export type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 
 export type { MapboxNamespace } from "./adapters/mapbox/markermanager";
 
+// Environment configuration
+export type Environment = "prod" | "test";
+
+const API_URLS: Record<Environment, string> = {
+  prod: "https://api.mapfirst.ai",
+  test: "https://ta-backend-test-290791666935.us-central1.run.app",
+};
+
+// Properties fetch error class
+export class PropertiesFetchError extends Error {
+  status: number;
+  code?: string;
+
+  constructor({
+    message,
+    status,
+    code,
+  }: {
+    message: string;
+    status: number;
+    code?: string;
+  }) {
+    super(message);
+    this.name = "PropertiesFetchError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
+type PropertiesErrorResponse = {
+  error?: string;
+  detail?: string;
+  code?: string;
+};
+
+type FetchPropertiesOptions = {
+  signal?: AbortSignal;
+};
+
+// Fetch properties from API
+export async function fetchProperties<TBody = any, TResponse = any>(
+  url: string,
+  body: TBody,
+  { signal }: FetchPropertiesOptions = {}
+): Promise<TResponse> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+
+  if (!response.ok) {
+    let message = `Unexpected response: ${response.status}`;
+    let code: string | undefined;
+    try {
+      const errorBody = (await response.json()) as PropertiesErrorResponse;
+      message = errorBody.detail ?? errorBody.error ?? message;
+      code = errorBody.code;
+    } catch {
+      // ignore JSON parsing errors and fall back to status-based message
+    }
+    throw new PropertiesFetchError({ message, status: response.status, code });
+  }
+
+  return (await response.json()) as TResponse;
+}
+
+// Helper function to convert Date to ISO date string (YYYY-MM-DD)
+function toISO(date: Date | string): string {
+  if (typeof date === "string") return date;
+  return date.toISOString().slice(0, 10);
+}
+
 type BaseMapFirstOptions = {
-  markers?: Property[];
+  properties?: Property[];
   primaryType?: PropertyType;
   selectedMarkerId?: number | null;
   clusterRadiusMeters?: number;
@@ -54,6 +128,10 @@ type BaseMapFirstOptions = {
   // State management options
   state?: Partial<MapState>;
   callbacks?: MapStateCallbacks;
+  // API configuration
+  environment?: Environment;
+  mfid?: string;
+  requestBody?: any;
 };
 
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -90,9 +168,21 @@ export type MapFirstOptions =
 
 const DEFAULT_PRIMARY_TYPE: PropertyType = "Accommodation";
 
+// Helper function to calculate default check-in/check-out dates
+function getDefaultDates(): { checkIn: Date; checkOut: Date } {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const base = new Date(Date.now() + 10 * dayMs);
+  const daysUntilSaturday = (6 - base.getDay() + 7) % 7;
+  const checkIn = new Date(base.getTime() + daysUntilSaturday * dayMs);
+  const startDay = checkIn.getDay();
+  const daysUntilWeekend = startDay === 0 ? 6 : 6 - startDay;
+  const checkOut = new Date(checkIn.getTime() + (daysUntilWeekend + 1) * dayMs);
+  return { checkIn, checkOut };
+}
+
 export class MapFirstCore {
   private readonly adapter: MapAdapter;
-  private markers: Property[] = [];
+  private properties: Property[] = [];
   private primaryType?: PropertyType;
   private selectedMarkerId: number | null = null;
   private destroyed = false;
@@ -102,10 +192,25 @@ export class MapFirstCore {
   private state: MapState;
   private callbacks: MapStateCallbacks;
 
+  // API configuration
+  private readonly environment: Environment;
+  private readonly apiUrl: string;
+  private readonly mfid?: string;
+  private readonly requestBody?: any;
+
   constructor(private readonly options: MapFirstOptions) {
-    this.markers = [...(options.markers ?? [])];
+    this.properties = [...(options.properties ?? [])];
     this.primaryType = options.primaryType;
     this.selectedMarkerId = options.selectedMarkerId ?? null;
+
+    // Initialize API configuration
+    this.environment = options.environment ?? "prod";
+    this.apiUrl = API_URLS[this.environment];
+    this.mfid = options.mfid ?? "default";
+    this.requestBody = options.requestBody;
+
+    // Initialize default dates
+    const defaultDates = getDefaultDates();
 
     // Initialize state
     this.state = {
@@ -114,13 +219,18 @@ export class MapFirstCore {
       bounds: null,
       pendingBounds: null,
       tempBounds: null,
-      properties: this.markers,
+      properties: this.properties,
       primary: this.primaryType ?? DEFAULT_PRIMARY_TYPE,
       selectedPropertyId: this.selectedMarkerId,
       initialLoading: true,
       isSearching: false,
       firstCallDone: false,
-      filters: {},
+      filters: {
+        checkIn: defaultDates.checkIn,
+        checkOut: defaultDates.checkOut,
+        numAdults: 2,
+        numRooms: 1,
+      },
       activeLocation: {
         country: "",
         location_id: null,
@@ -135,6 +245,36 @@ export class MapFirstCore {
 
     this.adapter = this.createAdapter(options);
     this.refresh();
+
+    // Auto-load properties if requestBody is provided
+    if (this.requestBody) {
+      this.autoLoadProperties();
+    }
+  }
+
+  private async autoLoadProperties(): Promise<void> {
+    if (!this.requestBody) return;
+
+    // Default request body structure based on InitialDataLoader.tsx
+    const defaultRequestBody = {
+      filters: this.getFilters(),
+      initial: true,
+      ...this.requestBody,
+    };
+
+    await this.loadProperties({
+      fetchFn: async () => {
+        const response = await fetchProperties<any, any>(
+          `${this.apiUrl}/${this.mfid}/hotels`,
+          defaultRequestBody
+        );
+        return response.properties || [];
+      },
+      onError: (error) => {
+        console.error("Failed to load properties:", error);
+        this.callbacks.onPropertiesLoadError?.(error);
+      },
+    });
   }
 
   private createAdapter(options: MapFirstOptions): MapAdapter {
@@ -176,7 +316,7 @@ export class MapFirstCore {
 
   setMarkers(markers: Property[]) {
     this.ensureAlive();
-    this.markers = [...markers];
+    this.properties = [...markers];
     this.updateState({ properties: markers });
     this.callbacks.onPropertiesChange?.(markers);
     this.refresh();
@@ -184,15 +324,15 @@ export class MapFirstCore {
 
   addMarker(marker: Property) {
     this.ensureAlive();
-    this.markers = [...this.markers, marker];
-    this.updateState({ properties: this.markers });
-    this.callbacks.onPropertiesChange?.(this.markers);
+    this.properties = [...this.properties, marker];
+    this.updateState({ properties: this.properties });
+    this.callbacks.onPropertiesChange?.(this.properties);
     this.refresh();
   }
 
   clearMarkers() {
     this.ensureAlive();
-    this.markers = [];
+    this.properties = [];
     this.updateState({ properties: [] });
     this.callbacks.onPropertiesChange?.([]);
     this.refresh();
@@ -297,6 +437,66 @@ export class MapFirstCore {
     this.setState({ isFlyToAnimating: animating });
   }
 
+  getFilters(): any {
+    const filters = { ...this.state.filters };
+    // Convert Date objects to ISO strings for API compatibility
+    if (filters.checkIn instanceof Date) {
+      filters.checkIn = toISO(filters.checkIn);
+    }
+    if (filters.checkOut instanceof Date) {
+      filters.checkOut = toISO(filters.checkOut);
+    }
+    return filters;
+  }
+
+  async loadProperties({
+    fetchFn,
+    onSuccess,
+    onError,
+  }: {
+    fetchFn: () => Promise<Property[]>;
+    onSuccess?: (properties: Property[]) => void;
+    onError?: (error: unknown) => void;
+  }): Promise<void> {
+    this.ensureAlive();
+    this.setLoading(true);
+    this.setSearching(true);
+    this.clearMarkers();
+
+    try {
+      const properties = await fetchFn();
+
+      // Apply properties to map
+      this.setMarkers(properties);
+
+      // Determine primary type from properties if not set
+      if (!this.primaryType && properties.length > 0) {
+        const typeCounts = properties.reduce((counts, property) => {
+          counts[property.type] = (counts[property.type] || 0) + 1;
+          return counts;
+        }, {} as Record<PropertyType, number>);
+
+        const mostCommonType = Object.entries(typeCounts).reduce((a, b) =>
+          typeCounts[a[0] as PropertyType] > typeCounts[b[0] as PropertyType]
+            ? a
+            : b
+        )[0] as PropertyType;
+
+        this.setPrimaryType(mostCommonType);
+      }
+
+      this.setState({ firstCallDone: true });
+      onSuccess?.(properties);
+    } catch (error) {
+      this.clearMarkers();
+      onError?.(error);
+    } finally {
+      this.setSearching(false);
+      this.setLoading(false);
+      this.setState({ firstCallDone: true });
+    }
+  }
+
   getClusters(): ClusterDisplayItem[] {
     this.ensureAlive();
     return [...this.clusterItems];
@@ -309,7 +509,7 @@ export class MapFirstCore {
 
     this.clusterItems = clusterMarkers({
       primaryType,
-      markers: this.markers,
+      markers: this.properties,
       map: this.adapter,
       selectedMarkerId: this.selectedMarkerId,
       zoom: viewState?.zoom ?? 0,
@@ -331,14 +531,14 @@ export class MapFirstCore {
     this.adapter.cleanup();
 
     this.clusterItems = [];
-    this.markers = [];
+    this.properties = [];
     this.destroyed = true;
   }
 
   private resolvePrimaryType(): PropertyType {
     return (
       this.primaryType ??
-      this.markers.find((marker) => marker.type)?.type ??
+      this.properties.find((marker) => marker.type)?.type ??
       DEFAULT_PRIMARY_TYPE
     );
   }
