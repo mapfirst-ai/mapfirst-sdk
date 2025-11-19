@@ -369,6 +369,10 @@ export class MapFirstCore {
     adapter.initialize({
       ...config,
       onMarkerClick: (marker: Property) => {
+        if (marker.location) {
+          this.flyMapTo(marker.location.lon, marker.location.lat, 14);
+        }
+
         // Change primary type if clicking a secondary marker
         if (marker.type !== this.primaryType) {
           this.setPrimaryType(marker.type);
@@ -543,6 +547,16 @@ export class MapFirstCore {
     const mapInstance = this.adapter.getMap();
     if (!mapInstance) return;
 
+    if (this.options.platform === "google") {
+      this.setFlyToAnimating(false);
+      mapInstance.setCenter({ lat: latitude, lng: longitude });
+      if (zoom !== null && typeof zoom === "number") {
+        mapInstance.setZoom(zoom ?? 13);
+      }
+      return;
+    }
+
+    // MapLibre/Mapbox
     if (animation === false) {
       this.setFlyToAnimating(false);
       if (mapInstance.jumpTo) {
@@ -588,15 +602,10 @@ export class MapFirstCore {
     if (!points || points.length === 0) return;
 
     // Check if this is Google Maps
-    const isGoogleMaps =
-      !!(window as any).google?.maps &&
-      mapInstance.setCenter &&
-      mapInstance.setZoom &&
-      !mapInstance.flyTo;
 
     if (points.length === 1) {
       const poi = points[0];
-      if (isGoogleMaps) {
+      if (this.options.platform === "google") {
         mapInstance.setCenter({ lat: poi.lat, lng: poi.lng });
         mapInstance.setZoom(13);
       } else if (mapInstance.flyTo) {
@@ -606,7 +615,7 @@ export class MapFirstCore {
         });
       }
     } else {
-      if (isGoogleMaps) {
+      if (this.options.platform === "google") {
         // Google Maps
         const LatLngBounds = (window as any).google?.maps?.LatLngBounds;
         if (LatLngBounds) {
