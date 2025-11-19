@@ -73,6 +73,9 @@ export interface MapStateCallbacks {
   onLoadingStateChange?: (loading: boolean) => void;
   onSearchingStateChange?: (searching: boolean) => void;
   onPropertiesLoadError?: (error: unknown) => void;
+
+  // Error callback
+  onError?: (error: Error | string, context?: string) => void;
 }
 
 export type MapStateUpdate = Partial<MapState>;

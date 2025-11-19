@@ -228,6 +228,7 @@ interface MapStateCallbacks {
     onLoadingStateChange?: (loading: boolean) => void;
     onSearchingStateChange?: (searching: boolean) => void;
     onPropertiesLoadError?: (error: unknown) => void;
+    onError?: (error: Error | string, context?: string) => void;
 }
 type MapStateUpdate = Partial<MapState>;
 
@@ -354,6 +355,7 @@ declare class MapFirstCore {
     setPrimaryType(primary: PropertyType): void;
     setSelectedMarker(markerId: number | null): void;
     getState(): Readonly<MapState>;
+    private handleError;
     updateState(update: MapStateUpdate): void;
     setState(newState: Partial<MapState>): void;
     setFilters(filters: FilterState): void;

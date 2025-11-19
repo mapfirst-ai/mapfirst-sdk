@@ -318,7 +318,7 @@ export class MapFirstCore {
         return response.properties || [];
       },
       onError: (error) => {
-        console.error("Failed to load properties:", error);
+        this.handleError(error, "autoLoadProperties");
         this.callbacks.onPropertiesLoadError?.(error);
       },
     });
@@ -414,6 +414,18 @@ export class MapFirstCore {
   // State management methods
   getState(): Readonly<MapState> {
     return { ...this.state };
+  }
+
+  // Centralized error handler
+  private handleError(error: unknown, context: string = "MapFirstCore") {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorObj = error instanceof Error ? error : new Error(errorMessage);
+
+    console.error(`[${context}]`, errorMessage);
+
+    if (this.callbacks.onError) {
+      this.callbacks.onError(errorObj, context);
+    }
   }
 
   updateState(update: MapStateUpdate) {
@@ -646,7 +658,7 @@ export class MapFirstCore {
           break;
         }
       } catch (error) {
-        console.error("Pricing polling failed", error);
+        this.handleError(error, "pollForPricing");
         this.callbacks.onPropertiesLoadError?.(error);
         break;
       }
@@ -766,6 +778,7 @@ export class MapFirstCore {
 
       return data;
     } catch (error) {
+      this.handleError(error, "runPropertiesSearch");
       onError?.(error);
       this.callbacks.onPropertiesLoadError?.(error);
       this.clearMarkers();
