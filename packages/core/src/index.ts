@@ -303,20 +303,14 @@ export class MapFirstCore {
     if (!this.requestBody) return;
 
     // Default request body structure based on InitialDataLoader.tsx
-    const defaultRequestBody = {
+    const defaultRequestBody: InitialRequestBody = {
       filters: this.getFilters(),
       initial: true,
       ...this.requestBody,
     };
 
-    await this.loadProperties({
-      fetchFn: async () => {
-        const response = await fetchProperties<any, any>(
-          `${this.apiUrl}/${this.mfid}/hotels`,
-          defaultRequestBody
-        );
-        return response.properties || [];
-      },
+    await this.runPropertiesSearch({
+      body: defaultRequestBody,
       onError: (error) => {
         this.handleError(error, "autoLoadProperties");
         this.callbacks.onPropertiesLoadError?.(error);
@@ -369,10 +363,16 @@ export class MapFirstCore {
     return adapter;
   }
 
-  setMarkers(markers: Property[]) {
+  _setProperties(markers: Property[]) {
     this.ensureAlive();
     this.properties = [...markers];
-    this.updateState({ properties: markers });
+    this.updateState({
+      properties: markers.filter((x) =>
+        x.type === "Accommodation"
+          ? x.pricing?.offer?.availability !== "unavailable"
+          : true
+      ),
+    });
     this.callbacks.onPropertiesChange?.(markers);
     this.refresh();
   }
@@ -385,7 +385,7 @@ export class MapFirstCore {
     this.refresh();
   }
 
-  clearMarkers() {
+  clearProperties() {
     this.ensureAlive();
     this.properties = [];
     this.updateState({ properties: [] });
@@ -528,15 +528,13 @@ export class MapFirstCore {
     this.ensureAlive();
     this.setLoading(true);
     this.setSearching(true);
-    this.clearMarkers();
+    this.clearProperties();
 
     try {
       const properties = await fetchFn();
 
-      // Apply properties to map
-      this.setMarkers(properties);
+      this._setProperties(properties);
 
-      // Determine primary type from properties if not set
       if (!this.primaryType && properties.length > 0) {
         const typeCounts = properties.reduce((counts, property) => {
           counts[property.type] = (counts[property.type] || 0) + 1;
@@ -555,7 +553,7 @@ export class MapFirstCore {
       this.setState({ firstCallDone: true });
       onSuccess?.(properties);
     } catch (error) {
-      this.clearMarkers();
+      this.clearProperties();
       onError?.(error);
     } finally {
       this.setSearching(false);
@@ -673,7 +671,7 @@ export class MapFirstCore {
 
   private setProperties(updater: (prev: Property[]) => Property[]): void {
     const updatedProperties = updater(this.properties);
-    this.setMarkers(updatedProperties);
+    this._setProperties(updatedProperties);
   }
 
   private mostCommonTypeFromProperties(properties: Property[]): PropertyType {
@@ -704,7 +702,7 @@ export class MapFirstCore {
     this.ensureAlive();
     this.setState({ firstCallDone: false });
     this.setSearching(true);
-    this.clearMarkers();
+    this.clearProperties();
 
     try {
       const data = await fetchProperties<InitialRequestBody, APIResponse>(
@@ -723,7 +721,7 @@ export class MapFirstCore {
       }
 
       // Apply properties
-      this.setMarkers(data.properties);
+      this._setProperties(data.properties);
 
       // Determine and set primary type
       if (
@@ -781,7 +779,7 @@ export class MapFirstCore {
       this.handleError(error, "runPropertiesSearch");
       onError?.(error);
       this.callbacks.onPropertiesLoadError?.(error);
-      this.clearMarkers();
+      this.clearProperties();
       this.setState({ firstCallDone: true });
       return null;
     } finally {

@@ -349,9 +349,9 @@ declare class MapFirstCore {
     private autoLoadProperties;
     private createAdapter;
     private initializeAdapter;
-    setMarkers(markers: Property[]): void;
+    _setProperties(markers: Property[]): void;
     addMarker(marker: Property): void;
-    clearMarkers(): void;
+    clearProperties(): void;
     setPrimaryType(primary: PropertyType): void;
     setSelectedMarker(markerId: number | null): void;
     getState(): Readonly<MapState>;
