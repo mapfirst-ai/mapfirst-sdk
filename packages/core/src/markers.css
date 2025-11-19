@@ -48,6 +48,7 @@
   background: #ffffff;
   border-color: #03852e;
   color: #03852e;
+  transform: scale(1.2);
 }
 
 .mapfirst-marker-pill-active:hover {
