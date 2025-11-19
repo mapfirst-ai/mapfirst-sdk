@@ -424,4 +424,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type APIResponse, type ActiveLocation, type Environment, type FilterState, type GoogleMapsNamespace, type HotelPricingAPIResponse, type InitialLocationData, type InitialRequestBody, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type PollOptions, type Price, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };
+export { type APIResponse, type ActiveLocation, type BaseMapFirstOptions, type Environment, type FilterState, type GoogleMapsNamespace, type HotelPricingAPIResponse, type InitialLocationData, type InitialRequestBody, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type PollOptions, type Price, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };

@@ -169,7 +169,7 @@ function toISO(date: Date | string): string {
   return date.toISOString().slice(0, 10);
 }
 
-type BaseMapFirstOptions = {
+export type BaseMapFirstOptions = {
   properties?: Property[];
   primaryType?: PropertyType;
   selectedMarkerId?: number | null;
