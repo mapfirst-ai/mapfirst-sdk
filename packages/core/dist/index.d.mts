@@ -280,6 +280,12 @@ type InitialRequestBody = {
     latitude?: number;
     radius?: number;
 };
+type InitialLocationData = {
+    city?: string;
+    country?: string;
+    query?: string;
+    currency?: string;
+};
 
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {
@@ -307,6 +313,7 @@ type BaseMapFirstOptions = {
     environment?: Environment;
     mfid?: string;
     requestBody?: any;
+    initialLocationData?: InitialLocationData;
     fitBoundsPadding?: {
         top?: number;
         bottom?: number;
@@ -320,44 +327,54 @@ type AdapterDrivenOptions = BaseMapFirstOptions & {
 };
 type MapLibreOptions = BaseMapFirstOptions & {
     platform: "maplibre";
-    mapInstance: any;
+    mapInstance?: any;
     maplibregl: MapLibreNamespace;
     onMarkerClick?: (marker: Property) => void;
 };
 type GoogleMapsOptions = BaseMapFirstOptions & {
     platform: "google";
-    mapInstance: any;
+    mapInstance?: any;
     google: GoogleMapsNamespace;
     onMarkerClick?: (marker: Property) => void;
 };
 type MapboxOptions = BaseMapFirstOptions & {
     platform: "mapbox";
-    mapInstance: any;
+    mapInstance?: any;
     mapboxgl: MapboxNamespace;
     onMarkerClick?: (marker: Property) => void;
 };
 type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOptions | MapboxOptions;
 declare class MapFirstCore {
     private readonly options;
-    private readonly adapter;
+    private adapter;
     private properties;
     private primaryType?;
     private selectedMarkerId;
     private destroyed;
     private clusterItems;
+    private isMapAttached;
     private state;
     private callbacks;
     private readonly environment;
     private readonly apiUrl;
     private readonly mfid?;
-    private readonly requestBody?;
+    private requestBody?;
     private readonly fitBoundsPadding;
     constructor(options: MapFirstOptions);
+    private hasMapInstance;
+    private initializeFromLocationData;
     private autoLoadProperties;
+    attachMap(mapInstance: any, config: {
+        platform: "maplibre" | "google" | "mapbox";
+        maplibregl?: MapLibreNamespace;
+        google?: GoogleMapsNamespace;
+        mapboxgl?: MapboxNamespace;
+        onMarkerClick?: (marker: Property) => void;
+    }): void;
     private createAdapter;
     private initializeAdapter;
-    _setProperties(markers: Property[]): void;
-    addMarker(marker: Property): void;
+    _setProperties(properties: Property[]): void;
+    addProperty(property: Property): void;
     clearProperties(): void;
     setPrimaryType(primary: PropertyType): void;
     setSelectedMarker(markerId: number | null): void;
@@ -407,4 +424,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type APIResponse, type ActiveLocation, type Environment, type FilterState, type GoogleMapsNamespace, type HotelPricingAPIResponse, type InitialRequestBody, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type PollOptions, type Price, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };
+export { type APIResponse, type ActiveLocation, type Environment, type FilterState, type GoogleMapsNamespace, type HotelPricingAPIResponse, type InitialLocationData, type InitialRequestBody, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type PollOptions, type Price, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };

@@ -82,6 +82,13 @@ export type InitialRequestBody = {
   radius?: number;
 };
 
+export type InitialLocationData = {
+  city?: string;
+  country?: string;
+  query?: string;
+  currency?: string;
+};
+
 export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 
 export type { GoogleMapsNamespace } from "./adapters/google/markermanager";
@@ -179,6 +186,8 @@ type BaseMapFirstOptions = {
   environment?: Environment;
   mfid?: string;
   requestBody?: any;
+  // Initial location data (alternative to requestBody)
+  initialLocationData?: InitialLocationData;
   // Map behavior options
   fitBoundsPadding?: {
     top?: number;
@@ -195,21 +204,21 @@ type AdapterDrivenOptions = BaseMapFirstOptions & {
 
 type MapLibreOptions = BaseMapFirstOptions & {
   platform: "maplibre";
-  mapInstance: any;
+  mapInstance?: any;
   maplibregl: MapLibreNamespace;
   onMarkerClick?: (marker: Property) => void;
 };
 
 type GoogleMapsOptions = BaseMapFirstOptions & {
   platform: "google";
-  mapInstance: any; // google.maps.Map
+  mapInstance?: any; // google.maps.Map
   google: GoogleMapsNamespace;
   onMarkerClick?: (marker: Property) => void;
 };
 
 type MapboxOptions = BaseMapFirstOptions & {
   platform: "mapbox";
-  mapInstance: any;
+  mapInstance?: any;
   mapboxgl: MapboxNamespace;
   onMarkerClick?: (marker: Property) => void;
 };
@@ -235,12 +244,13 @@ function getDefaultDates(): { checkIn: Date; checkOut: Date } {
 }
 
 export class MapFirstCore {
-  private readonly adapter: MapAdapter;
+  private adapter: MapAdapter | null = null;
   private properties: Property[] = [];
   private primaryType?: PropertyType;
   private selectedMarkerId: number | null = null;
   private destroyed = false;
   private clusterItems: ClusterDisplayItem[] = [];
+  private isMapAttached = false;
 
   // State management
   private state: MapState;
@@ -250,7 +260,7 @@ export class MapFirstCore {
   private readonly environment: Environment;
   private readonly apiUrl: string;
   private readonly mfid?: string;
-  private readonly requestBody?: any;
+  private requestBody?: any;
   private readonly fitBoundsPadding: {
     top: number;
     bottom: number;
@@ -301,6 +311,9 @@ export class MapFirstCore {
         checkOut: defaultDates.checkOut,
         numAdults: 2,
         numRooms: 1,
+        ...(options.initialLocationData?.currency && {
+          currency: options.initialLocationData.currency,
+        }),
       },
       activeLocation: {
         country: "",
@@ -314,12 +327,105 @@ export class MapFirstCore {
 
     this.callbacks = options.callbacks ?? {};
 
-    this.adapter = this.createAdapter(options);
-    this.refresh();
+    // Initialize map adapter if mapInstance is provided
+    if (this.hasMapInstance(options)) {
+      this.adapter = this.createAdapter(options);
+      this.isMapAttached = true;
+      this.refresh();
+    }
 
-    // Auto-load properties if requestBody is provided
-    if (this.requestBody) {
+    // Handle initial location data or auto-load properties
+    if (options.initialLocationData) {
+      this.initializeFromLocationData(options.initialLocationData);
+    } else if (this.requestBody && this.isMapAttached) {
       this.autoLoadProperties();
+    }
+  }
+
+  private hasMapInstance(options: MapFirstOptions): boolean {
+    if ("adapter" in options && options.adapter) return true;
+    if ("mapInstance" in options && options.mapInstance) return true;
+    return false;
+  }
+
+  private async initializeFromLocationData(
+    locationData: InitialLocationData
+  ): Promise<void> {
+    try {
+      const { city, country, query, currency } = locationData;
+
+      let requestBody: any = {
+        filters: this.getFilters(),
+        initial: true,
+      };
+
+      // Geo-lookup if city/country provided
+      if ((city && country) || country) {
+        const geoResponse = await fetch(
+          `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${
+            city ? `&city=${encodeURIComponent(city)}` : ""
+          }`
+        );
+
+        if (geoResponse.ok) {
+          const geoData = await geoResponse.json();
+
+          let finalCity = city;
+          if (
+            geoData.location_name &&
+            geoData.path3_name &&
+            geoData.location_name === geoData.path3_name
+          ) {
+            finalCity = undefined;
+          }
+          if (geoData.location_name) finalCity = geoData.location_name;
+
+          const finalCountry = geoData.path3_name || country;
+
+          requestBody = {
+            ...requestBody,
+            city: finalCity,
+            country: finalCountry,
+            location_id: geoData.location_id,
+            longitude: geoData.longitude,
+            latitude: geoData.latitude,
+          };
+
+          // Update active location
+          this.setActiveLocation({
+            city: finalCity,
+            country: finalCountry,
+            location_id: geoData.location_id,
+            locationName:
+              finalCity && finalCountry
+                ? `${finalCity}, ${finalCountry}`
+                : finalCountry || "",
+            coordinates: [geoData.latitude, geoData.longitude],
+          });
+
+          // Update state center
+          this.setState({
+            center: [geoData.latitude, geoData.longitude],
+            zoom: 12,
+          });
+        } else {
+          this.handleError(
+            new Error(`Geo mapping fetch failed: ${geoResponse.statusText}`),
+            "initializeFromLocationData"
+          );
+        }
+      } else if (query) {
+        requestBody.query = query;
+      }
+
+      this.requestBody = requestBody;
+
+      // Auto-load properties if map is already attached
+      if (this.isMapAttached) {
+        await this.autoLoadProperties();
+      }
+    } catch (error) {
+      this.handleError(error, "initializeFromLocationData");
     }
   }
 
@@ -342,26 +448,68 @@ export class MapFirstCore {
     });
   }
 
-  private createAdapter(options: MapFirstOptions): MapAdapter {
-    if (isMapLibreOptions(options)) {
+  attachMap(
+    mapInstance: any,
+    config: {
+      platform: "maplibre" | "google" | "mapbox";
+      maplibregl?: MapLibreNamespace;
+      google?: GoogleMapsNamespace;
+      mapboxgl?: MapboxNamespace;
+      onMarkerClick?: (marker: Property) => void;
+    }
+  ): void {
+    if (this.isMapAttached) {
+      console.warn("Map is already attached. Destroying previous adapter.");
+      if (this.adapter) {
+        const markerManager = this.adapter.getMarkerManager();
+        markerManager?.destroy();
+        this.adapter.cleanup();
+      }
+    }
+
+    const adapterConfig: any = {
+      ...this.options,
+      platform: config.platform,
+      mapInstance,
+      maplibregl: config.maplibregl,
+      google: config.google,
+      mapboxgl: config.mapboxgl,
+      onMarkerClick: config.onMarkerClick,
+    };
+
+    this.adapter = this.createAdapter(adapterConfig);
+    this.isMapAttached = true;
+    this.refresh();
+
+    // Auto-load properties if we have requestBody and haven't loaded yet
+    if (this.requestBody && !this.state.firstCallDone) {
+      this.autoLoadProperties();
+    }
+  }
+
+  private createAdapter(options: MapFirstOptions): MapAdapter | null {
+    if (isMapLibreOptions(options) && options.mapInstance) {
       return this.initializeAdapter(new MapLibreAdapter(options.mapInstance), {
         maplibregl: options.maplibregl,
         onMarkerClick: options.onMarkerClick,
       });
     }
-    if (isGoogleMapsOptions(options)) {
+    if (isGoogleMapsOptions(options) && options.mapInstance) {
       return this.initializeAdapter(
         new GoogleMapsAdapter(options.mapInstance),
         { google: options.google, onMarkerClick: options.onMarkerClick }
       );
     }
-    if (isMapboxOptions(options)) {
+    if (isMapboxOptions(options) && options.mapInstance) {
       return this.initializeAdapter(new MapboxAdapter(options.mapInstance), {
         mapboxgl: options.mapboxgl,
         onMarkerClick: options.onMarkerClick,
       });
     }
-    return options.adapter;
+    if ("adapter" in options && options.adapter) {
+      return options.adapter;
+    }
+    return null;
   }
 
   private initializeAdapter(adapter: MapAdapter, config: any): MapAdapter {
@@ -391,23 +539,25 @@ export class MapFirstCore {
     return adapter;
   }
 
-  _setProperties(markers: Property[]) {
+  _setProperties(properties: Property[]) {
     this.ensureAlive();
-    this.properties = [...markers];
-    this.updateState({
-      properties: markers.filter((x) =>
+    this.properties = [
+      ...properties.filter((x) =>
         x.type === "Accommodation"
-          ? x.pricing?.offer?.availability !== "unavailable"
+          ? x.pricing?.availability !== "unavailable"
           : true
       ),
+    ];
+    this.updateState({
+      properties: this.properties,
     });
-    this.callbacks.onPropertiesChange?.(markers);
+    this.callbacks.onPropertiesChange?.(properties);
     this.refresh();
   }
 
-  addMarker(marker: Property) {
+  addProperty(property: Property) {
     this.ensureAlive();
-    this.properties = [...this.properties, marker];
+    this.properties = [...this.properties, property];
     this.updateState({ properties: this.properties });
     this.callbacks.onPropertiesChange?.(this.properties);
     this.refresh();
@@ -544,6 +694,7 @@ export class MapFirstCore {
       this.setState({ zoom });
     }
 
+    if (!this.adapter) return;
     const mapInstance = this.adapter.getMap();
     if (!mapInstance) return;
 
@@ -583,6 +734,7 @@ export class MapFirstCore {
     animate: boolean = true
   ) {
     this.ensureAlive();
+    if (!this.adapter) return;
     const mapInstance = this.adapter.getMap();
     if (!mapInstance) return;
 
@@ -794,6 +946,9 @@ export class MapFirstCore {
 
             return updatedProperties;
           });
+
+          // Force a refresh after updating properties to ensure markers are re-rendered
+          this.refresh();
         }
 
         if (pollData?.success?.isComplete) {
@@ -991,6 +1146,8 @@ export class MapFirstCore {
 
   refresh() {
     this.ensureAlive();
+    if (!this.adapter) return;
+
     const viewState = this.safeExtractViewState();
     const primaryType = this.resolvePrimaryType();
 
@@ -1012,14 +1169,16 @@ export class MapFirstCore {
     if (this.destroyed) {
       return;
     }
-    const markerManager = this.adapter.getMarkerManager();
-    markerManager.destroy();
-
-    this.adapter.cleanup();
+    if (this.adapter) {
+      const markerManager = this.adapter.getMarkerManager();
+      markerManager.destroy();
+      this.adapter.cleanup();
+    }
 
     this.clusterItems = [];
     this.properties = [];
     this.destroyed = true;
+    this.isMapAttached = false;
   }
 
   private resolvePrimaryType(): PropertyType {
@@ -1031,6 +1190,7 @@ export class MapFirstCore {
   }
 
   private safeExtractViewState(): ViewStateSnapshot | null {
+    if (!this.adapter) return null;
     try {
       return extractViewState(this.adapter);
     } catch {
