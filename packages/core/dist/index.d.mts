@@ -320,6 +320,7 @@ type BaseMapFirstOptions = {
         left?: number;
         right?: number;
     };
+    apiUrl?: string;
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
     adapter: MapAdapter;

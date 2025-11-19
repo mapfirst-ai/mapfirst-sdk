@@ -195,6 +195,7 @@ export type BaseMapFirstOptions = {
     left?: number;
     right?: number;
   };
+  apiUrl?: string;
 };
 
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -275,7 +276,7 @@ export class MapFirstCore {
 
     // Initialize API configuration
     this.environment = options.environment ?? "prod";
-    this.apiUrl = API_URLS[this.environment];
+    this.apiUrl = options.apiUrl ?? API_URLS[this.environment];
     this.mfid = options.mfid ?? "default";
     this.requestBody = options.requestBody;
 
