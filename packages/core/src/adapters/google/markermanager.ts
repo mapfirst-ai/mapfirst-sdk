@@ -1,6 +1,11 @@
 import type { Property } from "../../types";
 import { createDotMarkerElement } from "../../dotmarket";
 import { createPrimaryMarkerElement } from "../../marker";
+import {
+  updatePrimaryMarkerElement,
+  updateDotMarkerElement,
+  extractMarkerIdFromKey,
+} from "../../marker-updater";
 import { ClusterDisplayItem } from "../../utils/clustering";
 
 export type GoogleMapsMarkerHandle = any; // google.maps.marker.AdvancedMarkerElement
@@ -87,8 +92,85 @@ export class GoogleMapsMarkerManager {
           this.createAndAddMarker(item, coords);
         }
       } else {
-        // Create new marker
-        this.createAndAddMarker(item, coords);
+        // Check if there's a marker for the same property with a different key (styling change)
+        const markerId = item.marker.tripadvisor_id;
+        let existingEntry: MarkerEntry | undefined;
+        let existingKey: string | undefined;
+
+        for (const [key, entry] of this.markerCache.entries()) {
+          if (
+            extractMarkerIdFromKey(key) === markerId &&
+            entry.kind === item.kind
+          ) {
+            existingEntry = entry;
+            existingKey = key;
+            break;
+          }
+        }
+
+        if (existingEntry && existingKey) {
+          // Same marker, different state - update styles instead of recreating
+          const isPrimaryType = item.marker.type === this.primaryType;
+          const isSelected =
+            this.selectedMarkerId === item.marker.tripadvisor_id;
+          const isAccommodation = item.marker.type === "Accommodation";
+          const isPending =
+            item.kind === "primary"
+              ? isAccommodation && !item.marker.pricing?.offer?.displayPrice
+              : isAccommodation &&
+                item.marker.pricing?.offer?.availability !== "available";
+
+          const element = existingEntry.marker.content;
+          if (element instanceof HTMLElement) {
+            if (item.kind === "primary") {
+              updatePrimaryMarkerElement(
+                element,
+                isPrimaryType,
+                isSelected,
+                isPending
+              );
+            } else {
+              updateDotMarkerElement(
+                element,
+                isPrimaryType,
+                isSelected,
+                isPending
+              );
+            }
+          }
+
+          // Update zIndex
+          const zIndex =
+            item.kind === "primary"
+              ? isSelected
+                ? 20
+                : isPrimaryType
+                ? 12
+                : 11
+              : isSelected
+              ? 20
+              : isPrimaryType
+              ? 3
+              : 1;
+          existingEntry.marker.zIndex = zIndex;
+
+          // Update cache with new key
+          this.markerCache.delete(existingKey);
+          this.markerCache.set(item.key, existingEntry);
+
+          // Update position
+          try {
+            existingEntry.marker.position = {
+              lat: coords.lat,
+              lng: coords.lon,
+            };
+          } catch {
+            // If update fails, ignore
+          }
+        } else {
+          // Create new marker
+          this.createAndAddMarker(item, coords);
+        }
       }
     }
   }
