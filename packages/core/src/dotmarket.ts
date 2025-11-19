@@ -26,7 +26,9 @@ export function createDotMarkerElement(
   button.type = "button";
   button.className = isPending
     ? "mapfirst-dot-marker-button mapfirst-dot-marker-button-pending"
-    : "mapfirst-dot-marker-button mapfirst-dot-marker-button-active";
+    : `mapfirst-dot-marker-button mapfirst-dot-marker-button-active${
+        !isPrimaryType ? " mapfirst-dot-marker-non-primary" : ""
+      }`;
   button.title = marker.name ?? String(marker.tripadvisor_id);
 
   button.addEventListener("click", (evt) => {

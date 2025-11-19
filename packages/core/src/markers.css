@@ -37,6 +37,13 @@
   cursor: pointer;
 }
 
+.mapfirst-marker-pill-active.mapfirst-marker-non-primary {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(3, 133, 46, 0.5);
+  color: rgba(3, 133, 46, 0.5);
+  padding: 4px;
+}
+
 .mapfirst-marker-pill-active:hover {
   transform: scale(1.2);
 }
@@ -131,6 +138,11 @@
 .mapfirst-dot-marker-button-active {
   background: #012b11;
   cursor: pointer;
+}
+
+.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(3, 133, 46, 0.2);
 }
 
 .mapfirst-dot-marker-button-active:hover {

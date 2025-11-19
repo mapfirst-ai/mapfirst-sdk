@@ -42,12 +42,18 @@ export function createPrimaryMarkerElement(
   pill.type = "button";
   pill.className = isPending
     ? "mapfirst-marker-pill mapfirst-marker-pill-pending"
-    : "mapfirst-marker-pill mapfirst-marker-pill-active";
+    : `mapfirst-marker-pill mapfirst-marker-pill-active${
+        !isPrimaryType ? " mapfirst-marker-non-primary" : ""
+      }`;
   pill.title = marker.name ?? String(marker.tripadvisor_id);
 
   // Awards or Rating badge
   if (!isPending && (marker.awards?.length || ratingLabel)) {
     const badge = document.createElement("div");
+    badge.className = "mapfirst-marker-badge";
+    if (!isPrimaryType) {
+      badge.style.opacity = "0.2";
+    }
     badge.className = "mapfirst-marker-badge";
 
     if (marker.awards?.length && marker.awards[0].type) {
