@@ -1,6 +1,6 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import React from 'react';
-import { BaseMapFirstOptions, MapFirstCore, MapState, Property, PropertyType, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace, MapFirstOptions } from '@mapfirst/core';
+import { BaseMapFirstOptions, MapFirstCore, MapState, Property, PropertyType, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace, MapFirstOptions } from '@mapfirst.ai/core';
 
 /**
  * Hook that creates a MapFirstCore instance that can be initialized before maps are ready.

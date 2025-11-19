@@ -9,7 +9,7 @@ import {
   type MapboxNamespace,
   type MapState,
   type PropertyType,
-} from "@mapfirst/core";
+} from "@mapfirst.ai/core";
 
 /**
  * Hook that creates a MapFirstCore instance that can be initialized before maps are ready.
