@@ -81,59 +81,45 @@ export class MapFirstCore {
     this.primaryType = options.primaryType;
     this.selectedMarkerId = options.selectedMarkerId ?? null;
 
-    if (isMapLibreOptions(options)) {
-      const adapter = new MapLibreAdapter(options.mapInstance);
-      const shouldAutoSelect = options.autoSelectOnClick ?? true;
-
-      adapter.initialize({
-        maplibregl: options.maplibregl,
-        onMarkerClick: (marker) => {
-          if (shouldAutoSelect) {
-            this.setSelectedMarker(marker.tripadvisor_id);
-          }
-          options.onMarkerClick?.(marker);
-        },
-        onRefresh: () => this.refresh(),
-      });
-
-      this.adapter = adapter;
-    } else if (isGoogleMapsOptions(options)) {
-      const adapter = new GoogleMapsAdapter(options.mapInstance);
-      const shouldAutoSelect = options.autoSelectOnClick ?? true;
-
-      adapter.initialize({
-        google: options.google,
-        onMarkerClick: (marker) => {
-          if (shouldAutoSelect) {
-            this.setSelectedMarker(marker.tripadvisor_id);
-          }
-          options.onMarkerClick?.(marker);
-        },
-        onRefresh: () => this.refresh(),
-      });
-
-      this.adapter = adapter;
-    } else if (isMapboxOptions(options)) {
-      const adapter = new MapboxAdapter(options.mapInstance);
-      const shouldAutoSelect = options.autoSelectOnClick ?? true;
-
-      adapter.initialize({
-        mapboxgl: options.mapboxgl,
-        onMarkerClick: (marker) => {
-          if (shouldAutoSelect) {
-            this.setSelectedMarker(marker.tripadvisor_id);
-          }
-          options.onMarkerClick?.(marker);
-        },
-        onRefresh: () => this.refresh(),
-      });
-
-      this.adapter = adapter;
-    } else {
-      this.adapter = options.adapter;
-    }
-
+    this.adapter = this.createAdapter(options);
     this.refresh();
+  }
+
+  private createAdapter(options: MapFirstOptions): MapAdapter {
+    if (isMapLibreOptions(options)) {
+      return this.initializeAdapter(new MapLibreAdapter(options.mapInstance), {
+        maplibregl: options.maplibregl,
+        onMarkerClick: options.onMarkerClick,
+      });
+    }
+    if (isGoogleMapsOptions(options)) {
+      return this.initializeAdapter(
+        new GoogleMapsAdapter(options.mapInstance),
+        { google: options.google, onMarkerClick: options.onMarkerClick }
+      );
+    }
+    if (isMapboxOptions(options)) {
+      return this.initializeAdapter(new MapboxAdapter(options.mapInstance), {
+        mapboxgl: options.mapboxgl,
+        onMarkerClick: options.onMarkerClick,
+      });
+    }
+    return options.adapter;
+  }
+
+  private initializeAdapter(adapter: MapAdapter, config: any): MapAdapter {
+    const shouldAutoSelect = this.options.autoSelectOnClick ?? true;
+    adapter.initialize({
+      ...config,
+      onMarkerClick: (marker: Property) => {
+        if (shouldAutoSelect) {
+          this.setSelectedMarker(marker.tripadvisor_id);
+        }
+        config.onMarkerClick?.(marker);
+      },
+      onRefresh: () => this.refresh(),
+    });
+    return adapter;
   }
 
   setMarkers(markers: Property[]) {

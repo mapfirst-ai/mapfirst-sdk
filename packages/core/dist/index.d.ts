@@ -210,6 +210,8 @@ declare class MapFirstCore {
     private destroyed;
     private clusterItems;
     constructor(options: MapFirstOptions);
+    private createAdapter;
+    private initializeAdapter;
     setMarkers(markers: Property[]): void;
     addMarker(marker: Property): void;
     clearMarkers(): void;
