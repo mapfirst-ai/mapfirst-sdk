@@ -1,8 +1,64 @@
 import { MapAdapter, type LngLat, type MapBounds } from "./index";
+import {
+  MapLibreMarkerManager,
+  type MapLibreNamespace,
+} from "./maplibre/markermanager";
+import type { Property } from "../types";
 
 export class MapLibreAdapter extends MapAdapter {
+  private markerManager?: MapLibreMarkerManager;
+  private cleanupFns: Array<() => void> = [];
+
   constructor(map: any) {
     super(map);
+  }
+
+  initialize(options: {
+    maplibregl: MapLibreNamespace;
+    onMarkerClick?: (marker: Property) => void;
+    onRefresh?: () => void;
+  }) {
+    this.markerManager = new MapLibreMarkerManager({
+      mapInstance: this.map,
+      maplibregl: options.maplibregl,
+      onMarkerClick: options.onMarkerClick,
+    });
+
+    if (options.onRefresh) {
+      this.attachEventListeners(options.onRefresh);
+    }
+
+    return this.markerManager;
+  }
+
+  private attachEventListeners(onRefresh: () => void) {
+    if (!this.map || typeof this.map.on !== "function") {
+      return;
+    }
+    const events = ["move", "zoom", "dragend", "pitch", "rotate"];
+    events.forEach((eventName) => {
+      this.map.on(eventName, onRefresh);
+      this.cleanupFns.push(() => {
+        if (typeof this.map.off === "function") {
+          this.map.off(eventName, onRefresh);
+        }
+      });
+    });
+  }
+
+  getMarkerManager() {
+    return this.markerManager;
+  }
+
+  cleanup() {
+    for (const cleanup of this.cleanupFns) {
+      try {
+        cleanup();
+      } catch {
+        // ignore
+      }
+    }
+    this.cleanupFns.length = 0;
   }
 
   getMap(): any {
@@ -53,6 +109,7 @@ export class MapLibreAdapter extends MapAdapter {
   }
 
   remove(): void {
+    this.cleanup();
     this.map.remove();
   }
 }

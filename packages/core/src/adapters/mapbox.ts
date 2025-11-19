@@ -1,8 +1,64 @@
 import { MapAdapter, type LngLat, type MapBounds } from "./index";
+import {
+  MapboxMarkerManager,
+  type MapboxNamespace,
+} from "./mapbox/markermanager";
+import type { Property } from "../types";
 
 export class MapboxAdapter extends MapAdapter {
+  private markerManager?: MapboxMarkerManager;
+  private cleanupFns: Array<() => void> = [];
+
   constructor(map: any) {
     super(map);
+  }
+
+  initialize(options: {
+    mapboxgl: MapboxNamespace;
+    onMarkerClick?: (marker: Property) => void;
+    onRefresh?: () => void;
+  }) {
+    this.markerManager = new MapboxMarkerManager({
+      mapInstance: this.map,
+      mapboxgl: options.mapboxgl,
+      onMarkerClick: options.onMarkerClick,
+    });
+
+    if (options.onRefresh) {
+      this.attachEventListeners(options.onRefresh);
+    }
+
+    return this.markerManager;
+  }
+
+  private attachEventListeners(onRefresh: () => void) {
+    if (!this.map || typeof this.map.on !== "function") {
+      return;
+    }
+    const events = ["move", "zoom", "dragend", "pitch", "rotate"];
+    events.forEach((eventName) => {
+      this.map.on(eventName, onRefresh);
+      this.cleanupFns.push(() => {
+        if (typeof this.map.off === "function") {
+          this.map.off(eventName, onRefresh);
+        }
+      });
+    });
+  }
+
+  getMarkerManager() {
+    return this.markerManager;
+  }
+
+  cleanup() {
+    for (const cleanup of this.cleanupFns) {
+      try {
+        cleanup();
+      } catch {
+        // ignore
+      }
+    }
+    this.cleanupFns.length = 0;
   }
 
   getMap(): any {
@@ -53,6 +109,7 @@ export class MapboxAdapter extends MapAdapter {
   }
 
   remove(): void {
+    this.cleanup();
     this.map.remove();
   }
 }

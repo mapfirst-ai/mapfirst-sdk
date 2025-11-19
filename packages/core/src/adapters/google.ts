@@ -1,11 +1,77 @@
 import { MapAdapter, type LngLat, type MapBounds } from "./index";
+import {
+  GoogleMapsMarkerManager,
+  type GoogleMapsNamespace,
+} from "./google/markermanager";
+import type { Property } from "../types";
 
 export class GoogleMapsAdapter extends MapAdapter {
   private overlayView: any;
+  private markerManager?: GoogleMapsMarkerManager;
+  private cleanupFns: Array<() => void> = [];
 
   constructor(map: any) {
     super(map);
     this.initializeOverlayView();
+  }
+
+  initialize(options: {
+    google: GoogleMapsNamespace;
+    onMarkerClick?: (marker: Property) => void;
+    onRefresh?: () => void;
+  }) {
+    this.markerManager = new GoogleMapsMarkerManager({
+      mapInstance: this.map,
+      google: options.google,
+      onMarkerClick: options.onMarkerClick,
+    });
+
+    if (options.onRefresh) {
+      this.attachEventListeners(options.onRefresh);
+    }
+
+    return this.markerManager;
+  }
+
+  private attachEventListeners(onRefresh: () => void) {
+    const events = [
+      "center_changed",
+      "zoom_changed",
+      "drag",
+      "heading_changed",
+      "tilt_changed",
+    ];
+    const listeners: any[] = [];
+
+    events.forEach((eventName) => {
+      const listener = this.map.addListener(eventName, onRefresh);
+      listeners.push(listener);
+    });
+
+    this.cleanupFns.push(() => {
+      listeners.forEach((listener) => {
+        try {
+          listener.remove();
+        } catch {
+          // ignore
+        }
+      });
+    });
+  }
+
+  getMarkerManager() {
+    return this.markerManager;
+  }
+
+  cleanup() {
+    for (const cleanup of this.cleanupFns) {
+      try {
+        cleanup();
+      } catch {
+        // ignore
+      }
+    }
+    this.cleanupFns.length = 0;
   }
 
   private initializeOverlayView() {
@@ -108,6 +174,7 @@ export class GoogleMapsAdapter extends MapAdapter {
   }
 
   remove(): void {
+    this.cleanup();
     // Clean up overlay view
     if (this.overlayView) {
       this.overlayView.setMap(null);

@@ -80,7 +80,6 @@ type MapLibreNamespace = {
     }) => MapLibreMarkerHandle;
 };
 
-type GoogleMapsMarkerHandle = any;
 type GoogleMapsNamespace = any;
 
 type MapboxMarkerHandle = {
@@ -107,6 +106,21 @@ declare abstract class MapAdapter {
      * @returns {any} The native map instance
      */
     getMap(): any;
+    /**
+     * Initialize the adapter with platform-specific configuration
+     * @param {any} options Platform-specific initialization options
+     * @returns {any} The marker manager instance
+     */
+    abstract initialize(options: any): any;
+    /**
+     * Get the marker manager instance
+     * @returns {any} The marker manager
+     */
+    abstract getMarkerManager(): any;
+    /**
+     * Clean up event listeners and resources
+     */
+    abstract cleanup(): void;
     /**
      * Get the current center coordinates of the map
      * @returns {{ lng: number; lat: number }} [longitude, latitude]
@@ -190,8 +204,6 @@ type MapFirstOptions = AdapterDrivenOptions | MapLibreOptions | GoogleMapsOption
 declare class MapFirstCore {
     private readonly options;
     private readonly adapter;
-    private readonly cleanupFns;
-    private readonly markerRenderer?;
     private markers;
     private primaryType?;
     private selectedMarkerId;
@@ -208,10 +220,7 @@ declare class MapFirstCore {
     destroy(): void;
     private resolvePrimaryType;
     private safeExtractViewState;
-    private attachMapLibreListeners;
-    private attachGoogleMapsListeners;
-    private attachMapboxListeners;
     private ensureAlive;
 }
 
-export { type GoogleMapsMarkerHandle, type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreMarkerHandle, type MapLibreNamespace, type MapboxMarkerHandle, type MapboxNamespace, type Property, type PropertyType };
+export { type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapboxNamespace, type Property, type PropertyType };

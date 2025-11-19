@@ -3,21 +3,9 @@ import { MapLibreAdapter } from "./adapters/maplibre";
 import { GoogleMapsAdapter } from "./adapters/google";
 import { MapboxAdapter } from "./adapters/mapbox";
 import type { Property, PropertyType } from "./types";
-import {
-  MapLibreMarkerManager,
-  type MapLibreMarkerHandle,
-  type MapLibreNamespace,
-} from "./adapters/maplibre/markermanager";
-import {
-  GoogleMapsMarkerManager,
-  type GoogleMapsMarkerHandle,
-  type GoogleMapsNamespace,
-} from "./adapters/google/markermanager";
-import {
-  MapboxMarkerManager,
-  type MapboxMarkerHandle,
-  type MapboxNamespace,
-} from "./adapters/mapbox/markermanager";
+import type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
+import type { GoogleMapsNamespace } from "./adapters/google/markermanager";
+import type { MapboxNamespace } from "./adapters/mapbox/markermanager";
 import {
   ClusterDisplayItem,
   clusterMarkers,
@@ -28,20 +16,11 @@ import {
 
 export type { Property, PropertyType } from "./types";
 
-export type {
-  MapLibreMarkerHandle,
-  MapLibreNamespace,
-} from "./adapters/maplibre/markermanager";
+export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 
-export type {
-  GoogleMapsMarkerHandle,
-  GoogleMapsNamespace,
-} from "./adapters/google/markermanager";
+export type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 
-export type {
-  MapboxMarkerHandle,
-  MapboxNamespace,
-} from "./adapters/mapbox/markermanager";
+export type { MapboxNamespace } from "./adapters/mapbox/markermanager";
 
 type BaseMapFirstOptions = {
   markers?: Property[];
@@ -91,11 +70,6 @@ const DEFAULT_PRIMARY_TYPE: PropertyType = "Accommodation";
 
 export class MapFirstCore {
   private readonly adapter: MapAdapter;
-  private readonly cleanupFns: Array<() => void> = [];
-  private readonly markerRenderer?:
-    | MapLibreMarkerManager
-    | GoogleMapsMarkerManager
-    | MapboxMarkerManager;
   private markers: Property[] = [];
   private primaryType?: PropertyType;
   private selectedMarkerId: number | null = null;
@@ -108,10 +82,10 @@ export class MapFirstCore {
     this.selectedMarkerId = options.selectedMarkerId ?? null;
 
     if (isMapLibreOptions(options)) {
+      const adapter = new MapLibreAdapter(options.mapInstance);
       const shouldAutoSelect = options.autoSelectOnClick ?? true;
-      this.adapter = new MapLibreAdapter(options.mapInstance);
-      this.markerRenderer = new MapLibreMarkerManager({
-        mapInstance: options.mapInstance,
+
+      adapter.initialize({
         maplibregl: options.maplibregl,
         onMarkerClick: (marker) => {
           if (shouldAutoSelect) {
@@ -119,13 +93,15 @@ export class MapFirstCore {
           }
           options.onMarkerClick?.(marker);
         },
+        onRefresh: () => this.refresh(),
       });
-      this.attachMapLibreListeners(options.mapInstance);
+
+      this.adapter = adapter;
     } else if (isGoogleMapsOptions(options)) {
+      const adapter = new GoogleMapsAdapter(options.mapInstance);
       const shouldAutoSelect = options.autoSelectOnClick ?? true;
-      this.adapter = new GoogleMapsAdapter(options.mapInstance);
-      this.markerRenderer = new GoogleMapsMarkerManager({
-        mapInstance: options.mapInstance,
+
+      adapter.initialize({
         google: options.google,
         onMarkerClick: (marker) => {
           if (shouldAutoSelect) {
@@ -133,13 +109,15 @@ export class MapFirstCore {
           }
           options.onMarkerClick?.(marker);
         },
+        onRefresh: () => this.refresh(),
       });
-      this.attachGoogleMapsListeners(options.mapInstance);
+
+      this.adapter = adapter;
     } else if (isMapboxOptions(options)) {
+      const adapter = new MapboxAdapter(options.mapInstance);
       const shouldAutoSelect = options.autoSelectOnClick ?? true;
-      this.adapter = new MapboxAdapter(options.mapInstance);
-      this.markerRenderer = new MapboxMarkerManager({
-        mapInstance: options.mapInstance,
+
+      adapter.initialize({
         mapboxgl: options.mapboxgl,
         onMarkerClick: (marker) => {
           if (shouldAutoSelect) {
@@ -147,8 +125,10 @@ export class MapFirstCore {
           }
           options.onMarkerClick?.(marker);
         },
+        onRefresh: () => this.refresh(),
       });
-      this.attachMapboxListeners(options.mapInstance);
+
+      this.adapter = adapter;
     } else {
       this.adapter = options.adapter;
     }
@@ -206,7 +186,8 @@ export class MapFirstCore {
       zoom: viewState?.zoom ?? 0,
     });
 
-    this.markerRenderer?.render(this.clusterItems);
+    const markerManager = this.adapter.getMarkerManager();
+    markerManager.render(this.clusterItems);
 
     this.options.onClusterUpdate?.(this.clusterItems, viewState);
   }
@@ -215,15 +196,11 @@ export class MapFirstCore {
     if (this.destroyed) {
       return;
     }
-    this.markerRenderer?.destroy();
-    for (const cleanup of this.cleanupFns) {
-      try {
-        cleanup();
-      } catch {
-        // ignore listener failures on teardown
-      }
-    }
-    this.cleanupFns.length = 0;
+    const markerManager = this.adapter.getMarkerManager();
+    markerManager.destroy();
+
+    this.adapter.cleanup();
+
     this.clusterItems = [];
     this.markers = [];
     this.destroyed = true;
@@ -243,65 +220,6 @@ export class MapFirstCore {
     } catch {
       return null;
     }
-  }
-
-  private attachMapLibreListeners(mapInstance: any) {
-    if (!mapInstance || typeof mapInstance.on !== "function") {
-      return;
-    }
-    const rerender = () => this.refresh();
-    const events = ["move", "zoom", "dragend", "pitch", "rotate"];
-    events.forEach((eventName) => {
-      mapInstance.on(eventName, rerender);
-      this.cleanupFns.push(() => {
-        if (typeof mapInstance.off === "function") {
-          mapInstance.off(eventName, rerender);
-        }
-      });
-    });
-  }
-
-  private attachGoogleMapsListeners(mapInstance: any) {
-    const rerender = () => this.refresh();
-    const events = [
-      "center_changed",
-      "zoom_changed",
-      "drag",
-      "heading_changed",
-      "tilt_changed",
-    ];
-    const listeners: any[] = [];
-
-    events.forEach((eventName) => {
-      const listener = mapInstance.addListener(eventName, rerender);
-      listeners.push(listener);
-    });
-
-    this.cleanupFns.push(() => {
-      listeners.forEach((listener) => {
-        try {
-          listener.remove();
-        } catch {
-          // ignore
-        }
-      });
-    });
-  }
-
-  private attachMapboxListeners(mapInstance: any) {
-    if (!mapInstance || typeof mapInstance.on !== "function") {
-      return;
-    }
-    const rerender = () => this.refresh();
-    const events = ["move", "zoom", "dragend", "pitch", "rotate"];
-    events.forEach((eventName) => {
-      mapInstance.on(eventName, rerender);
-      this.cleanupFns.push(() => {
-        if (typeof mapInstance.off === "function") {
-          mapInstance.off(eventName, rerender);
-        }
-      });
-    });
   }
 
   private ensureAlive() {

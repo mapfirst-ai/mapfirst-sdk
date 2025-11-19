@@ -33,6 +33,25 @@ export abstract class MapAdapter {
   getMap(): any {
     return this.map;
   }
+
+  /**
+   * Initialize the adapter with platform-specific configuration
+   * @param {any} options Platform-specific initialization options
+   * @returns {any} The marker manager instance
+   */
+  abstract initialize(options: any): any;
+
+  /**
+   * Get the marker manager instance
+   * @returns {any} The marker manager
+   */
+  abstract getMarkerManager(): any;
+
+  /**
+   * Clean up event listeners and resources
+   */
+  abstract cleanup(): void;
+
   /**
    * Get the current center coordinates of the map
    * @returns {{ lng: number; lat: number }} [longitude, latitude]
