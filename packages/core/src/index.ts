@@ -309,7 +309,11 @@ export class MapFirstCore {
           this.setPrimaryType(marker.type);
         }
         if (shouldAutoSelect) {
-          this.setSelectedMarker(marker.tripadvisor_id);
+          this.setSelectedMarker(
+            marker.tripadvisor_id === this.selectedMarkerId
+              ? null
+              : marker.tripadvisor_id
+          );
         }
         config.onMarkerClick?.(marker);
       },
