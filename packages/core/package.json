@@ -1,10 +1,43 @@
 {
   "name": "@mapfirst/core",
   "version": "0.0.1",
-  "main": "dist/index.cjs",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "description": "Core SDK for MapFirst - Multi-platform map markers and property visualization",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean --inject-style"
+    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean --inject-style",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "map",
+    "markers",
+    "maplibre",
+    "google-maps",
+    "mapbox",
+    "properties",
+    "hotels",
+    "clustering"
+  ],
+  "author": "MapFirst",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sandeshveerani4/mapfirst-sdk.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

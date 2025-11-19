@@ -1,16 +1,49 @@
 {
   "name": "@mapfirst/react",
   "version": "0.0.1",
-  "main": "dist/index.cjs",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "description": "React hooks for MapFirst SDK - Reactive state management for map properties",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "EXAMPLES.md"
+  ],
   "scripts": {
-    "build": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --clean"
+    "build": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --clean",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "map",
+    "mapfirst",
+    "state-management",
+    "markers",
+    "properties"
+  ],
+  "author": "MapFirst",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sandeshveerani4/mapfirst-sdk.git",
+    "directory": "packages/react"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "react": ">=17 || >=18"
   },
   "dependencies": {
-    "@mapfirst/core": "workspace:*"
+    "@mapfirst/core": "0.0.1"
   }
 }

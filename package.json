@@ -1,9 +1,16 @@
 {
   "name": "mapfirst-sdk",
   "version": "1.0.0",
+  "private": true,
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "publish:core": "cd packages/core && npm publish",
+    "publish:react": "cd packages/react && npm publish",
+    "publish:all": "pnpm publish:core && pnpm publish:react"
+  },
   "devDependencies": {
     "@types/react": "^19.2.4",
     "@types/react-dom": "^19.2.3",
