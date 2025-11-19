@@ -36,6 +36,7 @@ export class MapboxMarkerManager {
   private readonly onMarkerClick?: (marker: Property) => void;
   private markerCache = new Map<string, MarkerEntry>();
   private primaryType: string = "Accommodation";
+  private previousPrimaryType: string = "Accommodation";
 
   constructor(options: MapboxMarkerManagerOptions) {
     this.mapInstance = options.mapInstance;
@@ -44,8 +45,11 @@ export class MapboxMarkerManager {
   }
 
   render(items: ClusterDisplayItem[], primaryType?: string) {
-    if (primaryType) {
+    if (primaryType && primaryType !== this.primaryType) {
+      this.previousPrimaryType = this.primaryType;
       this.primaryType = primaryType;
+      // Clear cache when primary type changes to force marker recreation
+      this.destroy();
     }
     if (!this.MarkerCtor) {
       return;

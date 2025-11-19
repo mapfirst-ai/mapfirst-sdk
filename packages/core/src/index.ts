@@ -304,6 +304,10 @@ export class MapFirstCore {
     adapter.initialize({
       ...config,
       onMarkerClick: (marker: Property) => {
+        // Change primary type if clicking a secondary marker
+        if (marker.type !== this.primaryType) {
+          this.setPrimaryType(marker.type);
+        }
         if (shouldAutoSelect) {
           this.setSelectedMarker(marker.tripadvisor_id);
         }
