@@ -504,6 +504,121 @@ export class MapFirstCore {
     this.setState({ isFlyToAnimating: animating });
   }
 
+  flyMapTo(
+    longitude: number,
+    latitude: number,
+    zoom?: number | null,
+    animation: boolean = true
+  ) {
+    this.ensureAlive();
+    this.setState({ center: [latitude, longitude] });
+    if (typeof zoom === "number") {
+      this.setState({ zoom });
+    }
+
+    const mapInstance = this.adapter.getMap();
+    if (!mapInstance) return;
+
+    if (animation === false) {
+      this.setFlyToAnimating(false);
+      if (mapInstance.jumpTo) {
+        mapInstance.jumpTo({
+          center: [longitude, latitude],
+          ...(zoom !== null && { zoom: zoom ?? 13 }),
+        });
+      }
+      return;
+    }
+
+    this.setFlyToAnimating(true);
+    if (mapInstance.flyTo) {
+      mapInstance.flyTo({
+        center: [longitude, latitude],
+        ...(zoom !== null && { zoom: zoom ?? 13 }),
+      });
+    }
+  }
+
+  flyToPOIs(
+    pois?: { lat: number; lng: number }[],
+    type?: PropertyType,
+    animate: boolean = true
+  ) {
+    this.ensureAlive();
+    const mapInstance = this.adapter.getMap();
+    if (!mapInstance) return;
+
+    let points = pois;
+    if (!points || points.length === 0) {
+      points = this.properties
+        .filter(
+          (x) =>
+            x.location !== undefined &&
+            (type !== undefined ? x.type === type : true)
+        )
+        .map((h) => ({
+          lat: h.location!.lat,
+          lng: h.location!.lon,
+        }));
+    }
+    if (!points || points.length === 0) return;
+
+    // Check if this is Google Maps
+    const isGoogleMaps =
+      !!(window as any).google?.maps &&
+      mapInstance.setCenter &&
+      mapInstance.setZoom &&
+      !mapInstance.flyTo;
+
+    if (points.length === 1) {
+      const poi = points[0];
+      if (isGoogleMaps) {
+        mapInstance.setCenter({ lat: poi.lat, lng: poi.lng });
+        mapInstance.setZoom(13);
+      } else if (mapInstance.flyTo) {
+        mapInstance.flyTo({
+          center: [poi.lng, poi.lat],
+          zoom: 13,
+        });
+      }
+    } else {
+      if (isGoogleMaps) {
+        // Google Maps
+        const LatLngBounds = (window as any).google?.maps?.LatLngBounds;
+        if (LatLngBounds) {
+          const bounds = new LatLngBounds();
+          points.forEach((poi) => {
+            bounds.extend({ lat: poi.lat, lng: poi.lng });
+          });
+          this.setFlyToAnimating(true);
+          mapInstance.fitBounds(bounds, {
+            animate,
+            padding: { top: 50, bottom: 160, left: 50, right: 50 },
+          });
+        }
+      } else if (mapInstance.fitBounds) {
+        // MapLibre/Mapbox
+        const bounds: [[number, number], [number, number]] = [
+          [points[0].lng, points[0].lat],
+          [points[0].lng, points[0].lat],
+        ];
+
+        points.forEach((poi) => {
+          bounds[0][0] = Math.min(bounds[0][0], poi.lng);
+          bounds[0][1] = Math.min(bounds[0][1], poi.lat);
+          bounds[1][0] = Math.max(bounds[1][0], poi.lng);
+          bounds[1][1] = Math.max(bounds[1][1], poi.lat);
+        });
+
+        this.setFlyToAnimating(true);
+        mapInstance.fitBounds(bounds, {
+          padding: { top: 50, bottom: 160, left: 50, right: 50 },
+          animate,
+        });
+      }
+    }
+  }
+
   getFilters(): any {
     const filters = { ...this.state.filters };
     // Convert Date objects to ISO strings for API compatibility
@@ -690,6 +805,7 @@ export class MapFirstCore {
   async runPropertiesSearch({
     body,
     beforeApplyProperties,
+    smartFiltersClearable,
     onError,
   }: {
     body: InitialRequestBody;
@@ -697,6 +813,7 @@ export class MapFirstCore {
       price?: Price | null;
       limit?: number;
     };
+    smartFiltersClearable?: boolean;
     onError?: (error: unknown) => void;
   }): Promise<APIResponse | null> {
     this.ensureAlive();
@@ -720,8 +837,26 @@ export class MapFirstCore {
         limit = result.limit ?? 30;
       }
 
+      // Track if we've already flown to POIs
+      const flown = data.properties.some((x) => !!x.location);
+
       // Apply properties
       this._setProperties(data.properties);
+
+      // Fly to POIs if properties have locations
+      if (flown) {
+        this.flyToPOIs(
+          data.properties
+            .filter(
+              (x) =>
+                !!x.location &&
+                (data.filters.primary_type
+                  ? x.type === data.filters.primary_type
+                  : true)
+            )
+            .map((x) => ({ lat: x.location!.lat, lng: x.location!.lon }))
+        );
+      }
 
       // Determine and set primary type
       if (
@@ -771,6 +906,32 @@ export class MapFirstCore {
             data.properties
           );
           this.setPrimaryType(mostCommonType);
+        }
+      }
+
+      // Fly to POIs if not already done
+      if (!flown) {
+        if (data.properties.some((x) => !!x.location)) {
+          this.flyToPOIs(
+            data.properties
+              .filter(
+                (x) =>
+                  !!x.location &&
+                  (data.filters.primary_type
+                    ? x.type === data.filters.primary_type
+                    : true)
+              )
+              .map((x) => ({ lat: x.location!.lat, lng: x.location!.lon }))
+          );
+        } else if (
+          data.filters.location?.latitude &&
+          data.filters.location?.longitude
+        ) {
+          this.flyMapTo(
+            data.filters.location.longitude,
+            data.filters.location.latitude,
+            12
+          );
         }
       }
 

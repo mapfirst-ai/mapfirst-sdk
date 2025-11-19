@@ -366,6 +366,11 @@ declare class MapFirstCore {
     setLoading(loading: boolean): void;
     setSearching(searching: boolean): void;
     setFlyToAnimating(animating: boolean): void;
+    flyMapTo(longitude: number, latitude: number, zoom?: number | null, animation?: boolean): void;
+    flyToPOIs(pois?: {
+        lat: number;
+        lng: number;
+    }[], type?: PropertyType, animate?: boolean): void;
     getFilters(): any;
     loadProperties({ fetchFn, onSuccess, onError, }: {
         fetchFn: () => Promise<Property[]>;
@@ -378,12 +383,13 @@ declare class MapFirstCore {
     }>;
     private setProperties;
     private mostCommonTypeFromProperties;
-    runPropertiesSearch({ body, beforeApplyProperties, onError, }: {
+    runPropertiesSearch({ body, beforeApplyProperties, smartFiltersClearable, onError, }: {
         body: InitialRequestBody;
         beforeApplyProperties?: (data: APIResponse) => {
             price?: Price | null;
             limit?: number;
         };
+        smartFiltersClearable?: boolean;
         onError?: (error: unknown) => void;
     }): Promise<APIResponse | null>;
     getClusters(): ClusterDisplayItem[];
