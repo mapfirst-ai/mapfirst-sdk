@@ -150,10 +150,14 @@ export function clusterMarkers({
   groups.forEach((groupItems) => {
     if (groupItems.length === 1) {
       const [{ marker }] = groupItems;
+      const isPrimary = marker.type === primaryType;
+      const isSelected = selectedMarkerId === marker.tripadvisor_id;
       clustered.push({
         kind: "primary",
         marker,
-        key: `primary-${marker.tripadvisor_id}`,
+        key: `primary-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${
+          isSelected ? 1 : 0
+        }`,
       });
       return;
     }
@@ -162,10 +166,15 @@ export function clusterMarkers({
       compareMarkers(b.marker, a.marker, primaryType)
     );
     const [primary, ...rest] = sorted;
+    const isPrimaryPrimary = primary.marker.type === primaryType;
+    const isSelectedPrimary =
+      selectedMarkerId === primary.marker.tripadvisor_id;
     clustered.push({
       kind: "primary",
       marker: primary.marker,
-      key: `primary-${primary.marker.tripadvisor_id}`,
+      key: `primary-${primary.marker.tripadvisor_id}-p${
+        isPrimaryPrimary ? 1 : 0
+      }-s${isSelectedPrimary ? 1 : 0}`,
     });
 
     if (!rest.length) return;
@@ -175,10 +184,11 @@ export function clusterMarkers({
 
     rest.forEach((item) => {
       if (selectedMarkerId && item.marker.tripadvisor_id === selectedMarkerId) {
+        const isPrimary = item.marker.type === primaryType;
         clustered.push({
           kind: "primary",
           marker: item.marker,
-          key: `primary-${item.marker.tripadvisor_id}`,
+          key: `primary-${item.marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s1`,
         });
         return;
       }
@@ -191,10 +201,11 @@ export function clusterMarkers({
     });
 
     dotCandidates.forEach((item) => {
+      const isPrimary = item.marker.type === primaryType;
       clustered.push({
         kind: "dot",
         marker: item.marker,
-        key: `dot-${item.marker.tripadvisor_id}`,
+        key: `dot-${item.marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s0`,
         parentId: primary.marker.tripadvisor_id,
       });
     });

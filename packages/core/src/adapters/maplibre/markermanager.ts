@@ -36,9 +36,7 @@ export class MapLibreMarkerManager {
   private readonly onMarkerClick?: (marker: Property) => void;
   private markerCache = new Map<string, MarkerEntry>();
   private primaryType: string = "Accommodation";
-  private previousPrimaryType: string = "Accommodation";
   private selectedMarkerId: number | null = null;
-  private previousSelectedMarkerId: number | null = null;
 
   constructor(options: MapLibreMarkerManagerOptions) {
     this.mapInstance = options.mapInstance;
@@ -52,20 +50,9 @@ export class MapLibreMarkerManager {
     selectedMarkerId?: number | null
   ) {
     if (primaryType && primaryType !== this.primaryType) {
-      this.previousPrimaryType = this.primaryType;
       this.primaryType = primaryType;
-      // Clear cache when primary type changes to force marker recreation
-      this.destroy();
     }
-    if (
-      selectedMarkerId !== undefined &&
-      selectedMarkerId !== this.selectedMarkerId
-    ) {
-      this.previousSelectedMarkerId = this.selectedMarkerId;
-      this.selectedMarkerId = selectedMarkerId;
-      // Clear cache when selected marker changes to force marker recreation
-      this.destroy();
-    } else if (selectedMarkerId !== undefined) {
+    if (selectedMarkerId !== undefined) {
       this.selectedMarkerId = selectedMarkerId;
     }
     if (!this.MarkerCtor) {
