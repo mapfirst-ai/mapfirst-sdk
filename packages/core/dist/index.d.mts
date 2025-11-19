@@ -231,6 +231,55 @@ interface MapStateCallbacks {
 }
 type MapStateUpdate = Partial<MapState>;
 
+type Price = {
+    min: number;
+    max: number;
+};
+type PollOptions = {
+    pollingLink: string;
+    maxAttempts?: number;
+    delayMs?: number;
+    isCancelled?: () => boolean;
+    price?: Price;
+    limit?: number;
+};
+type HotelPricingAPIResponse = {
+    success?: {
+        isComplete: boolean;
+        pollingLink?: string;
+        results?: Property[];
+    };
+};
+type APIResponse = {
+    location_id?: number;
+    filters: any;
+    properties: Property[];
+    isComplete: boolean | undefined;
+    pollingLink: string | undefined;
+    durationSeconds: number;
+};
+type InitialRequestBody = {
+    initial?: boolean;
+    query?: string;
+    bounds?: {
+        sw: {
+            lat: number;
+            lng: number;
+        };
+        ne: {
+            lat: number;
+            lng: number;
+        };
+    };
+    filters?: any;
+    city?: string;
+    country?: string;
+    location_id?: number;
+    longitude?: number;
+    latitude?: number;
+    radius?: number;
+};
+
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {
     status: number;
@@ -321,6 +370,20 @@ declare class MapFirstCore {
         onSuccess?: (properties: Property[]) => void;
         onError?: (error: unknown) => void;
     }): Promise<void>;
+    pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, }: PollOptions): Promise<{
+        completed: boolean;
+        pollData?: HotelPricingAPIResponse;
+    }>;
+    private setProperties;
+    private mostCommonTypeFromProperties;
+    runPropertiesSearch({ body, beforeApplyProperties, onError, }: {
+        body: InitialRequestBody;
+        beforeApplyProperties?: (data: APIResponse) => {
+            price?: Price | null;
+            limit?: number;
+        };
+        onError?: (error: unknown) => void;
+    }): Promise<APIResponse | null>;
     getClusters(): ClusterDisplayItem[];
     refresh(): void;
     destroy(): void;
@@ -329,4 +392,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type Environment, type FilterState, type GoogleMapsNamespace, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };
+export { type APIResponse, type ActiveLocation, type Environment, type FilterState, type GoogleMapsNamespace, type HotelPricingAPIResponse, type InitialRequestBody, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type PollOptions, type Price, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };

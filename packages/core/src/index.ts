@@ -35,6 +35,53 @@ export type {
   MapStateUpdate,
 } from "./state-types";
 
+export type Price = {
+  min: number;
+  max: number;
+};
+
+export type PollOptions = {
+  pollingLink: string;
+  maxAttempts?: number;
+  delayMs?: number;
+  isCancelled?: () => boolean;
+  price?: Price;
+  limit?: number;
+};
+
+export type HotelPricingAPIResponse = {
+  success?: {
+    isComplete: boolean;
+    pollingLink?: string;
+    results?: Property[];
+  };
+};
+
+export type APIResponse = {
+  location_id?: number;
+  filters: any;
+  properties: Property[];
+  isComplete: boolean | undefined;
+  pollingLink: string | undefined;
+  durationSeconds: number;
+};
+
+export type InitialRequestBody = {
+  initial?: boolean;
+  query?: string;
+  bounds?: {
+    sw: { lat: number; lng: number };
+    ne: { lat: number; lng: number };
+  };
+  filters?: any;
+  city?: string;
+  country?: string;
+  location_id?: number;
+  longitude?: number;
+  latitude?: number;
+  radius?: number;
+};
+
 export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 
 export type { GoogleMapsNamespace } from "./adapters/google/markermanager";
@@ -501,6 +548,231 @@ export class MapFirstCore {
     } finally {
       this.setSearching(false);
       this.setLoading(false);
+      this.setState({ firstCallDone: true });
+    }
+  }
+
+  async pollForPricing({
+    pollingLink,
+    maxAttempts = 15,
+    delayMs = 2000,
+    isCancelled,
+    price,
+    limit,
+  }: PollOptions): Promise<{
+    completed: boolean;
+    pollData?: HotelPricingAPIResponse;
+  }> {
+    this.ensureAlive();
+
+    if (!pollingLink) {
+      return { completed: false };
+    }
+
+    let completed = false;
+    let pollData: HotelPricingAPIResponse | undefined = undefined;
+
+    const filters = this.getFilters();
+    if (limit) {
+      filters.limit = limit;
+    }
+
+    const body: any = {
+      filters,
+      pollingLink,
+    };
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      if (isCancelled?.()) {
+        return { completed, pollData };
+      }
+
+      try {
+        const pollResp = await fetch(`${this.apiUrl}/${this.mfid}/ta-polling`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!pollResp.ok) {
+          throw new PropertiesFetchError({
+            message: `Poll failed: ${pollResp.status}`,
+            status: pollResp.status,
+          });
+        }
+
+        pollData = await pollResp.json();
+
+        if (isCancelled?.()) {
+          return { completed, pollData };
+        }
+
+        const results = pollData?.success?.results ?? [];
+        if (results.length > 0) {
+          this.setProperties((prev) => {
+            const resultIds = new Set(results.map((h) => h.tripadvisor_id));
+            const updatedProperties = prev.filter(
+              (property) =>
+                property.type !== "Accommodation" ||
+                resultIds.has(property.tripadvisor_id)
+            );
+
+            results.forEach((property) => {
+              if (!property.location) return;
+              if (
+                property.pricing?.offer?.price &&
+                price &&
+                (property.pricing?.offer?.price < price?.min ||
+                  property.pricing?.offer?.price > price?.max)
+              ) {
+                property.pricing.availability = "unavailable";
+              }
+              const existingIndex = updatedProperties.findIndex(
+                (h) => h.tripadvisor_id === property.tripadvisor_id
+              );
+              if (existingIndex >= 0) {
+                updatedProperties[existingIndex] = property;
+              } else {
+                updatedProperties.push(property);
+              }
+            });
+
+            return updatedProperties;
+          });
+        }
+
+        if (pollData?.success?.isComplete) {
+          completed = true;
+          break;
+        }
+      } catch (error) {
+        console.error("Pricing polling failed", error);
+        this.callbacks.onPropertiesLoadError?.(error);
+        break;
+      }
+
+      if (attempt < maxAttempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+
+    return { completed, pollData };
+  }
+
+  private setProperties(updater: (prev: Property[]) => Property[]): void {
+    const updatedProperties = updater(this.properties);
+    this.setMarkers(updatedProperties);
+  }
+
+  private mostCommonTypeFromProperties(properties: Property[]): PropertyType {
+    const typeCounts = properties.reduce((counts, property) => {
+      counts[property.type] = (counts[property.type] || 0) + 1;
+      return counts;
+    }, {} as Record<PropertyType, number>);
+
+    return Object.entries(typeCounts).reduce((a, b) =>
+      typeCounts[a[0] as PropertyType] > typeCounts[b[0] as PropertyType]
+        ? a
+        : b
+    )[0] as PropertyType;
+  }
+
+  async runPropertiesSearch({
+    body,
+    beforeApplyProperties,
+    onError,
+  }: {
+    body: InitialRequestBody;
+    beforeApplyProperties?: (data: APIResponse) => {
+      price?: Price | null;
+      limit?: number;
+    };
+    onError?: (error: unknown) => void;
+  }): Promise<APIResponse | null> {
+    this.ensureAlive();
+    this.setState({ firstCallDone: false });
+    this.setSearching(true);
+    this.clearMarkers();
+
+    try {
+      const data = await fetchProperties<InitialRequestBody, APIResponse>(
+        `${this.apiUrl}/${this.mfid}/hotels`,
+        body
+      );
+
+      let price: Price | null = null;
+      let limit: number = 30;
+      let primary_type: PropertyType | undefined = data.filters.primary_type;
+
+      if (beforeApplyProperties) {
+        const result = beforeApplyProperties(data);
+        price = result.price ?? null;
+        limit = result.limit ?? 30;
+      }
+
+      // Apply properties
+      this.setMarkers(data.properties);
+
+      // Determine and set primary type
+      if (
+        data.filters.primary_type &&
+        data.properties.filter(
+          (property) =>
+            property.type === data.filters.primary_type &&
+            (property.type === "Accommodation"
+              ? property.pricing?.availability !== "unavailable"
+              : true)
+        ).length > 0
+      ) {
+        primary_type = data.filters.primary_type;
+        this.setPrimaryType(data.filters.primary_type);
+      } else if (data.properties.length > 0) {
+        const mostCommonType = this.mostCommonTypeFromProperties(
+          data.properties
+        );
+        this.setPrimaryType(mostCommonType);
+        primary_type = mostCommonType;
+      }
+
+      this.setState({ firstCallDone: true });
+
+      // Check if we need to poll for pricing
+      if (data.isComplete === false && data.pollingLink) {
+        const { completed, pollData } = await this.pollForPricing({
+          pollingLink: data.pollingLink,
+          ...(price && { price }),
+          ...(limit && { limit }),
+        });
+
+        if (
+          completed &&
+          pollData?.success?.results &&
+          pollData.success.results.filter(
+            (property) =>
+              property.type === data.filters.primary_type &&
+              (property.type === "Accommodation"
+                ? property.pricing?.availability !== "unavailable"
+                : true)
+          ).length === 0 &&
+          primary_type &&
+          primary_type !== data.filters.primary_type
+        ) {
+          const mostCommonType = this.mostCommonTypeFromProperties(
+            data.properties
+          );
+          this.setPrimaryType(mostCommonType);
+        }
+      }
+
+      return data;
+    } catch (error) {
+      onError?.(error);
+      this.callbacks.onPropertiesLoadError?.(error);
+      this.clearMarkers();
+      this.setState({ firstCallDone: true });
+      return null;
+    } finally {
+      this.setSearching(false);
       this.setState({ firstCallDone: true });
     }
   }
