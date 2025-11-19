@@ -37,6 +37,8 @@ export class MapLibreMarkerManager {
   private markerCache = new Map<string, MarkerEntry>();
   private primaryType: string = "Accommodation";
   private previousPrimaryType: string = "Accommodation";
+  private selectedMarkerId: number | null = null;
+  private previousSelectedMarkerId: number | null = null;
 
   constructor(options: MapLibreMarkerManagerOptions) {
     this.mapInstance = options.mapInstance;
@@ -44,12 +46,27 @@ export class MapLibreMarkerManager {
     this.onMarkerClick = options.onMarkerClick;
   }
 
-  render(items: ClusterDisplayItem[], primaryType?: string) {
+  render(
+    items: ClusterDisplayItem[],
+    primaryType?: string,
+    selectedMarkerId?: number | null
+  ) {
     if (primaryType && primaryType !== this.primaryType) {
       this.previousPrimaryType = this.primaryType;
       this.primaryType = primaryType;
       // Clear cache when primary type changes to force marker recreation
       this.destroy();
+    }
+    if (
+      selectedMarkerId !== undefined &&
+      selectedMarkerId !== this.selectedMarkerId
+    ) {
+      this.previousSelectedMarkerId = this.selectedMarkerId;
+      this.selectedMarkerId = selectedMarkerId;
+      // Clear cache when selected marker changes to force marker recreation
+      this.destroy();
+    } else if (selectedMarkerId !== undefined) {
+      this.selectedMarkerId = selectedMarkerId;
     }
     if (!this.MarkerCtor) {
       return;
@@ -117,8 +134,18 @@ export class MapLibreMarkerManager {
 
     const element =
       item.kind === "primary"
-        ? createPrimaryMarkerElement(item, this.primaryType, this.onMarkerClick)
-        : createDotMarkerElement(item, this.primaryType, this.onMarkerClick);
+        ? createPrimaryMarkerElement(
+            item,
+            this.primaryType,
+            this.selectedMarkerId,
+            this.onMarkerClick
+          )
+        : createDotMarkerElement(
+            item,
+            this.primaryType,
+            this.selectedMarkerId,
+            this.onMarkerClick
+          );
 
     if (!element) return;
 

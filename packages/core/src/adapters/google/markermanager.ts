@@ -27,6 +27,8 @@ export class GoogleMapsMarkerManager {
   private markerCache = new Map<string, MarkerEntry>();
   private primaryType: string = "Accommodation";
   private previousPrimaryType: string = "Accommodation";
+  private selectedMarkerId: number | null = null;
+  private previousSelectedMarkerId: number | null = null;
 
   constructor(options: GoogleMapsMarkerManagerOptions) {
     this.mapInstance = options.mapInstance;
@@ -34,12 +36,27 @@ export class GoogleMapsMarkerManager {
     this.onMarkerClick = options.onMarkerClick;
   }
 
-  render(items: ClusterDisplayItem[], primaryType?: string) {
+  render(
+    items: ClusterDisplayItem[],
+    primaryType?: string,
+    selectedMarkerId?: number | null
+  ) {
     if (primaryType && primaryType !== this.primaryType) {
       this.previousPrimaryType = this.primaryType;
       this.primaryType = primaryType;
       // Clear cache when primary type changes to force marker recreation
       this.destroy();
+    }
+    if (
+      selectedMarkerId !== undefined &&
+      selectedMarkerId !== this.selectedMarkerId
+    ) {
+      this.previousSelectedMarkerId = this.selectedMarkerId;
+      this.selectedMarkerId = selectedMarkerId;
+      // Clear cache when selected marker changes to force marker recreation
+      this.destroy();
+    } else if (selectedMarkerId !== undefined) {
+      this.selectedMarkerId = selectedMarkerId;
     }
     if (!this.google?.marker?.AdvancedMarkerElement) {
       console.warn("AdvancedMarkerElement not available");
@@ -108,17 +125,32 @@ export class GoogleMapsMarkerManager {
 
     const element =
       item.kind === "primary"
-        ? createPrimaryMarkerElement(item, this.primaryType, this.onMarkerClick)
-        : createDotMarkerElement(item, this.primaryType, this.onMarkerClick);
+        ? createPrimaryMarkerElement(
+            item,
+            this.primaryType,
+            this.selectedMarkerId,
+            this.onMarkerClick
+          )
+        : createDotMarkerElement(
+            item,
+            this.primaryType,
+            this.selectedMarkerId,
+            this.onMarkerClick
+          );
 
     if (!element) return;
 
     const isPrimaryType = item.marker.type === this.primaryType;
+    const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
     const zIndex =
       item.kind === "primary"
-        ? isPrimaryType
+        ? isSelected
           ? 20
-          : 19
+          : isPrimaryType
+          ? 12
+          : 11
+        : isSelected
+        ? 20
         : isPrimaryType
         ? 3
         : 1;

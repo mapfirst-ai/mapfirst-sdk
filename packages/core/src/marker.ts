@@ -13,6 +13,7 @@ const ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="cu
 export function createPrimaryMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "primary" }>,
   primaryType: string,
+  selectedMarkerId: number | null,
   onMarkerClick?: (marker: Property) => void
 ) {
   if (typeof document === "undefined") {
@@ -21,6 +22,7 @@ export function createPrimaryMarkerElement(
 
   const marker = item.marker;
   const isPrimaryType = marker.type === primaryType;
+  const isSelected = selectedMarkerId === marker.tripadvisor_id;
   const isAccommodation = marker.type === "Accommodation";
   const hasPrice = marker.pricing?.offer?.displayPrice;
   const isPending = isAccommodation && !hasPrice;
@@ -36,14 +38,18 @@ export function createPrimaryMarkerElement(
 
   const root = document.createElement("div");
   root.className = "mapfirst-marker-root";
-  root.style.zIndex = isPrimaryType ? "12" : "11";
+  root.style.zIndex = isSelected ? "20" : isPrimaryType ? "12" : "11";
 
   const pill = document.createElement("button");
   pill.type = "button";
   pill.className = isPending
     ? "mapfirst-marker-pill mapfirst-marker-pill-pending"
     : `mapfirst-marker-pill mapfirst-marker-pill-active${
-        !isPrimaryType ? " mapfirst-marker-non-primary" : ""
+        isSelected
+          ? " mapfirst-marker-selected"
+          : !isPrimaryType
+          ? " mapfirst-marker-non-primary"
+          : ""
       }`;
   pill.title = marker.name ?? String(marker.tripadvisor_id);
 

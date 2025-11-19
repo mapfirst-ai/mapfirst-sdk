@@ -44,6 +44,12 @@
   padding: 4px;
 }
 
+.mapfirst-marker-pill-active.mapfirst-marker-selected {
+  background: #ffffff;
+  border-color: #03852e;
+  color: #03852e;
+}
+
 .mapfirst-marker-pill-active:hover {
   transform: scale(1.2);
 }
@@ -143,6 +149,11 @@
 .mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(3, 133, 46, 0.2);
+}
+
+.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {
+  background: #ffffff;
+  border-color: #03852e;
 }
 
 .mapfirst-dot-marker-button-active:hover {
