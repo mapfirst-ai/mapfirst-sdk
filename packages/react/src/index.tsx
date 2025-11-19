@@ -47,61 +47,69 @@ export function useMapFirstCore(options: BaseMapFirstOptions) {
   const instanceRef = React.useRef<MapFirstCore | null>(null);
   const [state, setState] = React.useState<MapState | null>(null);
 
+  // Memoize the options to prevent recreation on every render
+  const optionsRef = React.useRef(options);
   React.useEffect(() => {
+    optionsRef.current = options;
+  });
+
+  React.useEffect(() => {
+    const opts = optionsRef.current;
+
     // Create MapFirstCore instance without map using adapter-driven options
     const coreOptions: MapFirstOptions = {
       adapter: null as any, // Will be set when attachMap is called
-      ...options,
+      ...opts,
       callbacks: {
-        ...options.callbacks,
+        ...opts.callbacks,
         // Add internal callbacks to trigger React re-renders
         onPropertiesChange: (properties) => {
           setState((prev) => (prev ? { ...prev, properties } : null));
-          options.callbacks?.onPropertiesChange?.(properties);
+          optionsRef.current.callbacks?.onPropertiesChange?.(properties);
         },
         onSelectedPropertyChange: (id) => {
           setState((prev) =>
             prev ? { ...prev, selectedPropertyId: id } : null
           );
-          options.callbacks?.onSelectedPropertyChange?.(id);
+          optionsRef.current.callbacks?.onSelectedPropertyChange?.(id);
         },
         onPrimaryTypeChange: (type) => {
           setState((prev) => (prev ? { ...prev, primary: type } : null));
-          options.callbacks?.onPrimaryTypeChange?.(type);
+          optionsRef.current.callbacks?.onPrimaryTypeChange?.(type);
         },
         onFiltersChange: (filters) => {
           setState((prev) => (prev ? { ...prev, filters } : null));
-          options.callbacks?.onFiltersChange?.(filters);
+          optionsRef.current.callbacks?.onFiltersChange?.(filters);
         },
         onBoundsChange: (bounds) => {
           setState((prev) => (prev ? { ...prev, bounds } : null));
-          options.callbacks?.onBoundsChange?.(bounds);
+          optionsRef.current.callbacks?.onBoundsChange?.(bounds);
         },
         onCenterChange: (center, zoom) => {
           setState((prev) => (prev ? { ...prev, center, zoom } : null));
-          options.callbacks?.onCenterChange?.(center, zoom);
+          optionsRef.current.callbacks?.onCenterChange?.(center, zoom);
         },
         onZoomChange: (zoom) => {
           setState((prev) => (prev ? { ...prev, zoom } : null));
-          options.callbacks?.onZoomChange?.(zoom);
+          optionsRef.current.callbacks?.onZoomChange?.(zoom);
         },
         onActiveLocationChange: (location) => {
           setState((prev) =>
             prev ? { ...prev, activeLocation: location } : null
           );
-          options.callbacks?.onActiveLocationChange?.(location);
+          optionsRef.current.callbacks?.onActiveLocationChange?.(location);
         },
         onLoadingStateChange: (loading) => {
           setState((prev) =>
             prev ? { ...prev, initialLoading: loading } : null
           );
-          options.callbacks?.onLoadingStateChange?.(loading);
+          optionsRef.current.callbacks?.onLoadingStateChange?.(loading);
         },
         onSearchingStateChange: (searching) => {
           setState((prev) =>
             prev ? { ...prev, isSearching: searching } : null
           );
-          options.callbacks?.onSearchingStateChange?.(searching);
+          optionsRef.current.callbacks?.onSearchingStateChange?.(searching);
         },
       },
     };
@@ -117,7 +125,8 @@ export function useMapFirstCore(options: BaseMapFirstOptions) {
       instanceRef.current = null;
       setState(null);
     };
-  }, [options.initialLocationData, options.environment, options.mfid]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { mapFirst: instanceRef.current, state };
 }

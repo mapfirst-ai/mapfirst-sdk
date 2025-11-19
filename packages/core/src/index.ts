@@ -583,6 +583,15 @@ export class MapFirstCore {
   setSelectedMarker(markerId: number | null) {
     this.ensureAlive();
     if (this.selectedMarkerId === markerId) return;
+
+    // If selecting a marker, check if we need to change the primary type
+    if (markerId !== null) {
+      const marker = this.properties.find((p) => p.tripadvisor_id === markerId);
+      if (marker && marker.type !== this.primaryType) {
+        this.setPrimaryType(marker.type);
+      }
+    }
+
     this.selectedMarkerId = markerId;
     this.updateState({ selectedPropertyId: markerId });
     this.callbacks.onSelectedPropertyChange?.(markerId);
