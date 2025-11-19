@@ -35,6 +35,7 @@ export class MapLibreMarkerManager {
   private readonly MarkerCtor?: MapLibreNamespace["Marker"];
   private readonly onMarkerClick?: (marker: Property) => void;
   private markerCache = new Map<string, MarkerEntry>();
+  private primaryType: string = "Accommodation";
 
   constructor(options: MapLibreMarkerManagerOptions) {
     this.mapInstance = options.mapInstance;
@@ -42,7 +43,10 @@ export class MapLibreMarkerManager {
     this.onMarkerClick = options.onMarkerClick;
   }
 
-  render(items: ClusterDisplayItem[]) {
+  render(items: ClusterDisplayItem[], primaryType?: string) {
+    if (primaryType) {
+      this.primaryType = primaryType;
+    }
     if (!this.MarkerCtor) {
       return;
     }
@@ -109,8 +113,8 @@ export class MapLibreMarkerManager {
 
     const element =
       item.kind === "primary"
-        ? createPrimaryMarkerElement(item, this.onMarkerClick)
-        : createDotMarkerElement(item, this.onMarkerClick);
+        ? createPrimaryMarkerElement(item, this.primaryType, this.onMarkerClick)
+        : createDotMarkerElement(item, this.primaryType, this.onMarkerClick);
 
     if (!element) return;
 

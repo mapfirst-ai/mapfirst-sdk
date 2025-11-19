@@ -12,6 +12,7 @@ const ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="cu
 
 export function createPrimaryMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "primary" }>,
+  primaryType: string,
   onMarkerClick?: (marker: Property) => void
 ) {
   if (typeof document === "undefined") {
@@ -19,6 +20,7 @@ export function createPrimaryMarkerElement(
   }
 
   const marker = item.marker;
+  const isPrimaryType = marker.type === primaryType;
   const isAccommodation = marker.type === "Accommodation";
   const hasPrice = marker.pricing?.offer?.displayPrice;
   const isPending = isAccommodation && !hasPrice;
@@ -34,6 +36,7 @@ export function createPrimaryMarkerElement(
 
   const root = document.createElement("div");
   root.className = "mapfirst-marker-root";
+  root.style.zIndex = isPrimaryType ? "12" : "11";
 
   const pill = document.createElement("button");
   pill.type = "button";

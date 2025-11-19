@@ -25,6 +25,7 @@ export class GoogleMapsMarkerManager {
   private readonly google: GoogleMapsNamespace;
   private readonly onMarkerClick?: (marker: Property) => void;
   private markerCache = new Map<string, MarkerEntry>();
+  private primaryType: string = "Accommodation";
 
   constructor(options: GoogleMapsMarkerManagerOptions) {
     this.mapInstance = options.mapInstance;
@@ -32,7 +33,10 @@ export class GoogleMapsMarkerManager {
     this.onMarkerClick = options.onMarkerClick;
   }
 
-  render(items: ClusterDisplayItem[]) {
+  render(items: ClusterDisplayItem[], primaryType?: string) {
+    if (primaryType) {
+      this.primaryType = primaryType;
+    }
     if (!this.google?.marker?.AdvancedMarkerElement) {
       console.warn("AdvancedMarkerElement not available");
       return;
@@ -100,17 +104,27 @@ export class GoogleMapsMarkerManager {
 
     const element =
       item.kind === "primary"
-        ? createPrimaryMarkerElement(item, this.onMarkerClick)
-        : createDotMarkerElement(item, this.onMarkerClick);
+        ? createPrimaryMarkerElement(item, this.primaryType, this.onMarkerClick)
+        : createDotMarkerElement(item, this.primaryType, this.onMarkerClick);
 
     if (!element) return;
+
+    const isPrimaryType = item.marker.type === this.primaryType;
+    const zIndex =
+      item.kind === "primary"
+        ? isPrimaryType
+          ? 20
+          : 19
+        : isPrimaryType
+        ? 3
+        : 1;
 
     try {
       const marker = new this.google.marker.AdvancedMarkerElement({
         map: this.mapInstance,
         position: { lat: coords.lat, lng: coords.lon },
         content: element,
-        zIndex: item.kind === "primary" ? 20 : 10,
+        zIndex,
       });
 
       this.markerCache.set(item.key, {

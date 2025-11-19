@@ -516,7 +516,7 @@ export class MapFirstCore {
     });
 
     const markerManager = this.adapter.getMarkerManager();
-    markerManager.render(this.clusterItems);
+    markerManager.render(this.clusterItems, primaryType);
 
     this.options.onClusterUpdate?.(this.clusterItems, viewState);
   }
