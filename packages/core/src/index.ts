@@ -13,8 +13,27 @@ import {
   metersToPixels,
   ViewStateSnapshot,
 } from "./utils/clustering";
+import type {
+  MapBounds,
+  ViewState,
+  ActiveLocation,
+  FilterState,
+  MapState,
+  MapStateCallbacks,
+  MapStateUpdate,
+} from "./state-types";
 
 export type { Property, PropertyType } from "./types";
+
+export type {
+  MapBounds,
+  ViewState,
+  ActiveLocation,
+  FilterState,
+  MapState,
+  MapStateCallbacks,
+  MapStateUpdate,
+} from "./state-types";
 
 export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 
@@ -32,6 +51,9 @@ type BaseMapFirstOptions = {
     clusters: ClusterDisplayItem[],
     viewState: ViewStateSnapshot | null
   ) => void;
+  // State management options
+  state?: Partial<MapState>;
+  callbacks?: MapStateCallbacks;
 };
 
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -76,10 +98,40 @@ export class MapFirstCore {
   private destroyed = false;
   private clusterItems: ClusterDisplayItem[] = [];
 
+  // State management
+  private state: MapState;
+  private callbacks: MapStateCallbacks;
+
   constructor(private readonly options: MapFirstOptions) {
     this.markers = [...(options.markers ?? [])];
     this.primaryType = options.primaryType;
     this.selectedMarkerId = options.selectedMarkerId ?? null;
+
+    // Initialize state
+    this.state = {
+      center: [0, 0],
+      zoom: 0,
+      bounds: null,
+      pendingBounds: null,
+      tempBounds: null,
+      properties: this.markers,
+      primary: this.primaryType ?? DEFAULT_PRIMARY_TYPE,
+      selectedPropertyId: this.selectedMarkerId,
+      initialLoading: true,
+      isSearching: false,
+      firstCallDone: false,
+      filters: {},
+      activeLocation: {
+        country: "",
+        location_id: null,
+        locationName: "",
+        coordinates: [0, 0],
+      },
+      isFlyToAnimating: false,
+      ...options.state,
+    };
+
+    this.callbacks = options.callbacks ?? {};
 
     this.adapter = this.createAdapter(options);
     this.refresh();
@@ -125,18 +177,24 @@ export class MapFirstCore {
   setMarkers(markers: Property[]) {
     this.ensureAlive();
     this.markers = [...markers];
+    this.updateState({ properties: markers });
+    this.callbacks.onPropertiesChange?.(markers);
     this.refresh();
   }
 
   addMarker(marker: Property) {
     this.ensureAlive();
     this.markers = [...this.markers, marker];
+    this.updateState({ properties: this.markers });
+    this.callbacks.onPropertiesChange?.(this.markers);
     this.refresh();
   }
 
   clearMarkers() {
     this.ensureAlive();
     this.markers = [];
+    this.updateState({ properties: [] });
+    this.callbacks.onPropertiesChange?.([]);
     this.refresh();
   }
 
@@ -144,6 +202,8 @@ export class MapFirstCore {
     this.ensureAlive();
     if (this.primaryType === primary) return;
     this.primaryType = primary;
+    this.updateState({ primary });
+    this.callbacks.onPrimaryTypeChange?.(primary);
     this.refresh();
   }
 
@@ -151,7 +211,90 @@ export class MapFirstCore {
     this.ensureAlive();
     if (this.selectedMarkerId === markerId) return;
     this.selectedMarkerId = markerId;
+    this.updateState({ selectedPropertyId: markerId });
+    this.callbacks.onSelectedPropertyChange?.(markerId);
     this.refresh();
+  }
+
+  // State management methods
+  getState(): Readonly<MapState> {
+    return { ...this.state };
+  }
+
+  updateState(update: MapStateUpdate) {
+    this.state = { ...this.state, ...update };
+  }
+
+  setState(newState: Partial<MapState>) {
+    const prevState = { ...this.state };
+    this.updateState(newState);
+
+    // Trigger callbacks for changed values
+    if (newState.center !== undefined && newState.center !== prevState.center) {
+      this.callbacks.onCenterChange?.(newState.center, this.state.zoom);
+    }
+    if (newState.zoom !== undefined && newState.zoom !== prevState.zoom) {
+      this.callbacks.onZoomChange?.(newState.zoom);
+    }
+    if (newState.bounds !== undefined && newState.bounds !== prevState.bounds) {
+      this.callbacks.onBoundsChange?.(newState.bounds);
+    }
+    if (
+      newState.filters !== undefined &&
+      newState.filters !== prevState.filters
+    ) {
+      this.callbacks.onFiltersChange?.(newState.filters);
+    }
+    if (
+      newState.activeLocation !== undefined &&
+      newState.activeLocation !== prevState.activeLocation
+    ) {
+      this.callbacks.onActiveLocationChange?.(newState.activeLocation);
+    }
+    if (
+      newState.initialLoading !== undefined &&
+      newState.initialLoading !== prevState.initialLoading
+    ) {
+      this.callbacks.onLoadingStateChange?.(newState.initialLoading);
+    }
+    if (
+      newState.isSearching !== undefined &&
+      newState.isSearching !== prevState.isSearching
+    ) {
+      this.callbacks.onSearchingStateChange?.(newState.isSearching);
+    }
+  }
+
+  setFilters(filters: FilterState) {
+    this.setState({ filters });
+  }
+
+  setActiveLocation(location: ActiveLocation) {
+    this.setState({ activeLocation: location });
+  }
+
+  setBounds(bounds: MapBounds | null) {
+    this.setState({ bounds });
+  }
+
+  setPendingBounds(bounds: MapBounds | null) {
+    this.setState({ pendingBounds: bounds });
+  }
+
+  setTempBounds(bounds: MapBounds | null) {
+    this.setState({ tempBounds: bounds });
+  }
+
+  setLoading(loading: boolean) {
+    this.setState({ initialLoading: loading });
+  }
+
+  setSearching(searching: boolean) {
+    this.setState({ isSearching: searching });
+  }
+
+  setFlyToAnimating(animating: boolean) {
+    this.setState({ isFlyToAnimating: animating });
   }
 
   getClusters(): ClusterDisplayItem[] {

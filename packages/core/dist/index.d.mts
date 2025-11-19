@@ -148,7 +148,7 @@ declare abstract class MapAdapter {
      * Get the current bounds of the map viewport
      * @returns {MapBounds} Map bounds with southwest and northeast corners
      */
-    abstract getMapBounds(): MapBounds;
+    abstract getMapBounds(): MapBounds$1;
     /**
      * Project a geographical coordinate to screen space
      * @param {[number, number]} lngLat [longitude, latitude]
@@ -159,7 +159,7 @@ declare abstract class MapAdapter {
         y: number;
     };
 }
-type MapBounds = {
+type MapBounds$1 = {
     sw: {
         lat: number;
         lng: number;
@@ -170,6 +170,66 @@ type MapBounds = {
     };
 };
 
+interface MapBounds {
+    sw: {
+        lat: number;
+        lng: number;
+    };
+    ne: {
+        lat: number;
+        lng: number;
+    };
+}
+interface ViewState {
+    center: [number, number];
+    zoom: number;
+    bounds: MapBounds | null;
+}
+interface ActiveLocation {
+    city?: string;
+    state?: string;
+    country: string;
+    location_id: number | null;
+    locationName: string;
+    coordinates: [number, number];
+}
+interface FilterState {
+    checkIn?: Date | string;
+    checkOut?: Date | string;
+    numAdults?: number;
+    numRooms?: number;
+    currency?: string;
+}
+interface MapState {
+    center: [number, number];
+    zoom: number;
+    bounds: MapBounds | null;
+    pendingBounds: MapBounds | null;
+    tempBounds: MapBounds | null;
+    properties: Property[];
+    primary: PropertyType;
+    selectedPropertyId: number | null;
+    initialLoading: boolean;
+    isSearching: boolean;
+    firstCallDone: boolean;
+    filters: FilterState;
+    activeLocation: ActiveLocation;
+    isFlyToAnimating: boolean;
+}
+interface MapStateCallbacks {
+    onCenterChange?: (center: [number, number], zoom: number) => void;
+    onBoundsChange?: (bounds: MapBounds | null) => void;
+    onZoomChange?: (zoom: number) => void;
+    onPropertiesChange?: (properties: Property[]) => void;
+    onSelectedPropertyChange?: (propertyId: number | null) => void;
+    onPrimaryTypeChange?: (type: PropertyType) => void;
+    onFiltersChange?: (filters: FilterState) => void;
+    onActiveLocationChange?: (location: ActiveLocation) => void;
+    onLoadingStateChange?: (loading: boolean) => void;
+    onSearchingStateChange?: (searching: boolean) => void;
+}
+type MapStateUpdate = Partial<MapState>;
+
 type BaseMapFirstOptions = {
     markers?: Property[];
     primaryType?: PropertyType;
@@ -177,6 +237,8 @@ type BaseMapFirstOptions = {
     clusterRadiusMeters?: number;
     autoSelectOnClick?: boolean;
     onClusterUpdate?: (clusters: ClusterDisplayItem[], viewState: ViewStateSnapshot | null) => void;
+    state?: Partial<MapState>;
+    callbacks?: MapStateCallbacks;
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
     adapter: MapAdapter;
@@ -209,6 +271,8 @@ declare class MapFirstCore {
     private selectedMarkerId;
     private destroyed;
     private clusterItems;
+    private state;
+    private callbacks;
     constructor(options: MapFirstOptions);
     private createAdapter;
     private initializeAdapter;
@@ -217,6 +281,17 @@ declare class MapFirstCore {
     clearMarkers(): void;
     setPrimaryType(primary: PropertyType): void;
     setSelectedMarker(markerId: number | null): void;
+    getState(): Readonly<MapState>;
+    updateState(update: MapStateUpdate): void;
+    setState(newState: Partial<MapState>): void;
+    setFilters(filters: FilterState): void;
+    setActiveLocation(location: ActiveLocation): void;
+    setBounds(bounds: MapBounds | null): void;
+    setPendingBounds(bounds: MapBounds | null): void;
+    setTempBounds(bounds: MapBounds | null): void;
+    setLoading(loading: boolean): void;
+    setSearching(searching: boolean): void;
+    setFlyToAnimating(animating: boolean): void;
     getClusters(): ClusterDisplayItem[];
     refresh(): void;
     destroy(): void;
@@ -225,4 +300,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type GoogleMapsNamespace, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapboxNamespace, type Property, type PropertyType };
+export { type ActiveLocation, type FilterState, type GoogleMapsNamespace, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Property, type PropertyType, type ViewState };
