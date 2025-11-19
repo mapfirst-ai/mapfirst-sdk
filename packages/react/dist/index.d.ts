@@ -86,6 +86,8 @@ declare function usePrimaryType(mapFirst: MapFirstCore | null): [PropertyType, (
 /**
  * Hook to access and control the selected marker.
  * Returns the current selected marker ID and a setter function.
+ * Note: This hook requires the MapFirstCore instance. For simpler usage with reactive updates,
+ * use state.selectedPropertyId from useMapFirstCore instead.
  *
  * @example
  * ```tsx
