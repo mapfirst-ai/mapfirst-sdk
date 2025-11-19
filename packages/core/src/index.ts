@@ -179,6 +179,13 @@ type BaseMapFirstOptions = {
   environment?: Environment;
   mfid?: string;
   requestBody?: any;
+  // Map behavior options
+  fitBoundsPadding?: {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
 };
 
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -244,6 +251,12 @@ export class MapFirstCore {
   private readonly apiUrl: string;
   private readonly mfid?: string;
   private readonly requestBody?: any;
+  private readonly fitBoundsPadding: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
 
   constructor(private readonly options: MapFirstOptions) {
     this.properties = [...(options.properties ?? [])];
@@ -255,6 +268,17 @@ export class MapFirstCore {
     this.apiUrl = API_URLS[this.environment];
     this.mfid = options.mfid ?? "default";
     this.requestBody = options.requestBody;
+
+    // Determine if using Google Maps
+    const isGoogleMaps = isGoogleMapsOptions(options);
+
+    // Set default padding based on platform (Google Maps uses 0, others use padding)
+    this.fitBoundsPadding = {
+      top: options.fitBoundsPadding?.top ?? (isGoogleMaps ? 0 : 50),
+      bottom: options.fitBoundsPadding?.bottom ?? (isGoogleMaps ? 0 : 160),
+      left: options.fitBoundsPadding?.left ?? (isGoogleMaps ? 0 : 50),
+      right: options.fitBoundsPadding?.right ?? (isGoogleMaps ? 0 : 50),
+    };
 
     // Initialize default dates
     const defaultDates = getDefaultDates();
@@ -591,9 +615,7 @@ export class MapFirstCore {
             bounds.extend({ lat: poi.lat, lng: poi.lng });
           });
           this.setFlyToAnimating(true);
-          mapInstance.fitBounds(bounds, {
-            padding: { top: 50, bottom: 50, left: 50, right: 50 },
-          });
+          mapInstance.fitBounds(bounds, this.fitBoundsPadding);
         }
       } else if (mapInstance.fitBounds) {
         // MapLibre/Mapbox
@@ -611,7 +633,7 @@ export class MapFirstCore {
 
         this.setFlyToAnimating(true);
         mapInstance.fitBounds(bounds, {
-          padding: { top: 50, bottom: 50, left: 50, right: 50 },
+          padding: this.fitBoundsPadding,
           animate,
         });
       }

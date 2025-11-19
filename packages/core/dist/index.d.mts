@@ -307,6 +307,12 @@ type BaseMapFirstOptions = {
     environment?: Environment;
     mfid?: string;
     requestBody?: any;
+    fitBoundsPadding?: {
+        top?: number;
+        bottom?: number;
+        left?: number;
+        right?: number;
+    };
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
     adapter: MapAdapter;
@@ -345,6 +351,7 @@ declare class MapFirstCore {
     private readonly apiUrl;
     private readonly mfid?;
     private readonly requestBody?;
+    private readonly fitBoundsPadding;
     constructor(options: MapFirstOptions);
     private autoLoadProperties;
     private createAdapter;
