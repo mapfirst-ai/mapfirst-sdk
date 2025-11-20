@@ -499,6 +499,119 @@ const selectedId = useMapFirstSelectedProperty(mapFirst);
 return <div>Selected: {selectedId || 'None'}</div>;
 ```
 
+### `usePropertiesSearch`
+
+Hook to run properties search with the MapFirst SDK. Returns a function to trigger the search and loading state.
+
+**Parameters:**
+
+- `mapFirst` - SDK instance from `useMapFirstCore`
+
+**Returns:** `{ search: Function, isLoading: boolean, error: Error | null }`
+
+**Example:**
+
+```tsx
+const { mapFirst } = useMapFirstCore({ ... });
+const { search, isLoading, error } = usePropertiesSearch(mapFirst);
+
+const handleSearch = async () => {
+  try {
+    await search({
+      body: {
+        city: "Paris",
+        country: "France",
+        filters: {
+          checkIn: new Date(),
+          checkOut: new Date(Date.now() + 86400000 * 3), // 3 days later
+          numAdults: 2,
+          numRooms: 1,
+          currency: "EUR"
+        }
+      }
+    });
+  } catch (err) {
+    console.error("Search failed:", err);
+  }
+};
+
+return (
+  <div>
+    <button onClick={handleSearch} disabled={isLoading}>
+      {isLoading ? "Searching..." : "Search Properties"}
+    </button>
+    {error && <p>Error: {error.message}</p>}
+  </div>
+);
+```
+
+### `useSmartFilterSearch`
+
+Hook to run smart filter search with natural language queries or predefined filters.
+
+**Parameters:**
+
+- `mapFirst` - SDK instance from `useMapFirstCore`
+
+**Returns:** `{ search: Function, isLoading: boolean, error: Error | null }`
+
+**Example with natural language query:**
+
+```tsx
+const { mapFirst } = useMapFirstCore({ ... });
+const { search, isLoading, error } = useSmartFilterSearch(mapFirst);
+
+const handleSearch = async (query: string) => {
+  try {
+    await search({ query });
+  } catch (err) {
+    console.error("Search failed:", err);
+  }
+};
+
+return (
+  <div>
+    <input
+      type="text"
+      placeholder="e.g., hotels near beach with pool"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          handleSearch(e.currentTarget.value);
+        }
+      }}
+    />
+    {isLoading && <p>Searching...</p>}
+    {error && <p>Error: {error.message}</p>}
+  </div>
+);
+```
+
+**Example with predefined filters:**
+
+```tsx
+const { mapFirst } = useMapFirstCore({ ... });
+const { search, isLoading, error } = useSmartFilterSearch(mapFirst);
+
+const handleFilterSearch = async () => {
+  try {
+    await search({
+      filters: [
+        { id: "pool", label: "Pool", type: "amenity", value: "pool" },
+        { id: "4star", label: "4 Star", type: "starRating", value: "4", numericValue: 4 }
+      ]
+    });
+  } catch (err) {
+    console.error("Search failed:", err);
+  }
+};
+
+return (
+  <button onClick={handleFilterSearch} disabled={isLoading}>
+    Apply Filters
+  </button>
+);
+```
+
 ## Legacy API
 
 The old `useMapFirst` hook is still available but deprecated:

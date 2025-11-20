@@ -386,6 +386,314 @@ function RealTimeUpdates() {
 }
 ```
 
+## Search Hooks Examples
+
+### Using `usePropertiesSearch` for Location-Based Search
+
+```tsx
+import React, { useState } from "react";
+import {
+  useMapFirstCore,
+  useMapLibreAttachment,
+  usePropertiesSearch,
+} from "@mapfirst/react";
+import maplibregl from "maplibre-gl";
+
+function LocationSearchExample() {
+  const [city, setCity] = useState("Paris");
+  const [country, setCountry] = useState("France");
+
+  const { mapFirst, state } = useMapFirstCore({
+    initialLocationData: { city, country, currency: "USD" },
+  });
+
+  const { search, isLoading, error } = usePropertiesSearch(mapFirst);
+
+  const handleSearch = async () => {
+    try {
+      await search({
+        body: {
+          city,
+          country,
+          filters: {
+            checkIn: new Date("2024-06-01"),
+            checkOut: new Date("2024-06-07"),
+            numAdults: 2,
+            numRooms: 1,
+            currency: "USD",
+          },
+        },
+      });
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+  };
+
+  return (
+    <div>
+      <div>
+        <input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="City"
+        />
+        <input
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          placeholder="Country"
+        />
+        <button onClick={handleSearch} disabled={isLoading}>
+          {isLoading ? "Searching..." : "Search"}
+        </button>
+      </div>
+      {error && <div style={{ color: "red" }}>Error: {error.message}</div>}
+      <div>Found {state?.properties.length || 0} properties</div>
+    </div>
+  );
+}
+```
+
+### Using `useSmartFilterSearch` for Natural Language Queries
+
+```tsx
+import React, { useState } from "react";
+import {
+  useMapFirstCore,
+  useMapLibreAttachment,
+  useSmartFilterSearch,
+} from "@mapfirst/react";
+import maplibregl from "maplibre-gl";
+
+function SmartSearchExample() {
+  const [query, setQuery] = useState("");
+
+  const { mapFirst, state } = useMapFirstCore({
+    initialLocationData: {
+      city: "New York",
+      country: "United States",
+      currency: "USD",
+    },
+  });
+
+  const { search, isLoading, error } = useSmartFilterSearch(mapFirst);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    try {
+      await search({ query });
+    } catch (err) {
+      console.error("Search failed:", err);
+    }
+  };
+
+  const exampleQueries = [
+    "Hotels near Times Square with free wifi",
+    "4-star hotels with pool and gym",
+    "Budget hotels under $150",
+    "Luxury hotels with spa",
+  ];
+
+  return (
+    <div>
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Try: hotels near beach with pool"
+          style={{ width: "400px", padding: "8px" }}
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Searching..." : "Search"}
+        </button>
+      </form>
+
+      <div style={{ marginTop: "10px" }}>
+        <strong>Try these examples:</strong>
+        <ul>
+          {exampleQueries.map((q) => (
+            <li key={q}>
+              <button
+                onClick={() => {
+                  setQuery(q);
+                  search({ query: q });
+                }}
+                disabled={isLoading}
+                style={{ textAlign: "left", padding: "4px 8px" }}
+              >
+                {q}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {error && (
+        <div style={{ color: "red", marginTop: "10px" }}>
+          Error: {error.message}
+        </div>
+      )}
+
+      <div style={{ marginTop: "10px" }}>
+        {isLoading ? (
+          <p>Searching...</p>
+        ) : (
+          <p>Found {state?.properties.length || 0} properties</p>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+### Combined Search with Filters
+
+```tsx
+import React, { useState } from "react";
+import {
+  useMapFirstCore,
+  usePropertiesSearch,
+  useSmartFilterSearch,
+} from "@mapfirst/react";
+
+type SearchMode = "location" | "smart";
+
+function CombinedSearchExample() {
+  const [mode, setMode] = useState<SearchMode>("location");
+  const [city, setCity] = useState("Los Angeles");
+  const [country, setCountry] = useState("United States");
+  const [query, setQuery] = useState("");
+
+  const { mapFirst, state } = useMapFirstCore({
+    initialLocationData: { city, country, currency: "USD" },
+  });
+
+  const propertiesSearch = usePropertiesSearch(mapFirst);
+  const smartSearch = useSmartFilterSearch(mapFirst);
+
+  const currentSearch = mode === "location" ? propertiesSearch : smartSearch;
+
+  const handleLocationSearch = async () => {
+    try {
+      await propertiesSearch.search({
+        body: {
+          city,
+          country,
+          filters: {
+            checkIn: new Date("2024-06-01"),
+            checkOut: new Date("2024-06-07"),
+            numAdults: 2,
+            numRooms: 1,
+            currency: "USD",
+          },
+        },
+      });
+    } catch (err) {
+      console.error("Location search failed:", err);
+    }
+  };
+
+  const handleSmartSearch = async () => {
+    if (!query.trim()) return;
+    try {
+      await smartSearch.search({ query });
+    } catch (err) {
+      console.error("Smart search failed:", err);
+    }
+  };
+
+  return (
+    <div>
+      <div>
+        <label>
+          <input
+            type="radio"
+            checked={mode === "location"}
+            onChange={() => setMode("location")}
+          />
+          Location Search
+        </label>
+        <label style={{ marginLeft: "20px" }}>
+          <input
+            type="radio"
+            checked={mode === "smart"}
+            onChange={() => setMode("smart")}
+          />
+          Smart Search
+        </label>
+      </div>
+
+      {mode === "location" ? (
+        <div style={{ marginTop: "10px" }}>
+          <input
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="City"
+          />
+          <input
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="Country"
+            style={{ marginLeft: "10px" }}
+          />
+          <button
+            onClick={handleLocationSearch}
+            disabled={currentSearch.isLoading}
+          >
+            Search
+          </button>
+        </div>
+      ) : (
+        <div style={{ marginTop: "10px" }}>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Describe what you're looking for..."
+            style={{ width: "400px" }}
+          />
+          <button
+            onClick={handleSmartSearch}
+            disabled={currentSearch.isLoading}
+          >
+            Search
+          </button>
+        </div>
+      )}
+
+      {currentSearch.error && (
+        <div style={{ color: "red", marginTop: "10px" }}>
+          Error: {currentSearch.error.message}
+        </div>
+      )}
+
+      <div style={{ marginTop: "10px" }}>
+        {currentSearch.isLoading ? (
+          <p>Searching...</p>
+        ) : (
+          <p>Found {state?.properties.length || 0} properties</p>
+        )}
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <h3>Results:</h3>
+        <ul>
+          {state?.properties.slice(0, 5).map((property) => (
+            <li key={property.tripadvisor_id}>
+              <strong>{property.name}</strong>
+              {property.pricing && (
+                <span> - ${property.pricing.display_price}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+```
+
 ## TypeScript Usage
 
 Full type safety with TypeScript:

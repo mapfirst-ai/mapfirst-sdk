@@ -11,6 +11,45 @@ import {
   type PropertyType,
 } from "@mapfirst.ai/core";
 
+// Import additional types for search functionality
+type InitialRequestBody = {
+  initial?: boolean;
+  query?: string;
+  bounds?: {
+    sw: { lat: number; lng: number };
+    ne: { lat: number; lng: number };
+  };
+  filters?: any;
+  city?: string;
+  country?: string;
+  location_id?: number;
+  longitude?: number;
+  latitude?: number;
+  radius?: number;
+};
+
+type SmartFilter = {
+  id: string;
+  label: string;
+  type:
+    | "amenity"
+    | "hotelStyle"
+    | "priceRange"
+    | "minRating"
+    | "starRating"
+    | "primary_type"
+    | "transformed_query"
+    | "selected_restaurant_price_levels";
+  value: string;
+  numericValue?: number;
+  priceRange?: {
+    min: number;
+    max?: number;
+  };
+  propertyType?: PropertyType;
+  priceLevels?: any[];
+};
+
 /**
  * Hook that creates a MapFirstCore instance that can be initialized before maps are ready.
  * Supports two-phase initialization: create SDK first, attach map later.
@@ -453,6 +492,152 @@ export function useMapFirst(options: MapFirstOptions | null) {
   }, [options]);
 
   return instanceRef;
+}
+
+/**
+ * Hook to run properties search with the MapFirst SDK.
+ * Returns a function to trigger the search and loading state.
+ *
+ * @example
+ * ```tsx
+ * const { mapFirst } = useMapFirstCore({ ... });
+ * const { search, isLoading, error } = usePropertiesSearch(mapFirst);
+ *
+ * const handleSearch = async () => {
+ *   await search({
+ *     body: {
+ *       city: "Paris",
+ *       country: "France",
+ *       filters: {
+ *         checkIn: new Date(),
+ *         checkOut: new Date(Date.now() + 86400000),
+ *         numAdults: 2,
+ *         numRooms: 1
+ *       }
+ *     }
+ *   });
+ * };
+ * ```
+ */
+export function usePropertiesSearch(mapFirst: MapFirstCore | null) {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+
+  const search = React.useCallback(
+    async (options: {
+      body: InitialRequestBody;
+      beforeApplyProperties?: (data: any) => {
+        price?: any;
+        limit?: number;
+      };
+      smartFiltersClearable?: boolean;
+    }) => {
+      if (!mapFirst) {
+        const err = new Error("MapFirst instance not available");
+        setError(err);
+        throw err;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const result = await mapFirst.runPropertiesSearch({
+          ...options,
+          onError: (err) => {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error);
+          },
+        });
+        return result;
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [mapFirst]
+  );
+
+  return { search, isLoading, error };
+}
+
+/**
+ * Hook to run smart filter search with the MapFirst SDK.
+ * Returns a function to trigger the search and loading state.
+ *
+ * @example
+ * ```tsx
+ * const { mapFirst } = useMapFirstCore({ ... });
+ * const { search, isLoading, error } = useSmartFilterSearch(mapFirst);
+ *
+ * const handleSearch = async () => {
+ *   await search({
+ *     query: "hotels near beach with pool"
+ *   });
+ * };
+ *
+ * // Or with filters
+ * const handleFilterSearch = async () => {
+ *   await search({
+ *     filters: [
+ *       { id: "pool", label: "Pool", type: "amenity", value: "pool" },
+ *       { id: "4star", label: "4 Star", type: "starRating", value: "4", numericValue: 4 }
+ *     ]
+ *   });
+ * };
+ * ```
+ */
+export function useSmartFilterSearch(mapFirst: MapFirstCore | null) {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+
+  const search = React.useCallback(
+    async (options: {
+      query?: string;
+      filters?: SmartFilter[];
+      onProcessFilters?: (
+        filters: any,
+        location_id?: number
+      ) => {
+        smartFilters?: SmartFilter[];
+        price?: any;
+        limit?: number;
+        language?: string;
+      };
+    }) => {
+      if (!mapFirst) {
+        const err = new Error("MapFirst instance not available");
+        setError(err);
+        throw err;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const result = await mapFirst.runSmartFilterSearch({
+          ...options,
+          onError: (err) => {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error);
+          },
+        });
+        return result;
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [mapFirst]
+  );
+
+  return { search, isLoading, error };
 }
 
 /**
