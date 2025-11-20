@@ -1,9 +1,6 @@
-import { MapAdapter, type LngLat, type MapBounds } from "./index";
-import {
-  MapboxMarkerManager,
-  type MapboxNamespace,
-} from "./mapbox/markermanager";
-import type { Property } from "../types";
+import { MapAdapter, type LngLat, type MapBounds } from "../index";
+import { MapboxMarkerManager, type MapboxNamespace } from "./markermanager";
+import type { Property } from "../../types";
 
 export class MapboxAdapter extends MapAdapter {
   private markerManager?: MapboxMarkerManager;

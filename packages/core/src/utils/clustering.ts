@@ -157,7 +157,7 @@ export function clusterMarkers({
         marker,
         key: `primary-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${
           isSelected ? 1 : 0
-        }`,
+        }-${marker.pricing?.availability}`,
       });
       return;
     }
@@ -174,7 +174,7 @@ export function clusterMarkers({
       marker: primary.marker,
       key: `primary-${primary.marker.tripadvisor_id}-p${
         isPrimaryPrimary ? 1 : 0
-      }-s${isSelectedPrimary ? 1 : 0}`,
+      }-s${isSelectedPrimary ? 1 : 0}-${primary.marker.pricing?.availability}`,
     });
 
     if (!rest.length) return;
@@ -188,7 +188,9 @@ export function clusterMarkers({
         clustered.push({
           kind: "primary",
           marker: item.marker,
-          key: `primary-${item.marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s1`,
+          key: `primary-${item.marker.tripadvisor_id}-p${
+            isPrimary ? 1 : 0
+          }-s1-${item.marker.pricing?.availability}`,
         });
         return;
       }
@@ -205,7 +207,9 @@ export function clusterMarkers({
       clustered.push({
         kind: "dot",
         marker: item.marker,
-        key: `dot-${item.marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s0`,
+        key: `dot-${item.marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s0-${
+          item.marker.pricing?.availability
+        }`,
         parentId: primary.marker.tripadvisor_id,
       });
     });

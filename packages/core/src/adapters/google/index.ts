@@ -1,9 +1,9 @@
-import { MapAdapter, type LngLat, type MapBounds } from "./index";
+import { MapAdapter, type LngLat, type MapBounds } from "../index";
 import {
   GoogleMapsMarkerManager,
   type GoogleMapsNamespace,
-} from "./google/markermanager";
-import type { Property } from "../types";
+} from "./markermanager";
+import type { Property } from "../../types";
 
 export class GoogleMapsAdapter extends MapAdapter {
   private overlayView: any;

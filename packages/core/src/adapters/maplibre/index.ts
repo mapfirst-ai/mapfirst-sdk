@@ -1,9 +1,6 @@
-import { MapAdapter, type LngLat, type MapBounds } from "./index";
-import {
-  MapLibreMarkerManager,
-  type MapLibreNamespace,
-} from "./maplibre/markermanager";
-import type { Property } from "../types";
+import { MapAdapter, type LngLat, type MapBounds } from "../index";
+import { MapLibreMarkerManager, type MapLibreNamespace } from "./markermanager";
+import type { Property } from "../../types";
 
 export class MapLibreAdapter extends MapAdapter {
   private markerManager?: MapLibreMarkerManager;

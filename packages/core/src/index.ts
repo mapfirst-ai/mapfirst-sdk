@@ -2,7 +2,19 @@ import type { MapAdapter } from "./adapters";
 import { MapLibreAdapter } from "./adapters/maplibre";
 import { GoogleMapsAdapter } from "./adapters/google";
 import { MapboxAdapter } from "./adapters/mapbox";
-import type { APIResponse, FilterSchema, HotelPricingAPIResponse, InitialLocationData, InitialRequestBody, PollOptions, Price, PriceLevel, Property, PropertyType, SmartFilter } from "./types";
+import type {
+  APIResponse,
+  FilterSchema,
+  HotelPricingAPIResponse,
+  InitialLocationData,
+  InitialRequestBody,
+  PollOptions,
+  Price,
+  PriceLevel,
+  Property,
+  PropertyType,
+  SmartFilter,
+} from "./types";
 import type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 import type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 import type { MapboxNamespace } from "./adapters/mapbox/markermanager";
@@ -310,7 +322,8 @@ export class MapFirstCore {
       // Geo-lookup if city/country provided
       if ((city && country) || country) {
         const geoResponse = await fetch(
-          `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${city ? `&city=${encodeURIComponent(city)}` : ""
+          `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${
+            city ? `&city=${encodeURIComponent(city)}` : ""
           }`
         );
 
@@ -856,11 +869,14 @@ export class MapFirstCore {
       }
 
       try {
-        const pollResp = await fetch(`${this.apiUrl}/${this.mfid}/ta-polling`, {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers: { "Content-Type": "application/json" },
-        });
+        const pollResp = await fetch(
+          `${this.apiUrl}/${this.mfid}/ta-polling?pollingNumber=${attempt}`,
+          {
+            method: "POST",
+            body: JSON.stringify(body),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         if (!pollResp.ok) {
           throw new PropertiesFetchError({
@@ -904,12 +920,8 @@ export class MapFirstCore {
                 updatedProperties.push(property);
               }
             });
-
             return updatedProperties;
           });
-
-          // Force a refresh after updating properties to ensure markers are re-rendered
-          this.refresh();
         }
 
         if (pollData?.success?.isComplete) {
@@ -1226,22 +1238,25 @@ export class MapFirstCore {
       ...(state.bounds
         ? { bounds: state.bounds }
         : state.activeLocation.location_id
-          ? { location_id: state.activeLocation.location_id }
-          : state.activeLocation.coordinates
-            ? { latitude: state.activeLocation.coordinates[0], longitude: state.activeLocation.coordinates[1] }
-            : {}),
+        ? { location_id: state.activeLocation.location_id }
+        : state.activeLocation.coordinates
+        ? {
+            latitude: state.activeLocation.coordinates[0],
+            longitude: state.activeLocation.coordinates[1],
+          }
+        : {}),
     };
 
     return this.runPropertiesSearch({
       body,
       beforeApplyProperties: onProcessFilters
         ? (data) => {
-          const result = onProcessFilters(data.filters, data.location_id);
-          return {
-            price: result.price ?? null,
-            limit: result.limit ?? 30,
-          };
-        }
+            const result = onProcessFilters(data.filters, data.location_id);
+            return {
+              price: result.price ?? null,
+              limit: result.limit ?? 30,
+            };
+          }
         : undefined,
       smartFiltersClearable: !!query,
       onError,
