@@ -1,4 +1,35 @@
+declare const locales: readonly ["en", "es", "de", "fr", "it", "pt"];
+type Locale = (typeof locales)[number];
+type Price = {
+    min: number;
+    max: number;
+};
 type PriceLevel = "Mid Range" | "Fine Dining" | "Cheap Eats";
+type FilterSchema = {
+    amenities?: string[];
+    hotelStyle?: string[];
+    price?: Price | null;
+    minRating?: number;
+    starRating?: number;
+    numAdults: number;
+    numRooms: number;
+    checkIn: string;
+    checkOut: string;
+    location?: {
+        locationId: number | null;
+        city: string | null;
+        state: string | null;
+        country: string | null;
+        longitude: number | null;
+        latitude: number | null;
+    } | null;
+    currency: string;
+    limit?: number;
+    language?: Locale;
+    primary_type?: PropertyType;
+    transformed_query?: string;
+    selected_restaurant_price_levels?: PriceLevel[];
+};
 type Offer = {
     availability: "available" | "unavailable" | "pending";
     providerId: number;
@@ -14,6 +45,13 @@ type HotelPricingAPIResults = {
     availability: "pending" | "available" | "unavailable";
     strikeThroughDisplayPrice?: string;
     offer?: Offer;
+};
+type HotelPricingAPIResponse = {
+    success?: {
+        isComplete: boolean;
+        pollingLink?: string;
+        results?: Property[];
+    };
 };
 type PropertyAwardImage = {
     key: string;
@@ -47,6 +85,62 @@ type Property = {
     price_level?: PriceLevel;
     city?: string;
     country?: string;
+};
+type APIResponse = {
+    location_id?: number;
+    filters: FilterSchema;
+    properties: Property[];
+    isComplete: boolean | undefined;
+    pollingLink: string | undefined;
+    durationSeconds: number;
+};
+type InitialRequestBody = {
+    initial?: boolean;
+    query?: string;
+    bounds?: {
+        sw: {
+            lat: number;
+            lng: number;
+        };
+        ne: {
+            lat: number;
+            lng: number;
+        };
+    };
+    filters?: FilterSchema;
+    city?: string;
+    country?: string;
+    location_id?: number;
+    longitude?: number;
+    latitude?: number;
+    radius?: number;
+};
+type SmartFilter = {
+    id: string;
+    label: string;
+    type: "amenity" | "hotelStyle" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
+    value: string;
+    numericValue?: number;
+    priceRange?: {
+        min: number;
+        max?: number;
+    };
+    propertyType?: PropertyType;
+    priceLevels?: PriceLevel[];
+};
+type PollOptions = {
+    pollingLink: string;
+    maxAttempts?: number;
+    delayMs?: number;
+    isCancelled?: () => boolean;
+    price?: Price;
+    limit?: number;
+};
+type InitialLocationData = {
+    city?: string;
+    country?: string;
+    query?: string;
+    currency?: string;
 };
 
 type ClusterDisplayItem = {
@@ -232,61 +326,6 @@ interface MapStateCallbacks {
 }
 type MapStateUpdate = Partial<MapState>;
 
-type Price = {
-    min: number;
-    max: number;
-};
-type PollOptions = {
-    pollingLink: string;
-    maxAttempts?: number;
-    delayMs?: number;
-    isCancelled?: () => boolean;
-    price?: Price;
-    limit?: number;
-};
-type HotelPricingAPIResponse = {
-    success?: {
-        isComplete: boolean;
-        pollingLink?: string;
-        results?: Property[];
-    };
-};
-type APIResponse = {
-    location_id?: number;
-    filters: any;
-    properties: Property[];
-    isComplete: boolean | undefined;
-    pollingLink: string | undefined;
-    durationSeconds: number;
-};
-type InitialRequestBody = {
-    initial?: boolean;
-    query?: string;
-    bounds?: {
-        sw: {
-            lat: number;
-            lng: number;
-        };
-        ne: {
-            lat: number;
-            lng: number;
-        };
-    };
-    filters?: any;
-    city?: string;
-    country?: string;
-    location_id?: number;
-    longitude?: number;
-    latitude?: number;
-    radius?: number;
-};
-type InitialLocationData = {
-    city?: string;
-    country?: string;
-    query?: string;
-    currency?: string;
-};
-
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {
     status: number;
@@ -359,6 +398,7 @@ declare class MapFirstCore {
     private readonly environment;
     private readonly apiUrl;
     private readonly mfid?;
+    private currentPlatform;
     private requestBody?;
     private readonly fitBoundsPadding;
     constructor(options: MapFirstOptions);
@@ -396,7 +436,7 @@ declare class MapFirstCore {
         lat: number;
         lng: number;
     }[], type?: PropertyType, animate?: boolean): void;
-    getFilters(): any;
+    getFilters(): FilterSchema;
     loadProperties({ fetchFn, onSuccess, onError, }: {
         fetchFn: () => Promise<Property[]>;
         onSuccess?: (properties: Property[]) => void;
@@ -417,6 +457,18 @@ declare class MapFirstCore {
         smartFiltersClearable?: boolean;
         onError?: (error: unknown) => void;
     }): Promise<APIResponse | null>;
+    private updateActiveLocationFromResponse;
+    runSmartFilterSearch({ query, filters, onProcessFilters, onError, }: {
+        query?: string;
+        filters?: SmartFilter[];
+        onProcessFilters?: (filters: any, location_id?: number) => {
+            smartFilters?: SmartFilter[];
+            price?: Price | null;
+            limit?: number;
+            language?: string;
+        };
+        onError?: (error: unknown) => void;
+    }): Promise<APIResponse | null>;
     getClusters(): ClusterDisplayItem[];
     refresh(): void;
     destroy(): void;
@@ -425,4 +477,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type APIResponse, type ActiveLocation, type BaseMapFirstOptions, type Environment, type FilterState, type GoogleMapsNamespace, type HotelPricingAPIResponse, type InitialLocationData, type InitialRequestBody, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type PollOptions, type Price, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };
+export { type ActiveLocation, type BaseMapFirstOptions, type Environment, type FilterState, type GoogleMapsNamespace, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, PropertiesFetchError, type Property, type PropertyType, type ViewState, fetchProperties };

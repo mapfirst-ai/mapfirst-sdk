@@ -40,8 +40,7 @@ export function createPrimaryMarkerElement(
   root.className = "mapfirst-marker-root";
   root.style.zIndex = isSelected ? "20" : isPrimaryType ? "12" : "11";
 
-  const pill = document.createElement("button");
-  pill.type = "button";
+  const pill = document.createElement("div");
   pill.className = isPending
     ? "mapfirst-marker-pill mapfirst-marker-pill-pending"
     : `mapfirst-marker-pill mapfirst-marker-pill-active${

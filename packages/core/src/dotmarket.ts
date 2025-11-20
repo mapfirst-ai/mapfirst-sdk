@@ -24,8 +24,7 @@ export function createDotMarkerElement(
   container.className = "mapfirst-dot-marker-container";
   container.style.zIndex = isSelected ? "20" : isPrimaryType ? "3" : "1";
 
-  const button = document.createElement("button");
-  button.type = "button";
+  const button = document.createElement("div");
   button.className = isPending
     ? "mapfirst-dot-marker-button mapfirst-dot-marker-button-pending"
     : `mapfirst-dot-marker-button mapfirst-dot-marker-button-active${

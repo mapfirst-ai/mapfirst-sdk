@@ -2,7 +2,7 @@ import type { MapAdapter } from "./adapters";
 import { MapLibreAdapter } from "./adapters/maplibre";
 import { GoogleMapsAdapter } from "./adapters/google";
 import { MapboxAdapter } from "./adapters/mapbox";
-import type { Property, PropertyType } from "./types";
+import type { APIResponse, FilterSchema, HotelPricingAPIResponse, InitialLocationData, InitialRequestBody, PollOptions, Price, PriceLevel, Property, PropertyType, SmartFilter } from "./types";
 import type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 import type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 import type { MapboxNamespace } from "./adapters/mapbox/markermanager";
@@ -10,7 +10,6 @@ import {
   ClusterDisplayItem,
   clusterMarkers,
   extractViewState,
-  metersToPixels,
   ViewStateSnapshot,
 } from "./utils/clustering";
 import type {
@@ -34,60 +33,6 @@ export type {
   MapStateCallbacks,
   MapStateUpdate,
 } from "./state-types";
-
-export type Price = {
-  min: number;
-  max: number;
-};
-
-export type PollOptions = {
-  pollingLink: string;
-  maxAttempts?: number;
-  delayMs?: number;
-  isCancelled?: () => boolean;
-  price?: Price;
-  limit?: number;
-};
-
-export type HotelPricingAPIResponse = {
-  success?: {
-    isComplete: boolean;
-    pollingLink?: string;
-    results?: Property[];
-  };
-};
-
-export type APIResponse = {
-  location_id?: number;
-  filters: any;
-  properties: Property[];
-  isComplete: boolean | undefined;
-  pollingLink: string | undefined;
-  durationSeconds: number;
-};
-
-export type InitialRequestBody = {
-  initial?: boolean;
-  query?: string;
-  bounds?: {
-    sw: { lat: number; lng: number };
-    ne: { lat: number; lng: number };
-  };
-  filters?: any;
-  city?: string;
-  country?: string;
-  location_id?: number;
-  longitude?: number;
-  latitude?: number;
-  radius?: number;
-};
-
-export type InitialLocationData = {
-  city?: string;
-  country?: string;
-  query?: string;
-  currency?: string;
-};
 
 export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 
@@ -261,6 +206,7 @@ export class MapFirstCore {
   private readonly environment: Environment;
   private readonly apiUrl: string;
   private readonly mfid?: string;
+  private currentPlatform: "google" | "maplibre" | "mapbox" | undefined;
   private requestBody?: any;
   private readonly fitBoundsPadding: {
     top: number;
@@ -279,6 +225,7 @@ export class MapFirstCore {
     this.apiUrl = options.apiUrl ?? API_URLS[this.environment];
     this.mfid = options.mfid ?? "default";
     this.requestBody = options.requestBody;
+    this.currentPlatform = options.platform;
 
     // Determine if using Google Maps
     const isGoogleMaps = isGoogleMapsOptions(options);
@@ -363,8 +310,7 @@ export class MapFirstCore {
       // Geo-lookup if city/country provided
       if ((city && country) || country) {
         const geoResponse = await fetch(
-          `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${
-            city ? `&city=${encodeURIComponent(city)}` : ""
+          `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${city ? `&city=${encodeURIComponent(city)}` : ""
           }`
         );
 
@@ -478,6 +424,7 @@ export class MapFirstCore {
       onMarkerClick: config.onMarkerClick,
     };
 
+    this.currentPlatform = config.platform;
     this.adapter = this.createAdapter(adapterConfig);
     this.isMapAttached = true;
     this.refresh();
@@ -708,7 +655,7 @@ export class MapFirstCore {
     const mapInstance = this.adapter.getMap();
     if (!mapInstance) return;
 
-    if (this.options.platform === "google") {
+    if (this.currentPlatform === "google") {
       this.setFlyToAnimating(false);
       mapInstance.setCenter({ lat: latitude, lng: longitude });
       if (zoom !== null && typeof zoom === "number") {
@@ -767,7 +714,7 @@ export class MapFirstCore {
 
     if (points.length === 1) {
       const poi = points[0];
-      if (this.options.platform === "google") {
+      if (this.currentPlatform === "google") {
         mapInstance.setCenter({ lat: poi.lat, lng: poi.lng });
         mapInstance.setZoom(13);
       } else if (mapInstance.flyTo) {
@@ -777,7 +724,7 @@ export class MapFirstCore {
         });
       }
     } else {
-      if (this.options.platform === "google") {
+      if (this.currentPlatform === "google") {
         // Google Maps
         const LatLngBounds = (window as any).google?.maps?.LatLngBounds;
         if (LatLngBounds) {
@@ -785,7 +732,9 @@ export class MapFirstCore {
           points.forEach((poi) => {
             bounds.extend({ lat: poi.lat, lng: poi.lng });
           });
-          this.setFlyToAnimating(true);
+          if (animate) {
+            this.setFlyToAnimating(true);
+          }
           mapInstance.fitBounds(bounds, this.fitBoundsPadding);
         }
       } else if (mapInstance.fitBounds) {
@@ -802,7 +751,9 @@ export class MapFirstCore {
           bounds[1][1] = Math.max(bounds[1][1], poi.lat);
         });
 
-        this.setFlyToAnimating(true);
+        if (animate) {
+          this.setFlyToAnimating(true);
+        }
         mapInstance.fitBounds(bounds, {
           padding: this.fitBoundsPadding,
           animate,
@@ -811,7 +762,7 @@ export class MapFirstCore {
     }
   }
 
-  getFilters(): any {
+  getFilters() {
     const filters = { ...this.state.filters };
     // Convert Date objects to ISO strings for API compatibility
     if (filters.checkIn instanceof Date) {
@@ -820,7 +771,7 @@ export class MapFirstCore {
     if (filters.checkOut instanceof Date) {
       filters.checkOut = toISO(filters.checkOut);
     }
-    return filters;
+    return filters as FilterSchema;
   }
 
   async loadProperties({
@@ -1022,6 +973,8 @@ export class MapFirstCore {
         body
       );
 
+      this.updateActiveLocationFromResponse(data);
+
       let price: Price | null = null;
       let limit: number = 30;
       let primary_type: PropertyType | undefined = data.filters.primary_type;
@@ -1147,6 +1100,152 @@ export class MapFirstCore {
       this.setSearching(false);
       this.setState({ firstCallDone: true });
     }
+  }
+
+  private updateActiveLocationFromResponse(data: APIResponse) {
+    const newLocationId = data.location_id ?? null;
+    const newCity = data.filters.location?.city ?? undefined;
+    const newCountry = data.filters.location?.country || "";
+    const newCoordinates = data.filters.location
+      ? [data.filters.location.latitude, data.filters.location.longitude]
+      : undefined;
+
+    if (!newCoordinates) return;
+
+    const currentLocation = this.state.activeLocation;
+
+    // Check if location has changed
+    if (
+      newLocationId !== currentLocation?.location_id ||
+      newCity !== currentLocation?.city ||
+      newCountry !== currentLocation?.country
+    ) {
+      this.setActiveLocation({
+        city: newCity,
+        country: newCountry,
+        location_id: newLocationId,
+        locationName:
+          newCity && newCountry
+            ? `${newCity}, ${newCountry}`
+            : newCountry || "",
+        coordinates: newCoordinates as [number, number],
+      });
+    }
+  }
+
+  async runSmartFilterSearch({
+    query,
+    filters,
+    onProcessFilters,
+    onError,
+  }: {
+    query?: string;
+    filters?: SmartFilter[];
+    onProcessFilters?: (
+      filters: any,
+      location_id?: number
+    ) => {
+      smartFilters?: SmartFilter[];
+      price?: Price | null;
+      limit?: number;
+      language?: string;
+    };
+    onError?: (error: unknown) => void;
+  }): Promise<APIResponse | null> {
+    this.ensureAlive();
+
+    // Build filter payload from smart filters if provided
+    let filterPayload = this.getFilters();
+    const state = this.getState();
+
+    if (filters && filters.length > 0) {
+      const amenities = new Set<string>();
+      const hotelStyle = new Set<string>();
+      let price: { min: number; max: number } | undefined;
+      let minRating: number | undefined;
+      let starRating: number | undefined;
+      let primary_type: PropertyType | undefined;
+      let transformed_query: string | undefined;
+      let selected_restaurant_price_levels: PriceLevel[] | undefined;
+
+      filters.forEach((filter) => {
+        switch (filter.type) {
+          case "amenity":
+            amenities.add(filter.value);
+            break;
+          case "hotelStyle":
+            hotelStyle.add(filter.value);
+            break;
+          case "priceRange":
+            if (filter.priceRange) {
+              price = {
+                min: filter.priceRange.min,
+                max: filter.priceRange.max ?? 0,
+              };
+            }
+            break;
+          case "minRating":
+            minRating = filter.numericValue ?? Number(filter.value);
+            break;
+          case "starRating":
+            starRating = filter.numericValue ?? Number(filter.value);
+            break;
+          case "primary_type":
+            primary_type = filter.propertyType;
+            break;
+          case "transformed_query":
+            transformed_query = filter.value;
+            break;
+          case "selected_restaurant_price_levels":
+            selected_restaurant_price_levels = filter.priceLevels;
+            break;
+        }
+      });
+
+      filterPayload = {
+        ...filterPayload,
+        ...(amenities.size > 0 && { amenities: Array.from(amenities) }),
+        ...(hotelStyle.size > 0 && { hotelStyle: Array.from(hotelStyle) }),
+        ...(price && { price }),
+        ...(minRating !== undefined && { minRating }),
+        ...(starRating !== undefined && { starRating }),
+        ...(primary_type && { primary_type }),
+        ...(transformed_query && { transformed_query }),
+        ...(selected_restaurant_price_levels && {
+          selected_restaurant_price_levels,
+        }),
+      };
+    } else if (!query) {
+      // Add default minRating if no filters and no query
+      filterPayload.minRating = 4;
+    }
+
+    const body: InitialRequestBody = {
+      filters: filterPayload,
+      ...(query && { query }),
+      ...(state.bounds
+        ? { bounds: state.bounds }
+        : state.activeLocation.location_id
+          ? { location_id: state.activeLocation.location_id }
+          : state.activeLocation.coordinates
+            ? { latitude: state.activeLocation.coordinates[0], longitude: state.activeLocation.coordinates[1] }
+            : {}),
+    };
+
+    return this.runPropertiesSearch({
+      body,
+      beforeApplyProperties: onProcessFilters
+        ? (data) => {
+          const result = onProcessFilters(data.filters, data.location_id);
+          return {
+            price: result.price ?? null,
+            limit: result.limit ?? 30,
+          };
+        }
+        : undefined,
+      smartFiltersClearable: !!query,
+      onError,
+    });
   }
 
   getClusters(): ClusterDisplayItem[] {

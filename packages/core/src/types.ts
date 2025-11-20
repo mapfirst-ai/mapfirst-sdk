@@ -128,7 +128,7 @@ export type GeoMapping = {
 export type InitialRequestBody = {
   initial?: boolean;
   query?: string;
-  bounds: {
+  bounds?: {
     sw: { lat: number; lng: number };
     ne: { lat: number; lng: number };
   };
@@ -140,4 +140,42 @@ export type InitialRequestBody = {
   longitude?: number;
   latitude?: number;
   radius?: number;
+};
+
+export type SmartFilter = {
+  id: string;
+  label: string;
+  type:
+  | "amenity"
+  | "hotelStyle"
+  | "priceRange"
+  | "minRating"
+  | "starRating"
+  | "primary_type"
+  | "transformed_query"
+  | "selected_restaurant_price_levels";
+  value: string;
+  numericValue?: number;
+  priceRange?: {
+    min: number;
+    max?: number;
+  };
+  propertyType?: PropertyType;
+  priceLevels?: PriceLevel[];
+};
+
+export type PollOptions = {
+  pollingLink: string;
+  maxAttempts?: number;
+  delayMs?: number;
+  isCancelled?: () => boolean;
+  price?: Price;
+  limit?: number;
+};
+
+export type InitialLocationData = {
+  city?: string;
+  country?: string;
+  query?: string;
+  currency?: string;
 };
