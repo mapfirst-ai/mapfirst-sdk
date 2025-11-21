@@ -34,7 +34,14 @@ import type {
   MapStateUpdate,
 } from "./state-types";
 
-export type { Property, PropertyType } from "./types";
+export type {
+  Property,
+  PropertyType,
+  PriceLevel,
+  Price,
+  FilterSchema,
+  Locale,
+} from "./types";
 
 export type {
   MapBounds,
