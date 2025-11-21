@@ -41,6 +41,7 @@ export type {
   Price,
   FilterSchema,
   Locale,
+  SmartFilter,
 } from "./types";
 
 export type {
