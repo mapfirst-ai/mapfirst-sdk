@@ -1,6 +1,16 @@
 # @mapfirst/react
 
-React hooks for the MapFirst SDK supporting MapLibre, Google Maps, and Mapbox.
+React hooks and components for the MapFirst SDK supporting MapLibre, Google Maps, and Mapbox.
+
+## Features
+
+- 🗺️ **Multi-Platform Support**: Works with MapLibre GL JS, Google Maps, and Mapbox GL JS
+- 🔍 **SmartFilter Component**: AI-powered search with interactive filter chips
+- ⚛️ **React Hooks**: Reactive state management for properties, filters, and map state
+- 🎨 **Customizable**: Native React styles (CSS-in-JS) - no framework dependencies
+- 📱 **Responsive**: Adapts to different screen sizes and orientations
+- ♿ **Accessible**: Full keyboard navigation and ARIA support
+- 🌍 **i18n Ready**: Built-in translations with extensibility
 
 ## Installation
 
@@ -11,6 +21,39 @@ pnpm add @mapfirst/react @mapfirst/core
 # or
 yarn add @mapfirst/react @mapfirst/core
 ```
+
+## Quick Start - SmartFilter Component
+
+```tsx
+import { useMapFirstCore, SmartFilter } from "@mapfirst/react";
+import { useState } from "react";
+
+function App() {
+  const { mapFirst, state } = useMapFirstCore({
+    initialLocationData: {
+      city: "New York",
+      country: "United States",
+      currency: "USD",
+    },
+  });
+
+  const [filters, setFilters] = useState([]);
+
+  return (
+    <SmartFilter
+      mapFirst={mapFirst}
+      filters={filters}
+      isSearching={state?.isSearching}
+      onSearch={async (query) => {
+        // Implement search logic
+      }}
+      onFilterChange={setFilters}
+    />
+  );
+}
+```
+
+See [SMARTFILTER.md](./SMARTFILTER.md) for complete SmartFilter documentation.
 
 ## Usage
 

@@ -1,6 +1,170 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
-import React from 'react';
-import { BaseMapFirstOptions, MapFirstCore, MapState, Property, PropertyType, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace, MapFirstOptions } from '@mapfirst.ai/core';
+import * as _mapfirst_ai_core from '@mapfirst.ai/core';
+import { PropertyType, PriceLevel, MapFirstCore, BaseMapFirstOptions, MapState, Property, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace, MapFirstOptions } from '@mapfirst.ai/core';
+import * as React$1 from 'react';
+import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'react';
+
+type Filter = {
+    id: string;
+    label: string | React.ReactNode;
+    type: "amenity" | "hotelStyle" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
+    value: string;
+    numericValue?: number;
+    icon?: React.ReactNode;
+    priceRange?: PriceRangeValue;
+    propertyType?: PropertyType;
+    priceLevels?: PriceLevel[];
+};
+type PriceRangeValue = {
+    min?: number;
+    max?: number;
+};
+
+interface SmartFilterProps {
+    mapFirst: MapFirstCore | null;
+    filters: Filter[];
+    value?: string;
+    isSearching?: boolean;
+    placeholder?: string;
+    onSearch: (query: string, filters?: Filter[]) => Promise<void> | void;
+    onFilterChange: (filters: Filter[]) => Promise<void> | void;
+    onValueChange?: (value: string) => void;
+    showTypingPrompt?: boolean;
+    customTranslations?: Record<string, string>;
+    currency?: string;
+    style?: CSSProperties;
+    inputStyle?: CSSProperties;
+    containerStyle?: CSSProperties;
+}
+/**
+ * SmartFilter component for AI-powered search with filter chips.
+ * Provides a search input with smart filtering capabilities.
+ *
+ * @example
+ * ```tsx
+ * const { mapFirst, state } = useMapFirstCore({ ... });
+ * const [filters, setFilters] = useState<Filter[]>([]);
+ * const [searchValue, setSearchValue] = useState("");
+ *
+ * const handleSearch = async (query: string, currentFilters?: Filter[]) => {
+ *   // Perform search using mapFirst.runSmartFilterSearch
+ *   const result = await mapFirst.runSmartFilterSearch({
+ *     query,
+ *     filters: currentFilters
+ *   });
+ *   // Update filters based on response
+ * };
+ *
+ * return (
+ *   <SmartFilter
+ *     mapFirst={mapFirst}
+ *     filters={filters}
+ *     value={searchValue}
+ *     isSearching={state?.isSearching}
+ *     onSearch={handleSearch}
+ *     onFilterChange={setFilters}
+ *     onValueChange={setSearchValue}
+ *   />
+ * );
+ * ```
+ */
+declare const SmartFilter$1: FunctionComponent<SmartFilterProps>;
+
+interface IconProps {
+    className?: string;
+    style?: CSSProperties;
+}
+declare const SearchIcon: React__default.FC<IconProps>;
+declare const CloseIcon: React__default.FC<IconProps>;
+declare const EditIcon: React__default.FC<IconProps>;
+declare const NextIcon: React__default.FC<IconProps>;
+declare const AiIcon: React__default.FC<IconProps>;
+declare const StarIcon: React__default.FC<IconProps & {
+    fill?: string;
+}>;
+
+interface ChipProps {
+    label: string | ReactNode;
+    icon?: ReactNode;
+    remove: () => void;
+    style?: CSSProperties;
+}
+declare const Chip: React__default.FC<ChipProps>;
+
+interface FilterChipsProps {
+    filters: Filter[];
+    isPortrait: boolean;
+    currency: string;
+    minRatingSuffix: string;
+    clearAllLabel: string;
+    previousFiltersLabel: string;
+    nextFiltersLabel: string;
+    formatCurrency: (value: number, currency?: string) => string;
+    onFilterChange: (filters: Filter[], clearAll?: boolean) => void | Promise<void>;
+    onResetFilters: () => void;
+    onClearAll: () => void;
+}
+declare const FilterChips: FunctionComponent<FilterChipsProps>;
+
+declare const MinRatingFilterChip: FunctionComponent<{
+    star?: boolean;
+    rating: number;
+    onChange: (rating: number) => void;
+    onRemove: () => void;
+}>;
+
+declare const PriceRangeFilterChip: FunctionComponent<{
+    priceRange: PriceRangeValue;
+    currency: string;
+    onChange: (range: PriceRangeValue) => void;
+    onRemove: () => void;
+}>;
+
+interface RestaurantPriceLevelChipProps {
+    values: PriceLevel[];
+    onChange: (values: PriceLevel[]) => void;
+    onRemove: () => void;
+}
+declare const RestaurantPriceLevelChip: FunctionComponent<RestaurantPriceLevelChipProps>;
+
+interface TransformedQueryChipProps {
+    value: string;
+    onChange: (nextValue: string) => void;
+    onRemove: () => void;
+}
+declare const TransformedQueryChip: FunctionComponent<TransformedQueryChipProps>;
+
+declare const renderStars: (rating: number) => ReactNode[];
+declare const createMinRatingFilterLabel: (rating: number, suffix?: string) => ReactNode;
+declare const formatRatingValue: (rating: number) => string;
+declare const createPriceRangeFilterLabel: (min: number, max: number | undefined, currency: string | undefined, formatCurrencyFn: (value: number, currency?: string) => string) => string;
+
+declare const useFilterScroll: (dependency: number) => {
+    scrollerRef: React$1.RefObject<HTMLDivElement | null>;
+    atStart: boolean;
+    atEnd: boolean;
+    scrollByDir: (dir: "prev" | "next") => void;
+};
+
+/**
+ * Hook to detect if the viewport is in portrait orientation.
+ * Updates on window resize.
+ */
+declare const useIsPortrait: () => boolean;
+
+type Locale = "en" | "es" | "de" | "fr" | "it" | "pt";
+type TranslationFunction = (key: string, params?: Record<string, any>) => string;
+type FormatCurrencyFunction = (value: number, currency?: string) => string;
+/**
+ * Simple translation hook with default English translations.
+ * Can be extended with custom translations and locales.
+ */
+declare const useTranslation: (customTranslations?: Record<string, string>, customFormatCurrency?: FormatCurrencyFunction) => {
+    t: TranslationFunction;
+    locale: Locale;
+    setLocale: React$1.Dispatch<React$1.SetStateAction<Locale>>;
+    formatCurrency: (value: number, currency?: string) => string;
+};
 
 type InitialRequestBody = {
     initial?: boolean;
@@ -221,7 +385,7 @@ declare function useMapboxAttachment({ mapFirst, map, mapboxgl, onMarkerClick, }
  *
  * @deprecated Use useMapFirstCore and platform-specific attachment hooks instead
  */
-declare function useMapFirst(options: MapFirstOptions | null): React.RefObject<MapFirstCore | null>;
+declare function useMapFirst(options: MapFirstOptions | null): React__default.RefObject<MapFirstCore | null>;
 /**
  * Hook to run properties search with the MapFirst SDK.
  * Returns a function to trigger the search and loading state.
@@ -257,34 +421,7 @@ declare function usePropertiesSearch(mapFirst: MapFirstCore | null): {
         smartFiltersClearable?: boolean;
     }) => Promise<{
         location_id?: number;
-        filters: {
-            amenities?: string[];
-            hotelStyle?: string[];
-            price?: {
-                min: number;
-                max: number;
-            } | null;
-            minRating?: number;
-            starRating?: number;
-            numAdults: number;
-            numRooms: number;
-            checkIn: string;
-            checkOut: string;
-            location?: {
-                locationId: number | null;
-                city: string | null;
-                state: string | null;
-                country: string | null;
-                longitude: number | null;
-                latitude: number | null;
-            } | null;
-            currency: string;
-            limit?: number;
-            language?: "en" | "es" | "de" | "fr" | "it" | "pt";
-            primary_type?: PropertyType;
-            transformed_query?: string;
-            selected_restaurant_price_levels?: ("Mid Range" | "Fine Dining" | "Cheap Eats")[];
-        };
+        filters: _mapfirst_ai_core.FilterSchema;
         properties: Property[];
         isComplete: boolean | undefined;
         pollingLink: string | undefined;
@@ -331,34 +468,7 @@ declare function useSmartFilterSearch(mapFirst: MapFirstCore | null): {
         };
     }) => Promise<{
         location_id?: number;
-        filters: {
-            amenities?: string[];
-            hotelStyle?: string[];
-            price?: {
-                min: number;
-                max: number;
-            } | null;
-            minRating?: number;
-            starRating?: number;
-            numAdults: number;
-            numRooms: number;
-            checkIn: string;
-            checkOut: string;
-            location?: {
-                locationId: number | null;
-                city: string | null;
-                state: string | null;
-                country: string | null;
-                longitude: number | null;
-                latitude: number | null;
-            } | null;
-            currency: string;
-            limit?: number;
-            language?: "en" | "es" | "de" | "fr" | "it" | "pt";
-            primary_type?: PropertyType;
-            transformed_query?: string;
-            selected_restaurant_price_levels?: ("Mid Range" | "Fine Dining" | "Cheap Eats")[];
-        };
+        filters: _mapfirst_ai_core.FilterSchema;
         properties: Property[];
         isComplete: boolean | undefined;
         pollingLink: string | undefined;
@@ -375,4 +485,4 @@ declare function MarkerDebugList({ markers }: {
     markers: Property[];
 }): react_jsx_runtime.JSX.Element;
 
-export { MarkerDebugList, useGoogleMapsAttachment, useMapFirst, useMapFirstCore, useMapFirstProperties, useMapFirstSelectedProperty, useMapLibreAttachment, useMapboxAttachment, usePrimaryType, usePropertiesSearch, useSelectedMarker, useSmartFilterSearch };
+export { AiIcon, Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MarkerDebugList, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useGoogleMapsAttachment, useIsPortrait, useMapFirst, useMapFirstCore, useMapFirstProperties, useMapFirstSelectedProperty, useMapLibreAttachment, useMapboxAttachment, usePrimaryType, usePropertiesSearch, useSelectedMarker, useSmartFilterSearch, useTranslation };
