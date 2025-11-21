@@ -7,7 +7,8 @@ import React, {
   useState,
   CSSProperties,
 } from "react";
-import { CloseIcon, EditIcon, SearchIcon } from "../Icons";
+import { EditIcon, SearchIcon } from "../Icons";
+import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
 
 const chipStyles: CSSProperties = {
@@ -25,18 +26,6 @@ const chipStyles: CSSProperties = {
   flexShrink: 0,
   userSelect: "none",
   height: "34px",
-};
-
-const removeButtonStyles: CSSProperties = {
-  position: "absolute",
-  top: "-8px",
-  right: "-8px",
-  padding: "2px",
-  borderRadius: "50%",
-  backgroundColor: "white",
-  border: "1px solid #03852e",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
 };
 
 const inputStyles: CSSProperties = {
@@ -75,7 +64,6 @@ export const TransformedQueryChip: FunctionComponent<
   const [draft, setDraft] = useState(value);
   const [isEditing, setIsEditing] = useState(false);
   const [editHover, setEditHover] = useState(false);
-  const [removeHover, setRemoveHover] = useState(false);
   const { t } = useTranslation();
 
   const removeLabel = t("smartFilter.transformedQuery.remove");
@@ -153,19 +141,7 @@ export const TransformedQueryChip: FunctionComponent<
           <EditIcon />
         </button>
       )}
-      <button
-        style={{
-          ...removeButtonStyles,
-          backgroundColor: removeHover ? "#e5e5e5" : "white",
-        }}
-        onClick={onRemove}
-        onMouseEnter={() => setRemoveHover(true)}
-        onMouseLeave={() => setRemoveHover(false)}
-        aria-label={removeLabel}
-        title={removeLabel}
-      >
-        <CloseIcon style={{ width: "17px", height: "17px" }} />
-      </button>
+      <CloseButton onClick={onRemove} />
     </div>
   );
 };

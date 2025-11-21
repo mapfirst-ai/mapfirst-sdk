@@ -9,9 +9,8 @@ type TranslationFunction = (
 type FormatCurrencyFunction = (value: number, currency?: string) => string;
 
 const defaultTranslations: Record<string, string> = {
-  "smartFilter.placeholder":
+  "smartFilter.typingPrompt":
     "Search for hotels, restaurants, or attractions...",
-  "smartFilter.typingPrompt": "Type to search...",
   "smartFilter.nav.previous": "Previous filters",
   "smartFilter.nav.next": "Next filters",
   "smartFilter.toast.locationRequired": "Please select a location first",

@@ -36,8 +36,8 @@ importers:
   packages/react:
     dependencies:
       '@mapfirst.ai/core':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: ^0.0.8
+        version: 0.0.8
       react:
         specifier: '>=17 || >=18'
         version: 19.2.0
@@ -217,8 +217,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@mapfirst.ai/core@0.0.7':
-    resolution: {integrity: sha512-8Ecqm8rq8+oW7iwHp+f+5S2WDUl9pBCSXHr8sTXmuU4M86kn900TttRdh6o+H3Hse1cT8lU05KY75nwviow3PA==}
+  '@mapfirst.ai/core@0.0.8':
+    resolution: {integrity: sha512-uODV66gXlDCQNA8Bi8jV6cFCVRZbmcB1rRX7STeSFz41eK6Kp0aunSGubC9Uv2pA/nUDk4kdCfluUjvvQvm5CQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -820,7 +820,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@mapfirst.ai/core@0.0.7': {}
+  '@mapfirst.ai/core@0.0.8': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

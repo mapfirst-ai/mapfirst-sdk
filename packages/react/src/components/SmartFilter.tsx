@@ -5,17 +5,11 @@ import React, {
   useState,
   CSSProperties,
 } from "react";
-import { AiIcon } from "./Icons";
 import { FilterChips } from "./smart-filter/FilterChips";
 import { useIsPortrait } from "../hooks/useIsPortrait";
 import { useTranslation } from "../hooks/useTranslation";
 import type { Filter } from "./smart-filter/types";
-import type {
-  MapFirstCore,
-  FilterSchema,
-  PropertyType,
-  PriceLevel,
-} from "@mapfirst.ai/core";
+import type { MapFirstCore } from "@mapfirst.ai/core";
 
 export interface SmartFilterProps {
   mapFirst: MapFirstCore | null;
@@ -58,15 +52,8 @@ const inputContainerStyles: CSSProperties = {
   backgroundColor: "white",
   borderRadius: "24px",
   border: "1px solid #e5e5e5",
-  padding: "12px 16px",
+  padding: "0 16px",
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-};
-
-const iconStyles: CSSProperties = {
-  width: "20px",
-  height: "20px",
-  color: "#03852e",
-  flexShrink: 0,
 };
 
 const inputStyles: CSSProperties = {
@@ -76,6 +63,7 @@ const inputStyles: CSSProperties = {
   fontSize: "16px",
   backgroundColor: "transparent",
   color: "#000",
+  padding: "10px",
 };
 
 const loaderContainerStyles: CSSProperties = {
@@ -96,9 +84,7 @@ const loaderStyles: CSSProperties = {
 
 const typingPromptStyles: CSSProperties = {
   position: "absolute",
-  left: "48px",
-  top: "50%",
-  transform: "translateY(-50%)",
+  padding: "10px",
   color: "#737373",
   pointerEvents: "none",
   fontSize: "16px",
@@ -160,8 +146,7 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
   const { t, formatCurrency } = useTranslation(customTranslations);
 
   const minRatingSuffix = t("smartFilter.minRating.suffix");
-  const placeholderText = placeholder || t("smartFilter.placeholder");
-  const typingPrompt = t("smartFilter.typingPrompt");
+  const typingPrompt = placeholder || t("smartFilter.typingPrompt");
   const previousFiltersLabel = t("smartFilter.nav.previous");
   const nextFiltersLabel = t("smartFilter.nav.next");
   const clearAllLabel = t("smartFilter.clearAll");
@@ -214,12 +199,10 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
       </style>
       <form onSubmit={formSubmit} style={{ ...formStyles, ...style }}>
         <div style={inputContainerStyles}>
-          <AiIcon style={iconStyles} />
           <input
             type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder={placeholderText}
             disabled={isSearching}
             style={{ ...inputStyles, ...inputStyle }}
             autoComplete="off"

@@ -6,7 +6,8 @@ import React, {
   useState,
   CSSProperties,
 } from "react";
-import { CloseIcon, EditIcon } from "../Icons";
+import { EditIcon } from "../Icons";
+import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
 import type { PriceRangeValue } from "./types";
 
@@ -25,18 +26,6 @@ const chipStyles: CSSProperties = {
   gap: "8px",
   flexShrink: 0,
   height: "34px",
-};
-
-const removeButtonStyles: CSSProperties = {
-  position: "absolute",
-  top: "-8px",
-  right: "-8px",
-  padding: "2px",
-  borderRadius: "50%",
-  backgroundColor: "white",
-  border: "1px solid #03852e",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
 };
 
 const inputStyles: CSSProperties = {
@@ -97,7 +86,6 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
   );
   const [isEditing, setIsEditing] = useState(false);
   const [editHover, setEditHover] = useState(false);
-  const [removeHover, setRemoveHover] = useState(false);
   const hasValue = value !== undefined;
 
   useEffect(() => {
@@ -241,21 +229,7 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
           <EditIcon />
         </button>
       )}
-      {showRemoveButton && (
-        <button
-          style={{
-            ...removeButtonStyles,
-            backgroundColor: removeHover ? "#e5e5e5" : "white",
-          }}
-          onClick={onRemove}
-          onMouseEnter={() => setRemoveHover(true)}
-          onMouseLeave={() => setRemoveHover(false)}
-          aria-label={removeLabel}
-          title={removeLabel}
-        >
-          <CloseIcon style={{ width: "17px", height: "17px" }} />
-        </button>
-      )}
+      {showRemoveButton && <CloseButton onClick={onRemove} />}
     </div>
   );
 };

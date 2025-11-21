@@ -72,24 +72,6 @@ export const NextIcon: React.FC<IconProps> = ({ className, style }) => (
   </svg>
 );
 
-export const AiIcon: React.FC<IconProps> = ({ className, style }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    style={{ width: "1em", height: "1em", ...style }}
-  >
-    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-    <path d="M2 17l10 5 10-5" />
-    <path d="M2 12l10 5 10-5" />
-  </svg>
-);
-
 export const StarIcon: React.FC<IconProps & { fill?: string }> = ({
   className,
   style,

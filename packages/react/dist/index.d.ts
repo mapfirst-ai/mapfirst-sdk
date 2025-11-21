@@ -78,7 +78,6 @@ declare const SearchIcon: React__default.FC<IconProps>;
 declare const CloseIcon: React__default.FC<IconProps>;
 declare const EditIcon: React__default.FC<IconProps>;
 declare const NextIcon: React__default.FC<IconProps>;
-declare const AiIcon: React__default.FC<IconProps>;
 declare const StarIcon: React__default.FC<IconProps & {
     fill?: string;
 }>;
@@ -485,4 +484,4 @@ declare function MarkerDebugList({ markers }: {
     markers: Property[];
 }): react_jsx_runtime.JSX.Element;
 
-export { AiIcon, Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MarkerDebugList, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useGoogleMapsAttachment, useIsPortrait, useMapFirst, useMapFirstCore, useMapFirstProperties, useMapFirstSelectedProperty, useMapLibreAttachment, useMapboxAttachment, usePrimaryType, usePropertiesSearch, useSelectedMarker, useSmartFilterSearch, useTranslation };
+export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MarkerDebugList, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useGoogleMapsAttachment, useIsPortrait, useMapFirst, useMapFirstCore, useMapFirstProperties, useMapFirstSelectedProperty, useMapLibreAttachment, useMapboxAttachment, usePrimaryType, usePropertiesSearch, useSelectedMarker, useSmartFilterSearch, useTranslation };

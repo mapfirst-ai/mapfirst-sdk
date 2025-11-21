@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FunctionComponent, CSSProperties } from "react";
-import { CloseIcon } from "../Icons";
+import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
 import type { PriceLevel } from "@mapfirst.ai/core";
 
@@ -19,18 +19,6 @@ const chipStyles: CSSProperties = {
   height: "34px",
 };
 
-const removeButtonStyles: CSSProperties = {
-  position: "absolute",
-  top: "-8px",
-  right: "-8px",
-  padding: "2px",
-  borderRadius: "50%",
-  backgroundColor: "white",
-  border: "1px solid #03852e",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
-};
-
 const PRICE_LEVEL_OPTIONS = [
   { value: "Cheap Eats" as PriceLevel, key: "cheapEats" },
   { value: "Mid Range" as PriceLevel, key: "midRange" },
@@ -47,7 +35,6 @@ export const RestaurantPriceLevelChip: FunctionComponent<
   RestaurantPriceLevelChipProps
 > = ({ values, onChange, onRemove }) => {
   const { t } = useTranslation();
-  const [removeHover, setRemoveHover] = React.useState(false);
 
   const label = t("smartFilter.restaurantPriceLevel.label");
   const removeLabel = t("smartFilter.restaurantPriceLevel.remove");
@@ -126,19 +113,7 @@ export const RestaurantPriceLevelChip: FunctionComponent<
         </div>
       </div>
 
-      <button
-        style={{
-          ...removeButtonStyles,
-          backgroundColor: removeHover ? "#e5e5e5" : "white",
-        }}
-        onClick={onRemove}
-        onMouseEnter={() => setRemoveHover(true)}
-        onMouseLeave={() => setRemoveHover(false)}
-        aria-label={removeLabel ?? label}
-        title={removeLabel ?? label}
-      >
-        <CloseIcon style={{ width: "17px", height: "17px" }} />
-      </button>
+      <CloseButton onClick={onRemove} />
     </div>
   );
 };

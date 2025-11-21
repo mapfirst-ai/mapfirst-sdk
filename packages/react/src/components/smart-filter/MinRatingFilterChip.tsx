@@ -4,7 +4,8 @@ import React, {
   FocusEvent,
   CSSProperties,
 } from "react";
-import { CloseIcon, StarIcon } from "../Icons";
+import { StarIcon } from "../Icons";
+import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
 import { formatRatingValue } from "./utils";
 
@@ -23,18 +24,6 @@ const chipContainerStyles: CSSProperties = {
   justifyContent: "center",
   flexShrink: 0,
   height: "34px",
-};
-
-const removeButtonStyles: CSSProperties = {
-  position: "absolute",
-  top: "-8px",
-  right: "-8px",
-  padding: "2px",
-  borderRadius: "50%",
-  backgroundColor: "white",
-  border: "1px solid #03852e",
-  cursor: "pointer",
-  transition: "background-color 0.2s",
 };
 
 const starContainerStyles: CSSProperties = {
@@ -69,7 +58,6 @@ export const MinRatingFilterChip: FunctionComponent<{
   onRemove: () => void;
 }> = ({ rating, onChange, onRemove, star = false }) => {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
-  const [removeHover, setRemoveHover] = useState(false);
   const { t } = useTranslation();
 
   const displayRating = hoverRating ?? rating;
@@ -237,19 +225,7 @@ export const MinRatingFilterChip: FunctionComponent<{
           {formatLabel(displayRating)}
         </span>
       </div>
-      <button
-        style={{
-          ...removeButtonStyles,
-          backgroundColor: removeHover ? "#e5e5e5" : "white",
-        }}
-        onClick={onRemove}
-        onMouseEnter={() => setRemoveHover(true)}
-        onMouseLeave={() => setRemoveHover(false)}
-        aria-label={removeLabel}
-        title={removeLabel}
-      >
-        <CloseIcon style={{ width: "17px", height: "17px" }} />
-      </button>
+      <CloseButton onClick={onRemove} />
     </div>
   );
 };
