@@ -1008,8 +1008,28 @@ export class MapFirstCore {
       // Track if we've already flown to POIs
       const flown = data.properties.some((x) => !!x.location);
 
+      // Apply price filtering if price range is specified
+      const filteredProperties = price
+        ? data.properties.map((x) =>
+            x.pricing?.offer
+              ? {
+                  ...x,
+                  pricing: {
+                    ...x.pricing,
+                    availability:
+                      x.pricing.offer.price &&
+                      (x.pricing.offer.price < price.min ||
+                        x.pricing.offer.price > price.max)
+                        ? ("unavailable" as const)
+                        : x.pricing.availability,
+                  },
+                }
+              : x
+          )
+        : data.properties;
+
       // Apply properties
-      this._setProperties(data.properties);
+      this._setProperties(filteredProperties);
 
       // Fly to POIs if properties have locations
       if (flown) {
