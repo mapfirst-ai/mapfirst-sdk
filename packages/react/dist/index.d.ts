@@ -477,6 +477,32 @@ declare function useSmartFilterSearch(mapFirst: MapFirstCore | null): {
     error: Error | null;
 };
 /**
+ * Hook to perform a bounds search when the user moves the map
+ *
+ * @example
+ * ```tsx
+ * const { mapFirst, state } = useMapFirstCore({ ... });
+ * const { performBoundsSearch, isSearching } = useMapFirstBoundsSearch(mapFirst);
+ *
+ * // When user clicks "Search this area" button
+ * <button onClick={performBoundsSearch} disabled={!state.pendingBounds || isSearching}>
+ *   Search this area
+ * </button>
+ * ```
+ */
+declare function useMapFirstBoundsSearch(mapFirst: MapFirstCore | null): {
+    performBoundsSearch: () => Promise<{
+        location_id?: number;
+        filters: _mapfirst_ai_core.FilterSchema;
+        properties: Property[];
+        isComplete: boolean | undefined;
+        pollingLink: string | undefined;
+        durationSeconds: number;
+    } | null>;
+    isSearching: boolean;
+    error: Error | null;
+};
+/**
  * Helper component that simply renders the markers it receives so non-React environments
  * can verify data flows before wiring the SDK into a map.
  */
@@ -484,4 +510,4 @@ declare function MarkerDebugList({ markers }: {
     markers: Property[];
 }): react_jsx_runtime.JSX.Element;
 
-export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MarkerDebugList, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useGoogleMapsAttachment, useIsPortrait, useMapFirst, useMapFirstCore, useMapFirstProperties, useMapFirstSelectedProperty, useMapLibreAttachment, useMapboxAttachment, usePrimaryType, usePropertiesSearch, useSelectedMarker, useSmartFilterSearch, useTranslation };
+export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MarkerDebugList, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useGoogleMapsAttachment, useIsPortrait, useMapFirst, useMapFirstBoundsSearch, useMapFirstCore, useMapFirstProperties, useMapFirstSelectedProperty, useMapLibreAttachment, useMapboxAttachment, usePrimaryType, usePropertiesSearch, useSelectedMarker, useSmartFilterSearch, useTranslation };

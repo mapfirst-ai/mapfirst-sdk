@@ -313,6 +313,7 @@ interface MapState {
 interface MapStateCallbacks {
     onCenterChange?: (center: [number, number], zoom: number) => void;
     onBoundsChange?: (bounds: MapBounds | null) => void;
+    onPendingBoundsChange?: (bounds: MapBounds | null) => void;
     onZoomChange?: (zoom: number) => void;
     onPropertiesChange?: (properties: Property[]) => void;
     onSelectedPropertyChange?: (propertyId: number | null) => void;
@@ -431,6 +432,7 @@ declare class MapFirstCore {
     setLoading(loading: boolean): void;
     setSearching(searching: boolean): void;
     setFlyToAnimating(animating: boolean): void;
+    handleMapMoveEnd(bounds: MapBounds): void;
     flyMapTo(longitude: number, latitude: number, zoom?: number | null, animation?: boolean): void;
     flyToPOIs(pois?: {
         lat: number;
@@ -457,6 +459,7 @@ declare class MapFirstCore {
         smartFiltersClearable?: boolean;
         onError?: (error: unknown) => void;
     }): Promise<APIResponse | null>;
+    performBoundsSearch(): Promise<APIResponse | null>;
     private updateActiveLocationFromResponse;
     runSmartFilterSearch({ query, filters, onProcessFilters, onError, }: {
         query?: string;

@@ -130,6 +130,10 @@ export function useMapFirstCore(options: BaseMapFirstOptions) {
           setState((prev) => (prev ? { ...prev, bounds } : null));
           optionsRef.current.callbacks?.onBoundsChange?.(bounds);
         },
+        onPendingBoundsChange: (pendingBounds) => {
+          setState((prev) => (prev ? { ...prev, pendingBounds } : null));
+          optionsRef.current.callbacks?.onPendingBoundsChange?.(pendingBounds);
+        },
         onCenterChange: (center, zoom) => {
           setState((prev) => (prev ? { ...prev, center, zoom } : null));
           optionsRef.current.callbacks?.onCenterChange?.(center, zoom);
@@ -644,6 +648,47 @@ export function useSmartFilterSearch(mapFirst: MapFirstCore | null) {
   );
 
   return { search, isLoading, error };
+}
+
+/**
+ * Hook to perform a bounds search when the user moves the map
+ *
+ * @example
+ * ```tsx
+ * const { mapFirst, state } = useMapFirstCore({ ... });
+ * const { performBoundsSearch, isSearching } = useMapFirstBoundsSearch(mapFirst);
+ *
+ * // When user clicks "Search this area" button
+ * <button onClick={performBoundsSearch} disabled={!state.pendingBounds || isSearching}>
+ *   Search this area
+ * </button>
+ * ```
+ */
+export function useMapFirstBoundsSearch(mapFirst: MapFirstCore | null) {
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+
+  const performBoundsSearch = React.useCallback(async () => {
+    if (!mapFirst) {
+      return null;
+    }
+
+    setIsSearching(true);
+    setError(null);
+
+    try {
+      const result = await mapFirst.performBoundsSearch();
+      return result;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error);
+      throw error;
+    } finally {
+      setIsSearching(false);
+    }
+  }, [mapFirst]);
+
+  return { performBoundsSearch, isSearching, error };
 }
 
 /**

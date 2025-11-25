@@ -603,6 +603,12 @@ export class MapFirstCore {
       this.callbacks.onBoundsChange?.(newState.bounds);
     }
     if (
+      newState.pendingBounds !== undefined &&
+      newState.pendingBounds !== prevState.pendingBounds
+    ) {
+      this.callbacks.onPendingBoundsChange?.(newState.pendingBounds);
+    }
+    if (
       newState.filters !== undefined &&
       newState.filters !== prevState.filters
     ) {
@@ -658,6 +664,39 @@ export class MapFirstCore {
 
   setFlyToAnimating(animating: boolean) {
     this.setState({ isFlyToAnimating: animating });
+  }
+
+  handleMapMoveEnd(bounds: MapBounds) {
+    if (this.state.isFlyToAnimating) {
+      this.setState({
+        isFlyToAnimating: false,
+        tempBounds: bounds,
+        pendingBounds: null,
+      });
+      return;
+    }
+
+    const tempBounds = this.state.tempBounds;
+    if (!tempBounds) {
+      this.setState({
+        tempBounds: bounds,
+        pendingBounds: bounds,
+      });
+      return;
+    }
+
+    const delta = 0.01;
+    const hasChanged =
+      Math.abs(bounds.sw.lat - tempBounds.sw.lat) > delta ||
+      Math.abs(bounds.sw.lng - tempBounds.sw.lng) > delta ||
+      Math.abs(bounds.ne.lat - tempBounds.ne.lat) > delta ||
+      Math.abs(bounds.ne.lng - tempBounds.ne.lng) > delta;
+
+    if (hasChanged) {
+      this.setState({ pendingBounds: bounds });
+    } else {
+      this.setState({ pendingBounds: null });
+    }
   }
 
   flyMapTo(
@@ -1140,6 +1179,37 @@ export class MapFirstCore {
       this.setSearching(false);
       this.setState({ firstCallDone: true });
     }
+  }
+
+  async performBoundsSearch(): Promise<APIResponse | null> {
+    this.ensureAlive();
+
+    if (!this.state.pendingBounds) {
+      return null;
+    }
+
+    const filters = this.getFilters();
+    const body: InitialRequestBody = {
+      bounds: this.state.pendingBounds,
+      filters,
+    };
+
+    const priceFilter = filters?.price ?? undefined;
+
+    const result = await this.runPropertiesSearch({
+      body,
+      beforeApplyProperties: () => {
+        return { price: priceFilter ?? null };
+      },
+    });
+
+    if (result) {
+      this.setBounds(this.state.pendingBounds);
+      this.setTempBounds(this.state.pendingBounds);
+      this.setPendingBounds(null);
+    }
+
+    return result;
   }
 
   private updateActiveLocationFromResponse(data: APIResponse) {

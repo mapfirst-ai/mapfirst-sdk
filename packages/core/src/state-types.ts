@@ -58,6 +58,7 @@ export interface MapStateCallbacks {
   // View callbacks
   onCenterChange?: (center: [number, number], zoom: number) => void;
   onBoundsChange?: (bounds: MapBounds | null) => void;
+  onPendingBoundsChange?: (bounds: MapBounds | null) => void;
   onZoomChange?: (zoom: number) => void;
 
   // Data callbacks
