@@ -348,22 +348,25 @@ type ApiFiltersResponse = Pick<FilterSchema, "amenities" | "hotelStyle" | "price
  */
 declare function processApiFilters(apiFilters: ApiFiltersResponse): SmartFilter[];
 /**
- * Converts SmartFilter objects back to API-compatible filter format.
+ * Converts filter objects (SmartFilter or React Filter) back to API-compatible filter format.
  * This is the inverse operation of processApiFilters.
+ * Accepts filters with label as string or ReactNode and normalizes them.
  *
- * @param smartFilters - Array of SmartFilter objects
- * @returns API-compatible filter object
+ * @param filters - Array of filter objects (SmartFilter or React Filter with ReactNode labels)
+ * @returns API-compatible SmartFilter array
  *
  * @example
  * ```typescript
- * const filters: SmartFilter[] = [
+ * const filters = [
  *   { id: "amenity-pool", label: "Pool", type: "amenity", value: "Pool" }
  * ];
  * const apiFilters = convertToApiFilters(filters);
- * // apiFilters will contain { amenities: ["Pool"] }
+ * // apiFilters will contain normalized SmartFilter objects
  * ```
  */
-declare function convertToApiFilters(smartFilters: SmartFilter[]): SmartFilter[];
+declare function convertToApiFilters(filters: Array<Omit<SmartFilter, "label"> & {
+    label: string | React.ReactNode | any;
+}>): SmartFilter[];
 
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {

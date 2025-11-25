@@ -122,25 +122,28 @@ export function processApiFilters(
 }
 
 /**
- * Converts SmartFilter objects back to API-compatible filter format.
+ * Converts filter objects (SmartFilter or React Filter) back to API-compatible filter format.
  * This is the inverse operation of processApiFilters.
+ * Accepts filters with label as string or ReactNode and normalizes them.
  *
- * @param smartFilters - Array of SmartFilter objects
- * @returns API-compatible filter object
+ * @param filters - Array of filter objects (SmartFilter or React Filter with ReactNode labels)
+ * @returns API-compatible SmartFilter array
  *
  * @example
  * ```typescript
- * const filters: SmartFilter[] = [
+ * const filters = [
  *   { id: "amenity-pool", label: "Pool", type: "amenity", value: "Pool" }
  * ];
  * const apiFilters = convertToApiFilters(filters);
- * // apiFilters will contain { amenities: ["Pool"] }
+ * // apiFilters will contain normalized SmartFilter objects
  * ```
  */
 export function convertToApiFilters(
-  smartFilters: SmartFilter[]
+  filters: Array<
+    Omit<SmartFilter, "label"> & { label: string | React.ReactNode | any }
+  >
 ): SmartFilter[] {
-  return smartFilters.map((filter) => {
+  return filters.map((filter) => {
     const apiFilter: SmartFilter = {
       id: filter.id,
       label:
