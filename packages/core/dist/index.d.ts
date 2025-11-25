@@ -327,6 +327,44 @@ interface MapStateCallbacks {
 }
 type MapStateUpdate = Partial<MapState>;
 
+/**
+ * Response type from the API containing filter information
+ */
+type ApiFiltersResponse = Pick<FilterSchema, "amenities" | "hotelStyle" | "price" | "minRating" | "starRating" | "transformed_query" | "selected_restaurant_price_levels">;
+/**
+ * Converts API filter response into SmartFilter objects that can be used with the SmartFilter component.
+ * This utility processes the various filter types returned from the API and transforms them into
+ * a standardized SmartFilter format.
+ *
+ * @param apiFilters - The filter response from the API
+ * @returns An array of SmartFilter objects
+ *
+ * @example
+ * ```typescript
+ * const apiResponse = await search({ query: "hotels with pool" });
+ * const filters = processApiFilters(apiResponse.filters);
+ * // filters will contain SmartFilter objects for amenities, price range, ratings, etc.
+ * ```
+ */
+declare function processApiFilters(apiFilters: ApiFiltersResponse): SmartFilter[];
+/**
+ * Converts SmartFilter objects back to API-compatible filter format.
+ * This is the inverse operation of processApiFilters.
+ *
+ * @param smartFilters - Array of SmartFilter objects
+ * @returns API-compatible filter object
+ *
+ * @example
+ * ```typescript
+ * const filters: SmartFilter[] = [
+ *   { id: "amenity-pool", label: "Pool", type: "amenity", value: "Pool" }
+ * ];
+ * const apiFilters = convertToApiFilters(filters);
+ * // apiFilters will contain { amenities: ["Pool"] }
+ * ```
+ */
+declare function convertToApiFilters(smartFilters: SmartFilter[]): SmartFilter[];
+
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {
     status: number;
@@ -480,4 +518,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type ViewState, fetchProperties };
+export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type ViewState, convertToApiFilters, fetchProperties, processApiFilters };

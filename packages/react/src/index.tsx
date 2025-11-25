@@ -11,6 +11,13 @@ import {
   type PropertyType,
 } from "@mapfirst.ai/core";
 
+// Export filter utilities from core
+export {
+  processApiFilters,
+  convertToApiFilters,
+  type ApiFiltersResponse,
+} from "@mapfirst.ai/core";
+
 // Export all components
 export * from "./components";
 

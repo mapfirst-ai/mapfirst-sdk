@@ -44,6 +44,9 @@ export type {
   SmartFilter,
 } from "./types";
 
+export type { ApiFiltersResponse } from "./utils/filters";
+export { processApiFilters, convertToApiFilters } from "./utils/filters";
+
 export type {
   MapBounds,
   ViewState,

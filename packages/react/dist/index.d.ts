@@ -1,6 +1,7 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import * as _mapfirst_ai_core from '@mapfirst.ai/core';
 import { PropertyType, PriceLevel, MapFirstCore, BaseMapFirstOptions, MapState, Property, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace, MapFirstOptions } from '@mapfirst.ai/core';
+export { ApiFiltersResponse, convertToApiFilters, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
 import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'react';
 
