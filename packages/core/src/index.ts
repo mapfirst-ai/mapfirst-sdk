@@ -504,6 +504,15 @@ export class MapFirstCore {
         config.onMarkerClick?.(marker);
       },
       onRefresh: () => this.refresh(),
+      onMapMoveEnd: (bounds: MapBounds) => {
+        // Only call handleMapMoveEnd if it's a real movement, not initial setup
+        if (this.state.tempBounds === null) {
+          this.setTempBounds(bounds);
+          this.setPendingBounds(null);
+        } else {
+          this.handleMapMoveEnd(bounds);
+        }
+      },
     });
     return adapter;
   }

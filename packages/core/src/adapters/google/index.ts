@@ -19,6 +19,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     google: GoogleMapsNamespace;
     onMarkerClick?: (marker: Property) => void;
     onRefresh?: () => void;
+    onMapMoveEnd?: (bounds: MapBounds) => void;
   }) {
     this.markerManager = new GoogleMapsMarkerManager({
       mapInstance: this.map,
@@ -30,7 +31,33 @@ export class GoogleMapsAdapter extends MapAdapter {
       this.attachEventListeners(options.onRefresh);
     }
 
+    if (options.onMapMoveEnd) {
+      this.attachBoundsTracking(options.onMapMoveEnd, options.google);
+    }
+
     return this.markerManager;
+  }
+
+  private attachBoundsTracking(
+    onMapMoveEnd: (bounds: MapBounds) => void,
+    google: GoogleMapsNamespace
+  ) {
+    if (!this.map) {
+      return;
+    }
+
+    const handleIdle = () => {
+      const bounds = this.getMapBounds();
+      onMapMoveEnd(bounds);
+    };
+
+    // Set initial bounds
+    handleIdle();
+
+    const listener = google.event.addListener(this.map, "idle", handleIdle);
+    this.cleanupFns.push(() => {
+      google.event.removeListener(listener);
+    });
   }
 
   private attachEventListeners(onRefresh: () => void) {

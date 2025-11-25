@@ -14,6 +14,7 @@ export class MapLibreAdapter extends MapAdapter {
     maplibregl: MapLibreNamespace;
     onMarkerClick?: (marker: Property) => void;
     onRefresh?: () => void;
+    onMapMoveEnd?: (bounds: MapBounds) => void;
   }) {
     this.markerManager = new MapLibreMarkerManager({
       mapInstance: this.map,
@@ -25,7 +26,46 @@ export class MapLibreAdapter extends MapAdapter {
       this.attachEventListeners(options.onRefresh);
     }
 
+    if (options.onMapMoveEnd) {
+      this.attachBoundsTracking(options.onMapMoveEnd);
+    }
+
     return this.markerManager;
+  }
+
+  private attachBoundsTracking(onMapMoveEnd: (bounds: MapBounds) => void) {
+    if (!this.map || typeof this.map.on !== "function") {
+      return;
+    }
+
+    const handleMoveEnd = () => {
+      const bounds = this.getMapBounds();
+      onMapMoveEnd(bounds);
+    };
+
+    // Set initial bounds on load
+    const handleLoad = () => {
+      const bounds = this.getMapBounds();
+      onMapMoveEnd(bounds);
+    };
+
+    if (this.map.loaded && this.map.loaded()) {
+      handleLoad();
+    } else {
+      this.map.once("load", handleLoad);
+      this.cleanupFns.push(() => {
+        if (typeof this.map.off === "function") {
+          this.map.off("load", handleLoad);
+        }
+      });
+    }
+
+    this.map.on("moveend", handleMoveEnd);
+    this.cleanupFns.push(() => {
+      if (typeof this.map.off === "function") {
+        this.map.off("moveend", handleMoveEnd);
+      }
+    });
   }
 
   private attachEventListeners(onRefresh: () => void) {
