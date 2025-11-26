@@ -364,9 +364,7 @@ declare function processApiFilters(apiFilters: ApiFiltersResponse): SmartFilter[
  * // apiFilters will contain normalized SmartFilter objects
  * ```
  */
-declare function convertToApiFilters(filters: Array<Omit<SmartFilter, "label"> & {
-    label: string | React.ReactNode | any;
-}>): SmartFilter[];
+declare function convertToApiFilters(filters: any[]): SmartFilter[];
 
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {

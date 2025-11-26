@@ -138,11 +138,7 @@ export function processApiFilters(
  * // apiFilters will contain normalized SmartFilter objects
  * ```
  */
-export function convertToApiFilters(
-  filters: Array<
-    Omit<SmartFilter, "label"> & { label: string | React.ReactNode | any }
-  >
-): SmartFilter[] {
+export function convertToApiFilters(filters: any[]): SmartFilter[] {
   return filters.map((filter) => {
     const apiFilter: SmartFilter = {
       id: filter.id,
@@ -158,15 +154,16 @@ export function convertToApiFilters(
       apiFilter.numericValue = filter.numericValue;
     }
 
-    if (
-      filter.priceRange &&
-      filter.priceRange.min !== undefined &&
-      filter.priceRange.max !== undefined
-    ) {
-      apiFilter.priceRange = {
-        min: filter.priceRange.min,
-        max: filter.priceRange.max,
-      };
+    if (filter.priceRange) {
+      // Handle both optional and required min/max
+      const min = filter.priceRange.min;
+      const max = filter.priceRange.max;
+      if (min !== undefined) {
+        apiFilter.priceRange = {
+          min,
+          ...(max !== undefined && { max }),
+        };
+      }
     }
 
     if (filter.priceLevels) {
