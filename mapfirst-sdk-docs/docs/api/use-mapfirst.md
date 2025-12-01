@@ -9,7 +9,7 @@ The unified React hook for MapFirst SDK that provides all functionality in one p
 ## Import
 
 ```typescript
-import { useMapFirst } from '@mapfirst/react';
+import { useMapFirst } from "@mapfirst/react";
 ```
 
 ## Usage
@@ -43,7 +43,7 @@ interface MapFirstConfig {
     country?: string;
     currency?: string;
   };
-  environment?: 'dev' | 'prod';
+  environment?: "dev" | "prod";
   callbacks?: {
     onPropertiesChange?: (properties: Property[]) => void;
     onSelectedPropertyChange?: (id: number | null) => void;
@@ -61,7 +61,7 @@ interface MapFirstConfig {
 The underlying MapFirstCore instance. Use this for advanced operations not covered by other methods.
 
 ```typescript
-instance: MapFirstCore | null
+instance: MapFirstCore | null;
 ```
 
 ### state
@@ -74,7 +74,7 @@ interface MapFirstState {
   selectedProperty: number | null;
   isSearching: boolean;
   bounds: Bounds | null;
-  primaryType: 'Accommodation' | 'Restaurant' | 'Attraction';
+  primaryType: "Accommodation" | "Restaurant" | "Attraction";
 }
 ```
 
@@ -87,8 +87,9 @@ setPrimaryType: (type: 'Accommodation' | 'Restaurant' | 'Attraction') => void
 ```
 
 **Example:**
+
 ```typescript
-setPrimaryType('Restaurant');
+setPrimaryType("Restaurant");
 ```
 
 ### setSelectedMarker
@@ -100,6 +101,7 @@ setSelectedMarker: (id: number | null) => void
 ```
 
 **Example:**
+
 ```typescript
 // Select property with ID 12345
 setSelectedMarker(12345);
@@ -113,18 +115,19 @@ setSelectedMarker(null);
 Search for properties by location and filters.
 
 ```typescript
-propertiesSearch: (params: SearchParams) => Promise<void>
+propertiesSearch: (params: SearchParams) => Promise<void>;
 ```
 
 **Parameters:**
+
 ```typescript
 interface SearchParams {
   body: {
     city: string;
     country: string;
     filters?: {
-      checkIn?: string;      // ISO date format
-      checkOut?: string;     // ISO date format
+      checkIn?: string; // ISO date format
+      checkOut?: string; // ISO date format
       numAdults?: number;
       numChildren?: number;
       numRooms?: number;
@@ -137,18 +140,19 @@ interface SearchParams {
 ```
 
 **Example:**
+
 ```typescript
 await propertiesSearch({
   body: {
-    city: 'Paris',
-    country: 'France',
+    city: "Paris",
+    country: "France",
     filters: {
-      checkIn: '2024-06-01',
-      checkOut: '2024-06-07',
+      checkIn: "2024-06-01",
+      checkOut: "2024-06-07",
       numAdults: 2,
-      currency: 'EUR'
-    }
-  }
+      currency: "EUR",
+    },
+  },
 });
 ```
 
@@ -157,10 +161,11 @@ await propertiesSearch({
 Natural language search powered by AI.
 
 ```typescript
-smartFilterSearch: (params: SmartSearchParams) => Promise<void>
+smartFilterSearch: (params: SmartSearchParams) => Promise<void>;
 ```
 
 **Parameters:**
+
 ```typescript
 interface SmartSearchParams {
   query: string;
@@ -170,11 +175,12 @@ interface SmartSearchParams {
 ```
 
 **Example:**
+
 ```typescript
 await smartFilterSearch({
-  query: 'hotels near eiffel tower with pool',
-  city: 'Paris',
-  country: 'France'
+  query: "hotels near eiffel tower with pool",
+  city: "Paris",
+  country: "France",
 });
 ```
 
@@ -183,10 +189,11 @@ await smartFilterSearch({
 Search properties within current map bounds.
 
 ```typescript
-boundsSearch: () => Promise<void>
+boundsSearch: () => Promise<void>;
 ```
 
 **Example:**
+
 ```typescript
 // Search visible area
 await boundsSearch();
@@ -201,6 +208,7 @@ attachMapLibre: (map: maplibregl.Map, options: AttachOptions) => void
 ```
 
 **Parameters:**
+
 ```typescript
 interface AttachOptions {
   onMarkerClick?: (property: Property) => void;
@@ -209,21 +217,22 @@ interface AttachOptions {
 ```
 
 **Example:**
+
 ```typescript
-import maplibregl from 'maplibre-gl';
+import maplibregl from "maplibre-gl";
 
 const map = new maplibregl.Map({
-  container: 'map',
-  style: 'https://demotiles.maplibre.org/style.json',
+  container: "map",
+  style: "https://demotiles.maplibre.org/style.json",
   center: [2.3522, 48.8566],
-  zoom: 12
+  zoom: 12,
 });
 
-map.on('load', () => {
+map.on("load", () => {
   attachMapLibre(map, {
     onMarkerClick: (property) => {
-      console.log('Clicked:', property.name);
-    }
+      console.log("Clicked:", property.name);
+    },
   });
 });
 ```
@@ -237,17 +246,18 @@ attachGoogle: (map: google.maps.Map, options: AttachOptions) => void
 ```
 
 **Example:**
+
 ```typescript
-const map = new google.maps.Map(document.getElementById('map'), {
+const map = new google.maps.Map(document.getElementById("map"), {
   center: { lat: 48.8566, lng: 2.3522 },
   zoom: 12,
-  mapId: 'YOUR_MAP_ID'
+  mapId: "YOUR_MAP_ID",
 });
 
 attachGoogle(map, {
   onMarkerClick: (property) => {
-    console.log('Clicked:', property.name);
-  }
+    console.log("Clicked:", property.name);
+  },
 });
 ```
 
@@ -260,23 +270,24 @@ attachMapbox: (map: mapboxgl.Map, options: AttachOptions) => void
 ```
 
 **Example:**
-```typescript
-import mapboxgl from 'mapbox-gl';
 
-mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
+```typescript
+import mapboxgl from "mapbox-gl";
+
+mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
 
 const map = new mapboxgl.Map({
-  container: 'map',
-  style: 'mapbox://styles/mapbox/streets-v12',
+  container: "map",
+  style: "mapbox://styles/mapbox/streets-v12",
   center: [2.3522, 48.8566],
-  zoom: 12
+  zoom: 12,
 });
 
-map.on('load', () => {
+map.on("load", () => {
   attachMapbox(map, {
     onMarkerClick: (property) => {
-      console.log('Clicked:', property.name);
-    }
+      console.log("Clicked:", property.name);
+    },
   });
 });
 ```
@@ -294,7 +305,7 @@ interface Property {
   rating?: number;
   price?: number;
   currency?: string;
-  type: 'Accommodation' | 'Restaurant' | 'Attraction';
+  type: "Accommodation" | "Restaurant" | "Attraction";
   address?: string;
   photos?: string[];
   amenities?: string[];

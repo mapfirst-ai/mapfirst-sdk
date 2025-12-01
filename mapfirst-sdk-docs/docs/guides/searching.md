@@ -21,29 +21,29 @@ Search by city, country, and various filters.
 ### React Example
 
 ```typescript
-import { useMapFirst } from '@mapfirst/react';
+import { useMapFirst } from "@mapfirst/react";
 
 function SearchComponent() {
   const { propertiesSearch, state } = useMapFirst({
     adapter: null,
-    environment: 'prod'
+    environment: "prod",
   });
 
   const handleSearch = async () => {
     await propertiesSearch({
       body: {
-        city: 'Barcelona',
-        country: 'Spain',
+        city: "Barcelona",
+        country: "Spain",
         filters: {
-          checkIn: '2024-08-01',
-          checkOut: '2024-08-07',
+          checkIn: "2024-08-01",
+          checkOut: "2024-08-07",
           numAdults: 2,
           numRooms: 1,
-          currency: 'EUR',
+          currency: "EUR",
           minPrice: 50,
-          maxPrice: 200
-        }
-      }
+          maxPrice: 200,
+        },
+      },
     });
   };
 
@@ -63,22 +63,22 @@ const mapFirst = new MapFirstCore({
   adapter: null,
   callbacks: {
     onPropertiesChange: (properties) => {
-      console.log('Found:', properties.length);
-    }
-  }
+      console.log("Found:", properties.length);
+    },
+  },
 });
 
 mapFirst.runPropertiesSearch({
   body: {
-    city: 'Barcelona',
-    country: 'Spain',
+    city: "Barcelona",
+    country: "Spain",
     filters: {
-      checkIn: '2024-08-01',
-      checkOut: '2024-08-07',
+      checkIn: "2024-08-01",
+      checkOut: "2024-08-07",
       numAdults: 2,
-      currency: 'EUR'
-    }
-  }
+      currency: "EUR",
+    },
+  },
 });
 ```
 
@@ -92,26 +92,28 @@ Use natural language to search for properties.
 function SmartSearch() {
   const { smartFilterSearch } = useMapFirst({
     adapter: null,
-    environment: 'prod'
+    environment: "prod",
   });
 
   const handleSmartSearch = async (query: string) => {
     await smartFilterSearch({
       query,
-      city: 'Tokyo',
-      country: 'Japan'
+      city: "Tokyo",
+      country: "Japan",
     });
   };
 
   return (
     <div>
-      <button onClick={() => handleSmartSearch('sushi restaurants near shibuya')}>
+      <button
+        onClick={() => handleSmartSearch("sushi restaurants near shibuya")}
+      >
         Find Sushi Restaurants
       </button>
-      <button onClick={() => handleSmartSearch('luxury hotels with spa')}>
+      <button onClick={() => handleSmartSearch("luxury hotels with spa")}>
         Find Luxury Hotels
       </button>
-      <button onClick={() => handleSmartSearch('family-friendly attractions')}>
+      <button onClick={() => handleSmartSearch("family-friendly attractions")}>
         Find Attractions
       </button>
     </div>
@@ -123,9 +125,9 @@ function SmartSearch() {
 
 ```javascript
 mapFirst.runSmartFilterSearch({
-  query: 'boutique hotels near the river',
-  city: 'Prague',
-  country: 'Czech Republic'
+  query: "boutique hotels near the river",
+  city: "Prague",
+  country: "Czech Republic",
 });
 ```
 
@@ -139,16 +141,13 @@ Search within the current map viewport.
 function BoundsSearch() {
   const { boundsSearch, state } = useMapFirst({
     adapter: null,
-    environment: 'prod'
+    environment: "prod",
   });
 
   return (
     <div>
-      <button 
-        onClick={() => boundsSearch()}
-        disabled={state.isSearching}
-      >
-        {state.isSearching ? 'Searching...' : 'Search This Area'}
+      <button onClick={() => boundsSearch()} disabled={state.isSearching}>
+        {state.isSearching ? "Searching..." : "Search This Area"}
       </button>
     </div>
   );
@@ -158,7 +157,7 @@ function BoundsSearch() {
 ### JavaScript Example
 
 ```javascript
-document.getElementById('search-btn').addEventListener('click', async () => {
+document.getElementById("search-btn").addEventListener("click", async () => {
   await mapFirst.performBoundsSearch();
 });
 ```
@@ -173,20 +172,14 @@ Switch between different property types.
 function TypeFilter() {
   const { setPrimaryType, state } = useMapFirst({
     adapter: null,
-    environment: 'prod'
+    environment: "prod",
   });
 
   return (
     <div>
-      <button onClick={() => setPrimaryType('Accommodation')}>
-        Hotels
-      </button>
-      <button onClick={() => setPrimaryType('Restaurant')}>
-        Restaurants
-      </button>
-      <button onClick={() => setPrimaryType('Attraction')}>
-        Attractions
-      </button>
+      <button onClick={() => setPrimaryType("Accommodation")}>Hotels</button>
+      <button onClick={() => setPrimaryType("Restaurant")}>Restaurants</button>
+      <button onClick={() => setPrimaryType("Attraction")}>Attractions</button>
       <p>Current: {state.primaryType}</p>
     </div>
   );
@@ -196,7 +189,7 @@ function TypeFilter() {
 ### JavaScript Example
 
 ```javascript
-mapFirst.setPrimaryType('Restaurant');
+mapFirst.setPrimaryType("Restaurant");
 ```
 
 ## Handling Search Results
@@ -207,7 +200,7 @@ mapFirst.setPrimaryType('Restaurant');
 function SearchResults() {
   const { state } = useMapFirst({
     adapter: null,
-    environment: 'prod'
+    environment: "prod",
   });
 
   if (state.isSearching) {
@@ -218,7 +211,7 @@ function SearchResults() {
     <div>
       <h3>Found {state.properties.length} properties</h3>
       <ul>
-        {state.properties.map(property => (
+        {state.properties.map((property) => (
           <li key={property.id}>
             {property.name} - {property.rating}/5
             {property.price && ` - ${property.currency}${property.price}`}
@@ -237,12 +230,10 @@ function FilteredResults() {
   const { state } = useMapFirst({ adapter: null });
 
   // Filter by rating
-  const highRated = state.properties.filter(p => p.rating >= 4.5);
+  const highRated = state.properties.filter((p) => p.rating >= 4.5);
 
   // Filter by price
-  const affordable = state.properties.filter(p => 
-    p.price && p.price < 100
-  );
+  const affordable = state.properties.filter((p) => p.price && p.price < 100);
 
   return (
     <div>
@@ -258,11 +249,11 @@ function FilteredResults() {
 ### Debounced Search
 
 ```typescript
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 function DebouncedSearch() {
   const { smartFilterSearch } = useMapFirst({ adapter: null });
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -296,16 +287,16 @@ function AutoSearch() {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: 'https://demotiles.maplibre.org/style.json',
+      style: "https://demotiles.maplibre.org/style.json",
       center: [0, 0],
-      zoom: 2
+      zoom: 2,
     });
 
-    map.on('load', () => {
+    map.on("load", () => {
       attachMapLibre(map, {});
-      
+
       // Search when map movement ends
-      map.on('moveend', () => {
+      map.on("moveend", () => {
         boundsSearch();
       });
     });
@@ -313,7 +304,7 @@ function AutoSearch() {
     return () => map.remove();
   }, []);
 
-  return <div ref={mapRef} style={{ height: '500px' }} />;
+  return <div ref={mapRef} style={{ height: "500px" }} />;
 }
 ```
 

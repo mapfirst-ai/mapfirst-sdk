@@ -10,7 +10,7 @@ Core JavaScript API for MapFirst SDK. Works in both React and vanilla JavaScript
 
 ```javascript
 // ES Modules
-import { MapFirstCore } from '@mapfirst/core';
+import { MapFirstCore } from "@mapfirst/core";
 
 // Browser (CDN)
 const { MapFirstCore } = window.MapFirstCore;
@@ -19,7 +19,7 @@ const { MapFirstCore } = window.MapFirstCore;
 ## Constructor
 
 ```javascript
-new MapFirstCore(config)
+new MapFirstCore(config);
 ```
 
 ### Parameters
@@ -32,7 +32,7 @@ interface MapFirstConfig {
     country?: string;
     currency?: string;
   };
-  environment?: 'dev' | 'prod';
+  environment?: "dev" | "prod";
   callbacks?: {
     onPropertiesChange?: (properties: Property[]) => void;
     onSelectedPropertyChange?: (id: number | null) => void;
@@ -49,16 +49,16 @@ interface MapFirstConfig {
 const mapFirst = new MapFirstCore({
   adapter: null,
   initialLocationData: {
-    city: 'Paris',
-    country: 'France',
-    currency: 'EUR'
+    city: "Paris",
+    country: "France",
+    currency: "EUR",
   },
-  environment: 'prod',
+  environment: "prod",
   callbacks: {
     onPropertiesChange: (properties) => {
-      console.log('Properties updated:', properties);
-    }
-  }
+      console.log("Properties updated:", properties);
+    },
+  },
 });
 ```
 
@@ -73,31 +73,33 @@ attachMap(map: any, options: AttachMapOptions): void
 ```
 
 **Parameters:**
+
 ```typescript
 interface AttachMapOptions {
-  platform: 'maplibre' | 'mapbox' | 'google';
-  maplibregl?: typeof maplibregl;  // Required for MapLibre
-  mapboxgl?: typeof mapboxgl;      // Required for Mapbox
-  google?: typeof google;          // Required for Google Maps
+  platform: "maplibre" | "mapbox" | "google";
+  maplibregl?: typeof maplibregl; // Required for MapLibre
+  mapboxgl?: typeof mapboxgl; // Required for Mapbox
+  google?: typeof google; // Required for Google Maps
   onMarkerClick?: (property: Property) => void;
 }
 ```
 
 **Example:**
+
 ```javascript
 // MapLibre
 mapFirst.attachMap(map, {
-  platform: 'maplibre',
+  platform: "maplibre",
   maplibregl: maplibregl,
   onMarkerClick: (property) => {
     alert(property.name);
-  }
+  },
 });
 
 // Google Maps
 mapFirst.attachMap(map, {
-  platform: 'google',
-  google: window.google
+  platform: "google",
+  google: window.google,
 });
 ```
 
@@ -110,18 +112,19 @@ runPropertiesSearch(params: SearchParams): Promise<void>
 ```
 
 **Example:**
+
 ```javascript
 await mapFirst.runPropertiesSearch({
   body: {
-    city: 'London',
-    country: 'United Kingdom',
+    city: "London",
+    country: "United Kingdom",
     filters: {
-      checkIn: '2024-07-01',
-      checkOut: '2024-07-05',
+      checkIn: "2024-07-01",
+      checkOut: "2024-07-05",
       numAdults: 2,
-      currency: 'GBP'
-    }
-  }
+      currency: "GBP",
+    },
+  },
 });
 ```
 
@@ -134,11 +137,12 @@ runSmartFilterSearch(params: SmartSearchParams): Promise<void>
 ```
 
 **Example:**
+
 ```javascript
 await mapFirst.runSmartFilterSearch({
-  query: 'romantic restaurants with outdoor seating',
-  city: 'Rome',
-  country: 'Italy'
+  query: "romantic restaurants with outdoor seating",
+  city: "Rome",
+  country: "Italy",
 });
 ```
 
@@ -151,6 +155,7 @@ performBoundsSearch(): Promise<void>
 ```
 
 **Example:**
+
 ```javascript
 await mapFirst.performBoundsSearch();
 ```
@@ -164,8 +169,9 @@ setPrimaryType(type: 'Accommodation' | 'Restaurant' | 'Attraction'): void
 ```
 
 **Example:**
+
 ```javascript
-mapFirst.setPrimaryType('Attraction');
+mapFirst.setPrimaryType("Attraction");
 ```
 
 ### setSelectedMarker
@@ -177,6 +183,7 @@ setSelectedMarker(id: number | null): void
 ```
 
 **Example:**
+
 ```javascript
 // Select
 mapFirst.setSelectedMarker(12345);
@@ -194,6 +201,7 @@ flyMapTo(lng: number, lat: number, zoom?: number): void
 ```
 
 **Example:**
+
 ```javascript
 // Fly to Eiffel Tower
 mapFirst.flyMapTo(2.2945, 48.8584, 15);
@@ -208,10 +216,11 @@ getState(): MapFirstState
 ```
 
 **Example:**
+
 ```javascript
 const state = mapFirst.getState();
-console.log('Current properties:', state.properties);
-console.log('Is searching:', state.isSearching);
+console.log("Current properties:", state.properties);
+console.log("Is searching:", state.isSearching);
 ```
 
 ### destroy
@@ -223,6 +232,7 @@ destroy(): void
 ```
 
 **Example:**
+
 ```javascript
 mapFirst.destroy();
 ```
@@ -286,7 +296,7 @@ interface Property {
   rating?: number;
   price?: number;
   currency?: string;
-  type: 'Accommodation' | 'Restaurant' | 'Attraction';
+  type: "Accommodation" | "Restaurant" | "Attraction";
   address?: string;
   photos?: string[];
   amenities?: string[];
