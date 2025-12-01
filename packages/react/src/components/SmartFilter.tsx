@@ -6,7 +6,6 @@ import React, {
   CSSProperties,
 } from "react";
 import { FilterChips } from "./smart-filter/FilterChips";
-import { useIsPortrait } from "../hooks/useIsPortrait";
 import { useTranslation } from "../hooks/useTranslation";
 import type { Filter } from "./smart-filter/types";
 import type { MapFirstCore } from "@mapfirst.ai/core";
@@ -142,7 +141,6 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
   const value = controlledValue !== undefined ? controlledValue : internalValue;
   const setValue = onValueChange || setInternalValue;
 
-  const isPortrait = useIsPortrait();
   const { t, formatCurrency } = useTranslation(customTranslations);
 
   const minRatingSuffix = t("smartFilter.minRating.suffix");
@@ -197,32 +195,33 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
           }
         `}
       </style>
-      <form onSubmit={formSubmit} style={{ ...formStyles, ...style }}>
-        <div style={inputContainerStyles}>
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            disabled={isSearching}
-            style={{ ...inputStyles, ...inputStyle }}
-            autoComplete="off"
-            aria-label="Smart search"
-          />
-          {showTypingPrompt && value.length === 0 && !isSearching && (
-            <span style={typingPromptStyles}>{typingPrompt}</span>
-          )}
-          {isSearching && (
-            <div style={loaderContainerStyles}>
-              <div style={loaderStyles} />
-            </div>
-          )}
-        </div>
-      </form>
+      {filters.length === 0 && (
+        <form onSubmit={formSubmit} style={{ ...formStyles, ...style }}>
+          <div style={inputContainerStyles}>
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              disabled={isSearching}
+              style={{ ...inputStyles, ...inputStyle }}
+              autoComplete="off"
+              aria-label="Smart search"
+            />
+            {showTypingPrompt && value.length === 0 && !isSearching && (
+              <span style={typingPromptStyles}>{typingPrompt}</span>
+            )}
+            {isSearching && (
+              <div style={loaderContainerStyles}>
+                <div style={loaderStyles} />
+              </div>
+            )}
+          </div>
+        </form>
+      )}
 
       {filters.length > 0 && (
         <FilterChips
           filters={filters}
-          isPortrait={isPortrait}
           currency={currency}
           minRatingSuffix={minRatingSuffix}
           clearAllLabel={clearAllLabel}

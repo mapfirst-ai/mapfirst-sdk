@@ -64,14 +64,24 @@ type SmartFilter = {
 };
 
 /**
- * Hook that creates a MapFirstCore instance that can be initialized before maps are ready.
- * Supports two-phase initialization: create SDK first, attach map later.
- * Returns the instance and reactive state that updates when SDK state changes.
+ * Comprehensive hook for MapFirst SDK with all functionality in one place.
+ * Creates a MapFirstCore instance with reactive state and provides all necessary methods.
  *
  * @example
  * ```tsx
- * // Phase 1: Create SDK instance with location data
- * const { mapFirst, state } = useMapFirstCore({
+ * // Initialize with location data
+ * const {
+ *   instance,
+ *   state,
+ *   setPrimaryType,
+ *   setSelectedMarker,
+ *   propertiesSearch,
+ *   smartFilterSearch,
+ *   boundsSearch,
+ *   attachMapLibre,
+ *   attachGoogle,
+ *   attachMapbox
+ * } = useMapFirst({
  *   initialLocationData: {
  *     city: "New York",
  *     country: "United States",
@@ -80,22 +90,32 @@ type SmartFilter = {
  * });
  *
  * // Access reactive state
- * console.log(state.properties); // Updates when properties change
- * console.log(state.isSearching); // Updates when search state changes
+ * console.log(state?.properties);
+ * console.log(state?.isSearching);
+ * console.log(state?.selectedPropertyId);
  *
- * // Phase 2: Attach map when ready
+ * // Attach map when ready
  * useEffect(() => {
- *   if (mapLibreInstance && mapFirst) {
- *     mapFirst.attachMap(mapLibreInstance, {
- *       platform: "maplibre",
- *       maplibregl: maplibregl,
+ *   if (mapLibreInstance) {
+ *     attachMapLibre(mapLibreInstance, maplibregl, {
  *       onMarkerClick: (marker) => console.log(marker)
  *     });
  *   }
- * }, [mapLibreInstance, mapFirst]);
+ * }, [mapLibreInstance]);
+ *
+ * // Use search methods
+ * await propertiesSearch.search({
+ *   body: { city: "Paris", country: "France" }
+ * });
+ *
+ * await smartFilterSearch.search({
+ *   query: "hotels near beach with pool"
+ * });
+ *
+ * await boundsSearch.perform();
  * ```
  */
-export function useMapFirstCore(options: BaseMapFirstOptions) {
+export function useMapFirst(options: BaseMapFirstOptions) {
   const instanceRef = React.useRef<MapFirstCore | null>(null);
   const [state, setState] = React.useState<MapState | null>(null);
 
@@ -184,536 +204,221 @@ export function useMapFirstCore(options: BaseMapFirstOptions) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { mapFirst: instanceRef.current, state };
-}
-
-/**
- * Hook to access reactive properties from MapFirst SDK.
- * Returns the current properties array that updates when properties change.
- *
- * @example
- * ```tsx
- * const { mapFirst } = useMapFirstCore({ ... });
- * const properties = useMapFirstProperties(mapFirst);
- *
- * return <div>Found {properties.length} properties</div>;
- * ```
- */
-export function useMapFirstProperties(
-  mapFirst: MapFirstCore | null
-): Property[] {
-  const [properties, setProperties] = React.useState<Property[]>([]);
-
-  React.useEffect(() => {
-    if (!mapFirst) {
-      setProperties([]);
-      return;
+  // Primary type control
+  const setPrimaryType = React.useCallback((type: PropertyType) => {
+    if (instanceRef.current) {
+      instanceRef.current.setPrimaryType(type);
     }
+  }, []);
 
-    // Initialize with current state
-    setProperties(mapFirst.getState().properties);
-  }, [mapFirst]);
-
-  return properties;
-}
-
-/**
- * Hook to access the selected property ID from MapFirst SDK.
- * Returns the currently selected property ID that updates when selection changes.
- *
- * @example
- * ```tsx
- * const { mapFirst } = useMapFirstCore({ ... });
- * const selectedId = useMapFirstSelectedProperty(mapFirst);
- *
- * return <div>Selected: {selectedId || 'None'}</div>;
- * ```
- */
-export function useMapFirstSelectedProperty(
-  mapFirst: MapFirstCore | null
-): number | null {
-  const [selectedId, setSelectedId] = React.useState<number | null>(null);
-
-  React.useEffect(() => {
-    if (!mapFirst) {
-      setSelectedId(null);
-      return;
+  // Selected marker control
+  const setSelectedMarker = React.useCallback((id: number | null) => {
+    if (instanceRef.current) {
+      instanceRef.current.setSelectedMarker(id);
     }
+  }, []);
 
-    // Initialize with current state
-    setSelectedId(mapFirst.getState().selectedPropertyId);
-  }, [mapFirst]);
+  // Properties search
+  const [propertiesSearchLoading, setPropertiesSearchLoading] =
+    React.useState(false);
+  const [propertiesSearchError, setPropertiesSearchError] =
+    React.useState<Error | null>(null);
 
-  return selectedId;
-}
+  const propertiesSearch = React.useMemo(
+    () => ({
+      search: async (options: {
+        body: InitialRequestBody;
+        beforeApplyProperties?: (data: any) => {
+          price?: any;
+          limit?: number;
+        };
+        smartFiltersClearable?: boolean;
+      }) => {
+        if (!instanceRef.current) {
+          const err = new Error("MapFirst instance not available");
+          setPropertiesSearchError(err);
+          throw err;
+        }
 
-/**
- * Hook to access and control the primary property type.
- * Returns the current primary type and a setter function.
- *
- * @example
- * ```tsx
- * const { mapFirst } = useMapFirstCore({ ... });
- * const [primaryType, setPrimaryType] = usePrimaryType(mapFirst);
- *
- * return (
- *   <select value={primaryType} onChange={(e) => setPrimaryType(e.target.value as PropertyType)}>
- *     <option value="Accommodation">Hotels</option>
- *     <option value="Restaurant">Restaurants</option>
- *     <option value="Attraction">Attractions</option>
- *   </select>
- * );
- * ```
- */
-export function usePrimaryType(
-  mapFirst: MapFirstCore | null
-): [PropertyType, (type: PropertyType) => void] {
-  const [primaryType, setPrimaryTypeState] =
-    React.useState<PropertyType>("Accommodation");
+        setPropertiesSearchLoading(true);
+        setPropertiesSearchError(null);
 
-  React.useEffect(() => {
-    if (!mapFirst) {
-      setPrimaryTypeState("Accommodation");
-      return;
-    }
-
-    // Initialize with current state
-    setPrimaryTypeState(mapFirst.getState().primary);
-  }, [mapFirst]);
-
-  const setPrimaryType = React.useCallback(
-    (type: PropertyType) => {
-      if (mapFirst) {
-        mapFirst.setPrimaryType(type);
-        setPrimaryTypeState(type);
-      }
-    },
-    [mapFirst]
+        try {
+          const result = await instanceRef.current.runPropertiesSearch({
+            ...options,
+            onError: (err) => {
+              const error = err instanceof Error ? err : new Error(String(err));
+              setPropertiesSearchError(error);
+            },
+          });
+          return result;
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          setPropertiesSearchError(error);
+          throw error;
+        } finally {
+          setPropertiesSearchLoading(false);
+        }
+      },
+      isLoading: propertiesSearchLoading,
+      error: propertiesSearchError,
+    }),
+    [propertiesSearchLoading, propertiesSearchError]
   );
 
-  return [primaryType, setPrimaryType];
-}
+  // Smart filter search
+  const [smartFilterSearchLoading, setSmartFilterSearchLoading] =
+    React.useState(false);
+  const [smartFilterSearchError, setSmartFilterSearchError] =
+    React.useState<Error | null>(null);
 
-/**
- * Hook to access and control the selected marker.
- * Returns the current selected marker ID and a setter function.
- * Note: This hook requires the MapFirstCore instance. For simpler usage with reactive updates,
- * use state.selectedPropertyId from useMapFirstCore instead.
- *
- * @example
- * ```tsx
- * const { mapFirst } = useMapFirstCore({ ... });
- * const [selectedMarker, setSelectedMarker] = useSelectedMarker(mapFirst);
- *
- * return (
- *   <div>
- *     <p>Selected: {selectedMarker || 'None'}</p>
- *     <button onClick={() => setSelectedMarker(null)}>Clear Selection</button>
- *   </div>
- * );
- * ```
- */
-export function useSelectedMarker(
-  mapFirst: MapFirstCore | null
-): [number | null, (id: number | null) => void] {
-  const [selectedMarker, setSelectedMarkerState] = React.useState<
-    number | null
-  >(null);
+  const smartFilterSearch = React.useMemo(
+    () => ({
+      search: async (options: {
+        query?: string;
+        filters?: SmartFilter[];
+        onProcessFilters?: (
+          filters: any,
+          location_id?: number
+        ) => {
+          smartFilters?: SmartFilter[];
+          price?: any;
+          limit?: number;
+          language?: string;
+        };
+      }) => {
+        if (!instanceRef.current) {
+          const err = new Error("MapFirst instance not available");
+          setSmartFilterSearchError(err);
+          throw err;
+        }
 
-  React.useEffect(() => {
-    if (!mapFirst) {
-      setSelectedMarkerState(null);
-      return;
-    }
+        setSmartFilterSearchLoading(true);
+        setSmartFilterSearchError(null);
 
-    // Initialize with current state
-    setSelectedMarkerState(mapFirst.getState().selectedPropertyId);
-  }, [mapFirst]);
-
-  const setSelectedMarker = React.useCallback(
-    (id: number | null) => {
-      if (mapFirst) {
-        mapFirst.setSelectedMarker(id);
-      }
-    },
-    [mapFirst]
+        try {
+          const result = await instanceRef.current.runSmartFilterSearch({
+            ...options,
+            onError: (err) => {
+              const error = err instanceof Error ? err : new Error(String(err));
+              setSmartFilterSearchError(error);
+            },
+          });
+          return result;
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          setSmartFilterSearchError(error);
+          throw error;
+        } finally {
+          setSmartFilterSearchLoading(false);
+        }
+      },
+      isLoading: smartFilterSearchLoading,
+      error: smartFilterSearchError,
+    }),
+    [smartFilterSearchLoading, smartFilterSearchError]
   );
 
-  return [selectedMarker, setSelectedMarker];
-}
+  // Bounds search
+  const [boundsSearchLoading, setBoundsSearchLoading] = React.useState(false);
+  const [boundsSearchError, setBoundsSearchError] =
+    React.useState<Error | null>(null);
 
-/**
- * Hook for MapLibre GL JS integration.
- * Automatically attaches the map when both the SDK instance and map are available.
- *
- * @example
- * ```tsx
- * const { mapFirst, state } = useMapFirstCore({ initialLocationData: { city: "Paris", country: "France" } });
- * const mapRef = useRef<maplibregl.Map | null>(null);
- *
- * useMapLibreAttachment({
- *   mapFirst,
- *   map: mapRef.current,
- *   maplibregl: maplibregl,
- *   onMarkerClick: (marker) => console.log(marker)
- * });
- *
- * // Access reactive state
- * console.log(state?.properties);
- * ```
- */
-export function useMapLibreAttachment({
-  mapFirst,
-  map,
-  maplibregl,
-  onMarkerClick,
-}: {
-  mapFirst: MapFirstCore | null;
-  map: any | null;
-  maplibregl: MapLibreNamespace;
-  onMarkerClick?: (marker: Property) => void;
-}) {
-  const attachedRef = React.useRef(false);
+  const boundsSearch = React.useMemo(
+    () => ({
+      perform: async () => {
+        if (!instanceRef.current) {
+          return null;
+        }
 
-  React.useEffect(() => {
-    if (!mapFirst || !map || attachedRef.current) {
-      return;
-    }
+        setBoundsSearchLoading(true);
+        setBoundsSearchError(null);
 
-    mapFirst.attachMap(map, {
-      platform: "maplibre",
-      maplibregl,
-      onMarkerClick,
-    });
+        try {
+          const result = await instanceRef.current.performBoundsSearch();
+          return result;
+        } catch (err) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          setBoundsSearchError(error);
+          throw error;
+        } finally {
+          setBoundsSearchLoading(false);
+        }
+      },
+      isSearching: boundsSearchLoading,
+      error: boundsSearchError,
+    }),
+    [boundsSearchLoading, boundsSearchError]
+  );
 
-    attachedRef.current = true;
-  }, [mapFirst, map, maplibregl, onMarkerClick]);
-}
-
-/**
- * Hook for Google Maps integration.
- * Automatically attaches the map when both the SDK instance and map are available.
- *
- * @example
- * ```tsx
- * const { mapFirst, state } = useMapFirstCore({ initialLocationData: { city: "Tokyo", country: "Japan" } });
- * const mapRef = useRef<google.maps.Map | null>(null);
- *
- * useGoogleMapsAttachment({
- *   mapFirst,
- *   map: mapRef.current,
- *   google: window.google,
- *   onMarkerClick: (marker) => console.log(marker)
- * });
- *
- * // Access reactive state
- * console.log(state?.isSearching);
- * ```
- */
-export function useGoogleMapsAttachment({
-  mapFirst,
-  map,
-  google,
-  onMarkerClick,
-}: {
-  mapFirst: MapFirstCore | null;
-  map: any | null;
-  google: GoogleMapsNamespace;
-  onMarkerClick?: (marker: Property) => void;
-}) {
-  const attachedRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!mapFirst || !map || attachedRef.current) {
-      return;
-    }
-
-    mapFirst.attachMap(map, {
-      platform: "google",
-      google,
-      onMarkerClick,
-    });
-
-    attachedRef.current = true;
-  }, [mapFirst, map, google, onMarkerClick]);
-}
-
-/**
- * Hook for Mapbox GL JS integration.
- * Automatically attaches the map when both the SDK instance and map are available.
- *
- * @example
- * ```tsx
- * const { mapFirst, state } = useMapFirstCore({ initialLocationData: { city: "London", country: "United Kingdom" } });
- * const mapRef = useRef<mapboxgl.Map | null>(null);
- *
- * useMapboxAttachment({
- *   mapFirst,
- *   map: mapRef.current,
- *   mapboxgl: mapboxgl,
- *   onMarkerClick: (marker) => console.log(marker)
- * });
- *
- * // Access reactive state
- * console.log(state?.filters);
- * ```
- */
-export function useMapboxAttachment({
-  mapFirst,
-  map,
-  mapboxgl,
-  onMarkerClick,
-}: {
-  mapFirst: MapFirstCore | null;
-  map: any | null;
-  mapboxgl: MapboxNamespace;
-  onMarkerClick?: (marker: Property) => void;
-}) {
-  const attachedRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (!mapFirst || !map || attachedRef.current) {
-      return;
-    }
-
-    mapFirst.attachMap(map, {
-      platform: "mapbox",
-      mapboxgl,
-      onMarkerClick,
-    });
-
-    attachedRef.current = true;
-  }, [mapFirst, map, mapboxgl, onMarkerClick]);
-}
-
-/**
- * Legacy hook that creates the MapFirstCore instance with a map immediately.
- * Use useMapFirstCore + useMap*Attachment hooks for better control.
- *
- * @deprecated Use useMapFirstCore and platform-specific attachment hooks instead
- */
-export function useMapFirst(options: MapFirstOptions | null) {
-  const instanceRef = React.useRef<MapFirstCore | null>(null);
-
-  React.useEffect(() => {
-    if (!options) {
-      return undefined;
-    }
-    const instance = new MapFirstCore(options);
-    instanceRef.current = instance;
-
-    return () => {
-      instance.destroy();
-      instanceRef.current = null;
-    };
-  }, [options]);
-
-  return instanceRef;
-}
-
-/**
- * Hook to run properties search with the MapFirst SDK.
- * Returns a function to trigger the search and loading state.
- *
- * @example
- * ```tsx
- * const { mapFirst } = useMapFirstCore({ ... });
- * const { search, isLoading, error } = usePropertiesSearch(mapFirst);
- *
- * const handleSearch = async () => {
- *   await search({
- *     body: {
- *       city: "Paris",
- *       country: "France",
- *       filters: {
- *         checkIn: new Date(),
- *         checkOut: new Date(Date.now() + 86400000),
- *         numAdults: 2,
- *         numRooms: 1
- *       }
- *     }
- *   });
- * };
- * ```
- */
-export function usePropertiesSearch(mapFirst: MapFirstCore | null) {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const search = React.useCallback(
-    async (options: {
-      body: InitialRequestBody;
-      beforeApplyProperties?: (data: any) => {
-        price?: any;
-        limit?: number;
-      };
-      smartFiltersClearable?: boolean;
-    }) => {
-      if (!mapFirst) {
-        const err = new Error("MapFirst instance not available");
-        setError(err);
-        throw err;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const result = await mapFirst.runPropertiesSearch({
-          ...options,
-          onError: (err) => {
-            const error = err instanceof Error ? err : new Error(String(err));
-            setError(error);
-          },
+  // Map attachment helpers
+  const mapLibreAttachedRef = React.useRef(false);
+  const attachMapLibre = React.useCallback(
+    (
+      map: any,
+      maplibregl: MapLibreNamespace,
+      options?: { onMarkerClick?: (marker: Property) => void }
+    ) => {
+      if (instanceRef.current && map && !mapLibreAttachedRef.current) {
+        instanceRef.current.attachMap(map, {
+          platform: "maplibre",
+          maplibregl,
+          onMarkerClick: options?.onMarkerClick,
         });
-        return result;
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        setError(error);
-        throw error;
-      } finally {
-        setIsLoading(false);
+        mapLibreAttachedRef.current = true;
       }
     },
-    [mapFirst]
+    []
   );
 
-  return { search, isLoading, error };
-}
-
-/**
- * Hook to run smart filter search with the MapFirst SDK.
- * Returns a function to trigger the search and loading state.
- *
- * @example
- * ```tsx
- * const { mapFirst } = useMapFirstCore({ ... });
- * const { search, isLoading, error } = useSmartFilterSearch(mapFirst);
- *
- * const handleSearch = async () => {
- *   await search({
- *     query: "hotels near beach with pool"
- *   });
- * };
- *
- * // Or with filters
- * const handleFilterSearch = async () => {
- *   await search({
- *     filters: [
- *       { id: "pool", label: "Pool", type: "amenity", value: "pool" },
- *       { id: "4star", label: "4 Star", type: "starRating", value: "4", numericValue: 4 }
- *     ]
- *   });
- * };
- * ```
- */
-export function useSmartFilterSearch(mapFirst: MapFirstCore | null) {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const search = React.useCallback(
-    async (options: {
-      query?: string;
-      filters?: SmartFilter[];
-      onProcessFilters?: (
-        filters: any,
-        location_id?: number
-      ) => {
-        smartFilters?: SmartFilter[];
-        price?: any;
-        limit?: number;
-        language?: string;
-      };
-    }) => {
-      if (!mapFirst) {
-        const err = new Error("MapFirst instance not available");
-        setError(err);
-        throw err;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const result = await mapFirst.runSmartFilterSearch({
-          ...options,
-          onError: (err) => {
-            const error = err instanceof Error ? err : new Error(String(err));
-            setError(error);
-          },
+  const googleMapsAttachedRef = React.useRef(false);
+  const attachGoogle = React.useCallback(
+    (
+      map: any,
+      google: GoogleMapsNamespace,
+      options?: { onMarkerClick?: (marker: Property) => void }
+    ) => {
+      if (instanceRef.current && map && !googleMapsAttachedRef.current) {
+        instanceRef.current.attachMap(map, {
+          platform: "google",
+          google,
+          onMarkerClick: options?.onMarkerClick,
         });
-        return result;
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        setError(error);
-        throw error;
-      } finally {
-        setIsLoading(false);
+        googleMapsAttachedRef.current = true;
       }
     },
-    [mapFirst]
+    []
   );
 
-  return { search, isLoading, error };
-}
-
-/**
- * Hook to perform a bounds search when the user moves the map
- *
- * @example
- * ```tsx
- * const { mapFirst, state } = useMapFirstCore({ ... });
- * const { performBoundsSearch, isSearching } = useMapFirstBoundsSearch(mapFirst);
- *
- * // When user clicks "Search this area" button
- * <button onClick={performBoundsSearch} disabled={!state.pendingBounds || isSearching}>
- *   Search this area
- * </button>
- * ```
- */
-export function useMapFirstBoundsSearch(mapFirst: MapFirstCore | null) {
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
-
-  const performBoundsSearch = React.useCallback(async () => {
-    if (!mapFirst) {
-      return null;
-    }
-
-    setIsSearching(true);
-    setError(null);
-
-    try {
-      const result = await mapFirst.performBoundsSearch();
-      return result;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
-      throw error;
-    } finally {
-      setIsSearching(false);
-    }
-  }, [mapFirst]);
-
-  return { performBoundsSearch, isSearching, error };
-}
-
-/**
- * Helper component that simply renders the markers it receives so non-React environments
- * can verify data flows before wiring the SDK into a map.
- */
-export function MarkerDebugList({ markers }: { markers: Property[] }) {
-  return (
-    <div style={{ fontFamily: "sans-serif", fontSize: 14 }}>
-      <strong>Markers</strong>
-      <ul>
-        {markers.map((marker) => (
-          <li key={String(marker.tripadvisor_id)}>
-            {marker.name} — {marker.location?.lat?.toFixed(3) ?? "n/a"},{" "}
-            {marker.location?.lon?.toFixed(3) ?? "n/a"}
-          </li>
-        ))}
-      </ul>
-    </div>
+  const mapboxAttachedRef = React.useRef(false);
+  const attachMapbox = React.useCallback(
+    (
+      map: any,
+      mapboxgl: MapboxNamespace,
+      options?: { onMarkerClick?: (marker: Property) => void }
+    ) => {
+      if (instanceRef.current && map && !mapboxAttachedRef.current) {
+        instanceRef.current.attachMap(map, {
+          platform: "mapbox",
+          mapboxgl,
+          onMarkerClick: options?.onMarkerClick,
+        });
+        mapboxAttachedRef.current = true;
+      }
+    },
+    []
   );
+
+  return {
+    instance: instanceRef.current,
+    state,
+    setPrimaryType,
+    setSelectedMarker,
+    propertiesSearch,
+    smartFilterSearch,
+    boundsSearch,
+    attachMapLibre,
+    attachGoogle,
+    attachMapbox,
+  };
 }

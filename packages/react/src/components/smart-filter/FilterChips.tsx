@@ -6,12 +6,10 @@ import { RestaurantPriceLevelChip } from "./RestaurantPriceLevelChip";
 import { TransformedQueryChip } from "./TransformedQueryChip";
 import { SearchIcon, NextIcon } from "../Icons";
 import { useFilterScroll } from "../../hooks/useFilterScroll";
-import { useTranslation } from "../../hooks/useTranslation";
 import type { Filter } from "./types";
 
 export interface FilterChipsProps {
   filters: Filter[];
-  isPortrait: boolean;
   currency: string;
   minRatingSuffix: string;
   clearAllLabel: string;
@@ -67,7 +65,6 @@ const navButtonStyles: CSSProperties = {
 
 export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   filters,
-  isPortrait,
   currency,
   minRatingSuffix,
   clearAllLabel,
@@ -81,22 +78,16 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
     filters.length
   );
-  const { t } = useTranslation();
   const [navHover, setNavHover] = React.useState<"prev" | "next" | null>(null);
-  const [resetHover, setResetHover] = React.useState(false);
   const [clearHover, setClearHover] = React.useState(false);
-
-  const scrollContainerStyles: CSSProperties = {
-    ...scrollContainerBase,
-    padding: isPortrait ? "8px 16px" : "8px",
-  };
 
   return (
     <div style={containerStyles}>
       <div
         ref={scrollerRef}
         style={{
-          ...scrollContainerStyles,
+          ...scrollContainerBase,
+          padding: "8px",
           // Hide scrollbar for webkit browsers
           WebkitOverflowScrolling: "touch",
         }}
@@ -108,27 +99,6 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             }
           `}
         </style>
-        <button
-          style={{
-            flexShrink: 0,
-            backgroundColor: resetHover ? "#03a03e" : "#03852e",
-            borderRadius: "50%",
-            padding: "8px",
-            cursor: "pointer",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "background-color 0.2s",
-          }}
-          onClick={onResetFilters}
-          onMouseEnter={() => setResetHover(true)}
-          onMouseLeave={() => setResetHover(false)}
-        >
-          <SearchIcon
-            style={{ width: "20px", height: "20px", color: "white" }}
-          />
-        </button>
         {filters.map((filter) => {
           const renderStandardChip = () => (
             <Chip
@@ -280,9 +250,9 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             cursor: "pointer",
             fontSize: "14px",
             userSelect: "none",
-            border: "none",
-            backgroundColor: clearHover ? "#e5e5e5" : "transparent",
-            transition: "background-color 0.2s",
+            backgroundColor: clearHover ? "#eee" : "white",
+            color: "black",
+            border: "1px solid #03852e",
           }}
           onClick={onClearAll}
           onMouseEnter={() => setClearHover(true)}
