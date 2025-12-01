@@ -321,4 +321,4 @@ function AutoSearch() {
 
 - [useMapFirst API](../api/use-mapfirst)
 - [MapFirstCore API](../api/core)
-- [Search Examples](../examples/searching)
+- [Basic Map Example](../examples/basic-map)

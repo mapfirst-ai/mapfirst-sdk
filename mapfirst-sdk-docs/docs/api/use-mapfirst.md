@@ -316,4 +316,4 @@ interface Property {
 
 - [MapFirstCore API](./core)
 - [React Guide](../getting-started/react)
-- [Search Examples](../examples/searching)
+- [Searching Guide](../guides/searching)

@@ -236,10 +236,9 @@ The `state` object contains reactive data:
 
 ## Next Steps
 
-- [Add SmartFilter Component](../components/smartfilter) - Add AI-powered search
+- [API Reference](../api/use-mapfirst) - Explore all available methods
 - [Perform Searches](../guides/searching) - Learn about different search methods
-- [Handle Events](../guides/events) - Respond to user interactions
-- [Customize Styling](../guides/styling) - Match your brand
+- [Map Integration](../guides/map-integration) - Deep dive into map providers
 
 ## Common Issues
 

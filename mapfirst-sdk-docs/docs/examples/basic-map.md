@@ -327,12 +327,6 @@ export default function BasicMap() {
 6. **State Management** - Display property count and loading states
 7. **Error Handling** - Catch and display errors
 
-## Next Steps
-
-- [Add Smart Search](./smart-search)
-- [Implement Property Details](./property-details)
-- [Add Search Filters](./search-filters)
-
 ## See Also
 
 - [useMapFirst API](../api/use-mapfirst)

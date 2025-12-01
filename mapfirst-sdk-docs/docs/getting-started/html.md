@@ -557,7 +557,7 @@ Here's a full example with a search interface:
 
 - [API Reference](../api/core) - Learn about all available methods
 - [Examples](../examples/basic-map) - See more complete examples
-- [Styling Guide](../guides/styling) - Customize the appearance
+- [Searching Guide](../guides/searching) - Learn different search techniques
 
 ## Troubleshooting
 
