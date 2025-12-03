@@ -73,8 +73,8 @@ importers:
   packages/react:
     dependencies:
       '@mapfirst.ai/core':
-        specifier: 0.0.13
-        version: 0.0.13
+        specifier: 0.0.14
+        version: 0.0.14
       react:
         specifier: '>=17 || >=18'
         version: 19.2.0
@@ -1470,8 +1470,8 @@ packages:
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
 
-  '@mapfirst.ai/core@0.0.13':
-    resolution: {integrity: sha512-WFwMBaZmoM7hDPVRLCOxHuNIwgDGZ5smBGfaZms6OqXl2kEpJtwcOU5as2fubPSTkVXURegmijVociLEr9gUkg==}
+  '@mapfirst.ai/core@0.0.14':
+    resolution: {integrity: sha512-YMeKFOoZwlsfIzyvL2IOaRYJOsEGrMOWgByTqdxJKQl62mBXdy7Bno6hW9dSgIqvWu/hNzWM6UocPE/YYAD/Wg==}
 
   '@mdx-js/mdx@3.1.1':
     resolution: {integrity: sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ==}
@@ -7637,7 +7637,7 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@mapfirst.ai/core@0.0.13': {}
+  '@mapfirst.ai/core@0.0.14': {}
 
   '@mdx-js/mdx@3.1.1':
     dependencies:

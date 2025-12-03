@@ -68,7 +68,7 @@ export type Environment = "prod" | "test";
 
 const API_URLS: Record<Environment, string> = {
   prod: "https://api.mapfirst.ai",
-  test: "https://ta-backend-test-290791666935.us-central1.run.app",
+  test: "https://api.mapfirst.ai/test",
 };
 
 // Properties fetch error class

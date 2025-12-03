@@ -1,6 +1,6 @@
 {
   "name": "@mapfirst.ai/core",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Core SDK for MapFirst - Multi-platform map markers and property visualization",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sandeshveerani4/mapfirst-sdk.git",
+    "url": "https://github.com/mapfirst-ai/mapfirst-sdk.git",
     "directory": "packages/core"
   },
   "publishConfig": {
