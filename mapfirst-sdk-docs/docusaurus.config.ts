@@ -92,6 +92,7 @@ const config: Config = {
         alt: "MapFirst SDK Logo",
         src: "img/logo.png",
         href: "https://mapfirst.ai",
+        target: "_self",
       },
       items: [
         {
