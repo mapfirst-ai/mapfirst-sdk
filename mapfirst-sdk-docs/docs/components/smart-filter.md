@@ -321,4 +321,3 @@ The SmartFilter component supports various filter types:
 
 - [useMapFirst Hook](../api/use-mapfirst) - Main React hook for MapFirst SDK
 - [Searching Guide](../guides/searching) - Learn about smart search functionality
-- [Filter Type Reference](../api/filters) - Detailed filter type documentation
