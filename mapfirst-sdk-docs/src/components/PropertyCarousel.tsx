@@ -21,12 +21,14 @@ interface PropertyCarouselProps {
   properties: Property[];
   selectedMarker: number | null;
   onSelectMarker: (id: number) => void;
+  onFlyTo?: (lon: number, lat: number) => void;
 }
 
 export default function PropertyCarousel({
   properties,
   selectedMarker,
   onSelectMarker,
+  onFlyTo,
 }: PropertyCarouselProps) {
   const [swiper, setSwiper] = useState<SwiperClass | null>(null);
   const skipNextChange = useRef(false);
@@ -73,11 +75,14 @@ export default function PropertyCarousel({
   const handleCardClick = useCallback(
     (property: Property, index: number) => {
       onSelectMarker(property.tripadvisor_id);
+      if (onFlyTo && property.location) {
+        onFlyTo(property.location.lon, property.location.lat);
+      }
       if (swiper) {
         swiper.slideTo(index);
       }
     },
-    [onSelectMarker, swiper]
+    [onSelectMarker, onFlyTo, swiper]
   );
 
   return (
