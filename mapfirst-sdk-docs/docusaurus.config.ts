@@ -108,6 +108,7 @@ const config: Config = {
           label: "Documentation",
         },
         { to: "/blog", label: "Blog", position: "left" },
+        { to: "/playground", label: "Playground", position: "left" },
         {
           href: "https://www.mapfirst.ai/publishers",
           label: "Publishers",
