@@ -84,38 +84,98 @@ mapFirst.runPropertiesSearch({
 
 ## Smart Filter Search
 
-Use natural language to search for properties.
+Use natural language to search for properties with AI-powered filters.
 
 ### React Example
 
 ```typescript
+import { useState } from "react";
+import {
+  useMapFirst,
+  SmartFilter,
+  Filter,
+  processApiFilters,
+  convertToApiFilters,
+} from "@mapfirst/react";
+
 function SmartSearch() {
-  const { smartFilterSearch } = useMapFirst({
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<Filter[]>([]);
+
+  const { smartFilterSearch, state } = useMapFirst({
     adapter: null,
     environment: "prod",
-  });
-
-  const handleSmartSearch = async (query: string) => {
-    await smartFilterSearch({
-      query,
+    initialLocationData: {
       city: "Tokyo",
       country: "Japan",
-    });
+      currency: "JPY",
+    },
+  });
+
+  const handleSmartSearch = async (
+    query: string,
+    currentFilters?: Filter[]
+  ) => {
+    if (!query.trim()) return;
+
+    try {
+      const apiFilters = currentFilters
+        ? convertToApiFilters(currentFilters)
+        : undefined;
+
+      await smartFilterSearch.search({
+        query: query.trim(),
+        filters: apiFilters,
+        onProcessFilters: (responseFilters) => {
+          const newFilters =
+            currentFilters || processApiFilters(responseFilters);
+
+          if (!currentFilters) {
+            setFilters(newFilters);
+          }
+
+          return {
+            smartFilters: convertToApiFilters(newFilters),
+            price: responseFilters.price,
+            limit: responseFilters.limit ?? 30,
+            language: responseFilters.language,
+          };
+        },
+      });
+    } catch (error) {
+      console.error("Search failed:", error);
+    }
+  };
+
+  const handleFilterChange = async (updatedFilters: Filter[]) => {
+    setFilters(updatedFilters);
+
+    if (searchQuery && !state?.isSearching) {
+      await handleSmartSearch(searchQuery, updatedFilters);
+    }
   };
 
   return (
     <div>
-      <button
-        onClick={() => handleSmartSearch("sushi restaurants near shibuya")}
-      >
-        Find Sushi Restaurants
-      </button>
-      <button onClick={() => handleSmartSearch("luxury hotels with spa")}>
-        Find Luxury Hotels
-      </button>
-      <button onClick={() => handleSmartSearch("family-friendly attractions")}>
-        Find Attractions
-      </button>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search hotels..."
+      />
+      <button onClick={() => handleSmartSearch(searchQuery)}>Search</button>
+
+      {/* Display filter chips */}
+      {filters.length > 0 && (
+        <SmartFilter
+          filters={filters}
+          isSearching={state?.isSearching}
+          onFilterChange={handleFilterChange}
+          currency="JPY"
+        />
+      )}
+
+      <p>Found {state?.properties?.length || 0} properties</p>
     </div>
   );
 }
@@ -130,6 +190,8 @@ mapFirst.runSmartFilterSearch({
   country: "Czech Republic",
 });
 ```
+
+For more details on the SmartFilter component, see the [SmartFilter Component Guide](../components/smart-filter).
 
 ## Bounds Search
 

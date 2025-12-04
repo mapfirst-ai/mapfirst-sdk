@@ -25,6 +25,7 @@ MapFirst SDK is a powerful mapping solution that provides intelligent property s
 
 - [Getting Started with React](./getting-started/react)
 - [Getting Started with HTML](./getting-started/html)
+- [SmartFilter Component](./components/smart-filter)
 - [API Reference](./api/use-mapfirst)
 - [Examples](./examples/basic-map)
 

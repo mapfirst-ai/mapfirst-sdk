@@ -18,25 +18,26 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Getting Started",
-      collapsed: false,
       items: ["getting-started/react", "getting-started/html"],
     },
     {
       type: "category",
+      label: "Components",
+      items: ["components/smart-filter"],
+    },
+    {
+      type: "category",
       label: "API Reference",
-      collapsed: false,
       items: ["api/use-mapfirst", "api/core"],
     },
     {
       type: "category",
       label: "Guides",
-      collapsed: false,
       items: ["guides/searching", "guides/map-integration"],
     },
     {
       type: "category",
       label: "Examples",
-      collapsed: false,
       items: ["examples/basic-map"],
     },
   ],

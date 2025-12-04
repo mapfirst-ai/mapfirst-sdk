@@ -1,5 +1,5 @@
 import * as _mapfirst_ai_core from '@mapfirst.ai/core';
-import { PropertyType, PriceLevel, MapFirstCore, BaseMapFirstOptions, MapState, Property, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace } from '@mapfirst.ai/core';
+import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace } from '@mapfirst.ai/core';
 export { ApiFiltersResponse, convertToApiFilters, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
 import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'react';
@@ -21,19 +21,12 @@ type PriceRangeValue = {
 };
 
 interface SmartFilterProps {
-    mapFirst: MapFirstCore | null;
     filters: Filter[];
-    value?: string;
     isSearching?: boolean;
-    placeholder?: string;
-    onSearch: (query: string, filters?: Filter[]) => Promise<void> | void;
     onFilterChange: (filters: Filter[]) => Promise<void> | void;
-    onValueChange?: (value: string) => void;
-    showTypingPrompt?: boolean;
     customTranslations?: Record<string, string>;
     currency?: string;
     style?: CSSProperties;
-    inputStyle?: CSSProperties;
     containerStyle?: CSSProperties;
 }
 /**

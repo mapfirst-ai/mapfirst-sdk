@@ -3,6 +3,7 @@ import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+import "dotenv/config";
 
 const config: Config = {
   title: "MapFirst SDK Docs",
@@ -41,6 +42,12 @@ const config: Config = {
   // GitHub pages deployment config.
   organizationName: "mapfirst-ai",
   projectName: "mapfirst-sdk",
+
+  // Custom fields for environment variables
+  customFields: {
+    mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN,
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+  },
 
   onBrokenLinks: "throw",
 

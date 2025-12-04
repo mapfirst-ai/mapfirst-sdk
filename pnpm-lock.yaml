@@ -43,14 +43,17 @@ importers:
         specifier: 0.0.14
         version: 0.0.14
       '@mapfirst.ai/react':
-        specifier: ^0.0.17
-        version: 0.0.17(react@19.2.0)
+        specifier: ^0.0.19
+        version: 0.0.19(react@19.2.0)
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.1.1(@types/react@19.2.4)(react@19.2.0)
       clsx:
         specifier: ^2.0.0
         version: 2.1.1
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
       mapbox-gl:
         specifier: ^3.17.0
         version: 3.17.0
@@ -1508,8 +1511,8 @@ packages:
   '@mapfirst.ai/core@0.0.14':
     resolution: {integrity: sha512-YMeKFOoZwlsfIzyvL2IOaRYJOsEGrMOWgByTqdxJKQl62mBXdy7Bno6hW9dSgIqvWu/hNzWM6UocPE/YYAD/Wg==}
 
-  '@mapfirst.ai/react@0.0.17':
-    resolution: {integrity: sha512-BcA5ryMawiEqLFnyLXPa8uvA90rf9JftyCuImtF/FPiTel6nv4odyD/ivqfCdKj9196ALDaYQ9t2Iw8KTnVDug==}
+  '@mapfirst.ai/react@0.0.19':
+    resolution: {integrity: sha512-sAAHOFpDFvkqyoeKuqQE0SiP2PMvy4/vsLFeJIpi/v1Zpml7Ii2o4pv4dV1x8BWUkA2hhS/Nx5yH4i6CDv6aDA==}
     peerDependencies:
       react: '>=17 || >=18'
 
@@ -2747,6 +2750,10 @@ packages:
   dot-prop@6.0.1:
     resolution: {integrity: sha512-tE7ztYzXHIeyvc7N+hR3oi7FIbf/NIjVP9hmAt3yMXzrQ072/fpjGLx2GxNxGxUl5V73MEqYzioOMoVhGMJ5cA==}
     engines: {node: '>=10'}
+
+  dotenv@17.2.3:
+    resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
+    engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -7777,7 +7784,7 @@ snapshots:
 
   '@mapfirst.ai/core@0.0.14': {}
 
-  '@mapfirst.ai/react@0.0.17(react@19.2.0)':
+  '@mapfirst.ai/react@0.0.19(react@19.2.0)':
     dependencies:
       '@mapfirst.ai/core': 0.0.14
       react: 19.2.0
@@ -9099,6 +9106,8 @@ snapshots:
   dot-prop@6.0.1:
     dependencies:
       is-obj: 2.0.0
+
+  dotenv@17.2.3: {}
 
   dunder-proto@1.0.1:
     dependencies:
