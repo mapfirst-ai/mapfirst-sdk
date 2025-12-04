@@ -6,25 +6,92 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #1f0f4f;
+  --ifm-color-primary-dark: #1c0d47;
+  --ifm-color-primary-darker: #1a0c43;
+  --ifm-color-primary-darkest: #150a37;
+  --ifm-color-primary-light: #221157;
+  --ifm-color-primary-lighter: #24125b;
+  --ifm-color-primary-lightest: #2a1467;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+[data-theme="dark"] {
+  --ifm-color-primary: #8d75f5;
+  --ifm-color-primary-dark: #4729d5;
+  --ifm-color-primary-darker: #3e1fce;
+  --ifm-color-primary-darkest: #3419b0;
+  --ifm-color-primary-light: #6f55dd;
+  --ifm-color-primary-lighter: #7d61e0;
+  --ifm-color-primary-lightest: #9983e7;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Navbar custom styling */
+.navbar {
+  background-color: #1f0f4f !important;
+}
+
+.navbar__title,
+.navbar__link {
+  color: #ffffff !important;
+}
+
+.navbar__link:hover {
+  color: #e0e0e0 !important;
+}
+
+/* Navbar icons and buttons - force light colors */
+.navbar__toggle,
+.navbar__toggle svg,
+.navbar-sidebar__close,
+.navbar-sidebar__close svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.navbar .clean-btn,
+.navbar button {
+  color: #ffffff !important;
+}
+
+.navbar button svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+[data-theme="dark"] .navbar {
+  background-color: #1f0f4f !important;
+}
+
+/* Hero header custom styling */
+.hero {
+  background-color: #1f0f4f !important;
+  color: #ffffff !important;
+}
+
+.hero__title,
+.hero__subtitle {
+  color: #ffffff !important;
+}
+
+/* Footer custom styling */
+.footer {
+  background-color: #27202e !important;
+}
+
+.footer__title,
+.footer__item,
+.footer__link-item {
+  color: #ffffff !important;
+}
+
+.footer__link-item:hover {
+  color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .footer {
+  background-color: #27202e !important;
 }

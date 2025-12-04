@@ -7,7 +7,25 @@ import type * as Preset from "@docusaurus/preset-classic";
 const config: Config = {
   title: "MapFirst SDK Docs",
   tagline: "Build powerful location-based applications",
-  favicon: "img/favicon.ico",
+
+  headTags: [
+    {
+      tagName: "link",
+      attributes: {
+        rel: "icon",
+        href: "/img/light-logo.png",
+        media: "(prefers-color-scheme: light)",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "icon",
+        href: "/img/dark-logo.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+    },
+  ],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -70,12 +88,18 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "MapFirst SDK Docs",
       logo: {
         alt: "MapFirst SDK Logo",
-        src: "img/logo.jpeg",
+        src: "img/logo.png",
+        href: "https://mapfirst.ai",
       },
       items: [
+        {
+          to: "/",
+          label: "Home",
+          position: "left",
+          activeBasePath: "never",
+        },
         {
           type: "docSidebar",
           sidebarId: "tutorialSidebar",
@@ -83,6 +107,16 @@ const config: Config = {
           label: "Documentation",
         },
         { to: "/blog", label: "Blog", position: "left" },
+        {
+          href: "https://www.mapfirst.ai/publishers",
+          label: "Publishers",
+          position: "right",
+        },
+        {
+          href: "https://www.mapfirst.ai/advertisers",
+          label: "Advertisers",
+          position: "right",
+        },
         {
           href: "https://github.com/mapfirst-ai/mapfirst-sdk",
           label: "GitHub",

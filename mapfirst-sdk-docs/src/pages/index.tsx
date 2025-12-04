@@ -34,7 +34,7 @@ export default function Home(): ReactNode {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`Welcome to ${siteConfig.title}`}
+      title={siteConfig.title}
       description="MapFirst SDK - Build powerful location-based applications with support for MapLibre, Mapbox, and Google Maps"
     >
       <HomepageHeader />
