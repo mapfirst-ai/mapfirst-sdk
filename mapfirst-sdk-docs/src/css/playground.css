@@ -48,11 +48,110 @@
   height: 100%;
 }
 
+.playground-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .playground-controls h2 {
-  margin: 0 0 16px 0;
+  margin: 0;
   color: var(--playground-text);
   font-size: 1.25rem;
   font-weight: 600;
+}
+
+.playground-code-toggle {
+  background: var(--playground-primary);
+  color: var(--playground-button-text);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.playground-code-toggle:hover {
+  opacity: 0.8;
+}
+
+.playground-code-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: calc(100% - 60px);
+}
+
+.playground-code-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--playground-border);
+  padding-bottom: 8px;
+}
+
+.playground-code-tabs button {
+  background: transparent;
+  color: var(--playground-text-muted);
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.playground-code-tabs button.active {
+  background: var(--playground-primary);
+  color: var(--playground-button-text);
+}
+
+.playground-code-tabs button:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.playground-code-content {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.playground-code-content pre {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.playground-code-content code {
+  color: var(--playground-text);
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+}
+
+.playground-copy-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--playground-primary);
+  color: var(--playground-button-text);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.playground-copy-btn:hover {
+  opacity: 0.8;
 }
 
 .playground-control-group {

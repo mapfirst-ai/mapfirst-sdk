@@ -81,6 +81,10 @@ function PlaygroundContent() {
   const [adults, setAdults] = useState(2);
   const [rooms, setRooms] = useState(1);
 
+  // Code view state
+  const [showCode, setShowCode] = useState(false);
+  const [codeTab, setCodeTab] = useState<"react" | "html">("react");
+
   // Calculate default dates (10 days from now, 3 night stay)
   const getDefaultDates = () => {
     const today = new Date();
@@ -390,169 +394,582 @@ function PlaygroundContent() {
     [mapFirst]
   );
 
+  // Generate code snippets
+  const generateReactCode = () => {
+    // Get current map center and zoom
+    let center = [2.3522, 48.8566];
+    let zoom = 12;
+
+    if (map) {
+      if (mapPlatform === "google") {
+        const googleCenter = map.getCenter();
+        center = [googleCenter.lng(), googleCenter.lat()];
+        zoom = map.getZoom();
+      } else {
+        // Mapbox/MapLibre
+        const mapCenter = map.getCenter();
+        center = [mapCenter.lng, mapCenter.lat];
+        zoom = Math.round(map.getZoom() * 10) / 10;
+      }
+    }
+
+    const mapPlatformConfig = {
+      mapbox: {
+        import:
+          'import mapboxgl from "mapbox-gl";\nimport "mapbox-gl/dist/mapbox-gl.css";',
+        init: `mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [${center[0].toFixed(4)}, ${center[1].toFixed(4)}],
+      zoom: ${zoom},
+    });`,
+        attach: `mapFirst.attachMap(map, {
+        platform: "mapbox",
+        mapboxgl: mapboxgl,
+      });`,
+      },
+      maplibre: {
+        import:
+          'import maplibregl from "maplibre-gl";\nimport "maplibre-gl/dist/maplibre-gl.css";',
+        init: `const map = new maplibregl.Map({
+      container: "map",
+      style: "https://demotiles.maplibre.org/style.json",
+      center: [${center[0].toFixed(4)}, ${center[1].toFixed(4)}],
+      zoom: ${zoom},
+    });`,
+        attach: `mapFirst.attachMap(map, {
+        platform: "maplibre",
+        maplibregl: maplibregl,
+      });`,
+      },
+      google: {
+        import:
+          '// Load Google Maps API in your HTML:\n// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=marker"></script>',
+        init: `const map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: ${center[1].toFixed(4)}, lng: ${center[0].toFixed(4)} },
+      zoom: ${zoom},
+      mapId: "YOUR_MAP_ID", // Required for Advanced Markers
+    });`,
+        attach: `mapFirst.attachMap(map, {
+        platform: "google",
+        google: google.maps,
+      });`,
+      },
+    };
+
+    const config = mapPlatformConfig[mapPlatform];
+
+    return `import { useMapFirst, SmartFilter, processApiFilters, convertToApiFilters } from "@mapfirst.ai/react";
+${config.import}
+
+function MapComponent() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState([]);
+
+  const { instance: mapFirst, state, smartFilterSearch } = useMapFirst({
+    initialLocationData: {
+      city: "${city}",
+      country: "${country}",
+      currency: "${currency}",
+    },
+    state: {
+      filters: {
+        checkIn: "${checkIn}",
+        checkOut: "${checkOut}",
+        numAdults: ${adults},
+        numRooms: ${rooms},
+        currency: "${currency}",
+      },
+    },
+  });
+
+  // Initialize ${mapPlatform} map
+  useEffect(() => {
+    ${config.init}
+
+    map.on("load", () => {
+      ${config.attach}
+    });
+  }, []);
+
+  // Smart Filter Search
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    await smartFilterSearch.search({
+      query: searchQuery,
+      filters: filters.length ? convertToApiFilters(filters) : undefined,
+      onProcessFilters: (responseFilters) => {
+        const newFilters = filters.length ? filters : processApiFilters(responseFilters);
+        if (!filters.length) setFilters(newFilters);
+        return {
+          smartFilters: convertToApiFilters(newFilters),
+          price: responseFilters.price,
+          limit: responseFilters.limit ?? 30,
+        };
+      },
+    });
+  };
+
+  const handleFilterChange = async (updatedFilters) => {
+    setFilters(updatedFilters);
+    if (searchQuery && !state.isSearching) {
+      await handleSearch();
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Search (e.g., Hotels near beach)"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ padding: "8px", width: "300px", marginRight: "10px" }}
+        />
+        <button onClick={handleSearch} disabled={state.isSearching}>
+          {state.isSearching ? "Searching..." : "Search"}
+        </button>
+      </div>
+
+      {filters.length > 0 && (
+        <SmartFilter
+          filters={filters}
+          isSearching={state.isSearching}
+          onFilterChange={handleFilterChange}
+          currency="${currency}"
+        />
+      )}
+
+      <div id="map" style={{ height: "600px", marginBottom: "20px" }} />
+
+      <div>
+        <h3>Properties ({state.properties?.length || 0})</h3>
+        {state.properties?.map((property) => {
+          const price = property.pricing?.offer?.displayPrice || property.price_level;
+          return (
+            <div key={property.id} style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
+              <h4>{property.name}</h4>
+              <p>{property.type}</p>
+              {price && <p>Price: {price}</p>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}`;
+  };
+
+  const generateHtmlCode = () => {
+    // Get current map center and zoom
+    let center = [2.3522, 48.8566];
+    let zoom = 12;
+
+    if (map) {
+      if (mapPlatform === "google") {
+        const googleCenter = map.getCenter();
+        center = [googleCenter.lng(), googleCenter.lat()];
+        zoom = map.getZoom();
+      } else {
+        // Mapbox/MapLibre
+        const mapCenter = map.getCenter();
+        center = [mapCenter.lng, mapCenter.lat];
+        zoom = Math.round(map.getZoom() * 10) / 10;
+      }
+    }
+
+    const mapPlatformConfig = {
+      mapbox: {
+        cdn: `<link href="https://unpkg.com/mapbox-gl/dist/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/mapbox-gl/dist/mapbox-gl.js"></script>`,
+        init: `mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [${center[0].toFixed(4)}, ${center[1].toFixed(4)}],
+      zoom: ${zoom},
+    });`,
+        attach: `mapFirst.attachMap(map, {
+        platform: "mapbox",
+        mapboxgl: mapboxgl,
+      });`,
+      },
+      maplibre: {
+        cdn: `<link href="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.js"></script>`,
+        init: `const map = new maplibregl.Map({
+      container: "map",
+      style: "https://demotiles.maplibre.org/style.json",
+      center: [${center[0].toFixed(4)}, ${center[1].toFixed(4)}],
+      zoom: ${zoom},
+    });`,
+        attach: `mapFirst.attachMap(map, {
+        platform: "maplibre",
+        maplibregl: maplibregl,
+      });`,
+      },
+      google: {
+        cdn: `<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=marker"></script>`,
+        init: `const map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: ${center[1].toFixed(4)}, lng: ${center[0].toFixed(4)} },
+      zoom: ${zoom},
+      mapId: "YOUR_MAP_ID", // Required for Advanced Markers
+    });`,
+        attach: `mapFirst.attachMap(map, {
+        platform: "google",
+        google: google.maps,
+      });`,
+      },
+    };
+
+    const config = mapPlatformConfig[mapPlatform];
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  ${config.cdn}
+  <script src="https://unpkg.com/@mapfirst.ai/core@latest/dist/index.global.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #search-container { margin-bottom: 20px; }
+    #search-input { padding: 8px; width: 300px; margin-right: 10px; }
+    #search-btn { padding: 8px 16px; cursor: pointer; }
+    #map { height: 600px; margin-bottom: 20px; }
+    .property-card { padding: 10px; border-bottom: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+  <div id="search-container">
+    <input
+      id="search-input"
+      type="text"
+      placeholder="Search (e.g., Hotels near beach)"
+    />
+    <button id="search-btn">Search</button>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="properties">
+    <h3>Properties (<span id="property-count">0</span>)</h3>
+    <div id="property-list"></div>
+  </div>
+
+  <script>
+    const sdkGlobal = window.MapFirstCore;
+    if (!sdkGlobal) {
+      console.error("MapFirst SDK global bundle not found.");
+    }
+
+    const { MapFirstCore: MapFirstCoreClass } = sdkGlobal;
+
+    // Initialize MapFirst
+    const mapFirst = new MapFirstCoreClass({
+      initialLocationData: {
+        city: "${city}",
+        country: "${country}",
+        currency: "${currency}",
+      },
+      callbacks: {
+        onPropertiesChange: (properties) => {
+          renderProperties(properties);
+        },
+      },
+    });
+
+    // Initialize ${mapPlatform} map
+    ${config.init}
+
+    map.on("load", () => {
+      ${config.attach}
+    });
+
+    // Render properties
+    function renderProperties(properties) {
+      const countEl = document.getElementById("property-count");
+      const listEl = document.getElementById("property-list");
+      
+      countEl.textContent = properties.length;
+      listEl.innerHTML = properties
+          .map((property) => {
+            const price =
+              property.pricing?.offer?.displayPrice || property.price_level;
+            return \`
+        <div class="property-card">
+          <h4>\${property.name}</h4>
+          <p>\${property.type}</p>
+          \${price ? \`<p>Price: \${price}</p>\` : ""}
+        </div>
+          \`;
+          })
+          .join("");
+    }
+
+    // Search
+    const searchInput = document.getElementById("search-input");
+    const searchBtn = document.getElementById("search-btn");
+
+    searchBtn.addEventListener("click", () => {
+      const query = searchInput.value.trim();
+      if (query) {
+        searchBtn.textContent = "Searching...";
+        searchBtn.disabled = true;
+
+        mapFirst.runSmartFilterSearch({
+          query: query,
+          onComplete: () => {
+            searchBtn.textContent = "Search";
+            searchBtn.disabled = false;
+          },
+        });
+      } else {
+        mapFirst.runPropertiesSearch({
+          body: {
+            city: "${city}",
+            country: "${country}",
+            filters: {
+              checkIn: "${checkIn}",
+              checkOut: "${checkOut}",
+              numAdults: ${adults},
+              numRooms: ${rooms},
+              currency: "${currency}",
+            },
+          },
+        });
+      }
+    });
+
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        searchBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>`;
+  };
+
+  const copyToClipboard = () => {
+    const code = codeTab === "react" ? generateReactCode() : generateHtmlCode();
+    navigator.clipboard.writeText(code);
+  };
+
   return (
     <div className="playground-wrapper">
       <aside className="playground-controls">
-        <h2>Playground Controls</h2>
-        <div className="playground-control-group">
-          <label>Map Provider</label>
-          <div className="playground-button-group">
-            <button
-              type="button"
-              className={mapPlatform === "google" ? "active" : ""}
-              onClick={() => setMapPlatform("google")}
-            >
-              Google
-            </button>
-            <button
-              type="button"
-              className={mapPlatform === "maplibre" ? "active" : ""}
-              onClick={() => setMapPlatform("maplibre")}
-            >
-              MapLibre
-            </button>
-            <button
-              type="button"
-              className={mapPlatform === "mapbox" ? "active" : ""}
-              onClick={() => setMapPlatform("mapbox")}
-            >
-              Mapbox
-            </button>
-          </div>
+        <div className="playground-header">
+          <h2>Playground Controls</h2>
+          <button
+            type="button"
+            className="playground-code-toggle"
+            onClick={() => setShowCode(!showCode)}
+            title={showCode ? "Show Controls" : "Show Code"}
+          >
+            {showCode ? "✕" : "</>"}
+          </button>
         </div>
-        <div className="playground-control-group">
-          <label>Search Query</label>
-          <input
-            type="text"
-            placeholder="e.g. Hotels near beach"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        {filters.length > 0 && (
-          <div className="playground-control-group">
-            <label>Smart Filters</label>
-            <SmartFilter
-              filters={filters}
-              isSearching={state?.isSearching}
-              onFilterChange={handleFilterChange}
-              currency={currency}
-            />
+
+        {showCode ? (
+          <div className="playground-code-view">
+            <div className="playground-code-tabs">
+              <button
+                type="button"
+                className={codeTab === "react" ? "active" : ""}
+                onClick={() => setCodeTab("react")}
+              >
+                React
+              </button>
+              <button
+                type="button"
+                className={codeTab === "html" ? "active" : ""}
+                onClick={() => setCodeTab("html")}
+              >
+                HTML
+              </button>
+            </div>
+            <div className="playground-code-content">
+              <pre>
+                <code>
+                  {codeTab === "react"
+                    ? generateReactCode()
+                    : generateHtmlCode()}
+                </code>
+              </pre>
+              <button
+                type="button"
+                className="playground-copy-btn"
+                onClick={copyToClipboard}
+              >
+                Copy
+              </button>
+            </div>
           </div>
-        )}
-        <div className="playground-control-group">
-          <label>Location</label>
-          <div className="playground-location-wrapper">
-            <input
-              type="text"
-              placeholder="Search for a city or place"
-              value={locationInput}
-              onChange={(e) => handleLocationInputChange(e.target.value)}
-              onFocus={() => {
-                if (suggestions.length > 0) setShowDropdown(true);
-              }}
-              onBlur={() => {
-                setTimeout(() => setShowDropdown(false), 200);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowDown") {
-                  e.preventDefault();
-                  setHighlightedIndex((idx) =>
-                    suggestions.length ? (idx + 1) % suggestions.length : -1
-                  );
-                } else if (e.key === "ArrowUp") {
-                  e.preventDefault();
-                  setHighlightedIndex((idx) =>
-                    suggestions.length
-                      ? (idx - 1 + suggestions.length) % suggestions.length
-                      : -1
-                  );
-                } else if (e.key === "Enter") {
-                  if (
-                    highlightedIndex >= 0 &&
-                    highlightedIndex < suggestions.length
-                  ) {
-                    e.preventDefault();
-                    selectLocation(suggestions[highlightedIndex]);
-                  }
-                } else if (e.key === "Escape") {
-                  setShowDropdown(false);
-                }
-              }}
-            />
-            {showDropdown && suggestions.length > 0 && (
-              <div className="playground-location-dropdown">
-                {suggestions.map((feature, i) => (
-                  <button
-                    key={feature.id}
-                    type="button"
-                    className={i === highlightedIndex ? "highlighted" : ""}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectLocation(feature);
-                    }}
-                    onMouseEnter={() => setHighlightedIndex(i)}
-                  >
-                    <div className="location-name">{feature.text}</div>
-                    <div className="location-address">{feature.place_name}</div>
-                  </button>
-                ))}
+        ) : (
+          <>
+            <div className="playground-control-group">
+              <label>Map Provider</label>
+              <div className="playground-button-group">
+                <button
+                  type="button"
+                  className={mapPlatform === "google" ? "active" : ""}
+                  onClick={() => setMapPlatform("google")}
+                >
+                  Google
+                </button>
+                <button
+                  type="button"
+                  className={mapPlatform === "maplibre" ? "active" : ""}
+                  onClick={() => setMapPlatform("maplibre")}
+                >
+                  MapLibre
+                </button>
+                <button
+                  type="button"
+                  className={mapPlatform === "mapbox" ? "active" : ""}
+                  onClick={() => setMapPlatform("mapbox")}
+                >
+                  Mapbox
+                </button>
+              </div>
+            </div>
+            <div className="playground-control-group">
+              <label>Search Query</label>
+              <input
+                type="text"
+                placeholder="e.g. Hotels near beach"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            {filters.length > 0 && (
+              <div className="playground-control-group">
+                <label>Smart Filters</label>
+                <SmartFilter
+                  filters={filters}
+                  isSearching={state?.isSearching}
+                  onFilterChange={handleFilterChange}
+                  currency={currency}
+                />
               </div>
             )}
-          </div>
-        </div>
-        <div className="playground-control-group">
-          <label>Check-in Date</label>
-          <input
-            type="date"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-          />
-        </div>
-        <div className="playground-control-group">
-          <label>Check-out Date</label>
-          <input
-            type="date"
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-          />
-        </div>
-        <div className="playground-control-group">
-          <div className="playground-row">
-            <div>
-              <label>Adults</label>
+            <div className="playground-control-group">
+              <label>Location</label>
+              <div className="playground-location-wrapper">
+                <input
+                  type="text"
+                  placeholder="Search for a city or place"
+                  value={locationInput}
+                  onChange={(e) => handleLocationInputChange(e.target.value)}
+                  onFocus={() => {
+                    if (suggestions.length > 0) setShowDropdown(true);
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setShowDropdown(false), 200);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setHighlightedIndex((idx) =>
+                        suggestions.length ? (idx + 1) % suggestions.length : -1
+                      );
+                    } else if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setHighlightedIndex((idx) =>
+                        suggestions.length
+                          ? (idx - 1 + suggestions.length) % suggestions.length
+                          : -1
+                      );
+                    } else if (e.key === "Enter") {
+                      if (
+                        highlightedIndex >= 0 &&
+                        highlightedIndex < suggestions.length
+                      ) {
+                        e.preventDefault();
+                        selectLocation(suggestions[highlightedIndex]);
+                      }
+                    } else if (e.key === "Escape") {
+                      setShowDropdown(false);
+                    }
+                  }}
+                />
+                {showDropdown && suggestions.length > 0 && (
+                  <div className="playground-location-dropdown">
+                    {suggestions.map((feature, i) => (
+                      <button
+                        key={feature.id}
+                        type="button"
+                        className={i === highlightedIndex ? "highlighted" : ""}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          selectLocation(feature);
+                        }}
+                        onMouseEnter={() => setHighlightedIndex(i)}
+                      >
+                        <div className="location-name">{feature.text}</div>
+                        <div className="location-address">
+                          {feature.place_name}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="playground-control-group">
+              <label>Check-in Date</label>
               <input
-                type="number"
-                value={adults}
-                onChange={(e) => setAdults(parseInt(e.target.value))}
-                min="1"
+                type="date"
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
               />
             </div>
-            <div>
-              <label>Rooms</label>
+            <div className="playground-control-group">
+              <label>Check-out Date</label>
               <input
-                type="number"
-                value={rooms}
-                onChange={(e) => setRooms(parseInt(e.target.value))}
-                min="1"
+                type="date"
+                value={checkOut}
+                onChange={(e) => setCheckOut(e.target.value)}
               />
             </div>
-          </div>
-        </div>
-        <div className="playground-control-group">
-          <div className="playground-row">
-            <div>
-              <label>Currency</label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-              >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
+            <div className="playground-control-group">
+              <div className="playground-row">
+                <div>
+                  <label>Adults</label>
+                  <input
+                    type="number"
+                    value={adults}
+                    onChange={(e) => setAdults(parseInt(e.target.value))}
+                    min="1"
+                  />
+                </div>
+                <div>
+                  <label>Rooms</label>
+                  <input
+                    type="number"
+                    value={rooms}
+                    onChange={(e) => setRooms(parseInt(e.target.value))}
+                    min="1"
+                  />
+                </div>
+              </div>
             </div>
-            {/* <div>
+            <div className="playground-control-group">
+              <div className="playground-row">
+                <div>
+                  <label>Currency</label>
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                  >
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+                {/* <div>
               <label>Locale</label>
               <select
                 value={locale}
@@ -568,15 +985,17 @@ function PlaygroundContent() {
                 <option value="zh">中文</option>
               </select>
             </div> */}
-          </div>
-        </div>{" "}
-        <button
-          className="playground-search-btn"
-          onClick={handleBasicSearch}
-          disabled={isSearching}
-        >
-          {isSearching ? "Searching..." : "Search"}
-        </button>
+              </div>
+            </div>{" "}
+            <button
+              className="playground-search-btn"
+              onClick={handleBasicSearch}
+              disabled={isSearching}
+            >
+              {isSearching ? "Searching..." : "Search"}
+            </button>
+          </>
+        )}
       </aside>
 
       <section className="playground-map-container">
