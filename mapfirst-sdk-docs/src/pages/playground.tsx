@@ -62,7 +62,7 @@ function PlaygroundContent() {
   const [mapPlatform, setMapPlatform] = useState<
     "mapbox" | "maplibre" | "google"
   >("maplibre");
-  const [useApi, setUseApi] = useState(false);
+  const [useApi, setUseApi] = useState(true);
   const [styleUrl, setStyleUrl] = useState(
     "https://api.mapfirst.ai/static/style.json"
   );
