@@ -29,8 +29,6 @@ export default function Playground() {
 
   const mapboxAccessToken =
     (siteConfig.customFields?.mapboxAccessToken as string) || "";
-  const googleMapsKey =
-    (siteConfig.customFields?.googleMapsApiKey as string) || "";
 
   if (mapboxAccessToken && mapboxgl.accessToken !== mapboxAccessToken) {
     mapboxgl.accessToken = mapboxAccessToken;
@@ -45,12 +43,6 @@ export default function Playground() {
       title="Playground"
       description="Interactive MapFirst SDK Playground"
     >
-      <Head>
-        <script
-          src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsKey}&libraries=marker`}
-        />
-      </Head>
-
       {mounted && <PlaygroundContent />}
     </Layout>
   );
@@ -70,6 +62,10 @@ function PlaygroundContent() {
     "https://api.mapfirst.ai/static/style.json"
   );
   const [locationInput, setLocationInput] = useState("Paris, France");
+  const [userMapboxToken, setUserMapboxToken] = useState("");
+  const [userGoogleKey, setUserGoogleKey] = useState("");
+  const [userGoogleMapId, setUserGoogleMapId] = useState("");
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -216,9 +212,52 @@ function PlaygroundContent() {
     setCountry(newCountry);
   };
 
+  // Load Google Maps API dynamically when user provides API key
+  useEffect(() => {
+    if (!userGoogleKey || googleMapsLoaded) return;
+
+    // Check if already loaded
+    if ((window as any).google?.maps) {
+      setGoogleMapsLoaded(true);
+      return;
+    }
+
+    // Load Google Maps API
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${userGoogleKey}&libraries=marker`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setGoogleMapsLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("Failed to load Google Maps API");
+      alert("Failed to load Google Maps API. Please check your API key.");
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup if key changes
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [userGoogleKey, googleMapsLoaded]);
+
   // Initialize map based on platform
   useEffect(() => {
     if (!mapContainerRef.current || !mapFirst) return;
+
+    // Check if API keys are required and provided
+    if (mapPlatform === "mapbox" && !userMapboxToken) {
+      return; // Don't initialize without token
+    }
+    if (
+      mapPlatform === "google" &&
+      (!userGoogleKey || !userGoogleMapId || !googleMapsLoaded)
+    ) {
+      return; // Don't initialize without credentials or before API loads
+    }
 
     // Clean up existing map DOM only
     if (map) {
@@ -261,6 +300,10 @@ function PlaygroundContent() {
     };
 
     if (mapPlatform === "mapbox") {
+      // Set user's token
+      if (userMapboxToken && mapboxgl.accessToken !== userMapboxToken) {
+        mapboxgl.accessToken = userMapboxToken;
+      }
       newMap = new mapboxgl.Map({
         container,
         style: "mapbox://styles/mapbox/streets-v12",
@@ -282,7 +325,7 @@ function PlaygroundContent() {
       newMap = new (window as any).google.maps.Map(container, {
         zoom: 12,
         center: { lat: 48.8566, lng: 2.3522 },
-        mapId: "DEMO_MAPFIRST_GOOGLE",
+        mapId: userGoogleMapId,
       });
       // Google Maps is ready immediately
       attachAndRender();
@@ -290,7 +333,15 @@ function PlaygroundContent() {
 
     setMap(newMap);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapPlatform, mapFirst, activeStyleUrl]);
+  }, [
+    mapPlatform,
+    mapFirst,
+    activeStyleUrl,
+    userMapboxToken,
+    userGoogleKey,
+    userGoogleMapId,
+    googleMapsLoaded,
+  ]);
 
   // Switch to maplibre when useApi is disabled
   useEffect(() => {
@@ -425,7 +476,9 @@ function PlaygroundContent() {
       mapbox: {
         import:
           'import mapboxgl from "mapbox-gl";\nimport "mapbox-gl/dist/mapbox-gl.css";',
-        init: `mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
+        init: `mapboxgl.accessToken = "${
+          userMapboxToken || "YOUR_MAPBOX_TOKEN"
+        }";
     const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/streets-v12",
@@ -452,12 +505,15 @@ function PlaygroundContent() {
       });`,
       },
       google: {
-        import:
-          '// Load Google Maps API in your HTML:\n// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=marker"></script>',
+        import: `// Load Google Maps API in your HTML:\n// <script src="https://maps.googleapis.com/maps/api/js?key=${
+          userGoogleKey || "YOUR_API_KEY"
+        }&libraries=marker"></script>`,
         init: `const map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: ${center[1].toFixed(4)}, lng: ${center[0].toFixed(4)} },
       zoom: ${zoom},
-      mapId: "YOUR_MAP_ID", // Required for Advanced Markers
+      mapId: "${
+        userGoogleMapId || "YOUR_MAP_ID"
+      }", // Required for Advanced Markers
     });`,
         attach: `mapFirst.attachMap(map, {
         platform: "google",
@@ -593,7 +649,9 @@ function MapComponent() {
       mapbox: {
         cdn: `<link href="https://unpkg.com/mapbox-gl/dist/mapbox-gl.css" rel="stylesheet" />
   <script src="https://unpkg.com/mapbox-gl/dist/mapbox-gl.js"></script>`,
-        init: `mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
+        init: `mapboxgl.accessToken = "${
+          userMapboxToken || "YOUR_MAPBOX_TOKEN"
+        }";
     const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/streets-v12",
@@ -620,11 +678,15 @@ function MapComponent() {
       });`,
       },
       google: {
-        cdn: `<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=marker"></script>`,
+        cdn: `<script src="https://maps.googleapis.com/maps/api/js?key=${
+          userGoogleKey || "YOUR_API_KEY"
+        }&libraries=marker"></script>`,
         init: `const map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: ${center[1].toFixed(4)}, lng: ${center[0].toFixed(4)} },
       zoom: ${zoom},
-      mapId: "YOUR_MAP_ID", // Required for Advanced Markers
+      mapId: "${
+        userGoogleMapId || "YOUR_MAP_ID"
+      }", // Required for Advanced Markers
     });`,
         attach: `mapFirst.attachMap(map, {
         platform: "google",
@@ -867,6 +929,75 @@ function MapComponent() {
                 </button>
               </div>
             </div>
+            {mapPlatform === "mapbox" && (
+              <div className="playground-control-group">
+                <label>Mapbox Access Token</label>
+                <input
+                  type="password"
+                  placeholder="Enter your Mapbox token"
+                  value={userMapboxToken}
+                  onChange={(e) => setUserMapboxToken(e.target.value)}
+                />
+                {!userMapboxToken && (
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#666",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Get your token at{" "}
+                    <a
+                      href="https://account.mapbox.com/access-tokens/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      mapbox.com
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+            {mapPlatform === "google" && (
+              <>
+                <div className="playground-control-group">
+                  <label>Google Maps API Key</label>
+                  <input
+                    type="password"
+                    placeholder="Enter your API key"
+                    value={userGoogleKey}
+                    onChange={(e) => setUserGoogleKey(e.target.value)}
+                  />
+                </div>
+                <div className="playground-control-group">
+                  <label>Google Map ID</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your Map ID"
+                    value={userGoogleMapId}
+                    onChange={(e) => setUserGoogleMapId(e.target.value)}
+                  />
+                  {(!userGoogleKey || !userGoogleMapId) && (
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#666",
+                        marginTop: "4px",
+                      }}
+                    >
+                      Get credentials at{" "}
+                      <a
+                        href="https://console.cloud.google.com/google/maps-apis"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Google Cloud Console
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
             {/* {mapPlatform === "maplibre" && (
               <div className="playground-control-group">
                 <label>MapLibre Style URL</label>
@@ -1074,6 +1205,38 @@ function MapComponent() {
       </aside>
 
       <section className="playground-map-container">
+        {/* Map loading message */}
+        {((mapPlatform === "mapbox" && !userMapboxToken) ||
+          (mapPlatform === "google" &&
+            (!userGoogleKey || !userGoogleMapId || !googleMapsLoaded))) && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center",
+              padding: "20px",
+              background: "rgba(255, 255, 255, 0.95)",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              zIndex: 1000,
+            }}
+          >
+            <h3 style={{ margin: "0 0 10px 0" }}>
+              {mapPlatform === "mapbox"
+                ? "Mapbox Token Required"
+                : "Google Maps Credentials Required"}
+            </h3>
+            <p style={{ margin: 0, color: "#666" }}>
+              {mapPlatform === "mapbox"
+                ? "Please enter your Mapbox access token in the controls panel"
+                : googleMapsLoaded
+                ? "Please enter your Google Maps API key and Map ID"
+                : "Loading Google Maps API..."}
+            </p>
+          </div>
+        )}
         {/* SmartFilter Component */}
         {pendingBounds && !isSearching && useApi && (
           <button
