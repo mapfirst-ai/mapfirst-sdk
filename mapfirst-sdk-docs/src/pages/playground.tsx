@@ -15,6 +15,8 @@ import {
   convertToApiFilters,
 } from "@mapfirst.ai/react";
 import type { MapboxNamespace } from "@mapfirst.ai/core";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import PropertyCarousel from "../components/PropertyCarousel";
@@ -44,11 +46,6 @@ export default function Playground() {
       description="Interactive MapFirst SDK Playground"
     >
       <Head>
-        <link
-          href="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.css"
-          rel="stylesheet"
-        />
-        <script src="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.js" />
         <script
           src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsKey}&libraries=marker`}
         />
@@ -273,11 +270,7 @@ function PlaygroundContent() {
       });
       newMap.addControl(new mapboxgl.NavigationControl(), "top-left");
       newMap.on("load", attachAndRender);
-    } else if (
-      mapPlatform === "maplibre" &&
-      typeof (window as any).maplibregl !== "undefined"
-    ) {
-      const maplibregl = (window as any).maplibregl;
+    } else if (mapPlatform === "maplibre") {
       newMap = new maplibregl.Map({
         container,
         style: activeStyleUrl,
@@ -450,7 +443,7 @@ function PlaygroundContent() {
           'import maplibregl from "maplibre-gl";\nimport "maplibre-gl/dist/maplibre-gl.css";',
         init: `const map = new maplibregl.Map({
       container: "map",
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "${activeStyleUrl}",
       center: [${center[0].toFixed(4)}, ${center[1].toFixed(4)}],
       zoom: ${zoom},
     });`,
@@ -618,7 +611,7 @@ function MapComponent() {
   <script src="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.js"></script>`,
         init: `const map = new maplibregl.Map({
       container: "map",
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "${activeStyleUrl}",
       center: [${center[0].toFixed(4)}, ${center[1].toFixed(4)}],
       zoom: ${zoom},
     });`,
@@ -888,7 +881,14 @@ function MapComponent() {
                   />
                   <button
                     type="button"
-                    onClick={() => setActiveStyleUrl(styleUrl)}
+                    onClick={() => {
+                      try {
+                        new URL(styleUrl);
+                        setActiveStyleUrl(styleUrl);
+                      } catch {
+                        alert("Please enter a valid URL");
+                      }
+                    }}
                     style={{
                       padding: "8px 16px",
                       cursor: "pointer",

@@ -23,6 +23,7 @@
     "clsx": "^2.0.0",
     "dotenv": "^17.2.3",
     "mapbox-gl": "^3.17.0",
+    "maplibre-gl": "^5.14.0",
     "prism-react-renderer": "^2.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
