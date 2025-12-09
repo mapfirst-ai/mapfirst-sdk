@@ -867,7 +867,7 @@ function MapComponent() {
                 </button>
               </div>
             </div>
-            {mapPlatform === "maplibre" && (
+            {/* {mapPlatform === "maplibre" && (
               <div className="playground-control-group">
                 <label>MapLibre Style URL</label>
                 <div style={{ display: "flex", gap: "8px" }}>
@@ -898,7 +898,7 @@ function MapComponent() {
                   </button>
                 </div>
               </div>
-            )}
+            )} */}
             {useApi && (
               <>
                 <div className="playground-control-group">
