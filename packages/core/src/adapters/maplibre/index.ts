@@ -87,6 +87,10 @@ export class MapLibreAdapter extends MapAdapter {
     return this.markerManager;
   }
 
+  getContainer(): HTMLElement | null {
+    return this.map?.getContainer?.() || null;
+  }
+
   cleanup() {
     for (const cleanup of this.cleanupFns) {
       try {

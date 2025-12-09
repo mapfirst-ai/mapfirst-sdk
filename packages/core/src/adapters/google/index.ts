@@ -90,6 +90,10 @@ export class GoogleMapsAdapter extends MapAdapter {
     return this.markerManager;
   }
 
+  getContainer(): HTMLElement | null {
+    return this.map?.getDiv?.() || null;
+  }
+
   cleanup() {
     for (const cleanup of this.cleanupFns) {
       try {

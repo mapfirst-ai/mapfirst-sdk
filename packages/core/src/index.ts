@@ -137,6 +137,28 @@ function toISO(date: Date | string): string {
   return date.toISOString().slice(0, 10);
 }
 
+// Track map impression
+async function trackMapImpression(
+  apiUrl: string,
+  mfid: string,
+  metadata?: Record<string, any>
+): Promise<void> {
+  try {
+    await fetch(`${apiUrl}/${mfid}/impressions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        type: "map_view",
+        ...metadata,
+      }),
+    });
+  } catch (error) {
+    // Silently fail - don't block user experience for analytics
+    console.debug("Failed to track map impression:", error);
+  }
+}
+
 export type BaseMapFirstOptions = {
   properties?: Property[];
   primaryType?: PropertyType;
@@ -546,6 +568,17 @@ export class MapFirstCore {
         }
       },
     });
+
+    // Set up impression tracking when map becomes visible in viewport
+    if (this.useApi) {
+      adapter.setupImpressionTracking(() => {
+        trackMapImpression(this.apiUrl, this.mfid || "default", {
+          platform: this.currentPlatform,
+          environment: this.environment,
+        });
+      });
+    }
+
     return adapter;
   }
 

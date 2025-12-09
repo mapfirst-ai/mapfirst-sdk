@@ -53,6 +53,49 @@ export abstract class MapAdapter {
   abstract cleanup(): void;
 
   /**
+   * Get the map container element
+   * @returns {HTMLElement | null} The map container DOM element
+   */
+  abstract getContainer(): HTMLElement | null;
+
+  /**
+   * Set up impression tracking when map becomes visible
+   * @param {() => void} onImpression Callback to invoke when map is visible
+   */
+  setupImpressionTracking(onImpression: () => void): void {
+    if (typeof window === "undefined" || !window.IntersectionObserver) {
+      return;
+    }
+
+    const container = this.getContainer();
+    if (!container) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            onImpression();
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+
+    // Store cleanup function
+    const cleanup = () => observer.disconnect();
+    const originalCleanup = this.cleanup.bind(this);
+    this.cleanup = () => {
+      cleanup();
+      originalCleanup();
+    };
+  }
+
+  /**
    * Get the current center coordinates of the map
    * @returns {{ lng: number; lat: number }} [longitude, latitude]
    */

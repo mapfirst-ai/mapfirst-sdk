@@ -216,6 +216,16 @@ declare abstract class MapAdapter {
      */
     abstract cleanup(): void;
     /**
+     * Get the map container element
+     * @returns {HTMLElement | null} The map container DOM element
+     */
+    abstract getContainer(): HTMLElement | null;
+    /**
+     * Set up impression tracking when map becomes visible
+     * @param {() => void} onImpression Callback to invoke when map is visible
+     */
+    setupImpressionTracking(onImpression: () => void): void;
+    /**
      * Get the current center coordinates of the map
      * @returns {{ lng: number; lat: number }} [longitude, latitude]
      */
