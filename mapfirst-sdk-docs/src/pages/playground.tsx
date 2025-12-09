@@ -65,6 +65,13 @@ function PlaygroundContent() {
   const [mapPlatform, setMapPlatform] = useState<
     "mapbox" | "maplibre" | "google"
   >("mapbox");
+  const [useApi, setUseApi] = useState(false);
+  const [styleUrl, setStyleUrl] = useState(
+    "https://api.mapfirst.ai/static/style.json"
+  );
+  const [activeStyleUrl, setActiveStyleUrl] = useState(
+    "https://api.mapfirst.ai/static/style.json"
+  );
   const [locationInput, setLocationInput] = useState("Paris, France");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -107,8 +114,10 @@ function PlaygroundContent() {
     instance: mapFirst,
     state,
     setSelectedMarker,
+    setUseApi: setUseApiFromHook,
     smartFilterSearch,
   } = useMapFirst({
+    useApi,
     initialLocationData: {
       city,
       country,
@@ -271,7 +280,7 @@ function PlaygroundContent() {
       const maplibregl = (window as any).maplibregl;
       newMap = new maplibregl.Map({
         container,
-        style: "/json/style.json",
+        style: activeStyleUrl,
         zoom: 12,
         center: [2.3522, 48.8566],
       });
@@ -289,7 +298,14 @@ function PlaygroundContent() {
 
     setMap(newMap);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapPlatform, mapFirst]);
+  }, [mapPlatform, mapFirst, activeStyleUrl]);
+
+  // Switch to maplibre when useApi is disabled
+  useEffect(() => {
+    if (!useApi && mapPlatform !== "maplibre") {
+      setMapPlatform("maplibre");
+    }
+  }, [useApi, mapPlatform]);
 
   // Handle search with SmartFilter
   const handleSearch = async (query: string, currentFilters?: Filter[]) => {
@@ -810,12 +826,35 @@ function MapComponent() {
         ) : (
           <>
             <div className="playground-control-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={useApi}
+                  onChange={(e) => {
+                    const newValue = e.target.checked;
+                    setUseApi(newValue);
+                    setUseApiFromHook(newValue);
+                  }}
+                  style={{ marginRight: "8px" }}
+                />
+                Use API
+              </label>
+              {!useApi && (
+                <div
+                  style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}
+                >
+                  Only MapLibre is available without API
+                </div>
+              )}
+            </div>
+            <div className="playground-control-group">
               <label>Map Provider</label>
               <div className="playground-button-group">
                 <button
                   type="button"
                   className={mapPlatform === "google" ? "active" : ""}
                   onClick={() => setMapPlatform("google")}
+                  disabled={!useApi}
                 >
                   Google
                 </button>
@@ -830,146 +869,181 @@ function MapComponent() {
                   type="button"
                   className={mapPlatform === "mapbox" ? "active" : ""}
                   onClick={() => setMapPlatform("mapbox")}
+                  disabled={!useApi}
                 >
                   Mapbox
                 </button>
               </div>
             </div>
-            <div className="playground-control-group">
-              <label>Search Query</label>
-              <input
-                type="text"
-                placeholder="e.g. Hotels near beach"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            {filters.length > 0 && (
+            {mapPlatform === "maplibre" && (
               <div className="playground-control-group">
-                <label>Smart Filters</label>
-                <SmartFilter
-                  filters={filters}
-                  isSearching={state?.isSearching}
-                  onFilterChange={handleFilterChange}
-                  currency={currency}
-                />
+                <label>MapLibre Style URL</label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input
+                    type="text"
+                    value={styleUrl}
+                    onChange={(e) => setStyleUrl(e.target.value)}
+                    placeholder="https://api.mapfirst.ai/static/style.json"
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setActiveStyleUrl(styleUrl)}
+                    style={{
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
             )}
-            <div className="playground-control-group">
-              <label>Location</label>
-              <div className="playground-location-wrapper">
-                <input
-                  type="text"
-                  placeholder="Search for a city or place"
-                  value={locationInput}
-                  onChange={(e) => handleLocationInputChange(e.target.value)}
-                  onFocus={() => {
-                    if (suggestions.length > 0) setShowDropdown(true);
-                  }}
-                  onBlur={() => {
-                    setTimeout(() => setShowDropdown(false), 200);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "ArrowDown") {
-                      e.preventDefault();
-                      setHighlightedIndex((idx) =>
-                        suggestions.length ? (idx + 1) % suggestions.length : -1
-                      );
-                    } else if (e.key === "ArrowUp") {
-                      e.preventDefault();
-                      setHighlightedIndex((idx) =>
-                        suggestions.length
-                          ? (idx - 1 + suggestions.length) % suggestions.length
-                          : -1
-                      );
-                    } else if (e.key === "Enter") {
-                      if (
-                        highlightedIndex >= 0 &&
-                        highlightedIndex < suggestions.length
-                      ) {
-                        e.preventDefault();
-                        selectLocation(suggestions[highlightedIndex]);
-                      }
-                    } else if (e.key === "Escape") {
-                      setShowDropdown(false);
-                    }
-                  }}
-                />
-                {showDropdown && suggestions.length > 0 && (
-                  <div className="playground-location-dropdown">
-                    {suggestions.map((feature, i) => (
-                      <button
-                        key={feature.id}
-                        type="button"
-                        className={i === highlightedIndex ? "highlighted" : ""}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          selectLocation(feature);
-                        }}
-                        onMouseEnter={() => setHighlightedIndex(i)}
-                      >
-                        <div className="location-name">{feature.text}</div>
-                        <div className="location-address">
-                          {feature.place_name}
-                        </div>
-                      </button>
-                    ))}
+            {useApi && (
+              <>
+                <div className="playground-control-group">
+                  <label>Search Query</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Hotels near beach"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                {filters.length > 0 && (
+                  <div className="playground-control-group">
+                    <label>Smart Filters</label>
+                    <SmartFilter
+                      filters={filters}
+                      isSearching={state?.isSearching}
+                      onFilterChange={handleFilterChange}
+                      currency={currency}
+                    />
                   </div>
                 )}
-              </div>
-            </div>
-            <div className="playground-control-group">
-              <label>Check-in Date</label>
-              <input
-                type="date"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
-              />
-            </div>
-            <div className="playground-control-group">
-              <label>Check-out Date</label>
-              <input
-                type="date"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-              />
-            </div>
-            <div className="playground-control-group">
-              <div className="playground-row">
-                <div>
-                  <label>Adults</label>
+                <div className="playground-control-group">
+                  <label>Location</label>
+                  <div className="playground-location-wrapper">
+                    <input
+                      type="text"
+                      placeholder="Search for a city or place"
+                      value={locationInput}
+                      onChange={(e) =>
+                        handleLocationInputChange(e.target.value)
+                      }
+                      onFocus={() => {
+                        if (suggestions.length > 0) setShowDropdown(true);
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setShowDropdown(false), 200);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "ArrowDown") {
+                          e.preventDefault();
+                          setHighlightedIndex((idx) =>
+                            suggestions.length
+                              ? (idx + 1) % suggestions.length
+                              : -1
+                          );
+                        } else if (e.key === "ArrowUp") {
+                          e.preventDefault();
+                          setHighlightedIndex((idx) =>
+                            suggestions.length
+                              ? (idx - 1 + suggestions.length) %
+                                suggestions.length
+                              : -1
+                          );
+                        } else if (e.key === "Enter") {
+                          if (
+                            highlightedIndex >= 0 &&
+                            highlightedIndex < suggestions.length
+                          ) {
+                            e.preventDefault();
+                            selectLocation(suggestions[highlightedIndex]);
+                          }
+                        } else if (e.key === "Escape") {
+                          setShowDropdown(false);
+                        }
+                      }}
+                    />
+                    {showDropdown && suggestions.length > 0 && (
+                      <div className="playground-location-dropdown">
+                        {suggestions.map((feature, i) => (
+                          <button
+                            key={feature.id}
+                            type="button"
+                            className={
+                              i === highlightedIndex ? "highlighted" : ""
+                            }
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              selectLocation(feature);
+                            }}
+                            onMouseEnter={() => setHighlightedIndex(i)}
+                          >
+                            <div className="location-name">{feature.text}</div>
+                            <div className="location-address">
+                              {feature.place_name}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="playground-control-group">
+                  <label>Check-in Date</label>
                   <input
-                    type="number"
-                    value={adults}
-                    onChange={(e) => setAdults(parseInt(e.target.value))}
-                    min="1"
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
                   />
                 </div>
-                <div>
-                  <label>Rooms</label>
+                <div className="playground-control-group">
+                  <label>Check-out Date</label>
                   <input
-                    type="number"
-                    value={rooms}
-                    onChange={(e) => setRooms(parseInt(e.target.value))}
-                    min="1"
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
                   />
                 </div>
-              </div>
-            </div>
-            <div className="playground-control-group">
-              <div className="playground-row">
-                <div>
-                  <label>Currency</label>
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                  </select>
+                <div className="playground-control-group">
+                  <div className="playground-row">
+                    <div>
+                      <label>Adults</label>
+                      <input
+                        type="number"
+                        value={adults}
+                        onChange={(e) => setAdults(parseInt(e.target.value))}
+                        min="1"
+                      />
+                    </div>
+                    <div>
+                      <label>Rooms</label>
+                      <input
+                        type="number"
+                        value={rooms}
+                        onChange={(e) => setRooms(parseInt(e.target.value))}
+                        min="1"
+                      />
+                    </div>
+                  </div>
                 </div>
-                {/* <div>
+                <div className="playground-control-group">
+                  <div className="playground-row">
+                    <div>
+                      <label>Currency</label>
+                      <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                      >
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                      </select>
+                    </div>
+                    {/* <div>
               <label>Locale</label>
               <select
                 value={locale}
@@ -985,15 +1059,17 @@ function MapComponent() {
                 <option value="zh">中文</option>
               </select>
             </div> */}
-              </div>
-            </div>{" "}
-            <button
-              className="playground-search-btn"
-              onClick={handleBasicSearch}
-              disabled={isSearching}
-            >
-              {isSearching ? "Searching..." : "Search"}
-            </button>
+                  </div>
+                </div>{" "}
+                <button
+                  className="playground-search-btn"
+                  onClick={handleBasicSearch}
+                  disabled={isSearching}
+                >
+                  {isSearching ? "Searching..." : "Search"}
+                </button>
+              </>
+            )}
           </>
         )}
       </aside>

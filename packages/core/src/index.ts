@@ -151,6 +151,7 @@ export type BaseMapFirstOptions = {
   state?: Partial<MapState>;
   callbacks?: MapStateCallbacks;
   // API configuration
+  useApi?: boolean; // default: true, can only be set at initialization
   environment?: Environment;
   mfid?: string;
   requestBody?: any;
@@ -226,6 +227,7 @@ export class MapFirstCore {
   private callbacks: MapStateCallbacks;
 
   // API configuration
+  private useApi: boolean;
   private readonly environment: Environment;
   private readonly apiUrl: string;
   private readonly mfid?: string;
@@ -244,11 +246,19 @@ export class MapFirstCore {
     this.selectedMarkerId = options.selectedMarkerId ?? null;
 
     // Initialize API configuration
+    this.useApi = options.useApi ?? true;
     this.environment = options.environment ?? "prod";
     this.apiUrl = options.apiUrl ?? API_URLS[this.environment];
     this.mfid = options.mfid ?? "default";
     this.requestBody = options.requestBody;
     this.currentPlatform = options.platform;
+
+    // Validate platform restrictions when useApi is false
+    if (!this.useApi && options.platform && options.platform !== "maplibre") {
+      throw new Error(
+        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage."
+      );
+    }
 
     // Determine if using Google Maps
     const isGoogleMaps = isGoogleMapsOptions(options);
@@ -322,6 +332,12 @@ export class MapFirstCore {
   private async initializeFromLocationData(
     locationData: InitialLocationData
   ): Promise<void> {
+    if (!this.useApi) {
+      console.warn(
+        "initializeFromLocationData requires API usage. Set useApi to true."
+      );
+      return;
+    }
     try {
       const { city, country, query, currency } = locationData;
 
@@ -401,6 +417,12 @@ export class MapFirstCore {
   }
 
   private async autoLoadProperties(): Promise<void> {
+    if (!this.useApi) {
+      console.warn(
+        "autoLoadProperties requires API usage. Set useApi to true."
+      );
+      return;
+    }
     if (!this.requestBody) return;
 
     // Default request body structure based on InitialDataLoader.tsx
@@ -429,6 +451,13 @@ export class MapFirstCore {
       onMarkerClick?: (marker: Property) => void;
     }
   ): void {
+    // Validate platform restrictions when useApi is false
+    if (!this.useApi && config.platform !== "maplibre") {
+      throw new Error(
+        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage."
+      );
+    }
+
     if (this.isMapAttached) {
       console.warn("Map is already attached. Destroying previous adapter.");
       if (this.adapter) {
@@ -905,6 +934,11 @@ export class MapFirstCore {
   }> {
     this.ensureAlive();
 
+    if (!this.useApi) {
+      console.warn("pollForPricing requires API usage. Set useApi to true.");
+      return { completed: false };
+    }
+
     if (!pollingLink) {
       return { completed: false };
     }
@@ -1034,6 +1068,15 @@ export class MapFirstCore {
     onError?: (error: unknown) => void;
   }): Promise<APIResponse | null> {
     this.ensureAlive();
+
+    if (!this.useApi) {
+      console.warn(
+        "runPropertiesSearch requires API usage. Set useApi to true."
+      );
+      onError?.(new Error("API usage is disabled"));
+      return null;
+    }
+
     this.setState({ firstCallDone: false });
     this.setSearching(true);
     this.clearProperties();
@@ -1196,6 +1239,13 @@ export class MapFirstCore {
   async performBoundsSearch(): Promise<APIResponse | null> {
     this.ensureAlive();
 
+    if (!this.useApi) {
+      console.warn(
+        "performBoundsSearch requires API usage. Set useApi to true."
+      );
+      return null;
+    }
+
     if (!this.state.pendingBounds) {
       return null;
     }
@@ -1275,6 +1325,14 @@ export class MapFirstCore {
     onError?: (error: unknown) => void;
   }): Promise<APIResponse | null> {
     this.ensureAlive();
+
+    if (!this.useApi) {
+      console.warn(
+        "runSmartFilterSearch requires API usage. Set useApi to true."
+      );
+      onError?.(new Error("API usage is disabled"));
+      return null;
+    }
 
     // Build filter payload from smart filters if provided
     let filterPayload = this.getFilters();
@@ -1376,6 +1434,38 @@ export class MapFirstCore {
   getClusters(): ClusterDisplayItem[] {
     this.ensureAlive();
     return [...this.clusterItems];
+  }
+
+  setUseApi(useApi: boolean, autoLoad: boolean = true) {
+    this.ensureAlive();
+
+    // Update useApi value
+    this.useApi = useApi;
+
+    // Validate platform restrictions when switching to useApi = false
+    if (
+      !useApi &&
+      this.currentPlatform &&
+      this.currentPlatform !== "maplibre"
+    ) {
+      console.warn(
+        "When useApi is false, only maplibre platform is supported. Please switch to maplibre."
+      );
+    }
+
+    // Clear properties when disabling API
+    if (!useApi) {
+      this.clearProperties();
+    }
+
+    // Auto-load properties if enabled and useApi is turned on
+    if (useApi && autoLoad) {
+      if (this.options.initialLocationData) {
+        this.initializeFromLocationData(this.options.initialLocationData);
+      } else if (this.requestBody && this.isMapAttached) {
+        this.autoLoadProperties();
+      }
+    }
   }
 
   refresh() {

@@ -218,6 +218,16 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     }
   }, []);
 
+  // Use API control
+  const setUseApi = React.useCallback(
+    (useApi: boolean, autoLoad: boolean = true) => {
+      if (instanceRef.current) {
+        instanceRef.current.setUseApi(useApi, autoLoad);
+      }
+    },
+    []
+  );
+
   // Properties search
   const [propertiesSearchLoading, setPropertiesSearchLoading] =
     React.useState(false);
@@ -414,6 +424,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     state,
     setPrimaryType,
     setSelectedMarker,
+    setUseApi,
     propertiesSearch,
     smartFilterSearch,
     boundsSearch,

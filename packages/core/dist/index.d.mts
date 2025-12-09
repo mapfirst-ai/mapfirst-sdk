@@ -389,6 +389,7 @@ type BaseMapFirstOptions = {
     onClusterUpdate?: (clusters: ClusterDisplayItem[], viewState: ViewStateSnapshot | null) => void;
     state?: Partial<MapState>;
     callbacks?: MapStateCallbacks;
+    useApi?: boolean;
     environment?: Environment;
     mfid?: string;
     requestBody?: any;
@@ -435,6 +436,7 @@ declare class MapFirstCore {
     private isMapAttached;
     private state;
     private callbacks;
+    private useApi;
     private readonly environment;
     private readonly apiUrl;
     private readonly mfid?;
@@ -512,6 +514,7 @@ declare class MapFirstCore {
         onError?: (error: unknown) => void;
     }): Promise<APIResponse | null>;
     getClusters(): ClusterDisplayItem[];
+    setUseApi(useApi: boolean, autoLoad?: boolean): void;
     refresh(): void;
     destroy(): void;
     private resolvePrimaryType;

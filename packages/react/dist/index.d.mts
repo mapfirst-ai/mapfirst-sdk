@@ -242,6 +242,7 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
     state: MapState | null;
     setPrimaryType: (type: PropertyType) => void;
     setSelectedMarker: (id: number | null) => void;
+    setUseApi: (useApi: boolean, autoLoad?: boolean) => void;
     propertiesSearch: {
         search: (options: {
             body: InitialRequestBody;
