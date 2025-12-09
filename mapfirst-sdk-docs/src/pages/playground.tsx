@@ -245,7 +245,6 @@ function PlaygroundContent() {
         });
         mapFirst.flyToPOIs(undefined, undefined, false);
       } else if (mapPlatform === "maplibre") {
-        const maplibregl = (window as any).maplibregl;
         mapFirst.attachMap(newMap, {
           platform: "maplibre",
           maplibregl,
