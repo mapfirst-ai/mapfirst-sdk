@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Getting Started with React
+# React setup
 
 Learn how to integrate MapFirst SDK into your React application in just a few minutes.
 

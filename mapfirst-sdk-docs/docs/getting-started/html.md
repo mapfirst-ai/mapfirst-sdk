@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Getting Started with HTML
+# Native JS setup
 
 Use MapFirst SDK in any HTML page without a framework. Perfect for simple websites, prototypes, or integrating into existing applications.
 
