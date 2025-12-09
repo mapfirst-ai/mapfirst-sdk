@@ -1075,7 +1075,7 @@ function MapComponent() {
 
       <section className="playground-map-container">
         {/* SmartFilter Component */}
-        {pendingBounds && !isSearching && (
+        {pendingBounds && !isSearching && useApi && (
           <button
             className="playground-search-area-btn"
             style={{ display: "block" }}
