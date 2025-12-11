@@ -1114,7 +1114,7 @@ export class MapFirstCore {
 
     try {
       const data = await fetchProperties<InitialRequestBody, APIResponse>(
-        `${this.apiUrl}/hotels`,
+        `${this.apiUrl}/properties`,
         body
       );
 
