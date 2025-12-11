@@ -131,20 +131,18 @@ export async function fetchProperties<TBody = any, TResponse = any>(
   return (await response.json()) as TResponse;
 }
 
-// Helper function to convert Date to ISO date string (YYYY-MM-DD)
 function toISO(date: Date | string): string {
   if (typeof date === "string") return date;
   return date.toISOString().slice(0, 10);
 }
 
-// Track map impression
 async function trackMapImpression(
   apiUrl: string,
-  mfid: string,
+  apiKey: string,
   metadata?: Record<string, any>
 ): Promise<void> {
   try {
-    await fetch(`${apiUrl}/${mfid}/impressions`, {
+    await fetch(`${apiUrl}/${apiKey}/impressions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -175,7 +173,7 @@ export type BaseMapFirstOptions = {
   // API configuration
   useApi?: boolean; // default: true, can only be set at initialization
   environment?: Environment;
-  mfid?: string;
+  apiKey?: string;
   requestBody?: any;
   // Initial location data (alternative to requestBody)
   initialLocationData?: InitialLocationData;
@@ -252,7 +250,7 @@ export class MapFirstCore {
   private useApi: boolean;
   private readonly environment: Environment;
   private readonly apiUrl: string;
-  private readonly mfid?: string;
+  private readonly apiKey?: string;
   private currentPlatform: "google" | "maplibre" | "mapbox" | undefined;
   private requestBody?: any;
   private readonly fitBoundsPadding: {
@@ -271,7 +269,7 @@ export class MapFirstCore {
     this.useApi = options.useApi ?? true;
     this.environment = options.environment ?? "prod";
     this.apiUrl = options.apiUrl ?? API_URLS[this.environment];
-    this.mfid = options.mfid ?? "default";
+    this.apiKey = options.apiKey ?? "default";
     this.requestBody = options.requestBody;
     this.currentPlatform = options.platform;
 
@@ -572,7 +570,7 @@ export class MapFirstCore {
     // Set up impression tracking when map becomes visible in viewport
     if (this.useApi) {
       adapter.setupImpressionTracking(() => {
-        trackMapImpression(this.apiUrl, this.mfid || "default", {
+        trackMapImpression(this.apiUrl, this.apiKey || "default", {
           platform: this.currentPlatform,
           environment: this.environment,
         });
@@ -996,7 +994,7 @@ export class MapFirstCore {
 
       try {
         const pollResp = await fetch(
-          `${this.apiUrl}/${this.mfid}/ta-polling?pollingNumber=${attempt}`,
+          `${this.apiUrl}/ta-polling?pollingNumber=${attempt}`,
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -1116,7 +1114,7 @@ export class MapFirstCore {
 
     try {
       const data = await fetchProperties<InitialRequestBody, APIResponse>(
-        `${this.apiUrl}/${this.mfid}/hotels`,
+        `${this.apiUrl}/hotels`,
         body
       );
 

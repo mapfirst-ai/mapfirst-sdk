@@ -401,7 +401,7 @@ type BaseMapFirstOptions = {
     callbacks?: MapStateCallbacks;
     useApi?: boolean;
     environment?: Environment;
-    mfid?: string;
+    apiKey?: string;
     requestBody?: any;
     initialLocationData?: InitialLocationData;
     fitBoundsPadding?: {
@@ -449,7 +449,7 @@ declare class MapFirstCore {
     private useApi;
     private readonly environment;
     private readonly apiUrl;
-    private readonly mfid?;
+    private readonly apiKey?;
     private currentPlatform;
     private requestBody?;
     private readonly fitBoundsPadding;
