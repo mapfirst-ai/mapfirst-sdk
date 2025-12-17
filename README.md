@@ -21,19 +21,19 @@ A powerful mapping SDK that provides intelligent property search with AI-powered
 
 This monorepo contains the following packages:
 
-- **[@mapfirst/core](./packages/core)** - Core SDK with map adapters for MapLibre, Google Maps, and Mapbox
-- **[@mapfirst/react](./packages/react)** - React hooks and components including SmartFilter
+- **[@mapfirst.ai/core](./packages/core)** - Core SDK with map adapters for MapLibre, Google Maps, and Mapbox
+- **[@mapfirst.ai/react](./packages/react)** - React hooks and components including SmartFilter
 
 ## 🎯 Quick Start
 
 ### React
 
 ```bash
-npm install @mapfirst/react @mapfirst/core
+npm install @mapfirst.ai/react @mapfirst.ai/core
 ```
 
 ```tsx
-import { useMapFirst, SmartFilter } from "@mapfirst/react";
+import { useMapFirst, SmartFilter } from "@mapfirst.ai/react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -163,8 +163,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Website](https://mapfirst.ai)
 - [Documentation](https://docs.mapfirst.ai/)
-- [NPM - @mapfirst/core](https://www.npmjs.com/package/@mapfirst.ai/core)
-- [NPM - @mapfirst/react](https://www.npmjs.com/package/@mapfirst.ai/react)
+- [NPM - @mapfirst.ai/core](https://www.npmjs.com/package/@mapfirst.ai/core)
+- [NPM - @mapfirst.ai/react](https://www.npmjs.com/package/@mapfirst.ai/react)
 - [GitHub Issues](https://github.com/mapfirst-ai/mapfirst-sdk/issues)
 - [GitHub Discussions](https://github.com/mapfirst-ai/mapfirst-sdk/discussions)
 

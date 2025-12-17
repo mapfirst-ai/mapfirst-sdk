@@ -17,8 +17,8 @@ MapFirst SDK is a powerful mapping solution that provides intelligent property s
 
 ## 📦 What's Included
 
-- **@mapfirst/core**: Core SDK with map adapters for MapLibre, Google Maps, and Mapbox
-- **@mapfirst/react**: React hooks and components including SmartFilter
+- **@mapfirst.ai/core**: Core SDK with map adapters for MapLibre, Google Maps, and Mapbox
+- **@mapfirst.ai/react**: React hooks and components including SmartFilter
 
 ## 🎯 Quick Links
 

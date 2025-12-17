@@ -11,11 +11,11 @@ Learn how to integrate MapFirst SDK into your React application in just a few mi
 Install the required packages using your preferred package manager:
 
 ```bash
-npm install @mapfirst/react @mapfirst/core
+npm install @mapfirst.ai/react @mapfirst.ai/core
 # or
-pnpm add @mapfirst/react @mapfirst/core
+pnpm add @mapfirst.ai/react @mapfirst.ai/core
 # or
-yarn add @mapfirst/react @mapfirst/core
+yarn add @mapfirst.ai/react @mapfirst.ai/core
 ```
 
 Additionally, install your preferred map library:
@@ -52,7 +52,7 @@ Here's a complete example using **MapLibre GL JS**:
 ```tsx
 import React, { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 function MapComponent() {
@@ -123,7 +123,7 @@ export default MapComponent;
 #### Mapbox GL JS
 
 ```tsx
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -164,7 +164,7 @@ function MapboxExample() {
 #### Google Maps
 
 ```tsx
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 
 function GoogleMapsExample() {
   const { instance: mapFirst, attachGoogle } = useMapFirst({

@@ -1,4 +1,4 @@
-# @mapfirst/react
+# @mapfirst.ai/react
 
 React hooks and components for the MapFirst SDK supporting MapLibre, Google Maps, and Mapbox.
 
@@ -14,17 +14,17 @@ React hooks and components for the MapFirst SDK supporting MapLibre, Google Maps
 ## Installation
 
 ```bash
-npm install @mapfirst/react @mapfirst/core
+npm install @mapfirst.ai/react @mapfirst.ai/core
 # or
-pnpm add @mapfirst/react @mapfirst/core
+pnpm add @mapfirst.ai/react @mapfirst.ai/core
 # or
-yarn add @mapfirst/react @mapfirst/core
+yarn add @mapfirst.ai/react @mapfirst.ai/core
 ```
 
 ## Quick Start - SmartFilter Component
 
 ```tsx
-import { useMapFirst, SmartFilter } from "@mapfirst/react";
+import { useMapFirst, SmartFilter } from "@mapfirst.ai/react";
 import { useState } from "react";
 
 function App() {
@@ -70,7 +70,7 @@ The React SDK supports a two-phase initialization pattern:
 ```tsx
 import React, { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 function MapLibreExample() {
@@ -139,7 +139,7 @@ function MapLibreExample() {
 
 ```tsx
 import React, { useEffect, useRef, useState } from "react";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 
 function GoogleMapsExample() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -193,7 +193,7 @@ function GoogleMapsExample() {
 ```tsx
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 function MapboxExample() {

@@ -10,7 +10,7 @@ Core JavaScript API for MapFirst SDK. Works in both React and vanilla JavaScript
 
 ```javascript
 // ES Modules
-import { MapFirstCore } from "@mapfirst/core";
+import { MapFirstCore } from "@mapfirst.ai/core";
 
 // Browser (CDN)
 const { MapFirstCore } = window.MapFirstCore;

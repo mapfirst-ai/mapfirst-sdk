@@ -26,7 +26,7 @@ npm install maplibre-gl
 
 ```typescript
 import { useEffect, useRef } from "react";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -91,7 +91,7 @@ npm install mapbox-gl
 
 ```typescript
 import { useEffect, useRef } from "react";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -159,7 +159,7 @@ npm install @googlemaps/js-api-loader
 
 ```typescript
 import { useEffect, useRef } from "react";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import { Loader } from "@googlemaps/js-api-loader";
 
 function GoogleMapComponent() {

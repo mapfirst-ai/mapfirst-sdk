@@ -8,17 +8,17 @@ The `SmartFilter` component provides an elegant way to display and manage filter
 
 ## Installation
 
-The SmartFilter component is included in the `@mapfirst/react` package:
+The SmartFilter component is included in the `@mapfirst.ai/react` package:
 
 ```bash
-npm install @mapfirst/react
+npm install @mapfirst.ai/react
 ```
 
 ## Basic Usage
 
 ```tsx
 import { useState } from "react";
-import { SmartFilter, Filter, useMapFirst } from "@mapfirst/react";
+import { SmartFilter, Filter, useMapFirst } from "@mapfirst.ai/react";
 
 function MyComponent() {
   const [filters, setFilters] = useState<Filter[]>([]);
@@ -129,7 +129,7 @@ import {
   Filter,
   processApiFilters,
   convertToApiFilters,
-} from "@mapfirst/react";
+} from "@mapfirst.ai/react";
 
 function SearchWithFilters() {
   const [searchQuery, setSearchQuery] = useState("");

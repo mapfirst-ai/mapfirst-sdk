@@ -10,7 +10,7 @@ A complete example showing how to create a basic map with MapFirst SDK.
 
 ```typescript
 import { useEffect, useRef, useState } from "react";
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 

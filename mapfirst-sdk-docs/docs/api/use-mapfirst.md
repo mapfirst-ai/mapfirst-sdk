@@ -9,7 +9,7 @@ The unified React hook for MapFirst SDK that provides all functionality in one p
 ## Import
 
 ```typescript
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 ```
 
 ## Usage

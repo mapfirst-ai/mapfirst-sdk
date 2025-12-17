@@ -21,7 +21,7 @@ Search by city, country, and various filters.
 ### React Example
 
 ```typescript
-import { useMapFirst } from "@mapfirst/react";
+import { useMapFirst } from "@mapfirst.ai/react";
 
 function SearchComponent() {
   const { propertiesSearch, state } = useMapFirst({
@@ -96,7 +96,7 @@ import {
   Filter,
   processApiFilters,
   convertToApiFilters,
-} from "@mapfirst/react";
+} from "@mapfirst.ai/react";
 
 function SmartSearch() {
   const [searchQuery, setSearchQuery] = useState("");
