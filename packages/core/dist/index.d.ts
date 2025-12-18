@@ -389,7 +389,7 @@ declare class PropertiesFetchError extends Error {
 type FetchPropertiesOptions = {
     signal?: AbortSignal;
 };
-declare function fetchProperties<TBody = any, TResponse = any>(url: string, body: TBody, { signal }?: FetchPropertiesOptions): Promise<TResponse>;
+declare function fetchProperties<TBody = any, TResponse = any>(url: string, body: TBody, apiKey?: string, { signal }?: FetchPropertiesOptions): Promise<TResponse>;
 type BaseMapFirstOptions = {
     properties?: Property[];
     primaryType?: PropertyType;
@@ -449,7 +449,7 @@ declare class MapFirstCore {
     private useApi;
     private readonly environment;
     private readonly apiUrl;
-    private readonly apiKey?;
+    private apiKey?;
     private currentPlatform;
     private requestBody?;
     private readonly fitBoundsPadding;
@@ -525,6 +525,8 @@ declare class MapFirstCore {
     }): Promise<APIResponse | null>;
     getClusters(): ClusterDisplayItem[];
     setUseApi(useApi: boolean, autoLoad?: boolean): void;
+    setApiKey(apiKey: string | undefined): void;
+    getApiKey(): string | undefined;
     refresh(): void;
     destroy(): void;
     private resolvePrimaryType;

@@ -66,6 +66,7 @@ function PlaygroundContent() {
   const [userGoogleKey, setUserGoogleKey] = useState("");
   const [userGoogleMapId, setUserGoogleMapId] = useState("");
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+  const [apiKey, setApiKey] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -111,6 +112,7 @@ function PlaygroundContent() {
     smartFilterSearch,
   } = useMapFirst({
     useApi,
+    apiKey: apiKey || undefined,
     initialLocationData: {
       city,
       country,
@@ -350,6 +352,13 @@ function PlaygroundContent() {
     }
   }, [useApi, mapPlatform]);
 
+  // Update API key when it changes
+  useEffect(() => {
+    if (mapFirst) {
+      mapFirst.setApiKey(apiKey || undefined);
+    }
+  }, [apiKey, mapFirst]);
+
   // Handle search with SmartFilter
   const handleSearch = async (query: string, currentFilters?: Filter[]) => {
     if (!query.trim()) return;
@@ -532,6 +541,7 @@ function MapComponent() {
   const [filters, setFilters] = useState([]);
 
   const { instance: mapFirst, state, smartFilterSearch } = useMapFirst({
+    apiKey: "YOUR_API_KEY", // Optional
     initialLocationData: {
       city: "${city}",
       country: "${country}",
@@ -738,6 +748,7 @@ function MapComponent() {
 
     // Initialize MapFirst
     const mapFirst = new MapFirstCoreClass({
+      apiKey: "YOUR_API_KEY", // Optional
       initialLocationData: {
         city: "${city}",
         country: "${country}",
@@ -901,6 +912,17 @@ function MapComponent() {
                 </div>
               )}
             </div>
+            {useApi && (
+              <div className="playground-control-group">
+                <label>MapFirst API Key</label>
+                <input
+                  type="password"
+                  placeholder="Enter your API key (optional)"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                />
+              </div>
+            )}
             <div className="playground-control-group">
               <label>Map Provider</label>
               <div className="playground-button-group">

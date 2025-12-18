@@ -106,11 +106,17 @@ type FetchPropertiesOptions = {
 export async function fetchProperties<TBody = any, TResponse = any>(
   url: string,
   body: TBody,
+  apiKey?: string,
   { signal }: FetchPropertiesOptions = {}
 ): Promise<TResponse> {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(apiKey && {
+        "X-API-Key": apiKey,
+      }),
+    },
     body: JSON.stringify(body),
     signal,
   });
@@ -144,7 +150,10 @@ async function trackMapImpression(
   try {
     await fetch(`${apiUrl}/${apiKey}/impressions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(apiKey && { "X-API-Key": apiKey }),
+      },
       body: JSON.stringify({
         timestamp: new Date().toISOString(),
         type: "map_view",
@@ -250,7 +259,7 @@ export class MapFirstCore {
   private useApi: boolean;
   private readonly environment: Environment;
   private readonly apiUrl: string;
-  private readonly apiKey?: string;
+  private apiKey?: string;
   private currentPlatform: "google" | "maplibre" | "mapbox" | undefined;
   private requestBody?: any;
   private readonly fitBoundsPadding: {
@@ -371,7 +380,14 @@ export class MapFirstCore {
         const geoResponse = await fetch(
           `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${
             city ? `&city=${encodeURIComponent(city)}` : ""
-          }`
+          }`,
+          {
+            headers: {
+              ...(this.apiKey && {
+                "X-API-Key": this.apiKey,
+              }),
+            },
+          }
         );
 
         if (geoResponse.ok) {
@@ -906,52 +922,6 @@ export class MapFirstCore {
     return filters as FilterSchema;
   }
 
-  async loadProperties({
-    fetchFn,
-    onSuccess,
-    onError,
-  }: {
-    fetchFn: () => Promise<Property[]>;
-    onSuccess?: (properties: Property[]) => void;
-    onError?: (error: unknown) => void;
-  }): Promise<void> {
-    this.ensureAlive();
-    this.setLoading(true);
-    this.setSearching(true);
-    this.clearProperties();
-
-    try {
-      const properties = await fetchFn();
-
-      this._setProperties(properties);
-
-      if (!this.primaryType && properties.length > 0) {
-        const typeCounts = properties.reduce((counts, property) => {
-          counts[property.type] = (counts[property.type] || 0) + 1;
-          return counts;
-        }, {} as Record<PropertyType, number>);
-
-        const mostCommonType = Object.entries(typeCounts).reduce((a, b) =>
-          typeCounts[a[0] as PropertyType] > typeCounts[b[0] as PropertyType]
-            ? a
-            : b
-        )[0] as PropertyType;
-
-        this.setPrimaryType(mostCommonType);
-      }
-
-      this.setState({ firstCallDone: true });
-      onSuccess?.(properties);
-    } catch (error) {
-      this.clearProperties();
-      onError?.(error);
-    } finally {
-      this.setSearching(false);
-      this.setLoading(false);
-      this.setState({ firstCallDone: true });
-    }
-  }
-
   async pollForPricing({
     pollingLink,
     maxAttempts = 15,
@@ -998,7 +968,12 @@ export class MapFirstCore {
           {
             method: "POST",
             body: JSON.stringify(body),
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              ...(this.apiKey && {
+                "X-API-Key": this.apiKey,
+              }),
+            },
           }
         );
 
@@ -1115,7 +1090,8 @@ export class MapFirstCore {
     try {
       const data = await fetchProperties<InitialRequestBody, APIResponse>(
         `${this.apiUrl}/properties`,
-        body
+        body,
+        this.apiKey
       );
 
       this.updateActiveLocationFromResponse(data);
@@ -1497,6 +1473,29 @@ export class MapFirstCore {
         this.autoLoadProperties();
       }
     }
+  }
+
+  setApiKey(apiKey: string | undefined) {
+    this.ensureAlive();
+    const oldKey = this.apiKey;
+    this.apiKey = apiKey || "default";
+
+    // If API key changed and map is attached, refresh
+    if (oldKey !== this.apiKey && this.isMapAttached) {
+      this.refresh();
+
+      if (this.useApi) {
+        if (this.options.initialLocationData) {
+          this.initializeFromLocationData(this.options.initialLocationData);
+        } else if (this.requestBody) {
+          this.autoLoadProperties();
+        }
+      }
+    }
+  }
+
+  getApiKey(): string | undefined {
+    return this.apiKey;
   }
 
   refresh() {
