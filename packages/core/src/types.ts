@@ -91,7 +91,7 @@ export type Property = {
   type: PropertyType;
   awards?: PropertyAward[];
   pricing?: HotelPricingAPIResults;
-  urls?: PropertyUrls;
+  url?: string;
   secondaries: string[];
   price_level?: PriceLevel;
   city?: string;
@@ -146,14 +146,14 @@ export type SmartFilter = {
   id: string;
   label: string;
   type:
-  | "amenity"
-  | "hotelStyle"
-  | "priceRange"
-  | "minRating"
-  | "starRating"
-  | "primary_type"
-  | "transformed_query"
-  | "selected_restaurant_price_levels";
+    | "amenity"
+    | "hotelStyle"
+    | "priceRange"
+    | "minRating"
+    | "starRating"
+    | "primary_type"
+    | "transformed_query"
+    | "selected_restaurant_price_levels";
   value: string;
   numericValue?: number;
   priceRange?: {

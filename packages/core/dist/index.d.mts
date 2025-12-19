@@ -63,11 +63,6 @@ type PropertyAward = {
     type: "0" | "1";
 };
 type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
-type PropertyUrls = {
-    tripadvisor: {
-        main: string;
-    };
-};
 type Property = {
     tripadvisor_id: number;
     name: string;
@@ -80,7 +75,7 @@ type Property = {
     type: PropertyType;
     awards?: PropertyAward[];
     pricing?: HotelPricingAPIResults;
-    urls?: PropertyUrls;
+    url?: string;
     secondaries: string[];
     price_level?: PriceLevel;
     city?: string;
@@ -389,6 +384,15 @@ declare class PropertiesFetchError extends Error {
 type FetchPropertiesOptions = {
     signal?: AbortSignal;
 };
+type TripAdvisorImage = {
+    [key: string]: {
+        url: string;
+    };
+};
+type TripAdvisorImageResponse = {
+    photos: TripAdvisorImage[];
+};
+declare function fetchImages(tripadvisorId: number, limit?: number): Promise<string | null>;
 declare function fetchProperties<TBody = any, TResponse = any>(url: string, body: TBody, apiKey?: string, { signal }?: FetchPropertiesOptions): Promise<TResponse>;
 type BaseMapFirstOptions = {
     properties?: Property[];
@@ -529,4 +533,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type ViewState, convertToApiFilters, fetchProperties, processApiFilters };
+export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, processApiFilters };

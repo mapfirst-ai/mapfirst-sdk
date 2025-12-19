@@ -117,6 +117,12 @@
   align-items: center;
 }
 
+.mapfirst-marker-loading-video {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
 /* Dot Marker Styles */
 .mapfirst-dot-marker-container {
   display: flex;
@@ -178,6 +184,9 @@
   pointer-events: auto;
   z-index: 9999;
   transition: opacity 0.2s;
+  height: 120px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .mapfirst-property-hover-card img {
@@ -185,6 +194,16 @@
   height: 120px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.mapfirst-property-hover-image {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.mapfirst-property-hover-image-placeholder {
+  background-color: #e5e7eb;
 }
 
 .mapfirst-property-hover-details {
@@ -196,7 +215,7 @@
 }
 
 .mapfirst-property-hover-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: #1a1a1a;
   overflow: hidden;
@@ -224,6 +243,7 @@
   gap: 1px;
   font-size: 10px;
   line-height: 1;
+  align-items: center;
 }
 
 .mapfirst-property-hover-rating .reviews {

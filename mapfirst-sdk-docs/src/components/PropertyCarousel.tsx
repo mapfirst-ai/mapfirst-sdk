@@ -132,8 +132,7 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
   const reviews = property.reviews || 0;
   const displayPrice =
     property.pricing?.offer?.displayPrice ?? property.price_level;
-  const url =
-    property.pricing?.offer?.clickUrl ?? property.urls?.tripadvisor.main;
+  const url = property.pricing?.offer?.clickUrl ?? property.url;
 
   // Generate star rating
   const renderStars = () => {

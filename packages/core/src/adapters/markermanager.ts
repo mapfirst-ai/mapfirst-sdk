@@ -58,7 +58,36 @@ export abstract class BaseMarkerManager<TMarker = any> {
       const existing = this.markerCache.get(item.key);
 
       if (existing) {
-        // Update existing marker position if needed
+        // Update existing marker position and content
+        const isPrimaryType = item.marker.type === this.primaryType;
+        const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
+        const isAccommodation = item.marker.type === "Accommodation";
+        const isPending =
+          item.kind === "primary"
+            ? isAccommodation && !item.marker.pricing?.offer?.displayPrice
+            : isAccommodation &&
+              item.marker.pricing?.offer?.availability !== "available";
+
+        const element = this.getMarkerElement(existing.marker);
+        if (element) {
+          if (item.kind === "primary") {
+            updatePrimaryMarkerElement(
+              element,
+              isPrimaryType,
+              isSelected,
+              isPending,
+              item.marker
+            );
+          } else {
+            updateDotMarkerElement(
+              element,
+              isPrimaryType,
+              isSelected,
+              isPending
+            );
+          }
+        }
+
         try {
           this.updateMarkerPosition(existing.marker, coords);
         } catch {
@@ -103,7 +132,8 @@ export abstract class BaseMarkerManager<TMarker = any> {
                 element,
                 isPrimaryType,
                 isSelected,
-                isPending
+                isPending,
+                item.marker
               );
             } else {
               updateDotMarkerElement(

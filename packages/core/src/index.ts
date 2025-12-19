@@ -102,6 +102,48 @@ type FetchPropertiesOptions = {
   signal?: AbortSignal;
 };
 
+// Image fetch types
+export type TripAdvisorImage = {
+  [key: string]: { url: string };
+};
+
+export type TripAdvisorImageResponse = {
+  photos: TripAdvisorImage[];
+};
+
+// Fetch images for a property from TripAdvisor
+export async function fetchImages(
+  tripadvisorId: number,
+  limit: number = 1
+): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://l4detuz832.execute-api.us-east-1.amazonaws.com/dev/photo?id=${tripadvisorId}&limit=${limit}`
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as TripAdvisorImageResponse;
+
+    if (data.photos && data.photos.length > 0) {
+      const imageUrl = data.photos[0]["FullSizeURL"].url;
+
+      // Verify the image URL is accessible
+      const imageResponse = await fetch(imageUrl);
+      if (imageResponse.ok) {
+        return imageUrl;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.debug("Failed to fetch images:", error);
+    return null;
+  }
+}
+
 // Fetch properties from API
 export async function fetchProperties<TBody = any, TResponse = any>(
   url: string,
@@ -1198,6 +1240,11 @@ export class MapFirstCore {
             data.properties
           );
           this.setPrimaryType(mostCommonType);
+        }
+
+        // Ensure markers are refreshed after polling completes
+        if (completed) {
+          this.refresh();
         }
       }
 

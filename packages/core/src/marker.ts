@@ -1,4 +1,5 @@
 import type { Property } from ".";
+import { fetchImages } from ".";
 import "./markers.css";
 import { ClusterDisplayItem } from "./utils/clustering";
 
@@ -10,6 +11,162 @@ const EAT_DRINK_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="cur
 
 const ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56 7.5H3.75a.25.25 0 0 0-.25.25v10c0 .138.112.25.25.25h16.5a.25.25 0 0 0 .25-.25v-10a.25.25 0 0 0-.25-.25h-3.81l-2-2H9.56zM8.94 4h6.12l2 2h3.19c.966 0 1.75.784 1.75 1.75v10a1.75 1.75 0 0 1-1.75 1.75H3.75A1.75 1.75 0 0 1 2 17.75v-10C2 6.784 2.784 6 3.75 6h3.19z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 9.25a2.75 2.75 0 1 0 0 5.5 2.75 2.75 0 0 0 0-5.5M7.75 12a4.25 4.25 0 1 1 8.5 0 4.25 4.25 0 0 1-8.5 0"/></svg>`;
 
+const LOADING_VIDEO_HTML = `<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>`;
+
+export function setupHoverCard(
+  root: HTMLElement,
+  pill: HTMLElement,
+  marker: Property,
+  isSelected: boolean
+) {
+  // Check if hover card is already set up
+  if (root.dataset.hasHoverCard === "true") return;
+  root.dataset.hasHoverCard = "true";
+
+  const propertyCard = createPropertyCard(marker);
+  let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+  let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+  let positionUpdateFrame: number | null = null;
+
+  const cleanupCard = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+    if (positionUpdateFrame) {
+      cancelAnimationFrame(positionUpdateFrame);
+      positionUpdateFrame = null;
+    }
+    if (propertyCard.parentElement) {
+      propertyCard.remove();
+    }
+  };
+
+  const updateCardPosition = () => {
+    if (propertyCard.parentElement) {
+      let mapContainer = root.parentElement;
+      while (
+        mapContainer &&
+        getComputedStyle(mapContainer).position === "static"
+      ) {
+        mapContainer = mapContainer.parentElement;
+      }
+
+      if (mapContainer) {
+        positionCard(propertyCard, root, mapContainer);
+        positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+      }
+    }
+  };
+
+  const showCard = (immediate = false) => {
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+
+    const doShow = () => {
+      // Find map container
+      let mapContainer = root.parentElement;
+      while (
+        mapContainer &&
+        getComputedStyle(mapContainer).position === "static"
+      ) {
+        mapContainer = mapContainer.parentElement;
+      }
+
+      if (mapContainer) {
+        mapContainer.appendChild(propertyCard);
+        positionCard(propertyCard, root, mapContainer);
+        // Load image when card is shown
+        loadCardImage(propertyCard, marker);
+        // Start continuous position updates
+        positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+      }
+    };
+
+    if (immediate) {
+      doShow();
+    } else {
+      hoverTimeout = setTimeout(doShow, 300); // Delay to avoid showing on quick hovers
+    }
+  };
+
+  const hideCard = () => {
+    // Don't hide if marker is selected
+    if (isSelected) return;
+
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    if (positionUpdateFrame) {
+      cancelAnimationFrame(positionUpdateFrame);
+      positionUpdateFrame = null;
+    }
+    hideTimeout = setTimeout(() => {
+      if (propertyCard.parentElement) {
+        propertyCard.remove();
+      }
+    }, 100); // Small delay to allow mouse to enter card
+  };
+
+  // Show card immediately if marker is selected
+  if (isSelected) {
+    showCard(true);
+  }
+
+  pill.addEventListener("mouseenter", () => showCard(false));
+  pill.addEventListener("mouseleave", hideCard);
+
+  // Keep card visible when hovering over it
+  propertyCard.addEventListener("mouseenter", () => {
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+    // Resume position updates if stopped
+    if (!positionUpdateFrame && propertyCard.parentElement) {
+      positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+    }
+  });
+
+  propertyCard.addEventListener("mouseleave", hideCard);
+
+  // Cleanup card when marker is removed from DOM
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const removedNode of mutation.removedNodes) {
+        if (removedNode === root || removedNode.contains(root)) {
+          cleanupCard();
+          observer.disconnect();
+          return;
+        }
+      }
+    }
+  });
+
+  // Start observing when the root is added to the DOM
+  if (root.parentElement) {
+    observer.observe(root.parentElement, { childList: true, subtree: true });
+  } else {
+    // If not yet in DOM, wait for it
+    const checkParent = setInterval(() => {
+      if (root.parentElement) {
+        observer.observe(root.parentElement, {
+          childList: true,
+          subtree: true,
+        });
+        clearInterval(checkParent);
+      }
+    }, 100);
+  }
+}
+
 function getDefaultImageForType(type: string): string {
   const normalizedType = type
     .toLowerCase()
@@ -19,42 +176,62 @@ function getDefaultImageForType(type: string): string {
 }
 
 function createPropertyCard(marker: Property): HTMLElement {
-  const card = document.createElement("div");
+  const url = marker.pricing?.offer?.clickUrl ?? marker.url;
+
+  const card = document.createElement(url ? "a" : "div");
   card.className = "mapfirst-property-hover-card";
+  card.setAttribute("data-marker-id", marker.tripadvisor_id.toString());
+
+  if (url) {
+    (card as HTMLAnchorElement).href = url;
+    (card as HTMLAnchorElement).target = "_blank";
+  }
 
   const rating = marker.rating || 0;
   const reviews = marker.reviews || 0;
   const displayPrice =
     marker.pricing?.offer?.displayPrice ?? marker.price_level;
-  const url = marker.pricing?.offer?.clickUrl ?? marker.urls?.tripadvisor.main;
 
   // Generate star rating
   const renderStars = () => {
     const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
+    const hasHalfStar = rating % 1 !== 0;
     const stars = [];
 
+    // Style for star circles
+    const starStyle = `
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border: 1px solid #03852e;
+      border-radius: 9999px;
+    `;
+
     for (let i = 0; i < fullStars; i++) {
-      stars.push(`<span style="color: #03852e">●</span>`);
+      stars.push(
+        `<span style="${starStyle} background-color: #03852e;"></span>`
+      );
     }
     if (hasHalfStar) {
-      stars.push(`<span style="color: #03852e">◐</span>`);
+      stars.push(
+        `<span style="${starStyle} background: linear-gradient(90deg, #03852e 50%, transparent 50%);"></span>`
+      );
     }
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(`<span style="color: #ccc">○</span>`);
+    const remainingStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < remainingStars; i++) {
+      stars.push(`<span style="${starStyle}"></span>`);
     }
     return stars.join("");
   };
 
-  const imageUrl = getDefaultImageForType(marker.type);
+  const defaultImageUrl = getDefaultImageForType(marker.type);
 
   card.innerHTML = `
-    <img 
-      src="${imageUrl}" 
-      alt="${marker.name}"
-      onerror="this.src='/images/placeholder.jpg'"
-    />
+    <div 
+      class="mapfirst-property-hover-image mapfirst-property-hover-image-placeholder"
+      data-tripadvisor-id="${marker.tripadvisor_id}"
+      data-default-image="${defaultImageUrl}"
+    ></div>
     <div class="mapfirst-property-hover-details">
       <div class="mapfirst-property-hover-name">${marker.name}</div>
       <div class="mapfirst-property-hover-rating">
@@ -74,14 +251,9 @@ function createPropertyCard(marker: Property): HTMLElement {
       ${
         url
           ? `
-        <a
-          href="${url}"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mapfirst-property-hover-learn-more"
-        >
+        <span class="mapfirst-property-hover-learn-more">
           Learn More
-        </a>
+        </span>
       `
           : ""
       }
@@ -89,6 +261,63 @@ function createPropertyCard(marker: Property): HTMLElement {
   `;
 
   return card;
+}
+
+function loadCardImage(card: HTMLElement, marker: Property) {
+  const imgContainer = card.querySelector(
+    ".mapfirst-property-hover-image"
+  ) as HTMLElement;
+
+  // Check if image was already loaded
+  if (
+    imgContainer &&
+    marker.tripadvisor_id &&
+    !imgContainer.dataset.imageLoaded
+  ) {
+    imgContainer.dataset.imageLoaded = "loading";
+    const defaultImageUrl = imgContainer.dataset.defaultImage;
+
+    fetchImages(marker.tripadvisor_id, 1)
+      .then((imageUrl) => {
+        if (imageUrl && imgContainer) {
+          // Create an img element and set the TripAdvisor image
+          const img = document.createElement("img");
+          img.src = imageUrl;
+          img.alt = marker.name;
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = "cover";
+
+          // Replace placeholder with image
+          imgContainer.innerHTML = "";
+          imgContainer.appendChild(img);
+          imgContainer.classList.remove(
+            "mapfirst-property-hover-image-placeholder"
+          );
+          imgContainer.dataset.imageLoaded = "true";
+        } else {
+          throw new Error("No image URL");
+        }
+      })
+      .catch(() => {
+        // Load default type-based image on error
+        if (defaultImageUrl && imgContainer) {
+          const img = document.createElement("img");
+          img.src = defaultImageUrl;
+          img.alt = marker.name;
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = "cover";
+
+          imgContainer.innerHTML = "";
+          imgContainer.appendChild(img);
+          imgContainer.classList.remove(
+            "mapfirst-property-hover-image-placeholder"
+          );
+          imgContainer.dataset.imageLoaded = "false";
+        }
+      });
+  }
 }
 
 function positionCard(
@@ -162,7 +391,15 @@ export function createPrimaryMarkerElement(
   root.className = "mapfirst-marker-root";
   root.style.zIndex = isSelected ? "20" : isPrimaryType ? "12" : "11";
 
-  const pill = document.createElement("div");
+  // Get URL for the marker
+  const markerUrl = marker.pricing?.offer?.clickUrl ?? marker.url;
+
+  const pill = document.createElement(markerUrl ? "a" : "div");
+  if (markerUrl) {
+    (pill as HTMLAnchorElement).href = markerUrl;
+    (pill as HTMLAnchorElement).target = "_blank";
+    pill.style.textDecoration = "none";
+  }
   pill.className = isPending
     ? "mapfirst-marker-pill mapfirst-marker-pill-pending"
     : `mapfirst-marker-pill mapfirst-marker-pill-active${
@@ -214,7 +451,13 @@ export function createPrimaryMarkerElement(
   const content = document.createElement("span");
   content.className = "mapfirst-marker-content";
   if (isAccommodation) {
-    content.textContent = marker.pricing?.offer?.displayPrice ?? "—";
+    if (marker.pricing?.offer?.displayPrice) {
+      content.innerHTML = marker.pricing.offer.displayPrice;
+      content.dataset.price = marker.pricing.offer.displayPrice;
+    } else {
+      content.innerHTML = LOADING_VIDEO_HTML;
+      content.dataset.price = "";
+    }
   } else if (marker.type === "Eat & Drink") {
     content.innerHTML = EAT_DRINK_SVG;
   } else if (marker.type === "Attraction") {
@@ -231,146 +474,7 @@ export function createPrimaryMarkerElement(
 
   // Add hover card
   if (!isPending) {
-    const propertyCard = createPropertyCard(marker);
-    let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
-    let hideTimeout: ReturnType<typeof setTimeout> | null = null;
-    let positionUpdateFrame: number | null = null;
-
-    const cleanupCard = () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        hoverTimeout = null;
-      }
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
-        hideTimeout = null;
-      }
-      if (positionUpdateFrame) {
-        cancelAnimationFrame(positionUpdateFrame);
-        positionUpdateFrame = null;
-      }
-      if (propertyCard.parentElement) {
-        propertyCard.remove();
-      }
-    };
-
-    const updateCardPosition = () => {
-      if (propertyCard.parentElement) {
-        let mapContainer = root.parentElement;
-        while (
-          mapContainer &&
-          getComputedStyle(mapContainer).position === "static"
-        ) {
-          mapContainer = mapContainer.parentElement;
-        }
-
-        if (mapContainer) {
-          positionCard(propertyCard, root, mapContainer);
-          positionUpdateFrame = requestAnimationFrame(updateCardPosition);
-        }
-      }
-    };
-
-    const showCard = (immediate = false) => {
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
-        hideTimeout = null;
-      }
-
-      const doShow = () => {
-        // Find map container
-        let mapContainer = root.parentElement;
-        while (
-          mapContainer &&
-          getComputedStyle(mapContainer).position === "static"
-        ) {
-          mapContainer = mapContainer.parentElement;
-        }
-
-        if (mapContainer) {
-          mapContainer.appendChild(propertyCard);
-          positionCard(propertyCard, root, mapContainer);
-          // Start continuous position updates
-          positionUpdateFrame = requestAnimationFrame(updateCardPosition);
-        }
-      };
-
-      if (immediate) {
-        doShow();
-      } else {
-        hoverTimeout = setTimeout(doShow, 300); // Delay to avoid showing on quick hovers
-      }
-    };
-
-    const hideCard = () => {
-      // Don't hide if marker is selected
-      if (isSelected) return;
-
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        hoverTimeout = null;
-      }
-      if (positionUpdateFrame) {
-        cancelAnimationFrame(positionUpdateFrame);
-        positionUpdateFrame = null;
-      }
-      hideTimeout = setTimeout(() => {
-        if (propertyCard.parentElement) {
-          propertyCard.remove();
-        }
-      }, 100); // Small delay to allow mouse to enter card
-    };
-
-    // Show card immediately if marker is selected
-    if (isSelected) {
-      showCard(true);
-    }
-
-    pill.addEventListener("mouseenter", () => showCard(false));
-    pill.addEventListener("mouseleave", hideCard);
-
-    // Keep card visible when hovering over it
-    propertyCard.addEventListener("mouseenter", () => {
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
-        hideTimeout = null;
-      }
-      // Resume position updates if stopped
-      if (!positionUpdateFrame && propertyCard.parentElement) {
-        positionUpdateFrame = requestAnimationFrame(updateCardPosition);
-      }
-    });
-
-    propertyCard.addEventListener("mouseleave", hideCard);
-
-    // Cleanup card when marker is removed from DOM
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const removedNode of mutation.removedNodes) {
-          if (removedNode === root || removedNode.contains(root)) {
-            cleanupCard();
-            observer.disconnect();
-            return;
-          }
-        }
-      }
-    });
-
-    // Start observing when the root is added to the DOM
-    if (root.parentElement) {
-      observer.observe(root.parentElement, { childList: true, subtree: true });
-    } else {
-      // If not yet in DOM, wait for it
-      const checkParent = setInterval(() => {
-        if (root.parentElement) {
-          observer.observe(root.parentElement, {
-            childList: true,
-            subtree: true,
-          });
-          clearInterval(checkParent);
-        }
-      }, 100);
-    }
+    setupHoverCard(root, pill, marker, isSelected);
   }
 
   root.appendChild(pill);
