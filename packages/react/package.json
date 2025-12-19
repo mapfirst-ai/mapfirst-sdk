@@ -1,6 +1,6 @@
 {
   "name": "@mapfirst.ai/react",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "React hooks for MapFirst SDK - Reactive state management for map properties",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -44,6 +44,6 @@
     "react": ">=17 || >=18"
   },
   "dependencies": {
-    "@mapfirst.ai/core": "0.0.26"
+    "@mapfirst.ai/core": "0.0.27"
   }
 }

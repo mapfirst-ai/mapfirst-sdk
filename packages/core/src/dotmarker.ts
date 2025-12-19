@@ -1,6 +1,7 @@
 import type { Property } from ".";
 import "./markers.css";
 import { ClusterDisplayItem } from "./utils/clustering";
+import { setupHoverCard } from "./marker";
 
 export function createDotMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "dot" }>,
@@ -44,5 +45,11 @@ export function createDotMarkerElement(
   });
 
   container.appendChild(button);
+
+  // Add hover card for non-pending markers
+  if (!isPending) {
+    setupHoverCard(container, button, marker, isSelected);
+  }
+
   return container;
 }
