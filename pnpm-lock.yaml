@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  dist: link:packages/core/dist
+
 importers:
 
   .:
@@ -43,11 +46,11 @@ importers:
         specifier: 3.9.2
         version: 3.9.2(@algolia/client-search@5.45.0)(@mdx-js/react@3.1.1(@types/react@19.2.4)(react@19.2.0))(@types/react@19.2.4)(esbuild@0.27.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(search-insights@2.17.3)(typescript@5.6.3)
       '@mapfirst.ai/core':
-        specifier: 0.0.24
-        version: 0.0.24
+        specifier: 0.0.25
+        version: 0.0.25
       '@mapfirst.ai/react':
-        specifier: ^0.0.30
-        version: 0.0.30(react@19.2.0)
+        specifier: ^0.0.31
+        version: 0.0.31(react@19.2.0)
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.1.1(@types/react@19.2.4)(react@19.2.0)
@@ -94,8 +97,8 @@ importers:
   packages/react:
     dependencies:
       '@mapfirst.ai/core':
-        specifier: 0.0.24
-        version: 0.0.24
+        specifier: 0.0.25
+        version: 0.0.25
       react:
         specifier: '>=17 || >=18'
         version: 19.2.0
@@ -1518,11 +1521,11 @@ packages:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
 
-  '@mapfirst.ai/core@0.0.24':
-    resolution: {integrity: sha512-jb/I/o4L78hAXHGnGh0AXcQqwvNxT+/5GL01esDqpX/5PQO1oUKAd24MYJAtqG6K5eI1BWjsXCI82TEternqnA==}
+  '@mapfirst.ai/core@0.0.25':
+    resolution: {integrity: sha512-YzSVUwDtCl6gEyWmz2uoyiT5zrMV9McXHQblKbtI1cMJNI+t+BNtZEiXd1wq1yF6LcVcnDrxZQL4Q7VTH3QRfg==}
 
-  '@mapfirst.ai/react@0.0.30':
-    resolution: {integrity: sha512-0BlhHDT3+t2pEaL7w5kk1Jaah+klXHPenJrOP2mJV2to+f+qBKUiv3WsS7k7Y0n+Q5tGVIiDvABo+BdtsF4FdQ==}
+  '@mapfirst.ai/react@0.0.31':
+    resolution: {integrity: sha512-R5wFAQP1ufygtQ4rnAuQY8Dzz6+Sh5s0qzLhGawouVAymwoyjW0ggjapAbhjH0bwqJkw29MVWAyaRY6K7v/UDQ==}
     peerDependencies:
       react: '>=17 || >=18'
 
@@ -7817,11 +7820,11 @@ snapshots:
 
   '@mapbox/whoots-js@3.1.0': {}
 
-  '@mapfirst.ai/core@0.0.24': {}
+  '@mapfirst.ai/core@0.0.25': {}
 
-  '@mapfirst.ai/react@0.0.30(react@19.2.0)':
+  '@mapfirst.ai/react@0.0.31(react@19.2.0)':
     dependencies:
-      '@mapfirst.ai/core': 0.0.24
+      '@mapfirst.ai/core': 0.0.25
       react: 19.2.0
 
   '@maplibre/maplibre-gl-style-spec@24.3.1':

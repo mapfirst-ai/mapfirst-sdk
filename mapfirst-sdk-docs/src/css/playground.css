@@ -409,11 +409,6 @@
 }
 
 .playground-property-card.selected {
-  border-color: var(--playground-primary);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] .playground-property-card.selected {
   border-color: #1f0f4f;
   box-shadow: 0 4px 12px rgba(31, 15, 79, 0.3);
 }

@@ -19,7 +19,6 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import PropertyCarousel from "../components/PropertyCarousel";
 import "../css/playground.css";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
@@ -1271,16 +1270,6 @@ function MapComponent() {
           </button>
         )}
         <div ref={mapContainerRef} className="playground-map-canvas" />
-
-        {/* Property Carousel */}
-        {properties.length > 0 && (
-          <PropertyCarousel
-            properties={properties}
-            selectedMarker={selectedMarker}
-            onSelectMarker={setSelectedMarker}
-            onFlyTo={handleFlyTo}
-          />
-        )}
       </section>
     </div>
   );

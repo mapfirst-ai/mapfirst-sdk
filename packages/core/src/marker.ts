@@ -10,6 +10,128 @@ const EAT_DRINK_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="cur
 
 const ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56 7.5H3.75a.25.25 0 0 0-.25.25v10c0 .138.112.25.25.25h16.5a.25.25 0 0 0 .25-.25v-10a.25.25 0 0 0-.25-.25h-3.81l-2-2H9.56zM8.94 4h6.12l2 2h3.19c.966 0 1.75.784 1.75 1.75v10a1.75 1.75 0 0 1-1.75 1.75H3.75A1.75 1.75 0 0 1 2 17.75v-10C2 6.784 2.784 6 3.75 6h3.19z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 9.25a2.75 2.75 0 1 0 0 5.5 2.75 2.75 0 0 0 0-5.5M7.75 12a4.25 4.25 0 1 1 8.5 0 4.25 4.25 0 0 1-8.5 0"/></svg>`;
 
+function getDefaultImageForType(type: string): string {
+  const normalizedType = type
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/&/g, "");
+  return `/img/${normalizedType}.webp`;
+}
+
+function createPropertyCard(marker: Property): HTMLElement {
+  const card = document.createElement("div");
+  card.className = "mapfirst-property-hover-card";
+
+  const rating = marker.rating || 0;
+  const reviews = marker.reviews || 0;
+  const displayPrice =
+    marker.pricing?.offer?.displayPrice ?? marker.price_level;
+  const url = marker.pricing?.offer?.clickUrl ?? marker.urls?.tripadvisor.main;
+
+  // Generate star rating
+  const renderStars = () => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const stars = [];
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(`<span style="color: #03852e">●</span>`);
+    }
+    if (hasHalfStar) {
+      stars.push(`<span style="color: #03852e">◐</span>`);
+    }
+    const emptyStars = 5 - stars.length;
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(`<span style="color: #ccc">○</span>`);
+    }
+    return stars.join("");
+  };
+
+  const imageUrl = getDefaultImageForType(marker.type);
+
+  card.innerHTML = `
+    <img 
+      src="${imageUrl}" 
+      alt="${marker.name}"
+      onerror="this.src='/images/placeholder.jpg'"
+    />
+    <div class="mapfirst-property-hover-details">
+      <div class="mapfirst-property-hover-name">${marker.name}</div>
+      <div class="mapfirst-property-hover-rating">
+        <span class="rating-value">${rating.toFixed(1)}</span>
+        <span class="stars">${renderStars()}</span>
+        <span class="reviews">(${reviews})</span>
+      </div>
+      ${
+        marker.type === "Accommodation" && displayPrice
+          ? `
+        <div class="mapfirst-property-hover-price">
+          Starting at <strong>${displayPrice}</strong>
+        </div>
+      `
+          : ""
+      }
+      ${
+        url
+          ? `
+        <a
+          href="${url}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mapfirst-property-hover-learn-more"
+        >
+          Learn More
+        </a>
+      `
+          : ""
+      }
+    </div>
+  `;
+
+  return card;
+}
+
+function positionCard(
+  card: HTMLElement,
+  markerElement: HTMLElement,
+  mapContainer: HTMLElement
+) {
+  // Get marker position and dimensions
+  const markerRect = markerElement.getBoundingClientRect();
+  const containerRect = mapContainer.getBoundingClientRect();
+
+  const cardWidth = 270; // Fixed card width
+  const cardHeight = 120; // Approximate card height
+  const offset = 12; // Gap between marker and card
+
+  // Calculate available space on each side
+  const spaceRight = containerRect.right - markerRect.right;
+  const spaceLeft = markerRect.left - containerRect.left;
+  const spaceBottom = containerRect.bottom - markerRect.bottom;
+  const spaceTop = markerRect.top - containerRect.top;
+
+  // Default position: bottom center
+  let left =
+    markerRect.left - containerRect.left + markerRect.width / 2 - cardWidth / 2;
+  let top = markerRect.top - containerRect.top + markerRect.height + offset;
+
+  // Horizontal adjustment if card would overflow
+  if (left < 0) {
+    left = 8; // Small margin from left edge
+  } else if (left + cardWidth > containerRect.width) {
+    left = containerRect.width - cardWidth - 8; // Small margin from right edge
+  }
+
+  // Vertical adjustment if not enough space below
+  if (spaceBottom < cardHeight + offset && spaceTop > spaceBottom) {
+    // Position above if more space above
+    top = markerRect.top - containerRect.top - cardHeight - offset;
+  }
+
+  card.style.left = `${left}px`;
+  card.style.top = `${top}px`;
+}
+
 export function createPrimaryMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "primary" }>,
   primaryType: string,
@@ -50,7 +172,7 @@ export function createPrimaryMarkerElement(
           ? " mapfirst-marker-non-primary"
           : ""
       }`;
-  pill.title = marker.name ?? String(marker.tripadvisor_id);
+  // pill.title = marker.name ?? String(marker.tripadvisor_id);
 
   // Awards or Rating badge
   if (!isPending && (marker.awards?.length || ratingLabel)) {
@@ -106,6 +228,150 @@ export function createPrimaryMarkerElement(
       onMarkerClick?.(marker);
     }
   });
+
+  // Add hover card
+  if (!isPending) {
+    const propertyCard = createPropertyCard(marker);
+    let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+    let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+    let positionUpdateFrame: number | null = null;
+
+    const cleanupCard = () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      if (positionUpdateFrame) {
+        cancelAnimationFrame(positionUpdateFrame);
+        positionUpdateFrame = null;
+      }
+      if (propertyCard.parentElement) {
+        propertyCard.remove();
+      }
+    };
+
+    const updateCardPosition = () => {
+      if (propertyCard.parentElement) {
+        let mapContainer = root.parentElement;
+        while (
+          mapContainer &&
+          getComputedStyle(mapContainer).position === "static"
+        ) {
+          mapContainer = mapContainer.parentElement;
+        }
+
+        if (mapContainer) {
+          positionCard(propertyCard, root, mapContainer);
+          positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+        }
+      }
+    };
+
+    const showCard = (immediate = false) => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+
+      const doShow = () => {
+        // Find map container
+        let mapContainer = root.parentElement;
+        while (
+          mapContainer &&
+          getComputedStyle(mapContainer).position === "static"
+        ) {
+          mapContainer = mapContainer.parentElement;
+        }
+
+        if (mapContainer) {
+          mapContainer.appendChild(propertyCard);
+          positionCard(propertyCard, root, mapContainer);
+          // Start continuous position updates
+          positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+        }
+      };
+
+      if (immediate) {
+        doShow();
+      } else {
+        hoverTimeout = setTimeout(doShow, 300); // Delay to avoid showing on quick hovers
+      }
+    };
+
+    const hideCard = () => {
+      // Don't hide if marker is selected
+      if (isSelected) return;
+
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+      if (positionUpdateFrame) {
+        cancelAnimationFrame(positionUpdateFrame);
+        positionUpdateFrame = null;
+      }
+      hideTimeout = setTimeout(() => {
+        if (propertyCard.parentElement) {
+          propertyCard.remove();
+        }
+      }, 100); // Small delay to allow mouse to enter card
+    };
+
+    // Show card immediately if marker is selected
+    if (isSelected) {
+      showCard(true);
+    }
+
+    pill.addEventListener("mouseenter", () => showCard(false));
+    pill.addEventListener("mouseleave", hideCard);
+
+    // Keep card visible when hovering over it
+    propertyCard.addEventListener("mouseenter", () => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      // Resume position updates if stopped
+      if (!positionUpdateFrame && propertyCard.parentElement) {
+        positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+      }
+    });
+
+    propertyCard.addEventListener("mouseleave", hideCard);
+
+    // Cleanup card when marker is removed from DOM
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const removedNode of mutation.removedNodes) {
+          if (removedNode === root || removedNode.contains(root)) {
+            cleanupCard();
+            observer.disconnect();
+            return;
+          }
+        }
+      }
+    });
+
+    // Start observing when the root is added to the DOM
+    if (root.parentElement) {
+      observer.observe(root.parentElement, { childList: true, subtree: true });
+    } else {
+      // If not yet in DOM, wait for it
+      const checkParent = setInterval(() => {
+        if (root.parentElement) {
+          observer.observe(root.parentElement, {
+            childList: true,
+            subtree: true,
+          });
+          clearInterval(checkParent);
+        }
+      }, 100);
+    }
+  }
 
   root.appendChild(pill);
   return root;

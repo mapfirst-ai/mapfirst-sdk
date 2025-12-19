@@ -368,7 +368,7 @@ export class MapFirstCore {
       return;
     }
     try {
-      const { city, country, query, currency } = locationData;
+      const { city, country, query } = locationData;
 
       let requestBody: any = {
         filters: this.getFilters(),
@@ -586,10 +586,11 @@ export class MapFirstCore {
     // Set up impression tracking when map becomes visible in viewport
     if (this.useApi) {
       adapter.setupImpressionTracking(() => {
-        trackMapImpression(this.apiUrl, this.apiKey, {
-          platform: this.currentPlatform,
-          environment: this.environment,
-        });
+        // trackMapImpression(this.apiUrl, this.apiKey, {
+        //   platform: this.currentPlatform,
+        //   environment: this.environment,
+        // });
+        console.log("ToDo: Track Map Impression");
       });
     }
 

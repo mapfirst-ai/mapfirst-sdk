@@ -46,7 +46,6 @@ const config: Config = {
   // Custom fields for environment variables
   customFields: {
     mapboxAccessToken: process.env.MAPBOX_ACCESS_TOKEN,
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
   },
 
   onBrokenLinks: "throw",
