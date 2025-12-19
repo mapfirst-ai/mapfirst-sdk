@@ -490,11 +490,6 @@ declare class MapFirstCore {
         lng: number;
     }[], type?: PropertyType, animate?: boolean): void;
     getFilters(): FilterSchema;
-    loadProperties({ fetchFn, onSuccess, onError, }: {
-        fetchFn: () => Promise<Property[]>;
-        onSuccess?: (properties: Property[]) => void;
-        onError?: (error: unknown) => void;
-    }): Promise<void>;
     pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, }: PollOptions): Promise<{
         completed: boolean;
         pollData?: HotelPricingAPIResponse;

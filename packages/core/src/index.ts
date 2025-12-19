@@ -144,7 +144,7 @@ function toISO(date: Date | string): string {
 
 async function trackMapImpression(
   apiUrl: string,
-  apiKey: string,
+  apiKey?: string,
   metadata?: Record<string, any>
 ): Promise<void> {
   try {
@@ -278,7 +278,7 @@ export class MapFirstCore {
     this.useApi = options.useApi ?? true;
     this.environment = options.environment ?? "prod";
     this.apiUrl = options.apiUrl ?? API_URLS[this.environment];
-    this.apiKey = options.apiKey ?? "default";
+    this.apiKey = options.apiKey;
     this.requestBody = options.requestBody;
     this.currentPlatform = options.platform;
 
@@ -586,7 +586,7 @@ export class MapFirstCore {
     // Set up impression tracking when map becomes visible in viewport
     if (this.useApi) {
       adapter.setupImpressionTracking(() => {
-        trackMapImpression(this.apiUrl, this.apiKey || "default", {
+        trackMapImpression(this.apiUrl, this.apiKey, {
           platform: this.currentPlatform,
           environment: this.environment,
         });
@@ -1478,7 +1478,7 @@ export class MapFirstCore {
   setApiKey(apiKey: string | undefined) {
     this.ensureAlive();
     const oldKey = this.apiKey;
-    this.apiKey = apiKey || "default";
+    this.apiKey = apiKey;
 
     // If API key changed and map is attached, refresh
     if (oldKey !== this.apiKey && this.isMapAttached) {
