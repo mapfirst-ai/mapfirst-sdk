@@ -251,6 +251,7 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
                 limit?: number;
             };
             smartFiltersClearable?: boolean;
+            onError?: (error: unknown) => void;
         }) => Promise<{
             location_id?: number;
             filters: _mapfirst_ai_core.FilterSchema;
@@ -259,8 +260,6 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
             pollingLink: string | undefined;
             durationSeconds: number;
         } | null>;
-        isLoading: boolean;
-        error: Error | null;
     };
     smartFilterSearch: {
         search: (options: {
@@ -272,6 +271,7 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
                 limit?: number;
                 language?: string;
             };
+            onError?: (error: unknown) => void;
         }) => Promise<{
             location_id?: number;
             filters: _mapfirst_ai_core.FilterSchema;
@@ -280,8 +280,6 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
             pollingLink: string | undefined;
             durationSeconds: number;
         } | null>;
-        isLoading: boolean;
-        error: Error | null;
     };
     boundsSearch: {
         perform: () => Promise<{
@@ -292,8 +290,6 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
             pollingLink: string | undefined;
             durationSeconds: number;
         } | null>;
-        isSearching: boolean;
-        error: Error | null;
     };
     attachMapLibre: (map: any, maplibregl: MapLibreNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;

@@ -1068,6 +1068,7 @@ export class MapFirstCore {
 
         if (pollData?.success?.isComplete) {
           completed = true;
+          this.setSearching(false);
           break;
         }
       } catch (error) {
@@ -1246,6 +1247,9 @@ export class MapFirstCore {
         if (completed) {
           this.refresh();
         }
+      } else if (data.isComplete === true) {
+        // If the initial response is complete, set searching to false now
+        this.setSearching(false);
       }
 
       // Fly to POIs if not already done
@@ -1284,10 +1288,8 @@ export class MapFirstCore {
       this.callbacks.onPropertiesLoadError?.(error);
       this.clearProperties();
       this.setState({ firstCallDone: true });
-      return null;
-    } finally {
       this.setSearching(false);
-      this.setState({ firstCallDone: true });
+      return null;
     }
   }
 

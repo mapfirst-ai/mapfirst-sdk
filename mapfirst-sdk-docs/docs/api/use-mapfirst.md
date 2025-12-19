@@ -37,19 +37,53 @@ Configuration object for initializing MapFirst.
 
 ```typescript
 interface MapFirstConfig {
-  adapter: any | null;
+  // API Configuration
+  apiKey?: string; // Your MapFirst API key
+  useApi?: boolean; // Use MapFirst API (default: true)
+  environment?: "dev" | "prod"; // API environment (default: "prod")
+  apiUrl?: string; // Custom API URL (optional)
+
+  // Initial location data
   initialLocationData?: {
     city?: string;
     country?: string;
     currency?: string;
   };
-  environment?: "dev" | "prod";
+
+  // Initial request body (alternative to initialLocationData)
+  requestBody?: any;
+
+  // Initial state
+  state?: Partial<MapState>;
+
+  // Property configuration
+  properties?: Property[]; // Pre-loaded properties
+  primaryType?: PropertyType; // Initial property type filter
+  selectedMarkerId?: number | null; // Initially selected marker
+
+  // Map behavior
+  autoSelectOnClick?: boolean; // Auto-select marker on click
+  fitBoundsPadding?: {
+    // Padding for fitBounds
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
+
+  // Callbacks
   callbacks?: {
     onPropertiesChange?: (properties: Property[]) => void;
     onSelectedPropertyChange?: (id: number | null) => void;
-    onBoundsChange?: (bounds: Bounds) => void;
-    onSearchingStateChange?: (isSearching: boolean) => void;
-    onError?: (error: Error) => void;
+    onPrimaryTypeChange?: (type: PropertyType) => void;
+    onFiltersChange?: (filters: FilterState) => void;
+    onBoundsChange?: (bounds: MapBounds | null) => void;
+    onPendingBoundsChange?: (bounds: MapBounds | null) => void;
+    onCenterChange?: (center: [number, number], zoom: number) => void;
+    onZoomChange?: (zoom: number) => void;
+    onActiveLocationChange?: (location: ActiveLocation) => void;
+    onLoadingStateChange?: (loading: boolean) => void;
+    onSearchingStateChange?: (searching: boolean) => void;
   };
 }
 ```
@@ -223,7 +257,7 @@ import maplibregl from "maplibre-gl";
 
 const map = new maplibregl.Map({
   container: "map",
-  style: "https://demotiles.maplibre.org/style.json",
+  style: "https://api.mapfirst.ai/static/style.json",
   center: [2.3522, 48.8566],
   zoom: 12,
 });

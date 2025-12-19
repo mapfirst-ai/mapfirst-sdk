@@ -349,7 +349,7 @@ function AutoSearch() {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "https://api.mapfirst.ai/static/style.json",
       center: [0, 0],
       zoom: 2,
     });

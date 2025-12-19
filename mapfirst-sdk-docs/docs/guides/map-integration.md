@@ -45,7 +45,7 @@ function MapLibreMap() {
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "https://api.mapfirst.ai/static/style.json",
       center: [-0.1278, 51.5074],
       zoom: 12,
     });

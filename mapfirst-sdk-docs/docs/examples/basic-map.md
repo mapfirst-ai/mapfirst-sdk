@@ -20,19 +20,28 @@ export default function BasicMap() {
 
   const { attachMapLibre, state, propertiesSearch, setPrimaryType } =
     useMapFirst({
-      adapter: null,
+      apiKey: "your-api-key",
       initialLocationData: {
         city: "Paris",
         country: "France",
         currency: "EUR",
       },
       environment: "prod",
+      state: {
+        filters: {
+          checkIn: "2024-06-01",
+          checkOut: "2024-06-07",
+          numAdults: 2,
+          numRooms: 1,
+          currency: "EUR",
+        },
+      },
       callbacks: {
         onPropertiesChange: (properties) => {
           console.log("Properties loaded:", properties.length);
         },
-        onError: (error) => {
-          console.error("Error:", error);
+        onSearchingStateChange: (searching) => {
+          console.log("Searching:", searching);
         },
       },
     });
@@ -42,7 +51,7 @@ export default function BasicMap() {
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "https://api.mapfirst.ai/static/style.json",
       center: [2.3522, 48.8566], // Paris
       zoom: 12,
     });
@@ -91,7 +100,7 @@ export default function BasicMap() {
           <button onClick={() => setPrimaryType("Accommodation")}>
             Hotels
           </button>
-          <button onClick={() => setPrimaryType("Restaurant")}>
+          <button onClick={() => setPrimaryType("Eat & Drink")}>
             Restaurants
           </button>
           <button onClick={() => setPrimaryType("Attraction")}>
@@ -226,7 +235,7 @@ export default function BasicMap() {
       // Initialize map
       const map = new maplibregl.Map({
         container: "map",
-        style: "https://demotiles.maplibre.org/style.json",
+        style: "https://api.mapfirst.ai/static/style.json",
         center: [2.3522, 48.8566], // Paris
         zoom: 12,
       });
@@ -236,13 +245,22 @@ export default function BasicMap() {
       map.on("load", function () {
         // Initialize MapFirst SDK
         mapFirst = new MapFirstCore({
-          adapter: null,
+          apiKey: "your-api-key",
           initialLocationData: {
             city: "Paris",
             country: "France",
             currency: "EUR",
           },
           environment: "prod",
+          state: {
+            filters: {
+              checkIn: "2024-06-01",
+              checkOut: "2024-06-07",
+              numAdults: 2,
+              numRooms: 1,
+              currency: "EUR",
+            },
+          },
           callbacks: {
             onPropertiesChange: function (properties) {
               document.getElementById("property-count").textContent =
@@ -255,10 +273,6 @@ export default function BasicMap() {
 
               status.textContent = isSearching ? "Loading..." : "";
               searchBtn.disabled = isSearching;
-            },
-            onError: function (error) {
-              console.error("Error:", error);
-              alert("Error: " + error.message);
             },
           },
         });
@@ -284,8 +298,8 @@ export default function BasicMap() {
       document
         .getElementById("restaurants-btn")
         .addEventListener("click", function () {
-          mapFirst.setPrimaryType("Restaurant");
-          document.getElementById("current-type").textContent = "Restaurant";
+          mapFirst.setPrimaryType("Eat & Drink");
+          document.getElementById("current-type").textContent = "Eat & Drink";
         });
 
       document

@@ -229,11 +229,6 @@ export function useMapFirst(options: BaseMapFirstOptions) {
   );
 
   // Properties search
-  const [propertiesSearchLoading, setPropertiesSearchLoading] =
-    React.useState(false);
-  const [propertiesSearchError, setPropertiesSearchError] =
-    React.useState<Error | null>(null);
-
   const propertiesSearch = React.useMemo(
     () => ({
       search: async (options: {
@@ -243,45 +238,19 @@ export function useMapFirst(options: BaseMapFirstOptions) {
           limit?: number;
         };
         smartFiltersClearable?: boolean;
+        onError?: (error: unknown) => void;
       }) => {
         if (!instanceRef.current) {
-          const err = new Error("MapFirst instance not available");
-          setPropertiesSearchError(err);
-          throw err;
+          throw new Error("MapFirst instance not available");
         }
 
-        setPropertiesSearchLoading(true);
-        setPropertiesSearchError(null);
-
-        try {
-          const result = await instanceRef.current.runPropertiesSearch({
-            ...options,
-            onError: (err) => {
-              const error = err instanceof Error ? err : new Error(String(err));
-              setPropertiesSearchError(error);
-            },
-          });
-          return result;
-        } catch (err) {
-          const error = err instanceof Error ? err : new Error(String(err));
-          setPropertiesSearchError(error);
-          throw error;
-        } finally {
-          setPropertiesSearchLoading(false);
-        }
+        return await instanceRef.current.runPropertiesSearch(options);
       },
-      isLoading: propertiesSearchLoading,
-      error: propertiesSearchError,
     }),
-    [propertiesSearchLoading, propertiesSearchError]
+    []
   );
 
   // Smart filter search
-  const [smartFilterSearchLoading, setSmartFilterSearchLoading] =
-    React.useState(false);
-  const [smartFilterSearchError, setSmartFilterSearchError] =
-    React.useState<Error | null>(null);
-
   const smartFilterSearch = React.useMemo(
     () => ({
       search: async (options: {
@@ -296,44 +265,19 @@ export function useMapFirst(options: BaseMapFirstOptions) {
           limit?: number;
           language?: string;
         };
+        onError?: (error: unknown) => void;
       }) => {
         if (!instanceRef.current) {
-          const err = new Error("MapFirst instance not available");
-          setSmartFilterSearchError(err);
-          throw err;
+          throw new Error("MapFirst instance not available");
         }
 
-        setSmartFilterSearchLoading(true);
-        setSmartFilterSearchError(null);
-
-        try {
-          const result = await instanceRef.current.runSmartFilterSearch({
-            ...options,
-            onError: (err) => {
-              const error = err instanceof Error ? err : new Error(String(err));
-              setSmartFilterSearchError(error);
-            },
-          });
-          return result;
-        } catch (err) {
-          const error = err instanceof Error ? err : new Error(String(err));
-          setSmartFilterSearchError(error);
-          throw error;
-        } finally {
-          setSmartFilterSearchLoading(false);
-        }
+        return await instanceRef.current.runSmartFilterSearch(options);
       },
-      isLoading: smartFilterSearchLoading,
-      error: smartFilterSearchError,
     }),
-    [smartFilterSearchLoading, smartFilterSearchError]
+    []
   );
 
   // Bounds search
-  const [boundsSearchLoading, setBoundsSearchLoading] = React.useState(false);
-  const [boundsSearchError, setBoundsSearchError] =
-    React.useState<Error | null>(null);
-
   const boundsSearch = React.useMemo(
     () => ({
       perform: async () => {
@@ -341,24 +285,10 @@ export function useMapFirst(options: BaseMapFirstOptions) {
           return null;
         }
 
-        setBoundsSearchLoading(true);
-        setBoundsSearchError(null);
-
-        try {
-          const result = await instanceRef.current.performBoundsSearch();
-          return result;
-        } catch (err) {
-          const error = err instanceof Error ? err : new Error(String(err));
-          setBoundsSearchError(error);
-          throw error;
-        } finally {
-          setBoundsSearchLoading(false);
-        }
+        return await instanceRef.current.performBoundsSearch();
       },
-      isSearching: boundsSearchLoading,
-      error: boundsSearchError,
     }),
-    [boundsSearchLoading, boundsSearchError]
+    []
   );
 
   // Map attachment helpers

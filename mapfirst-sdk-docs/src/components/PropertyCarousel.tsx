@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import type { Property } from "@mapfirst.ai/core";
+import { fetchImages } from "@mapfirst.ai/core";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";
@@ -134,6 +135,36 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
     property.pricing?.offer?.displayPrice ?? property.price_level;
   const url = property.pricing?.offer?.clickUrl ?? property.url;
 
+  const [imageSrc, setImageSrc] = useState<string>("");
+  const [imageError, setImageError] = useState(false);
+
+  // Fetch image from TripAdvisor API
+  useEffect(() => {
+    let cancelled = false;
+
+    if (property.tripadvisor_id) {
+      fetchImages(property.tripadvisor_id, 1)
+        .then((imageUrl) => {
+          if (!cancelled && imageUrl) {
+            setImageSrc(imageUrl);
+          } else if (!cancelled) {
+            setImageError(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setImageError(true);
+          }
+        });
+    } else {
+      setImageError(true);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [property.tripadvisor_id]);
+
   // Generate star rating
   const renderStars = () => {
     const fullStars = Math.floor(rating);
@@ -180,11 +211,19 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
       onClick={onClick}
     >
       <img
-        src={getDefaultImage()}
+        src={
+          imageSrc
+            ? imageSrc
+            : imageError
+            ? getDefaultImage()
+            : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e0e0e0'/%3E%3C/svg%3E"
+        }
         alt={property.name}
         onError={(e) => {
-          // Fallback to a placeholder if image fails
-          e.currentTarget.src = "/images/placeholder.jpg";
+          if (!imageError) {
+            e.currentTarget.src = getDefaultImage();
+            setImageError(true);
+          }
         }}
       />
       <div className="playground-property-details">

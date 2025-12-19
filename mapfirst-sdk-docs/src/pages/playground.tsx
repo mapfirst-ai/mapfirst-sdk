@@ -406,7 +406,7 @@ function PlaygroundContent() {
 
   // Handle basic search (for search button)
   const handleBasicSearch = useCallback(async () => {
-    if (!mapFirst) return;
+    if (!mapFirst || isSearching) return;
 
     try {
       if (searchQuery.trim()) {
@@ -431,7 +431,9 @@ function PlaygroundContent() {
     }
   }, [
     mapFirst,
+    isSearching,
     searchQuery,
+    handleSearch,
     city,
     country,
     checkIn,
@@ -747,33 +749,34 @@ function MapComponent() {
     const searchInput = document.getElementById("search-input");
     const searchBtn = document.getElementById("search-btn");
 
-    searchBtn.addEventListener("click", () => {
+    searchBtn.addEventListener("click", async () => {
       const query = searchInput.value.trim();
-      if (query) {
-        searchBtn.textContent = "Searching...";
-        searchBtn.disabled = true;
+      searchBtn.textContent = "Searching...";
+      searchBtn.disabled = true;
 
-        mapFirst.runSmartFilterSearch({
-          query: query,
-          onComplete: () => {
-            searchBtn.textContent = "Search";
-            searchBtn.disabled = false;
-          },
-        });
-      } else {
-        mapFirst.runPropertiesSearch({
-          body: {
-            city: "${city}",
-            country: "${country}",
-            filters: {
-              checkIn: "${checkIn}",
-              checkOut: "${checkOut}",
-              numAdults: ${adults},
-              numRooms: ${rooms},
-              currency: "${currency}",
+      try {
+        if (query) {
+          await mapFirst.runSmartFilterSearch({
+            query: query,
+          });
+        } else {
+          await mapFirst.runPropertiesSearch({
+            body: {
+              city: "${city}",
+              country: "${country}",
+              filters: {
+                checkIn: "${checkIn}",
+                checkOut: "${checkOut}",
+                numAdults: ${adults},
+                numRooms: ${rooms},
+                currency: "${currency}",
+              },
             },
-          },
-        });
+          });
+        }
+      } finally {
+        searchBtn.textContent = "Search";
+        searchBtn.disabled = false;
       }
     });
 

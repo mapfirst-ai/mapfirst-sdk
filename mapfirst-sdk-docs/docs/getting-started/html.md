@@ -2,15 +2,13 @@
 sidebar_position: 2
 ---
 
-# Native JS setup
+# HTML/JavaScript Setup
 
 Use MapFirst SDK in any HTML page without a framework. Perfect for simple websites, prototypes, or integrating into existing applications.
 
 ## Quick Start
 
-### 1. Include Required Scripts
-
-Add the MapFirst SDK and your chosen map library to your HTML:
+Here's a complete working example:
 
 ```html
 <!DOCTYPE html>
@@ -18,9 +16,9 @@ Add the MapFirst SDK and your chosen map library to your HTML:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MapFirst SDK - HTML Example</title>
+    <title>MapFirst SDK Example</title>
 
-    <!-- MapLibre GL JS (or choose Mapbox/Google Maps) -->
+    <!-- MapLibre GL JS -->
     <link
       href="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.css"
       rel="stylesheet"
@@ -39,82 +37,40 @@ Add the MapFirst SDK and your chosen map library to your HTML:
         width: 100vw;
         height: 100vh;
       }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-
-    <script>
-      // Your code here
-    </script>
-  </body>
-</html>
-```
-
-### 2. Initialize the Map
-
-Here's a complete working example with MapLibre:
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MapFirst Example</title>
-
-    <link
-      href="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/maplibre-gl@^5.12.0/dist/maplibre-gl.js"></script>
-    <script src="https://unpkg.com/@mapfirst.ai/core@latest/dist/index.global.js"></script>
-
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: system-ui, -apple-system, sans-serif;
-      }
-      #map {
-        width: 100vw;
-        height: 100vh;
-      }
-      .info-panel {
+      .controls {
         position: absolute;
         top: 20px;
         left: 20px;
         background: white;
         padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         z-index: 1000;
       }
     </style>
   </head>
   <body>
-    <div class="info-panel">
-      <h3>Properties: <span id="property-count">0</span></h3>
-      <button id="search-btn">Search Paris</button>
+    <div class="controls">
+      <input id="search-input" type="text" placeholder="Search hotels" />
+      <button id="search-btn">Search</button>
+      <p>Properties: <span id="count">0</span></p>
     </div>
 
     <div id="map"></div>
 
     <script>
-      // Access the MapFirst SDK
       const { MapFirstCore } = window.MapFirstCore;
 
-      // Initialize MapLibre map
+      // Initialize map
       const map = new maplibregl.Map({
         container: "map",
-        style: "https://demotiles.maplibre.org/style.json",
-        center: [2.3522, 48.8566], // Paris
+        style: "https://api.mapfirst.ai/static/style.json",
+        center: [2.3522, 48.8566],
         zoom: 12,
       });
 
-      // Wait for map to load
       map.on("load", function () {
-        // Initialize MapFirst SDK
+        // Initialize MapFirst
         const mapFirst = new MapFirstCore({
           adapter: null,
           initialLocationData: {
@@ -122,67 +78,69 @@ Here's a complete working example with MapLibre:
             country: "France",
             currency: "EUR",
           },
-          environment: "prod",
           callbacks: {
             onPropertiesChange: function (properties) {
-              document.getElementById("property-count").textContent =
-                properties.length;
-              console.log("Properties loaded:", properties);
-            },
-            onSelectedPropertyChange: function (id) {
-              console.log("Selected property:", id);
-            },
-            onError: function (error) {
-              console.error("Error:", error);
+              document.getElementById("count").textContent = properties.length;
             },
           },
         });
 
-        // Attach the map to MapFirst
+        // Attach map
         mapFirst.attachMap(map, {
           platform: "maplibre",
           maplibregl: maplibregl,
-          onMarkerClick: function (property) {
-            alert("Clicked: " + property.name);
-          },
         });
 
-        // Add search functionality
-        document
-          .getElementById("search-btn")
-          .addEventListener("click", function () {
-            mapFirst.runPropertiesSearch({
-              body: {
-                city: "Paris",
-                country: "France",
-                filters: {
-                  checkIn: "2024-06-01",
-                  checkOut: "2024-06-07",
-                  numAdults: 2,
-                  currency: "EUR",
+        // Search button
+        const searchBtn = document.getElementById("search-btn");
+        const searchInput = document.getElementById("search-input");
+
+        searchBtn.addEventListener("click", async function () {
+          const query = searchInput.value.trim();
+          searchBtn.textContent = "Searching...";
+          searchBtn.disabled = true;
+
+          try {
+            if (query) {
+              await mapFirst.runSmartFilterSearch({ query });
+            } else {
+              await mapFirst.runPropertiesSearch({
+                body: {
+                  city: "Paris",
+                  country: "France",
+                  filters: {
+                    checkIn: "2024-06-01",
+                    checkOut: "2024-06-07",
+                    numAdults: 2,
+                    currency: "EUR",
+                  },
                 },
-              },
-            });
-          });
+              });
+            }
+          } finally {
+            searchBtn.textContent = "Search";
+            searchBtn.disabled = false;
+          }
+        });
       });
     </script>
   </body>
 </html>
 ```
 
-## Using Different Map Providers
+> See [Property Type Reference](../api/core#property) for complete type definitions.
 
-### Mapbox GL JS
+## Using Mapbox
 
 ```html
 <!DOCTYPE html>
 <html>
   <head>
     <link
-      href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css"
+      href="https://unpkg.com/mapbox-gl/dist/mapbox-gl.css"
       rel="stylesheet"
     />
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+    <script src="https://unpkg.com/mapbox-gl/dist/mapbox-gl.js"></script>
     <script src="https://unpkg.com/@mapfirst.ai/core@latest/dist/index.global.js"></script>
   </head>
   <body>
@@ -220,7 +178,7 @@ Here's a complete working example with MapLibre:
 </html>
 ```
 
-### Google Maps
+## Using Google Maps
 
 ```html
 <!DOCTYPE html>
@@ -258,7 +216,7 @@ Here's a complete working example with MapLibre:
 
         mapFirst.attachMap(map, {
           platform: "google",
-          google: window.google,
+          google: window.google.maps,
         });
       }
     </script>
@@ -272,13 +230,12 @@ Here's a complete working example with MapLibre:
 </html>
 ```
 
-## Advanced Features
+## Common Methods
 
-### Performing Searches
+### Basic Search
 
 ```javascript
-// Search by city
-mapFirst.runPropertiesSearch({
+await mapFirst.runPropertiesSearch({
   body: {
     city: "Paris",
     country: "France",
@@ -291,51 +248,58 @@ mapFirst.runPropertiesSearch({
     },
   },
 });
-
-// Smart search with natural language
-mapFirst.runSmartFilterSearch({
-  query: "hotels near eiffel tower with pool",
-});
-
-// Search current map area
-mapFirst.performBoundsSearch();
 ```
 
-### Handling Events
+### Smart Search
+
+```javascript
+await mapFirst.runSmartFilterSearch({
+  query: "hotels near eiffel tower with pool",
+});
+```
+
+### Bounds Search
+
+```javascript
+await mapFirst.performBoundsSearch();
+```
+
+### Event Callbacks
 
 ```javascript
 const mapFirst = new MapFirstCore({
   adapter: null,
-  initialLocationData: { city: "Paris", country: "France" },
+  initialLocationData: {
+    city: "Paris",
+    country: "France",
+    currency: "EUR",
+  },
   callbacks: {
     onPropertiesChange: function (properties) {
-      console.log("New properties:", properties);
-      updateUI(properties);
+      console.log("Properties:", properties.length);
+    },
+    onSearchingStateChange: function (isSearching) {
+      console.log("Searching:", isSearching);
     },
     onSelectedPropertyChange: function (id) {
       console.log("Selected:", id);
-      highlightProperty(id);
-    },
-    onBoundsChange: function (bounds) {
-      console.log("Map bounds changed:", bounds);
-    },
-    onSearchingStateChange: function (isSearching) {
-      document.getElementById("loading").style.display = isSearching
-        ? "block"
-        : "none";
     },
   },
 });
 ```
 
-### Controlling the Map
+### Map Controls
 
 ```javascript
-// Fly to a location
-mapFirst.flyMapTo(2.2945, 48.8584, 15); // longitude, latitude, zoom
+// Fly to location
+mapFirst.flyMapTo(2.2945, 48.8584, 15);
 
-// Set property type filter
-mapFirst.setPrimaryType("Restaurant"); // or 'Accommodation', 'Attraction'
+// Set property type
+mapFirst.setPrimaryType("Restaurant");
+
+// Select marker
+mapFirst.setSelectedMarker(123456);
+```
 
 // Select a marker
 mapFirst.setSelectedMarker(123456);
@@ -347,7 +311,8 @@ mapFirst.setSelectedMarker(null);
 const state = mapFirst.getState();
 console.log("Current properties:", state.properties);
 console.log("Is searching:", state.isSearching);
-```
+
+````
 
 ## Complete Example with Search UI
 
@@ -475,7 +440,7 @@ Here's a full example with a search interface:
       // Initialize map
       const map = new maplibregl.Map({
         container: "map",
-        style: "https://demotiles.maplibre.org/style.json",
+        style: "https://api.mapfirst.ai/static/style.json",
         center: [2.3522, 48.8566],
         zoom: 12,
       });
@@ -551,7 +516,7 @@ Here's a full example with a search interface:
     </script>
   </body>
 </html>
-```
+````
 
 ## Next Steps
 

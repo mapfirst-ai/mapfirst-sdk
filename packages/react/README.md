@@ -104,7 +104,7 @@ function MapLibreExample() {
 
     const mapInstance = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: "https://api.mapfirst.ai/static/style.json",
       center: [2.3522, 48.8566], // Paris
       zoom: 12,
     });

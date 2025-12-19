@@ -26,19 +26,56 @@ new MapFirstCore(config);
 
 ```typescript
 interface MapFirstConfig {
+  // Map adapter (null when using platform-specific initialization)
   adapter: any | null;
+
+  // API Configuration
+  apiKey?: string; // Your MapFirst API key
+  useApi?: boolean; // Use MapFirst API (default: true)
+  environment?: "dev" | "prod"; // API environment (default: "prod")
+  apiUrl?: string; // Custom API URL (optional)
+
+  // Initial location data
   initialLocationData?: {
     city?: string;
     country?: string;
     currency?: string;
   };
-  environment?: "dev" | "prod";
+
+  // Initial request body (alternative to initialLocationData)
+  requestBody?: any;
+
+  // Initial state
+  state?: Partial<MapState>;
+
+  // Property configuration
+  properties?: Property[]; // Pre-loaded properties
+  primaryType?: PropertyType; // Initial property type filter
+  selectedMarkerId?: number | null; // Initially selected marker
+
+  // Map behavior
+  autoSelectOnClick?: boolean; // Auto-select marker on click
+  fitBoundsPadding?: {
+    // Padding for fitBounds
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
+
+  // Callbacks
   callbacks?: {
     onPropertiesChange?: (properties: Property[]) => void;
     onSelectedPropertyChange?: (id: number | null) => void;
-    onBoundsChange?: (bounds: Bounds) => void;
-    onSearchingStateChange?: (isSearching: boolean) => void;
-    onError?: (error: Error) => void;
+    onPrimaryTypeChange?: (type: PropertyType) => void;
+    onFiltersChange?: (filters: FilterState) => void;
+    onBoundsChange?: (bounds: MapBounds | null) => void;
+    onPendingBoundsChange?: (bounds: MapBounds | null) => void;
+    onCenterChange?: (center: [number, number], zoom: number) => void;
+    onZoomChange?: (zoom: number) => void;
+    onActiveLocationChange?: (location: ActiveLocation) => void;
+    onLoadingStateChange?: (loading: boolean) => void;
+    onSearchingStateChange?: (searching: boolean) => void;
   };
 }
 ```
@@ -48,15 +85,28 @@ interface MapFirstConfig {
 ```javascript
 const mapFirst = new MapFirstCore({
   adapter: null,
+  apiKey: "your-api-key",
   initialLocationData: {
     city: "Paris",
     country: "France",
     currency: "EUR",
   },
   environment: "prod",
+  state: {
+    filters: {
+      checkIn: "2024-06-01",
+      checkOut: "2024-06-07",
+      numAdults: 2,
+      numRooms: 1,
+      currency: "EUR",
+    },
+  },
   callbacks: {
     onPropertiesChange: (properties) => {
       console.log("Properties updated:", properties);
+    },
+    onSearchingStateChange: (searching) => {
+      console.log("Searching:", searching);
     },
   },
 });
@@ -285,22 +335,80 @@ onError?: (error: Error) => void
 
 ### Property
 
+Represents a property (accommodation, restaurant, or attraction) returned from search results.
+
 ```typescript
 interface Property {
-  id: number;
-  name: string;
-  location: {
+  tripadvisor_id: number; // Unique TripAdvisor ID
+  name: string; // Property name
+  rating: number; // TripAdvisor rating (0-5)
+  reviews: number; // Number of reviews
+  location?: {
+    // Geographic coordinates
     lat: number;
-    lng: number;
+    lon: number;
   };
-  rating?: number;
-  price?: number;
-  currency?: string;
-  type: "Accommodation" | "Restaurant" | "Attraction";
-  address?: string;
-  photos?: string[];
-  amenities?: string[];
+  type: PropertyType; // "Accommodation" | "Eat & Drink" | "Attraction"
+  awards?: PropertyAward[]; // TripAdvisor awards (e.g., Travelers' Choice)
+  pricing?: HotelPricingAPIResults; // Hotel pricing data when available
+  url?: string; // Property URL
+  secondaries: string[]; // Related property IDs
+  price_level?: PriceLevel; // Price level indicator ($ to $$$$)
+  city?: string; // City name
+  country?: string; // Country name
 }
+```
+
+**Example:**
+
+```typescript
+const property = {
+  tripadvisor_id: 123456,
+  name: "Hotel Example",
+  rating: 4.5,
+  reviews: 1250,
+  location: { lat: 48.8566, lon: 2.3522 },
+  type: "Accommodation",
+  awards: [
+    {
+      award_type: "Travelers Choice Best of the Best",
+      year: 2024,
+      images: [{ key: "logo", url: "https://..." }],
+    },
+  ],
+  price_level: "$$$",
+  city: "Paris",
+  country: "France",
+};
+```
+
+### PropertyType
+
+```typescript
+type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
+```
+
+### PropertyAward
+
+```typescript
+interface PropertyAward {
+  award_type: string; // Award name
+  year: number; // Year awarded
+  images: PropertyAwardImage[]; // Award badge images
+}
+
+interface PropertyAwardImage {
+  key: string; // Image type (e.g., "logo")
+  url: string; // Image URL
+}
+```
+
+### PriceLevel
+
+Price level indicator shown as dollar signs.
+
+```typescript
+type PriceLevel = "$" | "$$" | "$$$" | "$$$$";
 ```
 
 ### Bounds
