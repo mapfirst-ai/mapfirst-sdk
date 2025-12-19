@@ -110,6 +110,7 @@ function PlaygroundContent() {
     setUseApi: setUseApiFromHook,
     smartFilterSearch,
   } = useMapFirst({
+    environment: "test",
     useApi,
     apiKey: apiKey || undefined,
     initialLocationData: {
@@ -371,7 +372,6 @@ function PlaygroundContent() {
         query: query.trim(),
         filters: apiFilters,
         onProcessFilters: (responseFilters) => {
-          // Process API response and convert to Filter objects
           const newFilters =
             currentFilters || processApiFilters(responseFilters);
           if (!currentFilters) {
