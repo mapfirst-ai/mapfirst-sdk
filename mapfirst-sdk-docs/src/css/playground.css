@@ -167,6 +167,7 @@
 }
 
 .playground-control-group input[type="text"],
+.playground-control-group input[type="password"],
 .playground-control-group input[type="number"],
 .playground-control-group input[type="date"],
 .playground-control-group select {
@@ -189,6 +190,7 @@
 }
 
 [data-theme="light"] .playground-control-group input[type="text"],
+[data-theme="light"] .playground-control-group input[type="password"],
 [data-theme="light"] .playground-control-group input[type="number"],
 [data-theme="light"] .playground-control-group input[type="date"],
 [data-theme="light"] .playground-control-group select {

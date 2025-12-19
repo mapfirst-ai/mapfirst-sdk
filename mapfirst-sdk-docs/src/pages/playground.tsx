@@ -6,7 +6,6 @@ import React, {
   useMemo,
 } from "react";
 import Layout from "@theme/Layout";
-import Head from "@docusaurus/Head";
 import {
   useMapFirst,
   SmartFilter,
