@@ -540,7 +540,7 @@ function MapComponent() {
   const [filters, setFilters] = useState([]);
 
   const { instance: mapFirst, state, smartFilterSearch } = useMapFirst({
-    apiKey: "YOUR_API_KEY", // Optional
+    apiKey: "${apiKey || "YOUR_API_KEY_HERE"}",
     initialLocationData: {
       city: "${city}",
       country: "${country}",
@@ -617,20 +617,6 @@ function MapComponent() {
       )}
 
       <div id="map" style={{ height: "600px", marginBottom: "20px" }} />
-
-      <div>
-        <h3>Properties ({state.properties?.length || 0})</h3>
-        {state.properties?.map((property) => {
-          const price = property.pricing?.offer?.displayPrice || property.price_level;
-          return (
-            <div key={property.id} style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-              <h4>{property.name}</h4>
-              <p>{property.type}</p>
-              {price && <p>Price: {price}</p>}
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 }`;
@@ -732,11 +718,6 @@ function MapComponent() {
 
   <div id="map"></div>
 
-  <div id="properties">
-    <h3>Properties (<span id="property-count">0</span>)</h3>
-    <div id="property-list"></div>
-  </div>
-
   <script>
     const sdkGlobal = window.MapFirstCore;
     if (!sdkGlobal) {
@@ -747,17 +728,12 @@ function MapComponent() {
 
     // Initialize MapFirst
     const mapFirst = new MapFirstCoreClass({
-      apiKey: "YOUR_API_KEY", // Optional
+      apiKey: "${apiKey || "YOUR_API_KEY_HERE"}",
       initialLocationData: {
         city: "${city}",
         country: "${country}",
         currency: "${currency}",
-      },
-      callbacks: {
-        onPropertiesChange: (properties) => {
-          renderProperties(properties);
-        },
-      },
+      }
     });
 
     // Initialize ${mapPlatform} map
@@ -766,27 +742,6 @@ function MapComponent() {
     map.on("load", () => {
       ${config.attach}
     });
-
-    // Render properties
-    function renderProperties(properties) {
-      const countEl = document.getElementById("property-count");
-      const listEl = document.getElementById("property-list");
-      
-      countEl.textContent = properties.length;
-      listEl.innerHTML = properties
-          .map((property) => {
-            const price =
-              property.pricing?.offer?.displayPrice || property.price_level;
-            return \`
-        <div class="property-card">
-          <h4>\${property.name}</h4>
-          <p>\${property.type}</p>
-          \${price ? \`<p>Price: \${price}</p>\` : ""}
-        </div>
-          \`;
-          })
-          .join("");
-    }
 
     // Search
     const searchInput = document.getElementById("search-input");
@@ -915,7 +870,7 @@ function MapComponent() {
               <div className="playground-control-group">
                 <label>MapFirst API Key</label>
                 <input
-                  type="password"
+                  type="text"
                   placeholder="Enter your API key (optional)"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
