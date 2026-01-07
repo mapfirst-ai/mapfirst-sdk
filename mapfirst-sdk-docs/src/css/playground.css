@@ -500,7 +500,13 @@
   }
   .playground-controls {
     width: 100%;
-    height: 1000px;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid var(--playground-border);
+  }
+  .playground-map-container {
+    min-height: 50vh;
+    height: 50vh;
   }
   .playground-carousel {
     width: 100%;
