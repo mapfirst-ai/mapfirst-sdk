@@ -28,6 +28,7 @@ function MyComponent() {
     state,
     smartFilterSearch,
   } = useMapFirst({
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
       country: "France",
@@ -140,6 +141,7 @@ function SearchWithFilters() {
     state,
     smartFilterSearch,
   } = useMapFirst({
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
       country: "France",

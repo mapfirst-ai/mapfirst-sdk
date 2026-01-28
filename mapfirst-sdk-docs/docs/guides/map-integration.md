@@ -33,7 +33,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 function MapLibreMap() {
   const mapContainerRef = useRef(null);
   const { attachMapLibre } = useMapFirst({
-    adapter: null,
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "London",
       country: "UK",
@@ -100,7 +100,7 @@ mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN";
 function MapboxMap() {
   const mapContainerRef = useRef(null);
   const { attachMapbox } = useMapFirst({
-    adapter: null,
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "New York",
       country: "USA",
@@ -165,7 +165,7 @@ import { Loader } from "@googlemaps/js-api-loader";
 function GoogleMapComponent() {
   const mapContainerRef = useRef(null);
   const { attachGoogle } = useMapFirst({
-    adapter: null,
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Tokyo",
       country: "Japan",
@@ -241,7 +241,7 @@ map.addControl(
       enableHighAccuracy: true,
     },
     trackUserLocation: true,
-  })
+  }),
 );
 ```
 

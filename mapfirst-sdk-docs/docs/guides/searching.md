@@ -25,8 +25,7 @@ import { useMapFirst } from "@mapfirst.ai/react";
 
 function SearchComponent() {
   const { propertiesSearch, state } = useMapFirst({
-    adapter: null,
-    environment: "prod",
+    apiKey: "your-api-key",
   });
 
   const handleSearch = async () => {
@@ -60,7 +59,7 @@ function SearchComponent() {
 
 ```javascript
 const mapFirst = new MapFirstCore({
-  adapter: null,
+  apiKey: "your-api-key",
   callbacks: {
     onPropertiesChange: (properties) => {
       console.log("Found:", properties.length);
@@ -103,8 +102,7 @@ function SmartSearch() {
   const [filters, setFilters] = useState<Filter[]>([]);
 
   const { smartFilterSearch, state } = useMapFirst({
-    adapter: null,
-    environment: "prod",
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Tokyo",
       country: "Japan",
@@ -202,8 +200,7 @@ Search within the current map viewport.
 ```typescript
 function BoundsSearch() {
   const { boundsSearch, state } = useMapFirst({
-    adapter: null,
-    environment: "prod",
+    apiKey: "your-api-key",
   });
 
   return (
@@ -233,8 +230,7 @@ Switch between different property types.
 ```typescript
 function TypeFilter() {
   const { setPrimaryType, state } = useMapFirst({
-    adapter: null,
-    environment: "prod",
+    apiKey: "your-api-key",
   });
 
   return (
@@ -261,8 +257,7 @@ mapFirst.setPrimaryType("Restaurant");
 ```typescript
 function SearchResults() {
   const { state } = useMapFirst({
-    adapter: null,
-    environment: "prod",
+    apiKey: "your-api-key",
   });
 
   if (state.isSearching) {
@@ -289,7 +284,8 @@ function SearchResults() {
 
 ```typescript
 function FilteredResults() {
-  const { state } = useMapFirst({ adapter: null });
+  const { state } = useMapFirst({
+
 
   // Filter by rating
   const highRated = state.properties.filter((p) => p.rating >= 4.5);
@@ -314,7 +310,10 @@ function FilteredResults() {
 import { useState, useEffect } from "react";
 
 function DebouncedSearch() {
-  const { smartFilterSearch } = useMapFirst({ adapter: null });
+  const { smartFilterSearch } = useMapFirst({
+
+    apiKey: "your-api-key",
+  });
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -341,7 +340,10 @@ function DebouncedSearch() {
 
 ```typescript
 function AutoSearch() {
-  const { boundsSearch, attachMapLibre } = useMapFirst({ adapter: null });
+  const { boundsSearch, attachMapLibre } = useMapFirst({
+
+    apiKey: "your-api-key",
+  });
   const mapRef = useRef(null);
 
   useEffect(() => {

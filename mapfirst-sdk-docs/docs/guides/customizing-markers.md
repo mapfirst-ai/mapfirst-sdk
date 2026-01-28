@@ -181,6 +181,7 @@ import "./custom-markers.css"; // Your custom styles
 
 function MapComponent() {
   const { instance: mapFirst } = useMapFirst({
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
       country: "France",
@@ -348,6 +349,7 @@ For more complex styling needs, you can access marker elements programmatically:
 
 ```tsx
 const { instance: mapFirst } = useMapFirst({
+  apiKey: "your-api-key",
   callbacks: {
     onPropertiesChange: (properties) => {
       // Custom logic to style markers based on property data

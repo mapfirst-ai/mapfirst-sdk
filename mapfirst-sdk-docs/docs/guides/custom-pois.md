@@ -36,7 +36,7 @@ import { useMapFirst } from "@mapfirst.ai/react";
 
 function CustomLocationMap() {
   const { state } = useMapFirst({
-    adapter: null,
+    apiKey: "your-api-key",
     initialLocationData: {
       longitude: 2.3522,  // Paris coordinates
       latitude: 48.8566,
@@ -62,7 +62,7 @@ import { useMapFirst } from "@mapfirst.ai/react";
 
 function BoundsInitMap() {
   const { state } = useMapFirst({
-    adapter: null,
+    apiKey: "your-api-key",
     initialLocationData: {
       bounds: {
         sw: { lat: 48.8155, lng: 2.2241 },  // Southwest corner
@@ -99,8 +99,8 @@ function CoordinateSearch() {
   const [radius, setRadius] = useState(3000);
 
   const { propertiesSearch, state } = useMapFirst({
-    adapter: null,
-    });
+    apiKey: "your-api-key",
+  });
 
   const handleSearch = async () => {
     await propertiesSearch({
@@ -169,8 +169,8 @@ import { useMapFirst } from "@mapfirst.ai/react";
 
 function CustomBoundsSearch() {
   const { propertiesSearch, state } = useMapFirst({
-    adapter: null,
-      });
+    apiKey: "your-api-key",
+  });
 
   const searchCustomArea = async () => {
     await propertiesSearch({
@@ -207,7 +207,7 @@ function CustomBoundsSearch() {
 
 ```javascript
 const mapFirst = new MapFirstCore({
-  adapter: null,
+  apiKey: "your-api-key",
   callbacks: {
     onPropertiesChange: (properties) => {
       console.log("Found:", properties.length);
@@ -262,8 +262,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 function FlyToSearch() {
   const mapContainerRef = useRef(null);
   const { attachMapLibre, flyMapTo, boundsSearch, state } = useMapFirst({
-    adapter: null,
-      });
+    apiKey: "your-api-key",
+  });
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -333,7 +333,7 @@ function FlyToSearch() {
 
 ```javascript
 const mapFirst = new MapFirstCore({
-  adapter: null,
+  apiKey: "your-api-key",
 });
 
 // Attach map
@@ -395,7 +395,7 @@ You can combine location parameters with other search options:
 
 ```typescript
 const { propertiesSearch, setPrimaryType, state } = useMapFirst({
-  adapter: null,
+  apiKey: "your-api-key",
 });
 
 // Search for restaurants in a specific area
@@ -476,8 +476,8 @@ import maplibregl from "maplibre-gl";
 function ClickToSearch() {
   const mapContainerRef = useRef(null);
   const { attachMapLibre, propertiesSearch, state } = useMapFirst({
-    adapter: null,
-      });
+    apiKey: "your-api-key",
+  });
 
   useEffect(() => {
     if (!mapContainerRef.current) return;

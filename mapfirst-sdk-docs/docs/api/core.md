@@ -84,14 +84,12 @@ interface MapFirstConfig {
 
 ```javascript
 const mapFirst = new MapFirstCore({
-  adapter: null,
   apiKey: "your-api-key",
   initialLocationData: {
     city: "Paris",
     country: "France",
     currency: "EUR",
   },
-  environment: "prod",
   state: {
     filters: {
       checkIn: "2024-06-01",

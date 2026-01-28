@@ -72,7 +72,7 @@ Here's a complete working example:
       map.on("load", function () {
         // Initialize MapFirst
         const mapFirst = new MapFirstCore({
-          adapter: null,
+          apiKey: "your-api-key",
           initialLocationData: {
             city: "Paris",
             country: "France",
@@ -160,7 +160,7 @@ Here's a complete working example:
 
       map.on("load", function () {
         const mapFirst = new MapFirstCore({
-          adapter: null,
+          apiKey: "your-api-key",
           initialLocationData: {
             city: "Paris",
             country: "France",
@@ -206,7 +206,6 @@ Here's a complete working example:
         });
 
         const mapFirst = new MapFirstCore({
-          adapter: null,
           initialLocationData: {
             city: "Paris",
             country: "France",
@@ -268,7 +267,7 @@ await mapFirst.performBoundsSearch();
 
 ```javascript
 const mapFirst = new MapFirstCore({
-  adapter: null,
+  apiKey: "your-api-key",
   initialLocationData: {
     city: "Paris",
     country: "France",
@@ -449,13 +448,12 @@ Here's a full example with a search interface:
 
       map.on("load", function () {
         mapFirst = new MapFirstCore({
-          adapter: null,
+          apiKey: "your-api-key",
           initialLocationData: {
             city: "Paris",
             country: "France",
             currency: "EUR",
           },
-          environment: "prod",
           callbacks: {
             onPropertiesChange: function (properties) {
               document.getElementById("property-count").textContent =

@@ -37,6 +37,7 @@ function MapComponent() {
     state,
     attachMapLibre,
   } = useMapFirst({
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
       country: "France",
@@ -86,6 +87,7 @@ export default MapComponent;
 ```tsx
 function SearchExample() {
   const { instance: mapFirst, state } = useMapFirst({
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
       country: "France",
@@ -122,6 +124,7 @@ function SearchExample() {
 ```tsx
 function SmartSearchExample() {
   const { smartFilterSearch, state } = useMapFirst({
+    apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
       country: "France",

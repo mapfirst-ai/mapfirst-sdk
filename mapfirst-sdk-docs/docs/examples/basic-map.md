@@ -26,7 +26,6 @@ export default function BasicMap() {
         country: "France",
         currency: "EUR",
       },
-      environment: "prod",
       state: {
         filters: {
           checkIn: "2024-06-01",
@@ -161,7 +160,10 @@ export default function BasicMap() {
       }
 
       body {
-        font-family: system-ui, -apple-system, sans-serif;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
       }
 
       #controls {
@@ -251,7 +253,6 @@ export default function BasicMap() {
             country: "France",
             currency: "EUR",
           },
-          environment: "prod",
           state: {
             filters: {
               checkIn: "2024-06-01",
