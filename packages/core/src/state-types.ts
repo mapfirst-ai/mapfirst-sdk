@@ -14,10 +14,10 @@ export interface ViewState {
 export interface ActiveLocation {
   city?: string;
   state?: string;
-  country: string;
+  country?: string;
   location_id: number | null;
   locationName: string;
-  coordinates: [number, number];
+  coordinates?: [number, number];
 }
 
 export interface FilterState {

@@ -26,7 +26,6 @@ import {
 } from "./utils/clustering";
 import type {
   MapBounds,
-  ViewState,
   ActiveLocation,
   FilterState,
   MapState,
@@ -114,11 +113,11 @@ export type TripAdvisorImageResponse = {
 // Fetch images for a property from TripAdvisor
 export async function fetchImages(
   tripadvisorId: number,
-  limit: number = 1
+  limit: number = 1,
 ): Promise<string | null> {
   try {
     const response = await fetch(
-      `https://l4detuz832.execute-api.us-east-1.amazonaws.com/dev/photo?id=${tripadvisorId}&limit=${limit}`
+      `https://l4detuz832.execute-api.us-east-1.amazonaws.com/dev/photo?id=${tripadvisorId}&limit=${limit}`,
     );
 
     if (!response.ok) {
@@ -149,14 +148,26 @@ export async function fetchProperties<TBody = any, TResponse = any>(
   url: string,
   body: TBody,
   apiKey?: string,
-  { signal }: FetchPropertiesOptions = {}
+  { signal }: FetchPropertiesOptions = {},
 ): Promise<TResponse> {
+  let referrer: string | undefined;
+  try {
+    if (document.referrer) {
+      referrer = document.referrer;
+    }
+  } catch (e) {
+    console.error(e);
+  }
   const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Source": "SDK",
       ...(apiKey && {
         "X-API-Key": apiKey,
+      }),
+      ...(referrer && {
+        "X-Referer": referrer,
       }),
     },
     body: JSON.stringify(body),
@@ -187,7 +198,7 @@ function toISO(date: Date | string): string {
 async function trackMapImpression(
   apiUrl: string,
   apiKey?: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
 ): Promise<void> {
   try {
     await fetch(`${apiUrl}/${apiKey}/impressions`, {
@@ -212,11 +223,9 @@ export type BaseMapFirstOptions = {
   properties?: Property[];
   primaryType?: PropertyType;
   selectedMarkerId?: number | null;
-  clusterRadiusMeters?: number;
-  autoSelectOnClick?: boolean;
   onClusterUpdate?: (
     clusters: ClusterDisplayItem[],
-    viewState: ViewStateSnapshot | null
+    viewState: ViewStateSnapshot | null,
   ) => void;
   // State management options
   state?: Partial<MapState>;
@@ -303,7 +312,7 @@ export class MapFirstCore {
   private readonly apiUrl: string;
   private apiKey?: string;
   private currentPlatform: "google" | "maplibre" | "mapbox" | undefined;
-  private requestBody?: any;
+  private requestBody?: InitialRequestBody;
   private readonly fitBoundsPadding: {
     top: number;
     bottom: number;
@@ -327,7 +336,7 @@ export class MapFirstCore {
     // Validate platform restrictions when useApi is false
     if (!this.useApi && options.platform && options.platform !== "maplibre") {
       throw new Error(
-        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage."
+        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.",
       );
     }
 
@@ -347,9 +356,16 @@ export class MapFirstCore {
 
     // Initialize state
     this.state = {
-      center: [0, 0],
-      zoom: 0,
-      bounds: null,
+      center:
+        options.initialLocationData?.latitude &&
+        options.initialLocationData.longitude
+          ? [
+              options.initialLocationData.latitude,
+              options.initialLocationData.longitude,
+            ]
+          : [0, 0],
+      zoom: options.initialLocationData?.zoom ?? 0,
+      bounds: options.initialLocationData?.bounds ?? null,
       pendingBounds: null,
       tempBounds: null,
       properties: this.properties,
@@ -401,86 +417,105 @@ export class MapFirstCore {
   }
 
   private async initializeFromLocationData(
-    locationData: InitialLocationData
+    locationData: InitialLocationData,
   ): Promise<void> {
     if (!this.useApi) {
       console.warn(
-        "initializeFromLocationData requires API usage. Set useApi to true."
+        "initializeFromLocationData requires API usage. Set useApi to true.",
       );
       return;
     }
     try {
-      const { city, country, query } = locationData;
+      const {
+        city,
+        state,
+        country,
+        query,
+        latitude,
+        longitude,
+        radius,
+        bounds,
+      } = locationData;
 
-      let requestBody: any = {
+      const requestBody: InitialRequestBody = {
         filters: this.getFilters(),
         initial: true,
+        query,
+        latitude,
+        longitude,
+        radius,
+        bounds,
       };
 
-      // Geo-lookup if city/country provided
-      if ((city && country) || country) {
+      const location = [city, state].filter(Boolean).join(", ");
+
+      if (country || location) {
         const geoResponse = await fetch(
-          `${this.apiUrl}/geo-lookup?country=${encodeURIComponent(country!)}${
-            city ? `&city=${encodeURIComponent(city)}` : ""
-          }`,
+          `${this.apiUrl}/geo-lookup2?${new URLSearchParams({
+            ...(country && { country_code: country }),
+            ...(location && { q: location }),
+          }).toString()}`,
           {
             headers: {
               ...(this.apiKey && {
                 "X-API-Key": this.apiKey,
               }),
             },
-          }
+          },
         );
 
         if (geoResponse.ok) {
-          const geoData = await geoResponse.json();
-
-          let finalCity = city;
-          if (
-            geoData.location_name &&
-            geoData.path3_name &&
-            geoData.location_name === geoData.path3_name
-          ) {
-            finalCity = undefined;
-          }
-          if (geoData.location_name) finalCity = geoData.location_name;
-
-          const finalCountry = geoData.path3_name || country;
-
-          requestBody = {
-            ...requestBody,
-            city: finalCity,
-            country: finalCountry,
-            location_id: geoData.location_id,
-            longitude: geoData.longitude,
-            latitude: geoData.latitude,
+          const place = (await geoResponse.json()) as {
+            id?: number;
+            lon?: number;
+            lat?: number;
+            name: string;
+            state?: string;
+            country?: string;
+            country_code?: string;
+            type: string;
           };
 
-          // Update active location
+          requestBody.city = !["country", "island", "state"].includes(
+            place.type,
+          )
+            ? place.name
+            : undefined;
+          requestBody.state =
+            place.type === "state"
+              ? place.name
+              : !["country", "island", "county"].includes(place.type)
+                ? place.state
+                : undefined;
+          requestBody.country = ["country", "island"].includes(place.type)
+            ? place.name
+            : place.country;
+          requestBody.location_id = place.id;
+          requestBody.latitude = place.lat;
+          requestBody.longitude = place.lon;
+
           this.setActiveLocation({
-            city: finalCity,
-            country: finalCountry,
-            location_id: geoData.location_id,
-            locationName:
-              finalCity && finalCountry
-                ? `${finalCity}, ${finalCountry}`
-                : finalCountry || "",
-            coordinates: [geoData.latitude, geoData.longitude],
+            city,
+            state,
+            country,
+            location_id: place.id ?? null,
+            locationName: [city, state, country].filter(Boolean).join(", "),
+            ...(place.lon &&
+              place.lat && { coordinates: [place.lat, place.lon] }),
           });
 
-          // Update state center
-          this.setState({
-            center: [geoData.latitude, geoData.longitude],
-            zoom: 12,
-          });
+          if (place.lon && place.lat) {
+            this.setState({
+              center: [place.lat, place.lon],
+              zoom: city ? 12 : state ? 8 : 5,
+            });
+          }
         } else {
           this.handleError(
             new Error(`Geo mapping fetch failed: ${geoResponse.statusText}`),
-            "initializeFromLocationData"
+            "initializeFromLocationData",
           );
         }
-      } else if (query) {
-        requestBody.query = query;
       }
 
       this.requestBody = requestBody;
@@ -497,7 +532,7 @@ export class MapFirstCore {
   private async autoLoadProperties(): Promise<void> {
     if (!this.useApi) {
       console.warn(
-        "autoLoadProperties requires API usage. Set useApi to true."
+        "autoLoadProperties requires API usage. Set useApi to true.",
       );
       return;
     }
@@ -527,12 +562,12 @@ export class MapFirstCore {
       google?: GoogleMapsNamespace;
       mapboxgl?: MapboxNamespace;
       onMarkerClick?: (marker: Property) => void;
-    }
+    },
   ): void {
     // Validate platform restrictions when useApi is false
     if (!this.useApi && config.platform !== "maplibre") {
       throw new Error(
-        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage."
+        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.",
       );
     }
 
@@ -576,7 +611,7 @@ export class MapFirstCore {
     if (isGoogleMapsOptions(options) && options.mapInstance) {
       return this.initializeAdapter(
         new GoogleMapsAdapter(options.mapInstance),
-        { google: options.google, onMarkerClick: options.onMarkerClick }
+        { google: options.google, onMarkerClick: options.onMarkerClick },
       );
     }
     if (isMapboxOptions(options) && options.mapInstance) {
@@ -592,7 +627,6 @@ export class MapFirstCore {
   }
 
   private initializeAdapter(adapter: MapAdapter, config: any): MapAdapter {
-    const shouldAutoSelect = this.options.autoSelectOnClick ?? true;
     adapter.initialize({
       ...config,
       onMarkerClick: (marker: Property) => {
@@ -604,13 +638,11 @@ export class MapFirstCore {
         if (marker.type !== this.primaryType) {
           this.setPrimaryType(marker.type);
         }
-        if (shouldAutoSelect) {
-          this.setSelectedMarker(
-            marker.tripadvisor_id === this.selectedMarkerId
-              ? null
-              : marker.tripadvisor_id
-          );
-        }
+        this.setSelectedMarker(
+          marker.tripadvisor_id === this.selectedMarkerId
+            ? null
+            : marker.tripadvisor_id,
+        );
         config.onMarkerClick?.(marker);
       },
       onRefresh: () => this.refresh(),
@@ -632,7 +664,7 @@ export class MapFirstCore {
         //   platform: this.currentPlatform,
         //   environment: this.environment,
         // });
-        console.log("ToDo: Track Map Impression");
+        // console.log("ToDo: Track Map Impression");
       });
     }
 
@@ -645,7 +677,7 @@ export class MapFirstCore {
       ...properties.filter((x) =>
         x.type === "Accommodation"
           ? x.pricing?.availability !== "unavailable"
-          : true
+          : true,
       ),
     ];
     this.updateState({
@@ -834,7 +866,7 @@ export class MapFirstCore {
     longitude: number,
     latitude: number,
     zoom?: number | null,
-    animation: boolean = true
+    animation: boolean = true,
   ) {
     this.ensureAlive();
     this.setState({ center: [latitude, longitude] });
@@ -879,7 +911,7 @@ export class MapFirstCore {
   flyToPOIs(
     pois?: { lat: number; lng: number }[],
     type?: PropertyType,
-    animate: boolean = true
+    animate: boolean = true,
   ) {
     this.ensureAlive();
     if (!this.adapter) return;
@@ -892,7 +924,7 @@ export class MapFirstCore {
         .filter(
           (x) =>
             x.location !== undefined &&
-            (type !== undefined ? x.type === type : true)
+            (type !== undefined ? x.type === type : true),
         )
         .map((h) => ({
           lat: h.location!.lat,
@@ -1000,6 +1032,14 @@ export class MapFirstCore {
       pollingLink,
     };
 
+    let referrer: string | undefined;
+    try {
+      if (document.referrer) {
+        referrer = document.referrer;
+      }
+    } catch (e) {
+      console.error(e);
+    }
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (isCancelled?.()) {
         return { completed, pollData };
@@ -1013,11 +1053,15 @@ export class MapFirstCore {
             body: JSON.stringify(body),
             headers: {
               "Content-Type": "application/json",
+              "X-Source": "SDK",
               ...(this.apiKey && {
                 "X-API-Key": this.apiKey,
               }),
+              ...(referrer && {
+                "X-Referer": referrer,
+              }),
             },
-          }
+          },
         );
 
         if (!pollResp.ok) {
@@ -1040,7 +1084,7 @@ export class MapFirstCore {
             const updatedProperties = prev.filter(
               (property) =>
                 property.type !== "Accommodation" ||
-                resultIds.has(property.tripadvisor_id)
+                resultIds.has(property.tripadvisor_id),
             );
 
             results.forEach((property) => {
@@ -1054,7 +1098,7 @@ export class MapFirstCore {
                 property.pricing.availability = "unavailable";
               }
               const existingIndex = updatedProperties.findIndex(
-                (h) => h.tripadvisor_id === property.tripadvisor_id
+                (h) => h.tripadvisor_id === property.tripadvisor_id,
               );
               if (existingIndex >= 0) {
                 updatedProperties[existingIndex] = property;
@@ -1091,15 +1135,18 @@ export class MapFirstCore {
   }
 
   private mostCommonTypeFromProperties(properties: Property[]): PropertyType {
-    const typeCounts = properties.reduce((counts, property) => {
-      counts[property.type] = (counts[property.type] || 0) + 1;
-      return counts;
-    }, {} as Record<PropertyType, number>);
+    const typeCounts = properties.reduce(
+      (counts, property) => {
+        counts[property.type] = (counts[property.type] || 0) + 1;
+        return counts;
+      },
+      {} as Record<PropertyType, number>,
+    );
 
     return Object.entries(typeCounts).reduce((a, b) =>
       typeCounts[a[0] as PropertyType] > typeCounts[b[0] as PropertyType]
         ? a
-        : b
+        : b,
     )[0] as PropertyType;
   }
 
@@ -1121,7 +1168,7 @@ export class MapFirstCore {
 
     if (!this.useApi) {
       console.warn(
-        "runPropertiesSearch requires API usage. Set useApi to true."
+        "runPropertiesSearch requires API usage. Set useApi to true.",
       );
       onError?.(new Error("API usage is disabled"));
       return null;
@@ -1135,7 +1182,7 @@ export class MapFirstCore {
       const data = await fetchProperties<InitialRequestBody, APIResponse>(
         `${this.apiUrl}/properties`,
         body,
-        this.apiKey
+        this.apiKey,
       );
 
       this.updateActiveLocationFromResponse(data);
@@ -1169,7 +1216,7 @@ export class MapFirstCore {
                         : x.pricing.availability,
                   },
                 }
-              : x
+              : x,
           )
         : data.properties;
 
@@ -1185,11 +1232,11 @@ export class MapFirstCore {
                 !!x.location &&
                 (data.filters.primary_type
                   ? x.type === data.filters.primary_type
-                  : true)
+                  : true),
             )
             .map((x) => ({ lat: x.location!.lat, lng: x.location!.lon })),
           undefined,
-          body.initial !== true
+          body.initial !== true,
         );
       }
 
@@ -1201,14 +1248,14 @@ export class MapFirstCore {
             property.type === data.filters.primary_type &&
             (property.type === "Accommodation"
               ? property.pricing?.availability !== "unavailable"
-              : true)
+              : true),
         ).length > 0
       ) {
         primary_type = data.filters.primary_type;
         this.setPrimaryType(data.filters.primary_type);
       } else if (data.properties.length > 0) {
         const mostCommonType = this.mostCommonTypeFromProperties(
-          data.properties
+          data.properties,
         );
         this.setPrimaryType(mostCommonType);
         primary_type = mostCommonType;
@@ -1232,13 +1279,13 @@ export class MapFirstCore {
               property.type === data.filters.primary_type &&
               (property.type === "Accommodation"
                 ? property.pricing?.availability !== "unavailable"
-                : true)
+                : true),
           ).length === 0 &&
           primary_type &&
           primary_type !== data.filters.primary_type
         ) {
           const mostCommonType = this.mostCommonTypeFromProperties(
-            data.properties
+            data.properties,
           );
           this.setPrimaryType(mostCommonType);
         }
@@ -1262,11 +1309,11 @@ export class MapFirstCore {
                   !!x.location &&
                   (data.filters.primary_type
                     ? x.type === data.filters.primary_type
-                    : true)
+                    : true),
               )
               .map((x) => ({ lat: x.location!.lat, lng: x.location!.lon })),
             undefined,
-            body.initial !== true
+            body.initial !== true,
           );
         } else if (
           data.filters.location?.latitude &&
@@ -1276,7 +1323,7 @@ export class MapFirstCore {
             data.filters.location.longitude,
             data.filters.location.latitude,
             12,
-            body.initial !== true
+            body.initial !== true,
           );
         }
       }
@@ -1298,7 +1345,7 @@ export class MapFirstCore {
 
     if (!this.useApi) {
       console.warn(
-        "performBoundsSearch requires API usage. Set useApi to true."
+        "performBoundsSearch requires API usage. Set useApi to true.",
       );
       return null;
     }
@@ -1372,7 +1419,7 @@ export class MapFirstCore {
     filters?: SmartFilter[];
     onProcessFilters?: (
       filters: any,
-      location_id?: number
+      location_id?: number,
     ) => {
       smartFilters?: SmartFilter[];
       price?: Price | null;
@@ -1385,7 +1432,7 @@ export class MapFirstCore {
 
     if (!this.useApi) {
       console.warn(
-        "runSmartFilterSearch requires API usage. Set useApi to true."
+        "runSmartFilterSearch requires API usage. Set useApi to true.",
       );
       onError?.(new Error("API usage is disabled"));
       return null;
@@ -1463,13 +1510,13 @@ export class MapFirstCore {
       ...(state.bounds
         ? { bounds: state.bounds }
         : state.activeLocation.location_id
-        ? { location_id: state.activeLocation.location_id }
-        : state.activeLocation.coordinates
-        ? {
-            latitude: state.activeLocation.coordinates[0],
-            longitude: state.activeLocation.coordinates[1],
-          }
-        : {}),
+          ? { location_id: state.activeLocation.location_id }
+          : state.activeLocation.coordinates
+            ? {
+                latitude: state.activeLocation.coordinates[0],
+                longitude: state.activeLocation.coordinates[1],
+              }
+            : {}),
     };
 
     return this.runPropertiesSearch({
@@ -1506,7 +1553,7 @@ export class MapFirstCore {
       this.currentPlatform !== "maplibre"
     ) {
       console.warn(
-        "When useApi is false, only maplibre platform is supported. Please switch to maplibre."
+        "When useApi is false, only maplibre platform is supported. Please switch to maplibre.",
       );
     }
 
@@ -1610,13 +1657,13 @@ export class MapFirstCore {
 }
 
 function isMapLibreOptions(
-  options: MapFirstOptions
+  options: MapFirstOptions,
 ): options is MapLibreOptions {
   return (options as MapLibreOptions).platform === "maplibre";
 }
 
 function isGoogleMapsOptions(
-  options: MapFirstOptions
+  options: MapFirstOptions,
 ): options is GoogleMapsOptions {
   return (options as GoogleMapsOptions).platform === "google";
 }

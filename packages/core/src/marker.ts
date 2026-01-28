@@ -17,7 +17,7 @@ export function setupHoverCard(
   root: HTMLElement,
   pill: HTMLElement,
   marker: Property,
-  isSelected: boolean
+  isSelected: boolean,
 ) {
   // Check if hover card is already set up
   if (root.dataset.hasHoverCard === "true") return;
@@ -172,7 +172,7 @@ function getDefaultImageForType(type: string): string {
     .toLowerCase()
     .replace(/\s+/g, "")
     .replace(/&/g, "");
-  return `/img/${normalizedType}.webp`;
+  return `https://api.mapfirst.ai/static/images/${normalizedType}.webp`;
 }
 
 function createPropertyCard(marker: Property): HTMLElement {
@@ -209,12 +209,12 @@ function createPropertyCard(marker: Property): HTMLElement {
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        `<span style="${starStyle} background-color: #03852e;"></span>`
+        `<span style="${starStyle} background-color: #03852e;"></span>`,
       );
     }
     if (hasHalfStar) {
       stars.push(
-        `<span style="${starStyle} background: linear-gradient(90deg, #03852e 50%, transparent 50%);"></span>`
+        `<span style="${starStyle} background: linear-gradient(90deg, #03852e 50%, transparent 50%);"></span>`,
       );
     }
     const remainingStars = 5 - Math.ceil(rating);
@@ -265,7 +265,7 @@ function createPropertyCard(marker: Property): HTMLElement {
 
 function loadCardImage(card: HTMLElement, marker: Property) {
   const imgContainer = card.querySelector(
-    ".mapfirst-property-hover-image"
+    ".mapfirst-property-hover-image",
   ) as HTMLElement;
 
   // Check if image was already loaded
@@ -292,7 +292,7 @@ function loadCardImage(card: HTMLElement, marker: Property) {
           imgContainer.innerHTML = "";
           imgContainer.appendChild(img);
           imgContainer.classList.remove(
-            "mapfirst-property-hover-image-placeholder"
+            "mapfirst-property-hover-image-placeholder",
           );
           imgContainer.dataset.imageLoaded = "true";
         } else {
@@ -312,7 +312,7 @@ function loadCardImage(card: HTMLElement, marker: Property) {
           imgContainer.innerHTML = "";
           imgContainer.appendChild(img);
           imgContainer.classList.remove(
-            "mapfirst-property-hover-image-placeholder"
+            "mapfirst-property-hover-image-placeholder",
           );
           imgContainer.dataset.imageLoaded = "false";
         }
@@ -323,7 +323,7 @@ function loadCardImage(card: HTMLElement, marker: Property) {
 function positionCard(
   card: HTMLElement,
   markerElement: HTMLElement,
-  mapContainer: HTMLElement
+  mapContainer: HTMLElement,
 ) {
   // Get marker position and dimensions
   const markerRect = markerElement.getBoundingClientRect();
@@ -365,7 +365,7 @@ export function createPrimaryMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "primary" }>,
   primaryType: string,
   selectedMarkerId: number | null,
-  onMarkerClick?: (marker: Property) => void
+  onMarkerClick?: (marker: Property) => void,
 ) {
   if (typeof document === "undefined") {
     return null;
@@ -406,8 +406,8 @@ export function createPrimaryMarkerElement(
         isSelected
           ? " mapfirst-marker-selected"
           : !isPrimaryType
-          ? " mapfirst-marker-non-primary"
-          : ""
+            ? " mapfirst-marker-non-primary"
+            : ""
       }`;
   // pill.title = marker.name ?? String(marker.tripadvisor_id);
 

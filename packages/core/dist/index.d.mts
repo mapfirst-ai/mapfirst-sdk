@@ -91,21 +91,13 @@ type APIResponse = {
 };
 type InitialRequestBody = {
     initial?: boolean;
-    query?: string;
-    bounds?: {
-        sw: {
-            lat: number;
-            lng: number;
-        };
-        ne: {
-            lat: number;
-            lng: number;
-        };
-    };
     filters?: FilterSchema;
-    city?: string;
-    country?: string;
     location_id?: number;
+    query?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    bounds?: MapBounds$1;
     longitude?: number;
     latitude?: number;
     radius?: number;
@@ -133,7 +125,13 @@ type PollOptions = {
 };
 type InitialLocationData = {
     city?: string;
+    state?: string;
     country?: string;
+    longitude?: number;
+    latitude?: number;
+    zoom?: number;
+    radius?: number;
+    bounds?: MapBounds$1;
     query?: string;
     currency?: string;
 };
@@ -287,10 +285,10 @@ interface ViewState {
 interface ActiveLocation {
     city?: string;
     state?: string;
-    country: string;
+    country?: string;
     location_id: number | null;
     locationName: string;
-    coordinates: [number, number];
+    coordinates?: [number, number];
 }
 interface FilterState {
     checkIn?: Date | string;
@@ -398,8 +396,6 @@ type BaseMapFirstOptions = {
     properties?: Property[];
     primaryType?: PropertyType;
     selectedMarkerId?: number | null;
-    clusterRadiusMeters?: number;
-    autoSelectOnClick?: boolean;
     onClusterUpdate?: (clusters: ClusterDisplayItem[], viewState: ViewStateSnapshot | null) => void;
     state?: Partial<MapState>;
     callbacks?: MapStateCallbacks;

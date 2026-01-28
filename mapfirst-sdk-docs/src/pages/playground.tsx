@@ -47,6 +47,16 @@ export default function Playground() {
   );
 }
 
+type Suggestion = {
+  id: any;
+  name: string;
+  fullAddress: string;
+  center: [number, number];
+  city: string;
+  state: string;
+  country: string;
+};
+
 function PlaygroundContent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
@@ -55,10 +65,10 @@ function PlaygroundContent() {
   >("maplibre");
   const [useApi, setUseApi] = useState(true);
   const [styleUrl, setStyleUrl] = useState(
-    "https://api.mapfirst.ai/static/style.json"
+    "https://api.mapfirst.ai/static/style.json",
   );
   const [activeStyleUrl, setActiveStyleUrl] = useState(
-    "https://api.mapfirst.ai/static/style.json"
+    "https://api.mapfirst.ai/static/style.json",
   );
   const [locationInput, setLocationInput] = useState("Paris, France");
   const [userMapboxToken, setUserMapboxToken] = useState("");
@@ -66,7 +76,7 @@ function PlaygroundContent() {
   const [userGoogleMapId, setUserGoogleMapId] = useState("");
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
   const [apiKey, setApiKey] = useState("");
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const locationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -74,8 +84,23 @@ function PlaygroundContent() {
   // Form state
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<Filter[]>([]);
-  const [city, setCity] = useState("Paris");
-  const [country, setCountry] = useState("France");
+  const [locationData, setLocationData] = useState<{
+    type?: "city" | "country" | "state";
+    city?: string;
+    state?: string;
+    country?: string;
+    fullAddress: string;
+    lng?: number;
+    lat?: number;
+  }>({
+    city: "Paris",
+    state: "Ile-de-France",
+    country: "France",
+    fullAddress: "Paris, Ile-de-France, France",
+    lat: 48.857037,
+    lng: 48.857037,
+    type: "city",
+  });
   const [currency, setCurrency] = useState("USD");
   //   const [locale, setLocale] = useState("en");
   const [adults, setAdults] = useState(2);
@@ -105,7 +130,7 @@ function PlaygroundContent() {
   // Initialize MapFirst hook
   const {
     instance: mapFirst,
-    state,
+    state: mapState,
     setSelectedMarker,
     setUseApi: setUseApiFromHook,
     smartFilterSearch,
@@ -114,8 +139,9 @@ function PlaygroundContent() {
     useApi,
     apiKey: apiKey || undefined,
     initialLocationData: {
-      city,
-      country,
+      city: locationData.city,
+      state: locationData.state,
+      country: locationData.country,
       currency,
     },
     state: {
@@ -148,20 +174,31 @@ function PlaygroundContent() {
         }
       },
       onActiveLocationChange: (location) => {
-        if (location.city !== undefined) setCity(location.city || "");
-        if (location.country !== undefined) setCountry(location.country || "");
+        setLocationData({
+          city: location.city,
+          state: location.state,
+          country: location.country,
+          ...(location.coordinates &&
+            location.coordinates.length == 2 && {
+              lat: location.coordinates[0],
+              lng: location.coordinates[1],
+            }),
+          fullAddress: [location.city, location.state, location.country]
+            .filter(Boolean)
+            .join(", "),
+        });
       },
     },
   });
 
-  const pendingBounds = state?.pendingBounds;
-  const isSearching = state?.isSearching;
-  const selectedMarker = state?.selectedPropertyId ?? null;
+  const pendingBounds = mapState?.pendingBounds;
+  const isSearching = mapState?.isSearching;
+  const selectedMarker = mapState?.selectedPropertyId ?? null;
 
   // Memoize properties from state
   const properties = useMemo(() => {
-    return state?.properties || [];
-  }, [state?.properties]);
+    return mapState?.properties || [];
+  }, [mapState?.properties]);
 
   // Location search with Mapbox geocoding
   const handleLocationSearch = async (query: string) => {
@@ -174,12 +211,42 @@ function PlaygroundContent() {
     const token = mapboxgl.accessToken;
     try {
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        query
+        query,
       )}.json?access_token=${token}&limit=5`;
       const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
-      setSuggestions(data.features || []);
+      const mapped = (data.features || []).map((f: any) => {
+        const context = f.context ?? [];
+        const findContext = (prefixes: string[]) =>
+          context.find((entry: any) =>
+            prefixes.some((prefix) => entry.id.startsWith(prefix)),
+          );
+
+        const placeCandidate = f.place_type?.some((type: string) =>
+          ["place", "locality", "district"].includes(type),
+        )
+          ? f.text
+          : undefined;
+        const cityContext = findContext(["place.", "locality.", "district."]);
+        const regionContext = findContext(["region."]);
+        const countryContext = findContext(["country."]);
+
+        const cityName = placeCandidate ?? cityContext?.text;
+        const stateName = regionContext?.text;
+        const countryName = countryContext?.text;
+
+        return {
+          id: f.id,
+          name: f.text,
+          fullAddress: f.place_name,
+          center: f.center,
+          city: cityName ?? undefined,
+          state: stateName ?? undefined,
+          country: countryName ?? undefined,
+        };
+      });
+      setSuggestions(mapped);
       setHighlightedIndex(data.features?.length > 0 ? 0 : -1);
       setShowDropdown(true);
     } catch (err) {
@@ -197,21 +264,32 @@ function PlaygroundContent() {
     }, 300);
   };
 
-  const selectLocation = (feature: any) => {
-    const context = feature.context || [];
-    const cityContext = context.find((c: any) => c.id.startsWith("place."));
-    const countryContext = context.find((c: any) =>
-      c.id.startsWith("country.")
-    );
+  const selectLocation = (s: Suggestion) => {
+    const isCity = s.id.startsWith("place.");
+    const isState = s.id.startsWith("region.");
+    const isCountry = s.id.startsWith("country.");
+    const city = s.city?.trim();
+    const country = s.country?.trim();
+    const state = isState ? s.name : s.state?.trim();
 
-    const newCity = cityContext?.text || feature.text;
-    const newCountry = countryContext?.text || "";
-
-    setLocationInput(feature.place_name);
+    setLocationInput(s.fullAddress);
     setShowDropdown(false);
     setSuggestions([]);
-    setCity(newCity);
-    setCountry(newCountry);
+    setLocationData({
+      type: isCountry
+        ? "country"
+        : isCity
+          ? "city"
+          : isState
+            ? "state"
+            : undefined,
+      city: city,
+      state: state,
+      country: country,
+      fullAddress: s.fullAddress,
+      lng: s.center[0],
+      lat: s.center[1],
+    });
   };
 
   // Load Google Maps API dynamically when user provides API key
@@ -404,6 +482,23 @@ function PlaygroundContent() {
     }
   };
 
+  const requestBody = useMemo(() => {
+    const { type, city, state, country, fullAddress, lat, lng } = locationData;
+    return {
+      ...(type === "country"
+        ? { country: fullAddress }
+        : type === "city"
+          ? { city, state, country }
+          : type === "state" && { state, country }),
+      ...(lng &&
+        lat && {
+          longitude: lng,
+          latitude: lat,
+          radius: 5000,
+        }),
+    };
+  }, [locationData]);
+
   // Handle basic search (for search button)
   const handleBasicSearch = useCallback(async () => {
     if (!mapFirst || isSearching) return;
@@ -414,8 +509,7 @@ function PlaygroundContent() {
       } else {
         await mapFirst.runPropertiesSearch({
           body: {
-            city,
-            country,
+            ...requestBody,
             filters: {
               checkIn,
               checkOut,
@@ -434,8 +528,7 @@ function PlaygroundContent() {
     isSearching,
     searchQuery,
     handleSearch,
-    city,
-    country,
+    requestBody,
     checkIn,
     checkOut,
     adults,
@@ -460,7 +553,7 @@ function PlaygroundContent() {
         mapFirst.flyMapTo(lon, lat, 14);
       }
     },
-    [mapFirst]
+    [mapFirst],
   );
 
   // Generate code snippets
@@ -543,11 +636,7 @@ function MapComponent() {
 
   const { instance: mapFirst, state, smartFilterSearch } = useMapFirst({
     apiKey: "${apiKey || "YOUR_API_KEY_HERE"}",
-    initialLocationData: {
-      city: "${city}",
-      country: "${country}",
-      currency: "${currency}",
-    },
+    initialLocationData: ${JSON.stringify(requestBody)},
     state: {
       filters: {
         checkIn: "${checkIn}",
@@ -731,11 +820,7 @@ function MapComponent() {
     // Initialize MapFirst
     const mapFirst = new MapFirstCoreClass({
       apiKey: "${apiKey || "YOUR_API_KEY_HERE"}",
-      initialLocationData: {
-        city: "${city}",
-        country: "${country}",
-        currency: "${currency}",
-      }
+      initialLocationData: ${JSON.stringify(requestBody)},
     });
 
     // Initialize ${mapPlatform} map
@@ -761,17 +846,16 @@ function MapComponent() {
           });
         } else {
           await mapFirst.runPropertiesSearch({
-            body: {
-              city: "${city}",
-              country: "${country}",
+            body: ${JSON.stringify({
+              ...requestBody,
               filters: {
-                checkIn: "${checkIn}",
-                checkOut: "${checkOut}",
-                numAdults: ${adults},
-                numRooms: ${rooms},
-                currency: "${currency}",
+                checkIn: checkIn,
+                checkOut: checkOut,
+                numAdults: adults,
+                numRooms: rooms,
+                currency: currency,
               },
-            },
+            })},
           });
         }
       } finally {
@@ -874,10 +958,28 @@ function MapComponent() {
                 <label>MapFirst API Key</label>
                 <input
                   type="text"
-                  placeholder="Enter your API key (optional)"
+                  placeholder="Enter your API key"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                 />
+                {!apiKey && (
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#666",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Get your API key at{" "}
+                    <a
+                      href="https://partner.mapfirst.ai/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      partner.mapfirst.ai
+                    </a>
+                  </div>
+                )}
               </div>
             )}
             <div className="playground-control-group">
@@ -1025,7 +1127,7 @@ function MapComponent() {
                     <label>Smart Filters</label>
                     <SmartFilter
                       filters={filters}
-                      isSearching={state?.isSearching}
+                      isSearching={mapState?.isSearching}
                       onFilterChange={handleFilterChange}
                       currency={currency}
                     />
@@ -1053,7 +1155,7 @@ function MapComponent() {
                           setHighlightedIndex((idx) =>
                             suggestions.length
                               ? (idx + 1) % suggestions.length
-                              : -1
+                              : -1,
                           );
                         } else if (e.key === "ArrowUp") {
                           e.preventDefault();
@@ -1061,7 +1163,7 @@ function MapComponent() {
                             suggestions.length
                               ? (idx - 1 + suggestions.length) %
                                 suggestions.length
-                              : -1
+                              : -1,
                           );
                         } else if (e.key === "Enter") {
                           if (
@@ -1091,9 +1193,9 @@ function MapComponent() {
                             }}
                             onMouseEnter={() => setHighlightedIndex(i)}
                           >
-                            <div className="location-name">{feature.text}</div>
+                            <div className="location-name">{feature.name}</div>
                             <div className="location-address">
-                              {feature.place_name}
+                              {feature.fullAddress}
                             </div>
                           </button>
                         ))}
@@ -1211,8 +1313,8 @@ function MapComponent() {
               {mapPlatform === "mapbox"
                 ? "Please enter your Mapbox access token in the controls panel"
                 : googleMapsLoaded
-                ? "Please enter your Google Maps API key and Map ID"
-                : "Loading Google Maps API..."}
+                  ? "Please enter your Google Maps API key and Map ID"
+                  : "Loading Google Maps API..."}
             </p>
           </div>
         )}

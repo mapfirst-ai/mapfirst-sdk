@@ -39,7 +39,7 @@ export default function PropertyCarousel({
       return null;
     }
     const propertyIndex = properties.findIndex(
-      (p) => p.tripadvisor_id === selectedMarker
+      (p) => p.tripadvisor_id === selectedMarker,
     );
     return propertyIndex === -1 ? null : propertyIndex;
   }, [properties, selectedMarker]);
@@ -70,7 +70,7 @@ export default function PropertyCarousel({
         }
       }, 300);
     },
-    [properties, onSelectMarker]
+    [properties, onSelectMarker],
   );
 
   const handleCardClick = useCallback(
@@ -83,7 +83,7 @@ export default function PropertyCarousel({
         swiper.slideTo(index);
       }
     },
-    [onSelectMarker, onFlyTo, swiper]
+    [onSelectMarker, onFlyTo, swiper],
   );
 
   return (
@@ -175,21 +175,21 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
       stars.push(
         <span key={i} style={{ color: "#03852e" }}>
           ●
-        </span>
+        </span>,
       );
     }
     if (hasHalfStar) {
       stars.push(
         <span key="half" style={{ color: "#03852e" }}>
           ◐
-        </span>
+        </span>,
       );
     }
     while (stars.length < 5) {
       stars.push(
         <span key={`empty-${stars.length}`} style={{ color: "#ccc" }}>
           ○
-        </span>
+        </span>,
       );
     }
 
@@ -202,7 +202,7 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
       .toLowerCase()
       .replace(/\s+/g, "")
       .replace(/&/g, "");
-    return `/img/${type}.webp`;
+    return `https://api.mapfirst.ai/static/images/${type}.webp`;
   };
 
   return (
@@ -215,8 +215,8 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
           imageSrc
             ? imageSrc
             : imageError
-            ? getDefaultImage()
-            : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e0e0e0'/%3E%3C/svg%3E"
+              ? getDefaultImage()
+              : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e0e0e0'/%3E%3C/svg%3E"
         }
         alt={property.name}
         onError={(e) => {

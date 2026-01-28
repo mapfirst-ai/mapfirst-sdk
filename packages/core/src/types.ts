@@ -1,3 +1,5 @@
+import { MapBounds } from "./adapters";
+
 export const locales = ["en", "es", "de", "fr", "it", "pt"] as const;
 
 export type Locale = (typeof locales)[number];
@@ -127,16 +129,19 @@ export type GeoMapping = {
 
 export type InitialRequestBody = {
   initial?: boolean;
-  query?: string;
-  bounds?: {
-    sw: { lat: number; lng: number };
-    ne: { lat: number; lng: number };
-  };
+
   filters?: FilterSchema;
-  city?: string;
-  country?: string;
+
   location_id?: number;
-  // for non city and non country based searches
+
+  query?: string;
+
+  city?: string;
+  state?: string;
+  country?: string;
+
+  bounds?: MapBounds;
+
   longitude?: number;
   latitude?: number;
   radius?: number;
@@ -175,7 +180,16 @@ export type PollOptions = {
 
 export type InitialLocationData = {
   city?: string;
+  state?: string;
   country?: string;
+
+  longitude?: number;
+  latitude?: number;
+  zoom?: number;
+  radius?: number;
+
+  bounds?: MapBounds;
+
   query?: string;
   currency?: string;
 };
