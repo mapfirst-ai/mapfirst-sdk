@@ -37,7 +37,6 @@ import { useMapFirst } from "@mapfirst.ai/react";
 function CustomLocationMap() {
   const { state } = useMapFirst({
     adapter: null,
-    environment: "prod",
     initialLocationData: {
       longitude: 2.3522,  // Paris coordinates
       latitude: 48.8566,
@@ -64,7 +63,6 @@ import { useMapFirst } from "@mapfirst.ai/react";
 function BoundsInitMap() {
   const { state } = useMapFirst({
     adapter: null,
-    environment: "prod",
     initialLocationData: {
       bounds: {
         sw: { lat: 48.8155, lng: 2.2241 },  // Southwest corner
@@ -102,8 +100,7 @@ function CoordinateSearch() {
 
   const { propertiesSearch, state } = useMapFirst({
     adapter: null,
-    environment: "prod",
-  });
+    });
 
   const handleSearch = async () => {
     await propertiesSearch({
@@ -173,8 +170,7 @@ import { useMapFirst } from "@mapfirst.ai/react";
 function CustomBoundsSearch() {
   const { propertiesSearch, state } = useMapFirst({
     adapter: null,
-    environment: "prod",
-  });
+      });
 
   const searchCustomArea = async () => {
     await propertiesSearch({
@@ -267,8 +263,7 @@ function FlyToSearch() {
   const mapContainerRef = useRef(null);
   const { attachMapLibre, flyMapTo, boundsSearch, state } = useMapFirst({
     adapter: null,
-    environment: "prod",
-  });
+      });
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -339,7 +334,6 @@ function FlyToSearch() {
 ```javascript
 const mapFirst = new MapFirstCore({
   adapter: null,
-  environment: "prod",
 });
 
 // Attach map
@@ -402,7 +396,6 @@ You can combine location parameters with other search options:
 ```typescript
 const { propertiesSearch, setPrimaryType, state } = useMapFirst({
   adapter: null,
-  environment: "prod",
 });
 
 // Search for restaurants in a specific area
@@ -484,8 +477,7 @@ function ClickToSearch() {
   const mapContainerRef = useRef(null);
   const { attachMapLibre, propertiesSearch, state } = useMapFirst({
     adapter: null,
-    environment: "prod",
-  });
+      });
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
