@@ -4,7 +4,18 @@ sidebar_position: 3
 
 # Property Details Example
 
-Example showing how to display detailed property information with images.
+A complete example showing how to build a property details sidebar with images, ratings, reviews, pricing, and awards. When a user clicks a marker on the map, the sidebar slides open with rich information about that property.
+
+:::tip What you'll build
+By the end of this example, you'll have a map with:
+- A clickable marker for each property
+- A slide-out sidebar that appears when a marker is clicked
+- TripAdvisor images with loading states and fallbacks
+- Star ratings, review counts, and award badges
+- Pricing information and a "View on TripAdvisor" link
+:::
+
+---
 
 ## React Example
 
@@ -677,16 +688,28 @@ function PropertyDetailsSidebar({
 </html>
 ```
 
-## Key Features
+---
 
-- **Property Selection** - Click markers to view details
-- **Image Loading** - Fetches TripAdvisor images with fallbacks
-- **Detailed Information** - Shows ratings, reviews, pricing, awards
-- **Responsive Sidebar** - Clean layout with smooth transitions
-- **External Links** - Direct links to TripAdvisor
+## What This Example Demonstrates
 
-## See Also
+| Feature | How it's used |
+|---|---|
+| **Property Selection** | Clicking a marker selects it and opens the sidebar |
+| **Image Loading** | Fetches TripAdvisor images via `fetchImages` with loading skeleton and fallbacks |
+| **Detailed Information** | Displays star ratings, review counts, pricing, and award badges |
+| **Responsive Sidebar** | Clean, scrollable layout with a close button and smooth transitions |
+| **External Links** | Direct "View on TripAdvisor" link for each property |
 
-- [Fetching Images Guide](../guides/fetching-images)
-- [Property Type Reference](../api/core#property)
-- [useMapFirst API](../api/use-mapfirst)
+:::tip Fetching images
+This example uses the `fetchImages` function from `@mapfirst.ai/core`. For a deep dive into image loading patterns — including caching, lazy loading, and error handling — see the [Fetching Images guide](../guides/fetching-images).
+:::
+
+---
+
+## Next Steps
+
+- **[Fetching Images Guide](../guides/fetching-images)** — Advanced image loading patterns with caching and lazy loading.
+- **[Property Type Reference](../api/core#property)** — Full `Property` interface with all available fields.
+- **[useMapFirst API](../api/use-mapfirst)** — Complete hook reference.
+- **[Basic Map Example](./basic-map)** — A simpler starting point if this example feels complex.
+- **[Smart Filter Search Example](./smart-filter-search)** — Add AI-powered search alongside property details.

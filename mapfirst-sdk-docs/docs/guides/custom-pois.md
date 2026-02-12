@@ -4,30 +4,35 @@ sidebar_position: 3
 
 # Use with Custom POIs
 
-Learn how to search for properties around custom points of interest (POIs) using coordinates, radius, or map bounds.
+Sometimes you don't want to search by city name — you want to search around a specific point on the map, within a drawn area, or wherever the user clicks. This guide covers all coordinate-based and bounds-based search methods.
+
+:::tip When to use this
+Use coordinate/bounds search when you're building **custom location pickers**, **"near me" features**, **click-to-search maps**, or any experience where the user defines the search area themselves — rather than typing a city name.
+:::
+
+---
 
 ## Overview
 
-MapFirst SDK allows you to search for properties around specific locations or areas you define. This is useful when:
+MapFirst SDK supports three ways to define a custom search area:
 
-- Building custom location pickers or map explorers
-- Searching around user-selected coordinates
-- Finding properties near specific landmarks or addresses
-- Exploring properties within a custom area or radius
+| Method | Best For |
+|---|---|
+| **Longitude, Latitude & Radius** | "Near me" searches, circular areas around a point |
+| **Bounds (SW/NE corners)** | "Search this area" buttons, rectangular map viewport queries |
+| **Fly-to & Bounds Search** | Navigating to a location and then searching the visible area |
 
-You can define your search area using:
+:::caution Priority rule
+When both `bounds` and `longitude/latitude/radius` are provided in the same request, **bounds takes priority** and the coordinate/radius values are ignored.
+:::
 
-1. **Longitude, Latitude & Radius** - Circular area around a point
-2. **Bounds** - Rectangular area defined by southwest and northeast corners
-3. **Fly-to & Bounds Search** - Navigate to a location and search the visible area
-
-**Note:** When both `bounds` and `longitude/latitude/radius` are provided, **bounds takes priority**.
+---
 
 ## Search Methods
 
 ### Method 1: Initialize with Custom Location
 
-Define your search area when creating the MapFirst instance using `initialLocationData`.
+Define your search area up front when creating the MapFirst instance. The SDK will automatically search this area on initialization.
 
 #### Using Longitude, Latitude & Radius
 
@@ -81,11 +86,13 @@ function BoundsInitMap() {
 }
 ```
 
-### Method 2: Search with runPropertiesSearch
+---
 
-Programmatically search for properties using custom coordinates or bounds.
+### Method 2: Search with `runPropertiesSearch`
 
-#### React Example - Coordinate Search
+Trigger a search programmatically at any time — perfect for search forms, buttons, or click handlers.
+
+#### React Example — Coordinate Search
 
 ```typescript
 import { useState } from "react";
@@ -161,7 +168,7 @@ function CoordinateSearch() {
 }
 ```
 
-#### React Example - Bounds Search
+#### React Example — Bounds Search
 
 ```typescript
 import { useState } from "react";
@@ -203,7 +210,7 @@ function CustomBoundsSearch() {
 }
 ```
 
-#### JavaScript Example
+#### Vanilla JavaScript Example
 
 ```javascript
 const mapFirst = new MapFirstCore({
@@ -247,9 +254,11 @@ mapFirst.runPropertiesSearch({
 });
 ```
 
-### Method 3: Fly-to Location & Bounds Search
+---
 
-Navigate the map to a specific location, then search the visible area using `performBoundsSearch`.
+### Method 3: Fly-to & Bounds Search
+
+Navigate the map to a specific location first, wait for the animation to finish, then search whatever is visible. This gives users a smooth "fly and explore" experience.
 
 #### React Example
 
@@ -329,7 +338,7 @@ function FlyToSearch() {
 }
 ```
 
-#### JavaScript Example
+#### Vanilla JavaScript Example
 
 ```javascript
 const mapFirst = new MapFirstCore({
@@ -364,13 +373,17 @@ map.on("load", () => {
 });
 ```
 
+---
+
 ## Priority Rules
 
-When multiple location parameters are provided:
+:::info How the SDK resolves conflicts
+When multiple location parameters are provided in the same request:
 
 1. **Bounds takes priority** over longitude/latitude/radius
 2. If both are provided, only bounds will be used
-3. If neither is provided, you must provide city/country or location_id
+3. If neither is provided, you must provide `city`/`country` or `location_id`
+:::
 
 ```typescript
 // Only bounds will be used
@@ -387,9 +400,11 @@ await propertiesSearch({
 });
 ```
 
+---
+
 ## Combining with Other Search Parameters
 
-You can combine location parameters with other search options:
+Coordinate and bounds searches work seamlessly with all other SDK features — property type filters, price ranges, date filters, and more.
 
 ### With Property Type Filtering
 
@@ -432,41 +447,39 @@ await propertiesSearch({
 });
 ```
 
+---
+
 ## Best Practices
 
-1. **Choose appropriate radius values**
-   - Urban areas: 1000-3000 meters
-   - Suburban areas: 3000-10000 meters
-   - Rural areas: 10000+ meters
+:::tip Choosing radius values
+Pick a radius that matches the density of the area you're searching:
+- **Urban areas:** 1,000–3,000 meters
+- **Suburban areas:** 3,000–10,000 meters
+- **Rural areas:** 10,000+ meters
+:::
 
-2. **Use bounds for rectangular areas**
-   - Better for map viewport searches
-   - More precise control over the search area
-   - Ideal for "search this area" features
+1. **Use bounds for map viewport searches** — They map directly to what the user sees on screen, making them ideal for "search this area" buttons.
 
-3. **Use coordinates + radius for circular areas**
-   - Better for "near me" or "around this point" searches
-   - Simpler to define programmatically
-   - Good for location-based searches
+2. **Use coordinates + radius for "near me" searches** — Simpler to define programmatically and more intuitive for location-based discovery.
 
-4. **Consider zoom levels with flyMapTo**
-   - City level: 12-14
-   - Neighborhood: 14-16
-   - Street level: 16-18
+3. **Match zoom levels to `flyMapTo`** — Use zoom 12–14 for city level, 14–16 for neighborhoods, and 16–18 for street level.
 
-5. **Handle animation timing**
-   - Wait for map animations to complete before searching
-   - Use callbacks or timeouts appropriately
-   - Consider using map's `moveend` event for more reliable timing
+4. **Handle animation timing carefully** — Wait for map animations to complete before calling `performBoundsSearch`. Using the map's `moveend` event is more reliable than a fixed `setTimeout`:
 
-6. **Validate coordinates**
-   - Latitude: -90 to 90
-   - Longitude: -180 to 180
-   - Radius: reasonable values in meters
+   ```typescript
+   map.once("moveend", async () => {
+     await boundsSearch();
+   });
+   flyMapTo(lng, lat, zoom);
+   ```
+
+5. **Validate coordinates before searching** — Latitude must be between -90 and 90, longitude between -180 and 180. Invalid values will cause API errors.
+
+---
 
 ## Advanced Pattern: Click to Search
 
-Search for properties wherever the user clicks on the map:
+Build a "click anywhere to explore" experience — search for properties wherever the user clicks on the map:
 
 ```typescript
 import { useEffect, useRef } from "react";
@@ -526,9 +539,12 @@ function ClickToSearch() {
 }
 ```
 
-## See Also
+---
 
-- [Searching for Properties](./searching)
-- [Map Integration](./map-integration)
-- [useMapFirst API](../api/use-mapfirst)
-- [MapFirstCore API](../api/core)
+## Next Steps
+
+- **[Searching Guide](./searching)** — Learn all three search methods (location, smart, bounds).
+- **[Map Integration](./map-integration)** — Set up MapLibre, Mapbox, or Google Maps.
+- **[useMapFirst API](../api/use-mapfirst)** — Full React hook reference.
+- **[MapFirstCore API](../api/core)** — Core class docs for vanilla JavaScript.
+- **[Basic Map Example](../examples/basic-map)** — A complete, copy-paste example.

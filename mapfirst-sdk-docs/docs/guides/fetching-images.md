@@ -4,22 +4,30 @@ sidebar_position: 4
 
 # Fetching Property Images
 
-Learn how to fetch and display TripAdvisor images for properties using the MapFirst SDK.
+Every property returned by MapFirst SDK includes a `tripadvisor_id` that you can use to fetch high-quality photos. The `fetchImages` function handles the API call and returns ready-to-use image URLs.
+
+:::tip When to use this
+Use `fetchImages` whenever you need to display property photos — in cards, lists, modals, galleries, or detail panels. The function is lightweight and can be called on demand as properties come into view.
+:::
+
+---
 
 ## Overview
 
-The SDK provides a `fetchImages` function that retrieves high-quality images from TripAdvisor for any property. This is useful for:
+The SDK provides a `fetchImages` function that retrieves images from TripAdvisor for any property. Common use cases include:
 
 - Displaying property previews in cards or lists
-- Creating image galleries
+- Creating image galleries or carousels
 - Showing property details in modals or sidebars
-- Building custom UI components
+- Building custom UI components with thumbnails
 
 ## Import
 
 ```typescript
 import { fetchImages } from "@mapfirst.ai/core";
 ```
+
+---
 
 ## Basic Usage
 
@@ -42,9 +50,13 @@ if (imageUrl) {
 const imageUrl = await fetchImages(tripadvisorId, 5);
 ```
 
+---
+
 ## React Example
 
 ### Property Card with Image
+
+Here's a reusable component that fetches and displays a property image with loading and error states:
 
 ```tsx
 import React, { useState, useEffect } from "react";
@@ -94,6 +106,8 @@ function PropertyCard({ property }: { property: Property }) {
 ```
 
 ### Image with Fallback
+
+For a more robust approach, provide a fallback image based on the property type so the UI never shows a broken image:
 
 ```tsx
 import React, { useState, useEffect } from "react";
@@ -158,7 +172,11 @@ function PropertyImage({ property }: { property: Property }) {
 }
 ```
 
+---
+
 ## Vanilla JavaScript Example
+
+The same pattern works without React — just use the global `MapFirstCore` bundle:
 
 ```javascript
 // HTML
@@ -202,7 +220,11 @@ function PropertyImage({ property }: { property: Property }) {
 </script>
 ```
 
+---
+
 ## Image Gallery Example
+
+Build a simple gallery that fetches multiple images for a single property:
 
 ```tsx
 import React, { useState, useEffect } from "react";
@@ -257,6 +279,8 @@ function PropertyGallery({ property }: { property: Property }) {
 }
 ```
 
+---
+
 ## API Reference
 
 ### fetchImages
@@ -297,7 +321,13 @@ if (imageUrl) {
 }
 ```
 
+---
+
 ## Best Practices
+
+:::caution Don't block rendering on images
+Image fetching is asynchronous and depends on a third-party API. Always render your UI first with a placeholder, then swap in the real image when it arrives. Never make images a blocking dependency for your page load.
+:::
 
 ### 1. Handle Loading States
 
@@ -388,9 +418,13 @@ async function getCachedImage(id: number) {
 }
 ```
 
+---
+
 ## Styling Examples
 
 ### Responsive Card
+
+Here's a CSS snippet for a clean property card with a shimmer loading animation:
 
 ```css
 .property-card {
@@ -423,8 +457,11 @@ async function getCachedImage(id: number) {
 }
 ```
 
-## See Also
+---
 
-- [Property Type Reference](../api/core#property)
-- [useMapFirst Hook](../api/use-mapfirst)
-- [Searching Guide](./searching)
+## Next Steps
+
+- **[Property Type Reference](../api/core#property)** — Full `Property` interface with all available fields.
+- **[useMapFirst Hook](../api/use-mapfirst)** — React hook that provides properties for image fetching.
+- **[Searching Guide](./searching)** — Learn how to search for properties to display.
+- **[Customizing Markers](./customizing-markers)** — Style map markers to complement your property cards.

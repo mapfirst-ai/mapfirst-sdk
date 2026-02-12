@@ -1,6 +1,12 @@
 # Customizing Marker Styling
 
-MapFirst SDK provides highly customizable map markers with built-in styles that can be overridden to match your application's design system.
+MapFirst SDK renders interactive map markers automatically when properties are loaded. Every marker element is styled with CSS classes that you can override to match your brand, design system, or theme — no JavaScript required.
+
+:::tip No custom rendering needed
+You don't need to create your own marker elements. The SDK handles all marker rendering internally. This guide is about **styling** the markers that the SDK creates for you, using plain CSS overrides.
+:::
+
+---
 
 ## Marker Types
 
@@ -11,7 +17,7 @@ The SDK renders two types of markers:
 
 ## Built-in CSS Classes
 
-The SDK automatically applies CSS classes to marker elements that you can target for customization:
+The SDK applies well-named CSS classes to every marker element. Target these in your own stylesheet to change colors, sizes, shadows, and animations:
 
 ### Primary Marker Classes
 
@@ -39,11 +45,13 @@ The SDK automatically applies CSS classes to marker elements that you can target
 | `.mapfirst-dot-marker-non-primary`    | Applied to non-primary property types |
 | `.mapfirst-dot-marker-selected`       | Applied when marker is selected       |
 
+---
+
 ## Customization Examples
 
 ### Change Primary Marker Colors
 
-Override the default colors to match your brand:
+Override the default colors to match your brand. These three rules cover the most common use case:
 
 ```css
 /* Active markers */
@@ -69,9 +77,11 @@ Override the default colors to match your brand:
 }
 ```
 
+---
+
 ### Customize Marker Shape and Size
 
-Change the marker appearance:
+Adjust padding, border-radius, and font-size to change how markers look at every zoom level:
 
 ```css
 /* Make markers more rounded */
@@ -87,9 +97,11 @@ Change the marker appearance:
 }
 ```
 
+---
+
 ### Style Dot Markers
 
-Customize the appearance of dot markers:
+Dot markers are used for secondary or clustered properties. They're simpler but still fully customizable:
 
 ```css
 /* Larger dots */
@@ -113,9 +125,11 @@ Customize the appearance of dot markers:
 }
 ```
 
+---
+
 ### Customize Rating Badges
 
-Style the rating score badges:
+Rating badges appear above markers for highly-rated properties. Style them to stand out:
 
 ```css
 .mapfirst-marker-rating-badge {
@@ -128,9 +142,11 @@ Style the rating score badges:
 }
 ```
 
+---
+
 ### Adjust Marker Shadows
 
-Modify shadow effects for better visibility:
+Shadows help markers stand out against the map. Tune them for your preferred level of depth:
 
 ```css
 /* Softer shadow */
@@ -144,9 +160,11 @@ Modify shadow effects for better visibility:
 }
 ```
 
+---
+
 ### Dark Mode Support
 
-Create dark mode-friendly markers:
+Use `prefers-color-scheme` to automatically switch marker colors in dark mode:
 
 ```css
 @media (prefers-color-scheme: dark) {
@@ -169,9 +187,11 @@ Create dark mode-friendly markers:
 }
 ```
 
+---
+
 ## Complete Example
 
-Here's a complete example with custom styling:
+Here's a complete example showing a React component with a custom purple marker theme. The CSS file is loaded alongside the component:
 
 ```tsx
 import { useMapFirst } from "@mapfirst.ai/react";
@@ -261,11 +281,17 @@ function MapComponent() {
 }
 ```
 
+---
+
 ## Best Practices
+
+:::caution Accessibility matters
+Markers are interactive UI elements. Always ensure sufficient color contrast, visible focus states, and distinct selected/hover states so all users can identify and interact with them.
+:::
 
 ### 1. Maintain Contrast
 
-Ensure sufficient contrast between marker colors and the map background for accessibility:
+Ensure sufficient contrast between marker colors and the map background:
 
 ```css
 .mapfirst-marker-pill-active {
@@ -312,7 +338,7 @@ Ensure markers remain visible and appropriately sized at different zoom levels:
 
 ### 4. Consider Performance
 
-Keep animations and effects performant:
+Keep animations GPU-accelerated and avoid expensive properties like `filter` or `clip-path` on markers:
 
 ```css
 /* Use GPU-accelerated properties */
@@ -343,9 +369,11 @@ Coordinate marker styles with your application's overall design:
 }
 ```
 
+---
+
 ## Advanced: Dynamic Styling
 
-For more complex styling needs, you can access marker elements programmatically:
+For styling that depends on property data (e.g., highlighting premium properties), you can access marker elements programmatically via callbacks:
 
 ```tsx
 const { instance: mapFirst } = useMapFirst({
@@ -364,12 +392,17 @@ const { instance: mapFirst } = useMapFirst({
 });
 ```
 
+---
+
 ## Troubleshooting
 
 ### Styles Not Applying
 
-1. Ensure your custom CSS is loaded **after** the SDK's CSS
-2. Check CSS specificity - you may need to increase specificity:
+:::info CSS load order matters
+Your custom CSS must be loaded **after** the SDK's built-in styles. If you're using a CSS module or scoped styles, make sure the selectors are global (not scoped to a component).
+:::
+
+If your overrides still aren't working, increase CSS specificity:
 
 ```css
 /* More specific selector */
@@ -395,8 +428,11 @@ If you experience performance issues with many markers:
 }
 ```
 
+---
+
 ## Next Steps
 
-- [Map Integration Guide](./map-integration.md) - Learn about map setup
-- [Property Search](./searching.md) - Discover search capabilities
-- [API Reference](/docs/api/core) - Explore SDK methods and options
+- **[Map Integration Guide](./map-integration)** — Set up MapLibre, Mapbox, or Google Maps.
+- **[Searching Guide](./searching)** — Learn all three search methods.
+- **[Fetching Images](./fetching-images)** — Display property photos alongside your styled markers.
+- **[API Reference](../api/core)** — Full SDK method and type documentation.

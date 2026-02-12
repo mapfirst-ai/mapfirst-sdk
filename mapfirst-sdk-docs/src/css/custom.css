@@ -1,10 +1,9 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Global styles for MapFirst SDK Docs
+ * Built on top of Infima (Docusaurus CSS framework)
  */
 
-/* You can override the default Infima variables here. */
+/* ─── Color System ─── */
 :root {
   --ifm-color-primary: #1f0f4f;
   --ifm-color-primary-dark: #1c0d47;
@@ -13,37 +12,161 @@
   --ifm-color-primary-light: #221157;
   --ifm-color-primary-lighter: #24125b;
   --ifm-color-primary-lightest: #2a1467;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-code-font-size: 92%;
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
+  --ifm-heading-font-weight: 700;
+  --ifm-font-weight-semibold: 600;
+  --ifm-line-height-base: 1.7;
+
+  --docusaurus-highlighted-code-line-bg: rgba(124, 58, 237, 0.08);
+
+  /* Custom tokens */
+  --mf-purple-50: #f5f3ff;
+  --mf-purple-100: #ede9fe;
+  --mf-purple-200: #ddd6fe;
+  --mf-purple-500: #8b5cf6;
+  --mf-purple-600: #7c3aed;
+  --mf-purple-700: #6d28d9;
+  --mf-purple-900: #1f0f4f;
+  --mf-surface: #ffffff;
+  --mf-surface-raised: #faf9ff;
+  --mf-border: #f0eef5;
+  --mf-text-primary: #1a1a2e;
+  --mf-text-secondary: #6b7280;
+  --mf-text-tertiary: #9ca3af;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme="dark"] {
-  --ifm-color-primary: #8d75f5;
-  --ifm-color-primary-dark: #4729d5;
-  --ifm-color-primary-darker: #3e1fce;
-  --ifm-color-primary-darkest: #3419b0;
-  --ifm-color-primary-light: #6f55dd;
-  --ifm-color-primary-lighter: #7d61e0;
-  --ifm-color-primary-lightest: #9983e7;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+[data-theme='dark'] {
+  --ifm-color-primary: #a78bfa;
+  --ifm-color-primary-dark: #8b6af7;
+  --ifm-color-primary-darker: #7d5af5;
+  --ifm-color-primary-darkest: #5b2fd6;
+  --ifm-color-primary-light: #b9a2fc;
+  --ifm-color-primary-lighter: #c5b2fd;
+  --ifm-color-primary-lightest: #ddd6fe;
+
+  --docusaurus-highlighted-code-line-bg: rgba(139, 92, 246, 0.15);
+
+  --mf-surface: #1a1a2e;
+  --mf-surface-raised: #1f1f3a;
+  --mf-border: rgba(139, 92, 246, 0.1);
+  --mf-text-primary: #f1f1f1;
+  --mf-text-secondary: #9ca3af;
+  --mf-text-tertiary: #6b7280;
 }
 
-/* Navbar custom styling */
+/* ─── Global Typography ─── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+}
+
+.markdown h1:first-child {
+  font-size: 2.2rem;
+  margin-bottom: 1.25rem;
+}
+
+.markdown h2 {
+  font-size: 1.6rem;
+  margin-top: 2.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--mf-border);
+}
+
+.markdown h3 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+}
+
+.markdown > p {
+  color: var(--mf-text-secondary);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+[data-theme='dark'] .markdown > p {
+  color: var(--mf-text-secondary);
+}
+
+/* Better inline code */
+:not(pre) > code {
+  background: var(--mf-purple-50);
+  border: 1px solid var(--mf-purple-100);
+  color: var(--mf-purple-700);
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 0.88em;
+  font-weight: 500;
+}
+
+[data-theme='dark'] :not(pre) > code {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: var(--mf-purple-200);
+}
+
+/* ─── Code Blocks ─── */
+.prism-code {
+  border-radius: 12px !important;
+  font-size: 0.88rem !important;
+  line-height: 1.6 !important;
+}
+
+div[class*='codeBlockContainer'] {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin: 1.25rem 0;
+}
+
+[data-theme='dark'] div[class*='codeBlockContainer'] {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+div[class*='codeBlockTitle'] {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Navbar ─── */
 .navbar {
   background-color: #1f0f4f !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+  height: 60px;
 }
 
 .navbar__title,
 .navbar__link {
   color: #ffffff !important;
+  font-weight: 500;
+  font-size: 0.92rem;
 }
 
 .navbar__link:hover {
-  color: #e0e0e0 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Navbar icons and buttons - force light colors */
+.navbar__link--active {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Navbar icons and buttons */
 .navbar__toggle,
 .navbar__toggle svg,
 .navbar-sidebar__close,
@@ -62,11 +185,11 @@
   fill: #ffffff !important;
 }
 
-[data-theme="dark"] .navbar {
+[data-theme='dark'] .navbar {
   background-color: #1f0f4f !important;
 }
 
-/* Hero header custom styling */
+/* ─── Hero ─── */
 .hero {
   background-color: #1f0f4f !important;
   color: #ffffff !important;
@@ -77,21 +200,456 @@
   color: #ffffff !important;
 }
 
-/* Footer custom styling */
-.footer {
-  background-color: #27202e !important;
+/* ─── Sidebar ─── */
+.menu__link {
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 6px 12px;
+  transition: all 0.15s ease;
 }
 
-.footer__title,
-.footer__item,
+.menu__link:hover {
+  background: var(--mf-purple-50);
+}
+
+[data-theme='dark'] .menu__link:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--mf-purple-50);
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+[data-theme='dark'] .menu__link--active:not(.menu__link--sublist) {
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.menu__list-item-collapsible .menu__link {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mf-text-tertiary);
+}
+
+/* ─── Table of Contents ─── */
+.table-of-contents__link {
+  font-size: 0.85rem;
+  color: var(--mf-text-secondary);
+  transition: color 0.15s ease;
+}
+
+.table-of-contents__link--active,
+.table-of-contents__link:hover {
+  color: var(--ifm-color-primary);
+  font-weight: 500;
+}
+
+/* ─── Admonitions ─── */
+.admonition {
+  border-radius: 12px;
+  border: none;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.admonition-heading {
+  margin-bottom: 0.5rem;
+}
+
+.admonition-heading h5 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admonition-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Tip */
+[class*='admonitionTip'] {
+  background: #ecfdf5;
+  border-left: 4px solid #10b981;
+}
+
+[data-theme='dark'] [class*='admonitionTip'] {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* Info */
+[class*='admonitionInfo'] {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+}
+
+[data-theme='dark'] [class*='admonitionInfo'] {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* Warning / Caution */
+[class*='admonitionWarning'],
+[class*='admonitionCaution'] {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+}
+
+[data-theme='dark'] [class*='admonitionWarning'],
+[data-theme='dark'] [class*='admonitionCaution'] {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+/* Danger */
+[class*='admonitionDanger'] {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+}
+
+[data-theme='dark'] [class*='admonitionDanger'] {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Note */
+[class*='admonitionNote'] {
+  background: var(--mf-purple-50);
+  border-left: 4px solid var(--mf-purple-500);
+}
+
+[data-theme='dark'] [class*='admonitionNote'] {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+/* ─── Tables ─── */
+table {
+  display: table;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--mf-border);
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+}
+
+table thead tr {
+  background: var(--mf-surface-raised);
+}
+
+[data-theme='dark'] table thead tr {
+  background: rgba(139, 92, 246, 0.06);
+}
+
+table thead th {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mf-text-secondary);
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--mf-border);
+}
+
+table tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--mf-border);
+  vertical-align: top;
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table tbody tr:hover {
+  background: rgba(124, 58, 237, 0.02);
+}
+
+[data-theme='dark'] table tbody tr:hover {
+  background: rgba(139, 92, 246, 0.04);
+}
+
+/* ─── Blockquotes ─── */
+blockquote {
+  border-left: 4px solid var(--mf-purple-200);
+  background: var(--mf-purple-50);
+  padding: 1rem 1.25rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  color: var(--mf-text-secondary);
+}
+
+[data-theme='dark'] blockquote {
+  background: rgba(139, 92, 246, 0.06);
+  border-left-color: var(--mf-purple-500);
+  color: var(--mf-text-secondary);
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Links in docs ─── */
+.markdown a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.markdown a:hover {
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+/* ─── Pagination ─── */
+.pagination-nav__link {
+  border-radius: 12px;
+  border: 1px solid var(--mf-border);
+  padding: 1.25rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--mf-purple-200);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.06);
+}
+
+[data-theme='dark'] .pagination-nav__link:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+}
+
+.pagination-nav__sublabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--mf-text-tertiary);
+}
+
+.pagination-nav__label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+
+/* ─── Doc Page Layout ─── */
+.docMainContainer_node_modules-\@docusaurus-theme-classic-lib-theme-DocPage-Layout-Main-styles-module {
+  max-width: 100%;
+}
+
+article .markdown {
+  max-width: 780px;
+}
+
+/* ─── Breadcrumbs ─── */
+.breadcrumbs__link {
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+/* ─── Tabs ─── */
+.tabs__item {
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 18px;
+  transition: all 0.15s ease;
+}
+
+.tabs__item--active {
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+/* ─── Footer ─── */
+.footer {
+  background-color: #1a1030 !important;
+  padding-top: 3rem;
+}
+
+.footer__title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin-bottom: 1rem;
+}
+
+.footer__item {
+  margin-bottom: 0.5rem;
+}
+
 .footer__link-item {
-  color: #ffffff !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: color 0.15s ease;
 }
 
 .footer__link-item:hover {
-  color: #e0e0e0 !important;
+  color: #ffffff !important;
+  text-decoration: none;
 }
 
-[data-theme="dark"] .footer {
-  background-color: #27202e !important;
+.footer__copyright {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='dark'] .footer {
+  background-color: #0f0a1f !important;
+}
+
+/* ─── Search ─── */
+.searchBox_node_modules-\@cmfcmf-docusaurus-search-local-lib-client-theme-SearchBar-SearchBar-module input {
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.3);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.4);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: rgba(124, 58, 237, 0.15);
+  color: inherit;
+}
+
+[data-theme='dark'] ::selection {
+  background: rgba(167, 139, 250, 0.25);
+}
+
+/* ─── HR ─── */
+hr {
+  border: none;
+  border-top: 1px solid var(--mf-border);
+  margin: 2rem 0;
+}
+
+/* ─── Lists in docs ─── */
+.markdown ul,
+.markdown ol {
+  padding-left: 1.5rem;
+}
+
+.markdown li {
+  margin-bottom: 0.4rem;
+  line-height: 1.7;
+}
+
+.markdown li::marker {
+  color: var(--mf-purple-500);
+}
+
+/* ─── Images ─── */
+.markdown img {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  margin: 1rem 0;
+}
+
+[data-theme='dark'] .markdown img {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Details / Accordion ─── */
+details {
+  border: 1px solid var(--mf-border);
+  border-radius: 12px;
+  padding: 0;
+  margin: 1.25rem 0;
+  overflow: hidden;
+}
+
+details summary {
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--mf-surface-raised);
+  transition: background 0.15s ease;
+}
+
+details summary:hover {
+  background: var(--mf-purple-50);
+}
+
+[data-theme='dark'] details summary:hover {
+  background: rgba(139, 92, 246, 0.06);
+}
+
+details[open] summary {
+  border-bottom: 1px solid var(--mf-border);
+}
+
+details > :not(summary) {
+  padding: 0 1.25rem;
+}
+
+/* ─── Badge styles ─── */
+.badge {
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+}
+
+.badge--primary {
+  background: var(--mf-purple-100);
+  color: var(--mf-purple-700);
+  border: none;
+}
+
+[data-theme='dark'] .badge--primary {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--mf-purple-200);
+}
+
+/* ─── Smooth transitions ─── */
+* {
+  scroll-behavior: smooth;
+}
+
+.menu__link,
+.navbar__link,
+.footer__link-item,
+.pagination-nav__link,
+.table-of-contents__link {
+  transition: all 0.15s ease;
 }

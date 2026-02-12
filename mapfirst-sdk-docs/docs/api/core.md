@@ -4,7 +4,13 @@ sidebar_position: 2
 
 # MapFirstCore API
 
-Core JavaScript API for MapFirst SDK. Works in both React and vanilla JavaScript environments.
+The `MapFirstCore` class is the foundation of the MapFirst SDK. It manages map connections, property search, marker rendering, and state — all from a single instance. Use it directly in vanilla JavaScript projects, or let the [`useMapFirst` hook](./use-mapfirst) wrap it for you in React.
+
+:::tip React users
+If you're using React, you rarely need to interact with `MapFirstCore` directly. The `useMapFirst` hook creates and manages the instance for you. This page is most useful for **vanilla JavaScript** projects or **advanced React patterns** where you need direct access.
+:::
+
+---
 
 ## Import
 
@@ -15,6 +21,8 @@ import { MapFirstCore } from "@mapfirst.ai/core";
 // Browser (CDN)
 const { MapFirstCore } = window.MapFirstCore;
 ```
+
+---
 
 ## Constructor
 
@@ -82,6 +90,8 @@ interface MapFirstConfig {
 
 ### Example
 
+Here's a minimal setup that initializes the SDK, listens for property changes, and tracks search state:
+
 ```javascript
 const mapFirst = new MapFirstCore({
   apiKey: "your-api-key",
@@ -110,11 +120,13 @@ const mapFirst = new MapFirstCore({
 });
 ```
 
+---
+
 ## Methods
 
 ### attachMap
 
-Attach a map instance to MapFirst.
+Attach a map instance to MapFirst. This is how the SDK knows which map to render markers on. Call this **after** the map has fully loaded.
 
 ```typescript
 attachMap(map: any, options: AttachMapOptions): void
@@ -151,9 +163,11 @@ mapFirst.attachMap(map, {
 });
 ```
 
+---
+
 ### runPropertiesSearch
 
-Search for properties by location.
+Search for properties by location. This is the primary search method — specify a city, country, and optional filters to find accommodations, restaurants, or attractions.
 
 ```typescript
 runPropertiesSearch(params: SearchParams): Promise<void>
@@ -176,9 +190,11 @@ await mapFirst.runPropertiesSearch({
 });
 ```
 
+---
+
 ### runSmartFilterSearch
 
-AI-powered natural language search.
+AI-powered natural language search. Pass a plain-text query and the SDK will use AI to extract structured filters and return matching properties.
 
 ```typescript
 runSmartFilterSearch(params: SmartSearchParams): Promise<void>
@@ -194,9 +210,11 @@ await mapFirst.runSmartFilterSearch({
 });
 ```
 
+---
+
 ### performBoundsSearch
 
-Search within current map bounds.
+Search within the current visible map area. Perfect for implementing a "Search this area" button.
 
 ```typescript
 performBoundsSearch(): Promise<void>
@@ -208,9 +226,11 @@ performBoundsSearch(): Promise<void>
 await mapFirst.performBoundsSearch();
 ```
 
+---
+
 ### setPrimaryType
 
-Set the property type filter.
+Set the active property type filter. This controls which category of markers is displayed on the map.
 
 ```typescript
 setPrimaryType(type: 'Accommodation' | 'Restaurant' | 'Attraction'): void
@@ -222,9 +242,11 @@ setPrimaryType(type: 'Accommodation' | 'Restaurant' | 'Attraction'): void
 mapFirst.setPrimaryType("Attraction");
 ```
 
+---
+
 ### setSelectedMarker
 
-Select or deselect a property.
+Select or deselect a property marker on the map. Selected markers are visually highlighted.
 
 ```typescript
 setSelectedMarker(id: number | null): void
@@ -240,9 +262,11 @@ mapFirst.setSelectedMarker(12345);
 mapFirst.setSelectedMarker(null);
 ```
 
+---
+
 ### flyMapTo
 
-Animate map to a location.
+Smoothly animate the map camera to a specific location and zoom level.
 
 ```typescript
 flyMapTo(lng: number, lat: number, zoom?: number): void
@@ -255,9 +279,11 @@ flyMapTo(lng: number, lat: number, zoom?: number): void
 mapFirst.flyMapTo(2.2945, 48.8584, 15);
 ```
 
+---
+
 ### getState
 
-Get current state snapshot.
+Get a snapshot of the current SDK state. Useful for reading properties, search status, or filter values at any point in time.
 
 ```typescript
 getState(): MapFirstState
@@ -271,9 +297,15 @@ console.log("Current properties:", state.properties);
 console.log("Is searching:", state.isSearching);
 ```
 
+---
+
 ### destroy
 
-Clean up resources.
+Clean up all resources — removes markers, detaches event listeners, and disconnects from the map. Always call this when you're done with the instance.
+
+:::caution Memory leaks
+Failing to call `destroy()` when removing a map (e.g., on page navigation) can lead to memory leaks, especially in single-page applications. In React, call it in your `useEffect` cleanup function.
+:::
 
 ```typescript
 destroy(): void
@@ -285,9 +317,11 @@ destroy(): void
 mapFirst.destroy();
 ```
 
+---
+
 ## Events / Callbacks
 
-All callbacks are optional and passed during initialization.
+All callbacks are optional and passed in the `callbacks` object during initialization. They fire whenever the corresponding state changes.
 
 ### onPropertiesChange
 
@@ -329,11 +363,15 @@ Called when an error occurs.
 onError?: (error: Error) => void
 ```
 
+---
+
 ## Types
+
+These TypeScript interfaces describe the data structures used throughout the SDK. All types are exported from `@mapfirst.ai/core`.
 
 ### Property
 
-Represents a property (accommodation, restaurant, or attraction) returned from search results.
+Represents a property (accommodation, restaurant, or attraction) returned from search results. This is the main data object you'll work with.
 
 ```typescript
 interface Property {
@@ -401,15 +439,21 @@ interface PropertyAwardImage {
 }
 ```
 
+---
+
 ### PriceLevel
 
-Price level indicator shown as dollar signs.
+Price level indicator shown as dollar signs. Useful for displaying relative cost at a glance.
 
 ```typescript
 type PriceLevel = "$" | "$$" | "$$$" | "$$$$";
 ```
 
+---
+
 ### Bounds
+
+Represents a rectangular geographic area defined by its edges. Used for bounds-based searches and map viewport tracking.
 
 ```typescript
 interface Bounds {
@@ -420,8 +464,12 @@ interface Bounds {
 }
 ```
 
-## See Also
+---
 
-- [useMapFirst Hook](./use-mapfirst)
-- [HTML Guide](../getting-started/html)
-- [Examples](../examples/basic-map)
+## Next Steps
+
+- **[useMapFirst Hook](./use-mapfirst)** — React wrapper that manages a `MapFirstCore` instance for you.
+- **[HTML/JavaScript Setup](../getting-started/html)** — Step-by-step guide for using `MapFirstCore` in vanilla JS.
+- **[Searching Guide](../guides/searching)** — Learn all three search methods in depth.
+- **[Customizing Markers](../guides/customizing-markers)** — Style the markers that `MapFirstCore` renders.
+- **[Examples](../examples/basic-map)** — Complete, copy-paste examples.

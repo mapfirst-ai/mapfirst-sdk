@@ -4,15 +4,17 @@ sidebar_position: 2
 
 # Map Integration
 
-Learn how to integrate MapFirst SDK with different mapping platforms.
+MapFirst SDK works with all three major web mapping libraries. This guide shows you how to set up each one, add controls, handle events, and optimize performance.
 
-## Supported Platforms
+:::tip Which platform should I choose?
+- **MapLibre GL JS** — Free, open-source, no API key required for the map itself. Best default choice.
+- **Mapbox GL JS** — Premium cartography with a generous free tier. Requires an access token.
+- **Google Maps** — Industry standard with the largest user base. Requires an API key and Map ID.
 
-MapFirst SDK supports three major mapping platforms:
+You can switch between platforms later with minimal code changes — the MapFirst SDK abstracts away the differences.
+:::
 
-- **MapLibre GL JS** - Open-source, free
-- **Mapbox GL JS** - Commercial, requires API token
-- **Google Maps** - Commercial, requires API key
+---
 
 ## MapLibre GL JS
 
@@ -65,6 +67,10 @@ function MapLibreMap() {
 }
 ```
 
+:::caution Don't forget the CSS import
+MapLibre (and Mapbox) require their CSS file to render correctly. Without it, the map canvas will appear but tiles and controls will be broken.
+:::
+
 ### Custom Styles
 
 ```typescript
@@ -78,6 +84,8 @@ const map = new maplibregl.Map({
   zoom: 12,
 });
 ```
+
+---
 
 ## Mapbox GL JS
 
@@ -135,6 +143,10 @@ function MapboxMap() {
 }
 ```
 
+:::info Mapbox access token
+You need a Mapbox access token to use Mapbox GL JS. Get one for free at [account.mapbox.com](https://account.mapbox.com). The token is set globally via `mapboxgl.accessToken`.
+:::
+
 ### Available Styles
 
 ```typescript
@@ -146,6 +158,8 @@ function MapboxMap() {
 "mapbox://styles/mapbox/satellite-v9";
 "mapbox://styles/mapbox/satellite-streets-v12";
 ```
+
+---
 
 ## Google Maps
 
@@ -205,6 +219,12 @@ function GoogleMapComponent() {
 }
 ```
 
+:::info Google Maps Map ID
+Google Maps requires a **Map ID** when using Advanced Markers (which MapFirst uses for rendering). Create one in the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/studio/maps).
+:::
+
+---
+
 ## Map Controls
 
 ### Add Navigation Controls
@@ -257,7 +277,11 @@ navigator.geolocation.getCurrentPosition((position) => {
 });
 ```
 
+---
+
 ## Handling Map Events
+
+You can listen to native map events alongside MapFirst SDK events. This is useful for building custom UI that responds to user interactions.
 
 ### MapLibre/Mapbox Events
 
@@ -295,9 +319,11 @@ map.addListener("zoom_changed", () => {
 });
 ```
 
+---
+
 ## Custom Markers
 
-MapFirst SDK manages markers automatically, but you can customize their appearance:
+MapFirst SDK manages markers automatically, but you can customize their appearance. For full marker styling options, see the [Customizing Markers guide](./customizing-markers).
 
 ```typescript
 attachMapLibre(map, {
@@ -311,16 +337,26 @@ attachMapLibre(map, {
 });
 ```
 
+---
+
 ## Performance Tips
 
-1. **Lazy load maps** - Only initialize when needed
-2. **Cleanup on unmount** - Always call `map.remove()`
-3. **Debounce events** - Avoid excessive updates on zoom/pan
-4. **Limit visible markers** - Use clustering for many markers
-5. **Optimize styles** - Use vector tiles instead of raster
+:::tip Keep your maps fast
+Follow these guidelines to ensure smooth rendering, especially on mobile devices and pages with many markers.
+:::
 
-## See Also
+1. **Lazy load maps** — Only initialize the map when it scrolls into view or when the user navigates to the map page.
+2. **Clean up on unmount** — Always call `map.remove()` in your React `useEffect` cleanup to free GPU memory and event listeners.
+3. **Debounce events** — Avoid excessive API calls on zoom/pan by debouncing `moveend` events (300–500ms works well).
+4. **Limit visible markers** — The SDK handles this internally, but if you add your own markers, consider clustering for large datasets.
+5. **Use vector tiles** — Vector tile styles (like MapLibre's default) render faster and use less bandwidth than raster tiles.
 
-- [Getting Started - React](../getting-started/react)
-- [Getting Started - HTML](../getting-started/html)
-- [Examples](../examples/basic-map)
+---
+
+## Next Steps
+
+- **[Getting Started — React](../getting-started/react)** — Full React integration guide.
+- **[Getting Started — HTML](../getting-started/html)** — Vanilla JavaScript setup.
+- **[Customizing Markers](./customizing-markers)** — Style markers to match your brand.
+- **[Searching Guide](./searching)** — Learn all three search methods.
+- **[Examples](../examples/basic-map)** — Complete, runnable examples.

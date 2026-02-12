@@ -4,9 +4,21 @@ sidebar_position: 2
 
 # Smart Filter Search Example
 
-Example showing natural language search with dynamic filters.
+A complete example showing how to build an AI-powered search experience with natural language queries and interactive filter chips. Users type what they're looking for in plain English, and the SDK extracts structured filters automatically.
+
+:::tip What you'll build
+By the end of this example, you'll have a map with:
+- A search bar that accepts natural language queries (e.g., *"hotels near Eiffel Tower with pool"*)
+- Dynamic filter chips that appear after each search
+- The ability to remove individual filters and re-search
+- A live property count that updates in real time
+:::
+
+---
 
 ## React Example
+
+Here's a complete React component with AI search, filter management, and a MapLibre map:
 
 ```tsx
 import { useEffect, useRef, useState } from "react";
@@ -191,7 +203,11 @@ export default function SmartFilterSearch() {
 }
 ```
 
+---
+
 ## HTML/JavaScript Example
+
+The same functionality works without React — use the global `MapFirstCore` bundle and manage filters with plain DOM manipulation:
 
 ```html
 <!DOCTYPE html>
@@ -429,20 +445,30 @@ export default function SmartFilterSearch() {
 </html>
 ```
 
+---
+
 ## Example Queries
 
-Try these natural language queries:
+:::info Try these natural language queries
+The AI search engine understands a wide range of queries. Here are some to get you started:
 
-- "hotels near Eiffel Tower with pool"
-- "romantic restaurants with outdoor seating"
-- "budget hotels near Louvre Museum"
-- "5 star hotels with spa"
-- "family friendly attractions"
-- "cheap eats in Montmartre"
-- "hotels with free wifi and parking"
+- **"hotels near Eiffel Tower with pool"** — Location + amenity filter
+- **"romantic restaurants with outdoor seating"** — Mood + feature filter
+- **"budget hotels near Louvre Museum"** — Price + location filter
+- **"5 star hotels with spa"** — Rating + amenity filter
+- **"family friendly attractions"** — Audience + category filter
+- **"cheap eats in Montmartre"** — Price + neighborhood filter
+- **"hotels with free wifi and parking"** — Multiple amenity filters
 
-## See Also
+The SDK parses these into structured filters that you can display as interactive chips using the [SmartFilter component](../components/smart-filter).
+:::
 
-- [Searching Guide](../guides/searching)
-- [useMapFirst API](../api/use-mapfirst)
-- [Basic Map Example](./basic-map)
+---
+
+## Next Steps
+
+- **[SmartFilter Component](../components/smart-filter)** — Display AI-generated filters as interactive, toggleable chips.
+- **[Searching Guide](../guides/searching)** — Learn all three search methods in depth.
+- **[useMapFirst API](../api/use-mapfirst)** — Full hook reference with all parameters.
+- **[Basic Map Example](./basic-map)** — A simpler example to start with.
+- **[Property Details Example](./property-details)** — Add a sidebar with images, ratings, and pricing.
