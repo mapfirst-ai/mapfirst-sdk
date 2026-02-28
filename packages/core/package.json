@@ -17,7 +17,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean --inject-style",
+    "build": "tsup src/index.ts --format esm,cjs,iife --dts --global-name MapFirstCore --clean --inject-style",
     "prepublishOnly": "pnpm build"
   },
   "keywords": [

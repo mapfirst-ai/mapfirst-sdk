@@ -91,7 +91,7 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
   }, [handleFilterChange]);
 
   return (
-    <div style={{ ...containerStyles, ...containerStyle }}>
+    <div style={{ ...containerStyles, ...containerStyle, ...style }}>
       {filters.length > 0 && (
         <FilterChips
           filters={filters}

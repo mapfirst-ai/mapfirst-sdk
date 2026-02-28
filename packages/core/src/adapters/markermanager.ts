@@ -15,6 +15,12 @@ export type MarkerEntry<T = any> = {
   parentId?: number;
 };
 
+type MarkerDisplayState = {
+  isPrimaryType: boolean;
+  isSelected: boolean;
+  isPending: boolean;
+};
+
 export abstract class BaseMarkerManager<TMarker = any> {
   protected readonly mapInstance: any;
   protected readonly onMarkerClick?: (marker: Property) => void;
@@ -59,34 +65,8 @@ export abstract class BaseMarkerManager<TMarker = any> {
 
       if (existing) {
         // Update existing marker position and content
-        const isPrimaryType = item.marker.type === this.primaryType;
-        const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
-        const isAccommodation = item.marker.type === "Accommodation";
-        const isPending =
-          item.kind === "primary"
-            ? isAccommodation && !item.marker.pricing?.offer?.displayPrice
-            : isAccommodation &&
-              item.marker.pricing?.offer?.availability !== "available";
-
-        const element = this.getMarkerElement(existing.marker);
-        if (element) {
-          if (item.kind === "primary") {
-            updatePrimaryMarkerElement(
-              element,
-              isPrimaryType,
-              isSelected,
-              isPending,
-              item.marker
-            );
-          } else {
-            updateDotMarkerElement(
-              element,
-              isPrimaryType,
-              isSelected,
-              isPending
-            );
-          }
-        }
+        const displayState = this.getDisplayState(item);
+        this.updateMarkerElement(existing.marker, item, displayState);
 
         try {
           this.updateMarkerPosition(existing.marker, coords);
@@ -98,64 +78,30 @@ export abstract class BaseMarkerManager<TMarker = any> {
         }
       } else {
         // Check if there's a marker for the same property with a different key (styling change)
-        const markerId = item.marker.tripadvisor_id;
-        let existingEntry: MarkerEntry<TMarker> | undefined;
-        let existingKey: string | undefined;
-
-        for (const [key, entry] of this.markerCache.entries()) {
-          if (
-            extractMarkerIdFromKey(key) === markerId &&
-            entry.kind === item.kind
-          ) {
-            existingEntry = entry;
-            existingKey = key;
-            break;
-          }
-        }
+        const existingMatch = this.findMatchingMarkerEntry(item);
+        const existingEntry = existingMatch?.entry;
+        const existingKey = existingMatch?.key;
 
         if (existingEntry && existingKey) {
           // Same marker, different state - update styles instead of recreating
-          const isPrimaryType = item.marker.type === this.primaryType;
-          const isSelected =
-            this.selectedMarkerId === item.marker.tripadvisor_id;
-          const isAccommodation = item.marker.type === "Accommodation";
-          const isPending =
-            item.kind === "primary"
-              ? isAccommodation && !item.marker.pricing?.offer?.displayPrice
-              : isAccommodation &&
-                item.marker.pricing?.offer?.availability !== "available";
-
-          const element = this.getMarkerElement(existingEntry.marker);
-          if (element) {
-            if (item.kind === "primary") {
-              updatePrimaryMarkerElement(
-                element,
-                isPrimaryType,
-                isSelected,
-                isPending,
-                item.marker
-              );
-            } else {
-              updateDotMarkerElement(
-                element,
-                isPrimaryType,
-                isSelected,
-                isPending
-              );
-            }
-          }
+          const displayState = this.getDisplayState(item);
+          this.updateMarkerElement(existingEntry.marker, item, displayState);
 
           // Update zIndex if supported
           this.updateMarkerZIndex(
             existingEntry.marker,
             item,
-            isPrimaryType,
-            isSelected
+            displayState.isPrimaryType,
+            displayState.isSelected
           );
 
           // Update cache with new key
           this.markerCache.delete(existingKey);
-          this.markerCache.set(item.key, existingEntry);
+          this.markerCache.set(item.key, {
+            ...existingEntry,
+            key: item.key,
+            parentId: item.kind === "dot" ? item.parentId : undefined,
+          });
 
           // Update position
           try {
@@ -199,16 +145,15 @@ export abstract class BaseMarkerManager<TMarker = any> {
 
     if (!element) return;
 
-    const isPrimaryType = item.marker.type === this.primaryType;
-    const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
+    const displayState = this.getDisplayState(item);
 
     try {
       const marker = this.createMarker(
         element,
         coords,
         item,
-        isPrimaryType,
-        isSelected
+        displayState.isPrimaryType,
+        displayState.isSelected
       );
       if (marker) {
         this.markerCache.set(item.key, {
@@ -248,6 +193,60 @@ export abstract class BaseMarkerManager<TMarker = any> {
     isSelected: boolean
   ): void {
     // Default implementation does nothing (override in subclasses that support zIndex)
+  }
+
+  private getDisplayState(item: ClusterDisplayItem): MarkerDisplayState {
+    const isPrimaryType = item.marker.type === this.primaryType;
+    const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
+    const isAccommodation = item.marker.type === "Accommodation";
+    const isPending =
+      item.kind === "primary"
+        ? isAccommodation && !item.marker.pricing?.offer?.displayPrice
+        : isAccommodation &&
+          item.marker.pricing?.offer?.availability !== "available";
+    return { isPrimaryType, isSelected, isPending };
+  }
+
+  private updateMarkerElement(
+    marker: TMarker,
+    item: ClusterDisplayItem,
+    displayState: MarkerDisplayState
+  ) {
+    const element = this.getMarkerElement(marker);
+    if (!element) {
+      return;
+    }
+
+    if (item.kind === "primary") {
+      updatePrimaryMarkerElement(
+        element,
+        displayState.isPrimaryType,
+        displayState.isSelected,
+        displayState.isPending,
+        item.marker
+      );
+      return;
+    }
+
+    updateDotMarkerElement(
+      element,
+      displayState.isPrimaryType,
+      displayState.isSelected,
+      displayState.isPending
+    );
+  }
+
+  private findMatchingMarkerEntry(item: ClusterDisplayItem) {
+    const markerId = item.marker.tripadvisor_id;
+    for (const [key, entry] of this.markerCache.entries()) {
+      if (
+        extractMarkerIdFromKey(key) === markerId &&
+        entry.kind === item.kind
+      ) {
+        return { key, entry };
+      }
+    }
+    return null;
   }
 }
 

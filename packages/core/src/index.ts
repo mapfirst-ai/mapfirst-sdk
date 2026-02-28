@@ -70,6 +70,30 @@ const API_URLS: Record<Environment, string> = {
   test: "https://api.mapfirst.ai/test",
 };
 
+const API_DISABLED_ERROR_MESSAGE = "API usage is disabled";
+const USE_API_FALSE_PLATFORM_ERROR =
+  "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.";
+const USE_API_FALSE_PLATFORM_WARNING =
+  "When useApi is false, only maplibre platform is supported. Please switch to maplibre.";
+
+function getDocumentReferrer(): string | undefined {
+  try {
+    return document.referrer || undefined;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+}
+
+function createSdkHeaders(apiKey?: string, referrer?: string) {
+  return {
+    "Content-Type": "application/json",
+    "X-Source": "SDK",
+    ...(apiKey && { "X-API-Key": apiKey }),
+    ...(referrer && { "X-Referer": referrer }),
+  };
+}
+
 // Properties fetch error class
 export class PropertiesFetchError extends Error {
   status: number;
@@ -150,26 +174,10 @@ export async function fetchProperties<TBody = any, TResponse = any>(
   apiKey?: string,
   { signal }: FetchPropertiesOptions = {},
 ): Promise<TResponse> {
-  let referrer: string | undefined;
-  try {
-    if (document.referrer) {
-      referrer = document.referrer;
-    }
-  } catch (e) {
-    console.error(e);
-  }
+  const referrer = getDocumentReferrer();
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Source": "SDK",
-      ...(apiKey && {
-        "X-API-Key": apiKey,
-      }),
-      ...(referrer && {
-        "X-Referer": referrer,
-      }),
-    },
+    headers: createSdkHeaders(apiKey, referrer),
     body: JSON.stringify(body),
     signal,
   });
@@ -334,11 +342,7 @@ export class MapFirstCore {
     this.currentPlatform = options.platform;
 
     // Validate platform restrictions when useApi is false
-    if (!this.useApi && options.platform && options.platform !== "maplibre") {
-      throw new Error(
-        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.",
-      );
-    }
+    this.assertPlatformSupportForNoApi(options.platform, "throw");
 
     // Determine if using Google Maps
     const isGoogleMaps = isGoogleMapsOptions(options);
@@ -416,13 +420,33 @@ export class MapFirstCore {
     return false;
   }
 
+  private assertPlatformSupportForNoApi(
+    platform: "google" | "maplibre" | "mapbox" | undefined,
+    mode: "throw" | "warn",
+  ): void {
+    if (this.useApi || !platform || platform === "maplibre") {
+      return;
+    }
+    if (mode === "throw") {
+      throw new Error(USE_API_FALSE_PLATFORM_ERROR);
+    }
+    console.warn(USE_API_FALSE_PLATFORM_WARNING);
+  }
+
+  private ensureApiEnabled(
+    method: string,
+    onError?: (error: unknown) => void,
+  ): boolean {
+    if (this.useApi) return true;
+    console.warn(`${method} requires API usage. Set useApi to true.`);
+    onError?.(new Error(API_DISABLED_ERROR_MESSAGE));
+    return false;
+  }
+
   private async initializeFromLocationData(
     locationData: InitialLocationData,
   ): Promise<void> {
-    if (!this.useApi) {
-      console.warn(
-        "initializeFromLocationData requires API usage. Set useApi to true.",
-      );
+    if (!this.ensureApiEnabled("initializeFromLocationData")) {
       return;
     }
     try {
@@ -530,10 +554,7 @@ export class MapFirstCore {
   }
 
   private async autoLoadProperties(): Promise<void> {
-    if (!this.useApi) {
-      console.warn(
-        "autoLoadProperties requires API usage. Set useApi to true.",
-      );
+    if (!this.ensureApiEnabled("autoLoadProperties")) {
       return;
     }
     if (!this.requestBody) return;
@@ -565,11 +586,7 @@ export class MapFirstCore {
     },
   ): void {
     // Validate platform restrictions when useApi is false
-    if (!this.useApi && config.platform !== "maplibre") {
-      throw new Error(
-        "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.",
-      );
-    }
+    this.assertPlatformSupportForNoApi(config.platform, "throw");
 
     if (this.isMapAttached) {
       console.warn("Map is already attached. Destroying previous adapter.");
@@ -908,6 +925,22 @@ export class MapFirstCore {
     }
   }
 
+  private extractPoiPoints(
+    properties: Property[],
+    type?: PropertyType,
+  ): { lat: number; lng: number }[] {
+    return properties
+      .filter(
+        (property) =>
+          property.location !== undefined &&
+          (type !== undefined ? property.type === type : true),
+      )
+      .map((property) => ({
+        lat: property.location!.lat,
+        lng: property.location!.lon,
+      }));
+  }
+
   flyToPOIs(
     pois?: { lat: number; lng: number }[],
     type?: PropertyType,
@@ -920,16 +953,7 @@ export class MapFirstCore {
 
     let points = pois;
     if (!points || points.length === 0) {
-      points = this.properties
-        .filter(
-          (x) =>
-            x.location !== undefined &&
-            (type !== undefined ? x.type === type : true),
-        )
-        .map((h) => ({
-          lat: h.location!.lat,
-          lng: h.location!.lon,
-        }));
+      points = this.extractPoiPoints(this.properties, type);
     }
     if (!points || points.length === 0) return;
 
@@ -1010,8 +1034,7 @@ export class MapFirstCore {
   }> {
     this.ensureAlive();
 
-    if (!this.useApi) {
-      console.warn("pollForPricing requires API usage. Set useApi to true.");
+    if (!this.ensureApiEnabled("pollForPricing")) {
       return { completed: false };
     }
 
@@ -1032,14 +1055,7 @@ export class MapFirstCore {
       pollingLink,
     };
 
-    let referrer: string | undefined;
-    try {
-      if (document.referrer) {
-        referrer = document.referrer;
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    const referrer = getDocumentReferrer();
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (isCancelled?.()) {
         return { completed, pollData };
@@ -1051,16 +1067,7 @@ export class MapFirstCore {
           {
             method: "POST",
             body: JSON.stringify(body),
-            headers: {
-              "Content-Type": "application/json",
-              "X-Source": "SDK",
-              ...(this.apiKey && {
-                "X-API-Key": this.apiKey,
-              }),
-              ...(referrer && {
-                "X-Referer": referrer,
-              }),
-            },
+            headers: createSdkHeaders(this.apiKey, referrer),
           },
         );
 
@@ -1166,11 +1173,7 @@ export class MapFirstCore {
   }): Promise<APIResponse | null> {
     this.ensureAlive();
 
-    if (!this.useApi) {
-      console.warn(
-        "runPropertiesSearch requires API usage. Set useApi to true.",
-      );
-      onError?.(new Error("API usage is disabled"));
+    if (!this.ensureApiEnabled("runPropertiesSearch", onError)) {
       return null;
     }
 
@@ -1199,6 +1202,10 @@ export class MapFirstCore {
 
       // Track if we've already flown to POIs
       const flown = data.properties.some((x) => !!x.location);
+      const primaryTypePoiPoints = this.extractPoiPoints(
+        data.properties,
+        data.filters.primary_type,
+      );
 
       // Apply price filtering if price range is specified
       const filteredProperties = price
@@ -1226,15 +1233,7 @@ export class MapFirstCore {
       // Fly to POIs if properties have locations
       if (flown) {
         this.flyToPOIs(
-          data.properties
-            .filter(
-              (x) =>
-                !!x.location &&
-                (data.filters.primary_type
-                  ? x.type === data.filters.primary_type
-                  : true),
-            )
-            .map((x) => ({ lat: x.location!.lat, lng: x.location!.lon })),
+          primaryTypePoiPoints,
           undefined,
           body.initial !== true,
         );
@@ -1301,24 +1300,7 @@ export class MapFirstCore {
 
       // Fly to POIs if not already done
       if (!flown) {
-        if (data.properties.some((x) => !!x.location)) {
-          this.flyToPOIs(
-            data.properties
-              .filter(
-                (x) =>
-                  !!x.location &&
-                  (data.filters.primary_type
-                    ? x.type === data.filters.primary_type
-                    : true),
-              )
-              .map((x) => ({ lat: x.location!.lat, lng: x.location!.lon })),
-            undefined,
-            body.initial !== true,
-          );
-        } else if (
-          data.filters.location?.latitude &&
-          data.filters.location?.longitude
-        ) {
+        if (data.filters.location?.latitude && data.filters.location?.longitude) {
           this.flyMapTo(
             data.filters.location.longitude,
             data.filters.location.latitude,
@@ -1343,10 +1325,7 @@ export class MapFirstCore {
   async performBoundsSearch(): Promise<APIResponse | null> {
     this.ensureAlive();
 
-    if (!this.useApi) {
-      console.warn(
-        "performBoundsSearch requires API usage. Set useApi to true.",
-      );
+    if (!this.ensureApiEnabled("performBoundsSearch")) {
       return null;
     }
 
@@ -1430,11 +1409,7 @@ export class MapFirstCore {
   }): Promise<APIResponse | null> {
     this.ensureAlive();
 
-    if (!this.useApi) {
-      console.warn(
-        "runSmartFilterSearch requires API usage. Set useApi to true.",
-      );
-      onError?.(new Error("API usage is disabled"));
+    if (!this.ensureApiEnabled("runSmartFilterSearch", onError)) {
       return null;
     }
 
@@ -1547,14 +1522,8 @@ export class MapFirstCore {
     this.useApi = useApi;
 
     // Validate platform restrictions when switching to useApi = false
-    if (
-      !useApi &&
-      this.currentPlatform &&
-      this.currentPlatform !== "maplibre"
-    ) {
-      console.warn(
-        "When useApi is false, only maplibre platform is supported. Please switch to maplibre.",
-      );
+    if (!useApi) {
+      this.assertPlatformSupportForNoApi(this.currentPlatform, "warn");
     }
 
     // Clear properties when disabling API

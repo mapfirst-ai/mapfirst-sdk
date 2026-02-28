@@ -1,6 +1,10 @@
 import type { Property } from "../../types";
 import { BaseMarkerManager } from "../markermanager";
 import { ClusterDisplayItem } from "../../utils/clustering";
+import {
+  getDotMarkerZIndex,
+  getPrimaryMarkerZIndex,
+} from "../../marker-style-utils";
 
 export type GoogleMapsMarkerHandle = any; // google.maps.marker.AdvancedMarkerElement
 
@@ -43,16 +47,8 @@ export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerH
 
     const zIndex =
       item.kind === "primary"
-        ? isSelected
-          ? 20
-          : isPrimaryType
-          ? 12
-          : 11
-        : isSelected
-        ? 20
-        : isPrimaryType
-        ? 3
-        : 1;
+        ? getPrimaryMarkerZIndex(isPrimaryType, isSelected)
+        : getDotMarkerZIndex(isPrimaryType, isSelected);
 
     return new this.google.marker.AdvancedMarkerElement({
       map: this.mapInstance,
@@ -90,18 +86,9 @@ export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerH
     isPrimaryType: boolean,
     isSelected: boolean
   ): void {
-    const zIndex =
+    marker.zIndex =
       item.kind === "primary"
-        ? isSelected
-          ? 20
-          : isPrimaryType
-          ? 12
-          : 11
-        : isSelected
-        ? 20
-        : isPrimaryType
-        ? 3
-        : 1;
-    marker.zIndex = zIndex;
+        ? getPrimaryMarkerZIndex(isPrimaryType, isSelected)
+        : getDotMarkerZIndex(isPrimaryType, isSelected);
   }
 }

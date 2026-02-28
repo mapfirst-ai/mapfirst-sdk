@@ -39,6 +39,8 @@ export type ProjectedMarker = {
   y: number;
 };
 
+type RawProjectedMarker = Omit<ProjectedMarker, "index">;
+
 export function extractViewState(mapInstance: MapAdapter): ViewStateSnapshot {
   const center = mapInstance.getCenter();
   return {
@@ -82,11 +84,7 @@ export function clusterMarkers({
 }: ClusterParams): ClusterDisplayItem[] {
   if (!markers.length) return [];
   if (!map) {
-    return markers.map((marker) => ({
-      kind: "primary" as const,
-      marker,
-      key: `primary-${marker.tripadvisor_id}`,
-    }));
+    return markers.map((marker) => createSimplePrimaryClusterItem(marker));
   }
 
   const projected: ProjectedMarker[] = markers
@@ -99,9 +97,10 @@ export function clusterMarkers({
         return null;
       }
       const { x, y } = map.project([location.lon, location.lat]);
-      return { marker, index, x, y };
+      return { marker, x, y };
     })
-    .filter((value): value is ProjectedMarker => Boolean(value));
+    .filter((value): value is RawProjectedMarker => Boolean(value))
+    .map((value, index) => ({ ...value, index }));
 
   if (!projected.length) {
     return [];
@@ -150,15 +149,9 @@ export function clusterMarkers({
   groups.forEach((groupItems) => {
     if (groupItems.length === 1) {
       const [{ marker }] = groupItems;
-      const isPrimary = marker.type === primaryType;
-      const isSelected = selectedMarkerId === marker.tripadvisor_id;
-      clustered.push({
-        kind: "primary",
-        marker,
-        key: `primary-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${
-          isSelected ? 1 : 0
-        }-${marker.pricing?.availability}`,
-      });
+      clustered.push(
+        createPrimaryClusterItem(marker, primaryType, selectedMarkerId),
+      );
       return;
     }
 
@@ -166,16 +159,9 @@ export function clusterMarkers({
       compareMarkers(b.marker, a.marker, primaryType)
     );
     const [primary, ...rest] = sorted;
-    const isPrimaryPrimary = primary.marker.type === primaryType;
-    const isSelectedPrimary =
-      selectedMarkerId === primary.marker.tripadvisor_id;
-    clustered.push({
-      kind: "primary",
-      marker: primary.marker,
-      key: `primary-${primary.marker.tripadvisor_id}-p${
-        isPrimaryPrimary ? 1 : 0
-      }-s${isSelectedPrimary ? 1 : 0}-${primary.marker.pricing?.availability}`,
-    });
+    clustered.push(
+      createPrimaryClusterItem(primary.marker, primaryType, selectedMarkerId),
+    );
 
     if (!rest.length) return;
 
@@ -184,14 +170,7 @@ export function clusterMarkers({
 
     rest.forEach((item) => {
       if (selectedMarkerId && item.marker.tripadvisor_id === selectedMarkerId) {
-        const isPrimary = item.marker.type === primaryType;
-        clustered.push({
-          kind: "primary",
-          marker: item.marker,
-          key: `primary-${item.marker.tripadvisor_id}-p${
-            isPrimary ? 1 : 0
-          }-s1-${item.marker.pricing?.availability}`,
-        });
+        clustered.push(createPrimaryClusterItem(item.marker, primaryType, true));
         return;
       }
 
@@ -203,15 +182,7 @@ export function clusterMarkers({
     });
 
     dotCandidates.forEach((item) => {
-      const isPrimary = item.marker.type === primaryType;
-      clustered.push({
-        kind: "dot",
-        marker: item.marker,
-        key: `dot-${item.marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s0-${
-          item.marker.pricing?.availability
-        }`,
-        parentId: primary.marker.tripadvisor_id,
-      });
+      clustered.push(createDotClusterItem(item.marker, primaryType, primary));
     });
 
     if (remainder.length) {
@@ -229,6 +200,56 @@ export function clusterMarkers({
   });
 
   return clustered;
+}
+
+function createSimplePrimaryClusterItem(marker: Property): ClusterDisplayItem {
+  return {
+    kind: "primary",
+    marker,
+    key: `primary-${marker.tripadvisor_id}`,
+  };
+}
+
+function createPrimaryClusterItem(
+  marker: Property,
+  primaryType: PropertyType,
+  selected: number | null | boolean,
+): ClusterDisplayItem {
+  const isPrimary = marker.type === primaryType;
+  const isSelected =
+    typeof selected === "boolean"
+      ? selected
+      : selected === marker.tripadvisor_id;
+  return {
+    kind: "primary",
+    marker,
+    key: buildClusterKey("primary", marker, isPrimary, isSelected),
+  };
+}
+
+function createDotClusterItem(
+  marker: Property,
+  primaryType: PropertyType,
+  parent: ProjectedMarker,
+): ClusterDisplayItem {
+  const isPrimary = marker.type === primaryType;
+  return {
+    kind: "dot",
+    marker,
+    key: buildClusterKey("dot", marker, isPrimary, false),
+    parentId: parent.marker.tripadvisor_id,
+  };
+}
+
+function buildClusterKey(
+  kind: "primary" | "dot",
+  marker: Property,
+  isPrimary: boolean,
+  isSelected: boolean,
+): string {
+  return `${kind}-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${
+    isSelected ? 1 : 0
+  }-${marker.pricing?.availability}`;
 }
 
 function distancePx(a: ProjectedMarker, b: ProjectedMarker) {

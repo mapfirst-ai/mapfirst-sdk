@@ -2,6 +2,11 @@ import type { Property } from ".";
 import { fetchImages } from ".";
 import "./markers.css";
 import { ClusterDisplayItem } from "./utils/clustering";
+import {
+  LOADING_VIDEO_HTML,
+  getPrimaryMarkerPillClass,
+  getPrimaryMarkerZIndex,
+} from "./marker-style-utils";
 
 const AWARD_SVG = `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 3.953a7.442 7.442 0 1 0 .001 14.884A7.442 7.442 0 0 0 12 3.953m0 14.05a6.61 6.61 0 1 1 0-13.218 6.61 6.61 0 0 1 0 13.219M10.343 11.9a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.821 0m5.134 0a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.82 0m.82-1.897.84-.913h-1.863A5.8 5.8 0 0 0 12 8.08a5.77 5.77 0 0 0-3.27 1.008H6.862l.84.913a2.567 2.567 0 1 0 3.475 3.78l.823.896.823-.895a2.568 2.568 0 1 0 3.474-3.78m-6.865 3.634a1.738 1.738 0 1 1 0-3.476 1.738 1.738 0 0 1 0 3.476M12 11.85c0-1.143-.832-2.124-1.929-2.543A5 5 0 0 1 12 8.92a5 5 0 0 1 1.928.386c-1.096.42-1.927 1.4-1.927 2.543m2.566 1.787a1.738 1.738 0 1 1 .001-3.476 1.738 1.738 0 0 1 0 3.476m-8.456 3.719s-.377-.946-1.396-1.903c-1.02-.957-2.303-1.132-2.303-1.132s.457 1.02 1.54 2.04c1.086 1.017 2.159.995 2.159.995m2.568 1.41s-.524-.511-1.479-.883-1.861-.191-1.861-.191.598.54 1.615.935c1.016.397 1.725.139 1.725.139m2.493.505s-.545-.224-1.357-.196-1.415.47-1.415.47.608.222 1.473.193 1.3-.467 1.3-.467m-6.186-4.203s-.175-1.008-.974-2.154c-.8-1.147-2.015-1.578-2.015-1.578s.238 1.098 1.089 2.319c.85 1.22 1.9 1.413 1.9 1.413m-1.003-3.071s.195-1.021-.134-2.393c-.328-1.371-1.294-2.21-1.294-2.21s-.17 1.128.18 2.589c.35 1.46 1.248 2.014 1.248 2.014"></path><path d="M17.887 17.355s.377-.946 1.396-1.903c1.02-.957 2.303-1.132 2.303-1.132s-.457 1.02-1.54 2.04c-1.086 1.017-2.159.995-2.159.995m-2.567 1.41s.524-.511 1.479-.883 1.861-.191 1.861-.191-.598.54-1.615.935c-1.016.397-1.725.139-1.725.139m-2.493.505s.545-.224 1.357-.196 1.415.47 1.415.47-.608.222-1.473.193-1.3-.467-1.3-.467m6.186-4.203s.175-1.008.974-2.154c.8-1.147 2.015-1.578 2.015-1.578s-.238 1.098-1.089 2.319c-.85 1.22-1.9 1.413-1.9 1.413m1.003-3.071s-.195-1.021.133-2.393c.33-1.371 1.293-2.21 1.293-2.21s.17 1.128-.18 2.589c-.349 1.46-1.246 2.014-1.246 2.014M12 20.047a.413.413 0 1 0 0-.827.413.413 0 0 0 0 .827"></path></svg>`;
 
@@ -11,7 +16,12 @@ const EAT_DRINK_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="cur
 
 const ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56 7.5H3.75a.25.25 0 0 0-.25.25v10c0 .138.112.25.25.25h16.5a.25.25 0 0 0 .25-.25v-10a.25.25 0 0 0-.25-.25h-3.81l-2-2H9.56zM8.94 4h6.12l2 2h3.19c.966 0 1.75.784 1.75 1.75v10a1.75 1.75 0 0 1-1.75 1.75H3.75A1.75 1.75 0 0 1 2 17.75v-10C2 6.784 2.784 6 3.75 6h3.19z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 9.25a2.75 2.75 0 1 0 0 5.5 2.75 2.75 0 0 0 0-5.5M7.75 12a4.25 4.25 0 1 1 8.5 0 4.25 4.25 0 0 1-8.5 0"/></svg>`;
 
-const LOADING_VIDEO_HTML = `<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>`;
+const STAR_BASE_STYLE =
+  "display:inline-block;width:8px;height:8px;border:1px solid #03852e;border-radius:9999px;";
+const STAR_HALF_STYLE =
+  "linear-gradient(90deg, #03852e 50%, transparent 50%)";
+type CardStarKind = "full" | "half" | "empty";
+const STAR_KIND_CACHE = new Map<string, CardStarKind[]>();
 
 export function setupHoverCard(
   root: HTMLElement,
@@ -177,6 +187,10 @@ function getDefaultImageForType(type: string): string {
 
 function createPropertyCard(marker: Property): HTMLElement {
   const url = marker.pricing?.offer?.clickUrl ?? marker.url;
+  const rating = marker.rating || 0;
+  const reviews = marker.reviews || 0;
+  const displayPrice = marker.pricing?.offer?.displayPrice ?? marker.price_level;
+  const defaultImageUrl = getDefaultImageForType(marker.type);
 
   const card = document.createElement(url ? "a" : "div");
   card.className = "mapfirst-property-hover-card";
@@ -187,80 +201,102 @@ function createPropertyCard(marker: Property): HTMLElement {
     (card as HTMLAnchorElement).target = "_blank";
   }
 
-  const rating = marker.rating || 0;
-  const reviews = marker.reviews || 0;
-  const displayPrice =
-    marker.pricing?.offer?.displayPrice ?? marker.price_level;
+  const imageContainer = document.createElement("div");
+  imageContainer.className =
+    "mapfirst-property-hover-image mapfirst-property-hover-image-placeholder";
+  imageContainer.dataset.tripadvisorId = marker.tripadvisor_id.toString();
+  imageContainer.dataset.defaultImage = defaultImageUrl;
 
-  // Generate star rating
-  const renderStars = () => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const stars = [];
+  const details = document.createElement("div");
+  details.className = "mapfirst-property-hover-details";
 
-    // Style for star circles
-    const starStyle = `
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border: 1px solid #03852e;
-      border-radius: 9999px;
-    `;
+  const name = document.createElement("div");
+  name.className = "mapfirst-property-hover-name";
+  name.textContent = marker.name ?? "";
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        `<span style="${starStyle} background-color: #03852e;"></span>`,
-      );
-    }
-    if (hasHalfStar) {
-      stars.push(
-        `<span style="${starStyle} background: linear-gradient(90deg, #03852e 50%, transparent 50%);"></span>`,
-      );
-    }
-    const remainingStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < remainingStars; i++) {
-      stars.push(`<span style="${starStyle}"></span>`);
-    }
-    return stars.join("");
-  };
+  const ratingContainer = document.createElement("div");
+  ratingContainer.className = "mapfirst-property-hover-rating";
 
-  const defaultImageUrl = getDefaultImageForType(marker.type);
+  const ratingValue = document.createElement("span");
+  ratingValue.className = "rating-value";
+  ratingValue.textContent = rating.toFixed(1);
 
-  card.innerHTML = `
-    <div 
-      class="mapfirst-property-hover-image mapfirst-property-hover-image-placeholder"
-      data-tripadvisor-id="${marker.tripadvisor_id}"
-      data-default-image="${defaultImageUrl}"
-    ></div>
-    <div class="mapfirst-property-hover-details">
-      <div class="mapfirst-property-hover-name">${marker.name}</div>
-      <div class="mapfirst-property-hover-rating">
-        <span class="rating-value">${rating.toFixed(1)}</span>
-        <span class="stars">${renderStars()}</span>
-        <span class="reviews">(${reviews})</span>
-      </div>
-      ${
-        marker.type === "Accommodation" && displayPrice
-          ? `
-        <div class="mapfirst-property-hover-price">
-          Starting at <strong>${displayPrice}</strong>
-        </div>
-      `
-          : ""
-      }
-      ${
-        url
-          ? `
-        <span class="mapfirst-property-hover-learn-more">
-          Learn More
-        </span>
-      `
-          : ""
-      }
-    </div>
-  `;
+  const stars = document.createElement("span");
+  stars.className = "stars";
+  stars.appendChild(renderCardStars(rating));
+
+  const reviewsText = document.createElement("span");
+  reviewsText.className = "reviews";
+  reviewsText.textContent = `(${reviews})`;
+
+  ratingContainer.append(ratingValue, stars, reviewsText);
+  details.append(name, ratingContainer);
+
+  if (marker.type === "Accommodation" && displayPrice) {
+    const price = document.createElement("div");
+    price.className = "mapfirst-property-hover-price";
+    price.append("Starting at ");
+    const strong = document.createElement("strong");
+    strong.textContent = displayPrice;
+    price.appendChild(strong);
+    details.appendChild(price);
+  }
+
+  if (url) {
+    const learnMore = document.createElement("span");
+    learnMore.className = "mapfirst-property-hover-learn-more";
+    learnMore.textContent = "Learn More";
+    details.appendChild(learnMore);
+  }
+
+  card.append(imageContainer, details);
 
   return card;
+}
+
+function renderCardStars(rating: number): DocumentFragment {
+  const fragment = document.createDocumentFragment();
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  const cacheKey = `${fullStars}:${hasHalfStar}`;
+  const cached = STAR_KIND_CACHE.get(cacheKey);
+  if (cached) {
+    for (const star of cached) {
+      fragment.appendChild(createCardStar(star));
+    }
+    return fragment;
+  }
+
+  const stars: CardStarKind[] = [];
+  for (let i = 0; i < fullStars; i += 1) {
+    stars.push("full");
+  }
+  if (hasHalfStar) {
+    stars.push("half");
+  }
+  const remainingStars = 5 - Math.ceil(rating);
+  for (let i = 0; i < remainingStars; i += 1) {
+    stars.push("empty");
+  }
+
+  STAR_KIND_CACHE.set(cacheKey, stars);
+  for (const star of stars) {
+    fragment.appendChild(createCardStar(star));
+  }
+  return fragment;
+}
+
+function createCardStar(kind: CardStarKind): HTMLElement {
+  const star = document.createElement("span");
+  star.style.cssText = STAR_BASE_STYLE;
+
+  if (kind === "full") {
+    star.style.backgroundColor = "#03852e";
+  } else if (kind === "half") {
+    star.style.background = STAR_HALF_STYLE;
+  }
+
+  return star;
 }
 
 function loadCardImage(card: HTMLElement, marker: Property) {
@@ -280,17 +316,7 @@ function loadCardImage(card: HTMLElement, marker: Property) {
     fetchImages(marker.tripadvisor_id, 1)
       .then((imageUrl) => {
         if (imageUrl && imgContainer) {
-          // Create an img element and set the TripAdvisor image
-          const img = document.createElement("img");
-          img.src = imageUrl;
-          img.alt = marker.name;
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
-
-          // Replace placeholder with image
-          imgContainer.innerHTML = "";
-          imgContainer.appendChild(img);
+          setCardImage(imgContainer, imageUrl, marker.name);
           imgContainer.classList.remove(
             "mapfirst-property-hover-image-placeholder",
           );
@@ -302,15 +328,7 @@ function loadCardImage(card: HTMLElement, marker: Property) {
       .catch(() => {
         // Load default type-based image on error
         if (defaultImageUrl && imgContainer) {
-          const img = document.createElement("img");
-          img.src = defaultImageUrl;
-          img.alt = marker.name;
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
-
-          imgContainer.innerHTML = "";
-          imgContainer.appendChild(img);
+          setCardImage(imgContainer, defaultImageUrl, marker.name);
           imgContainer.classList.remove(
             "mapfirst-property-hover-image-placeholder",
           );
@@ -318,6 +336,22 @@ function loadCardImage(card: HTMLElement, marker: Property) {
         }
       });
   }
+}
+
+function setCardImage(
+  container: HTMLElement,
+  imageUrl: string,
+  alt: string | undefined,
+) {
+  const img = document.createElement("img");
+  img.src = imageUrl;
+  img.alt = alt ?? "";
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "cover";
+
+  container.innerHTML = "";
+  container.appendChild(img);
 }
 
 function positionCard(
@@ -389,7 +423,7 @@ export function createPrimaryMarkerElement(
 
   const root = document.createElement("div");
   root.className = "mapfirst-marker-root";
-  root.style.zIndex = isSelected ? "20" : isPrimaryType ? "12" : "11";
+  root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
 
   // Get URL for the marker
   const markerUrl = marker.pricing?.offer?.clickUrl ?? marker.url;
@@ -400,15 +434,11 @@ export function createPrimaryMarkerElement(
     (pill as HTMLAnchorElement).target = "_blank";
     pill.style.textDecoration = "none";
   }
-  pill.className = isPending
-    ? "mapfirst-marker-pill mapfirst-marker-pill-pending"
-    : `mapfirst-marker-pill mapfirst-marker-pill-active${
-        isSelected
-          ? " mapfirst-marker-selected"
-          : !isPrimaryType
-            ? " mapfirst-marker-non-primary"
-            : ""
-      }`;
+  pill.className = getPrimaryMarkerPillClass(
+    isPending,
+    isPrimaryType,
+    isSelected,
+  );
   // pill.title = marker.name ?? String(marker.tripadvisor_id);
 
   // Awards or Rating badge

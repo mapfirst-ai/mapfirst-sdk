@@ -33,30 +33,27 @@ export function processApiFilters(
   apiFilters: ApiFiltersResponse
 ): SmartFilter[] {
   const filters: SmartFilter[] = [];
+  const addBasicFilters = (
+    values: string[] | undefined,
+    type: "amenity" | "hotelStyle",
+    prefix: string
+  ) => {
+    if (!values || !Array.isArray(values)) return;
+    values.forEach((value) => {
+      filters.push({
+        id: `${prefix}-${value}`,
+        label: value,
+        type,
+        value,
+      });
+    });
+  };
 
   // Process amenities
-  if (apiFilters.amenities && Array.isArray(apiFilters.amenities)) {
-    apiFilters.amenities.forEach((amenity: string) => {
-      filters.push({
-        id: `amenity-${amenity}`,
-        label: amenity,
-        type: "amenity",
-        value: amenity,
-      });
-    });
-  }
+  addBasicFilters(apiFilters.amenities, "amenity", "amenity");
 
   // Process hotel styles
-  if (apiFilters.hotelStyle && Array.isArray(apiFilters.hotelStyle)) {
-    apiFilters.hotelStyle.forEach((style: string) => {
-      filters.push({
-        id: `hotelStyle-${style}`,
-        label: style,
-        type: "hotelStyle",
-        value: style,
-      });
-    });
-  }
+  addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
 
   // Process price range
   if (apiFilters.price) {
@@ -109,11 +106,14 @@ export function processApiFilters(
 
   // Process restaurant price levels
   if (apiFilters.selected_restaurant_price_levels) {
+    const joinedPriceLevels = apiFilters.selected_restaurant_price_levels.join(
+      ", "
+    );
     filters.push({
       id: "selected_restaurant_price_levels",
-      label: apiFilters.selected_restaurant_price_levels.join(", "),
+      label: joinedPriceLevels,
       type: "selected_restaurant_price_levels",
-      value: apiFilters.selected_restaurant_price_levels.join(", "),
+      value: joinedPriceLevels,
       priceLevels: apiFilters.selected_restaurant_price_levels,
     });
   }

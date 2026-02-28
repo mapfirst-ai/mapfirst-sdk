@@ -4,7 +4,7 @@ export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm", "cjs", "iife"],
   dts: true,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
   globalName: "MyUniversalLib", // window.MyUniversalLib in browsers
   minify: true,
