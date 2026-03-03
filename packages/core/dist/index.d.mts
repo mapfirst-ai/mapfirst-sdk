@@ -51,6 +51,8 @@ type HotelPricingAPIResponse = {
         isComplete: boolean;
         pollingLink?: string;
         results?: Property[];
+        invalidHotelIds?: string[];
+        unsupportedHotelIds?: string[];
     };
 };
 type PropertyAwardImage = {

@@ -11,11 +11,39 @@ import {
   type PropertyType,
 } from "@mapfirst.ai/core";
 
-// Export filter utilities from core
+// Re-export all of @mapfirst.ai/core so users only need @mapfirst.ai/react.
+// SmartFilter and Locale are excluded here because the react package provides
+// its own versions (SmartFilter component, Locale from useTranslation).
+export type {
+  Property,
+  PropertyType,
+  PriceLevel,
+  Price,
+  FilterSchema,
+  ApiFiltersResponse,
+  MapBounds,
+  ViewState,
+  ActiveLocation,
+  FilterState,
+  MapState,
+  MapStateCallbacks,
+  MapStateUpdate,
+  MapLibreNamespace,
+  GoogleMapsNamespace,
+  MapboxNamespace,
+  Environment,
+  TripAdvisorImage,
+  TripAdvisorImageResponse,
+  BaseMapFirstOptions,
+  MapFirstOptions,
+} from "@mapfirst.ai/core";
 export {
   processApiFilters,
   convertToApiFilters,
-  type ApiFiltersResponse,
+  PropertiesFetchError,
+  fetchImages,
+  fetchProperties,
+  MapFirstCore,
 } from "@mapfirst.ai/core";
 
 // Export all components
@@ -68,7 +96,7 @@ type StateSetter = React.Dispatch<React.SetStateAction<MapState | null>>;
 function updateStateField<K extends keyof MapState>(
   setState: StateSetter,
   key: K,
-  value: MapState[K]
+  value: MapState[K],
 ) {
   setState((prev) => (prev ? { ...prev, [key]: value } : null));
 }
@@ -90,7 +118,7 @@ function attachMapOnce(
   instanceRef: React.MutableRefObject<MapFirstCore | null>,
   attachedRef: React.MutableRefObject<boolean>,
   map: any,
-  config: AttachMapConfig
+  config: AttachMapConfig,
 ) {
   if (!instanceRef.current || !map || attachedRef.current) {
     return;
@@ -253,7 +281,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         instanceRef.current.setUseApi(useApi, autoLoad);
       }
     },
-    []
+    [],
   );
 
   // Properties search
@@ -275,7 +303,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         return await instanceRef.current.runPropertiesSearch(options);
       },
     }),
-    []
+    [],
   );
 
   // Smart filter search
@@ -286,7 +314,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         filters?: SmartFilter[];
         onProcessFilters?: (
           filters: any,
-          location_id?: number
+          location_id?: number,
         ) => {
           smartFilters?: SmartFilter[];
           price?: any;
@@ -302,7 +330,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         return await instanceRef.current.runSmartFilterSearch(options);
       },
     }),
-    []
+    [],
   );
 
   // Bounds search
@@ -316,7 +344,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         return await instanceRef.current.performBoundsSearch();
       },
     }),
-    []
+    [],
   );
 
   // Map attachment helpers
@@ -325,7 +353,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       maplibregl: MapLibreNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void }
+      options?: { onMarkerClick?: (marker: Property) => void },
     ) => {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
         platform: "maplibre",
@@ -333,7 +361,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         onMarkerClick: options?.onMarkerClick,
       });
     },
-    []
+    [],
   );
 
   const googleMapsAttachedRef = React.useRef(false);
@@ -341,7 +369,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       google: GoogleMapsNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void }
+      options?: { onMarkerClick?: (marker: Property) => void },
     ) => {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
         platform: "google",
@@ -349,7 +377,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         onMarkerClick: options?.onMarkerClick,
       });
     },
-    []
+    [],
   );
 
   const mapboxAttachedRef = React.useRef(false);
@@ -357,7 +385,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       mapboxgl: MapboxNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void }
+      options?: { onMarkerClick?: (marker: Property) => void },
     ) => {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {
         platform: "mapbox",
@@ -365,7 +393,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         onMarkerClick: options?.onMarkerClick,
       });
     },
-    []
+    [],
   );
 
   return {

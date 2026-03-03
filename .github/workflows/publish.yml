@@ -1,0 +1,71 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "core@v*"
+      - "react@v*"
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    # "npm" environment must be configured in GitHub repo Settings → Environments
+    # with a branch protection rule: only allow tags from the "main" branch.
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write # required for npm trusted publishing (OIDC) + provenance
+      # One-time setup on npmjs.com per package:
+      # Package → Settings → Publishing → GitHub Actions → add this repo + workflow path
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Publish as "next" for pre-release versions (e.g. 1.0.0-beta.1), "latest" otherwise
+      - name: Determine dist-tag
+        id: dist_tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#*@v}"
+          if [[ "$VERSION" == *"-"* ]]; then
+            echo "tag=next" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Core ──────────────────────────────────────────────────────────────
+      - name: Publish @mapfirst.ai/core
+        if: startsWith(github.ref_name, 'core@v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#core@v}"
+          PKG_VERSION=$(node -p "require('./packages/core/package.json').version")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          cd packages/core && npm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }}
+
+      # ── React ─────────────────────────────────────────────────────────────
+      - name: Publish @mapfirst.ai/react
+        if: startsWith(github.ref_name, 'react@v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#react@v}"
+          PKG_VERSION=$(node -p "require('./packages/react/package.json').version")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          cd packages/react && npm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }}

@@ -1,5 +1,1549 @@
-import v from"react";import{MapFirstCore as rt}from"@mapfirst.ai/core";import{processApiFilters as qr,convertToApiFilters as Vr}from"@mapfirst.ai/core";import{useCallback as oe}from"react";import W from"react";import Se from"react";import{jsx as L,jsxs as Q}from"react/jsx-runtime";var se=({className:t,style:e})=>Q("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:t,style:{width:"1em",height:"1em",...e},children:[L("circle",{cx:"11",cy:"11",r:"8"}),L("path",{d:"m21 21-4.35-4.35"})]}),le=({className:t,style:e})=>Q("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:t,style:{width:"1em",height:"1em",...e},children:[L("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),L("line",{x1:"6",y1:"6",x2:"18",y2:"18"})]}),_=({className:t,style:e})=>Q("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:t,style:{width:"1em",height:"1em",...e},children:[L("path",{d:"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}),L("path",{d:"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"})]}),K=({className:t,style:e})=>L("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:t,style:{width:"1em",height:"1em",...e},children:L("polyline",{points:"9 18 15 12 9 6"})}),ce=({className:t,style:e,fill:p="none"})=>L("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:p,stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:t,style:{width:"1em",height:"1em",...e},children:L("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"})});import{jsx as pe}from"react/jsx-runtime";var xe={position:"absolute",top:"-8px",right:"-8px",padding:"2px",borderRadius:"50%",backgroundColor:"white",border:"1px solid #03852e",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background-color 0.2s"},ve={width:"17px",height:"17px"},w=({onClick:t,style:e})=>{let[p,n]=Se.useState(!1);return pe("button",{style:{...xe,backgroundColor:p?"#e5e5e5":"white",...e},onClick:t,onMouseEnter:()=>n(!0),onMouseLeave:()=>n(!1),"aria-label":"Remove filter",children:pe(le,{style:ve})})};import{jsx as q,jsxs as Fe}from"react/jsx-runtime";var ke={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"8px",flexShrink:0,height:"34px"},V=({label:t,icon:e,remove:p,style:n})=>Fe("div",{style:{...ke,...n},children:[e&&q("span",{style:{display:"flex",alignItems:"center"},children:e}),q("span",{style:{whiteSpace:"nowrap"},children:t}),q(w,{onClick:p})]});import{useState as Ne}from"react";import{useCallback as ue,useMemo as Re,useState as Pe}from"react";var Le={"smartFilter.typingPrompt":"Search for hotels, restaurants, or attractions...","smartFilter.nav.previous":"Previous filters","smartFilter.nav.next":"Next filters","smartFilter.toast.locationRequired":"Please select a location first","smartFilter.clearAll":"Clear all","smartFilter.minRating.suffix":"+","smartFilter.minRating.label":"{{value}}+","smartFilter.minRating.remove":"Remove rating filter","smartFilter.minRating.setTo":"Set rating to {{rating}}","smartFilter.priceRange.label":"Price Range","smartFilter.priceRange.remove":"Remove price filter","smartFilter.priceRange.edit":"Edit price","smartFilter.transformedQuery.remove":"Remove search query","smartFilter.transformedQuery.edit":"Edit search query","smartFilter.restaurantPriceLevel.label":"Price Level","smartFilter.restaurantPriceLevel.remove":"Remove price level filter","smartFilter.restaurantPriceLevel.none":"Any","smartFilter.restaurantPriceLevel.options.cheapEats":"Cheap Eats","smartFilter.restaurantPriceLevel.options.midRange":"Mid Range","smartFilter.restaurantPriceLevel.options.fineDining":"Fine Dining"},we=(t,e="USD")=>new Intl.NumberFormat("en-US",{style:"currency",currency:e,minimumFractionDigits:0,maximumFractionDigits:0}).format(t),R=(t,e)=>{let[p,n]=Pe("en"),i=Re(()=>({...Le,...t}),[t]),a=ue((c,o)=>{let u=i[c]||c;return o&&Object.keys(o).forEach(l=>{u=u.replace(new RegExp(`{{${l}}}`,"g"),String(o[l]))}),u},[i]),f=ue((c,o)=>e?e(c,o):we(c,o),[e]);return{t:a,locale:p,setLocale:n,formatCurrency:f}};import{jsx as D,jsxs as Ae}from"react/jsx-runtime";var Y={display:"block",width:"12px",height:"12px",borderRadius:"50%",border:"1px solid #03852e",pointerEvents:"none"},Me={...Y,backgroundColor:"#03852e"},Ee={...Y,background:"linear-gradient(90deg, #03852e 50%, transparent 50%)"},Te={display:"flex",alignItems:"center",gap:"4px"},Ie={display:"flex",gap:"1px",userSelect:"none"},Be=t=>{let e=[],p=Math.floor(t),n=t%1!==0;for(let a=0;a<p;a+=1)e.push(D("span",{style:Me},`full-${a}`));n&&e.push(D("span",{style:Ee},"half"));let i=Math.max(0,5-Math.ceil(t));for(let a=0;a<i;a+=1)e.push(D("span",{style:Y},`empty-${a}`));return e},ft=(t,e)=>Ae("span",{style:Te,children:[D("span",{style:Ie,children:Be(t)})," ",e]}),$=t=>t.toFixed(1),yt=(t,e,p,n)=>`${n(t,p)} - ${n(e!=null?e:0,p)}`;import{jsx as T,jsxs as z}from"react/jsx-runtime";var _e={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",gap:"8px",alignItems:"center",justifyContent:"center",flexShrink:0,height:"34px"},De={display:"flex",gap:"1px",userSelect:"none"},U={display:"block",width:"12px",height:"12px",borderRadius:"50%",border:"1px solid #03852e",pointerEvents:"none"},H={position:"absolute",top:0,height:"100%",cursor:"pointer",backgroundColor:"transparent",border:"none",padding:0},G=({rating:t,onChange:e,onRemove:p,star:n=!1})=>{let[i,a]=Ne(null),{t:f}=R(),c=i!=null?i:t,o=g=>n&&g?g.toString():f("smartFilter.minRating.label",{value:$(g)}),u=f("smartFilter.minRating.remove"),l=g=>f("smartFilter.minRating.setTo",{rating:$(g)}),y=g=>{let S=g+1;return c>=S?"full":c>=S-.5?"half":"empty"},C=g=>{a(null),g!==t&&e(g)},b=g=>{var h;let S=g.relatedTarget;(!S||!((h=g.currentTarget.closest("[data-min-rating-chip]"))!=null&&h.contains(S)))&&a(null)};return z("div",{style:_e,"data-min-rating-chip":!0,children:[z("div",{style:{display:"flex",alignItems:"center",gap:"4px"},onMouseLeave:()=>a(null),children:[T("div",{style:De,children:Array.from({length:5}).map((g,S)=>{let h=y(S),s=S+1,m=s-.5;if(n)return z("div",{style:{position:"relative",width:"16px",height:"16px"},children:[T(ce,{fill:c>=s?"#03852e":"none",style:{width:"16px",height:"16px",pointerEvents:"none"}}),T("button",{type:"button",style:{...H,left:0,width:"50%",borderRadius:"50% 0 0 50%"},onMouseEnter:()=>a(m),onFocus:()=>a(m),onBlur:b,onClick:()=>C(m),"aria-label":l(m),title:o(m)}),T("button",{type:"button",style:{...H,left:"50%",width:"50%",borderRadius:"0 50% 50% 0"},onMouseEnter:()=>a(s),onFocus:()=>a(s),onBlur:b,onClick:()=>C(s),"aria-label":l(s),title:o(s)})]},S);let x=h==="full"?{...U,backgroundColor:"#03852e"}:U,r={...U,background:"linear-gradient(90deg, #03852e 50%, transparent 50%)"};return z("div",{style:{position:"relative",width:"12px",height:"12px"},children:[T("span",{style:h==="half"?r:x}),T("button",{type:"button",style:{...H,left:0,width:"50%",borderRadius:"50% 0 0 50%",outline:"2px solid transparent",outlineOffset:"1px"},onMouseEnter:()=>a(m),onFocus:()=>a(m),onBlur:b,onClick:()=>C(m),"aria-label":l(m),title:o(m)}),T("button",{type:"button",style:{...H,left:"50%",width:"50%",borderRadius:"0 50% 50% 0",outline:"2px solid transparent",outlineOffset:"1px"},onMouseEnter:()=>a(s),onFocus:()=>a(s),onBlur:b,onClick:()=>C(s),"aria-label":l(s),title:o(s)})]},S)})}),T("span",{style:{whiteSpace:"nowrap"},children:o(c)})]}),T(w,{onClick:p})]})};import{useEffect as He,useState as j}from"react";import{Fragment as Ke,jsx as M,jsxs as Z}from"react/jsx-runtime";var ze={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"8px",flexShrink:0,height:"34px"},Oe={outline:"none",fontSize:"16px",backgroundColor:"transparent",borderRadius:"2px",padding:"2px 8px",width:"64px",textAlign:"center",border:"none"},We={padding:"4px",borderRadius:"50%",cursor:"pointer",transition:"background-color 0.2s",border:"none",backgroundColor:"transparent",color:"#737373",display:"flex",alignItems:"center",justifyContent:"center"},de=({label:t,value:e,placeholder:p,currency:n,isOptional:i=!1,showRemoveButton:a=!1,editLabel:f,showAddWhenEmpty:c=!1,onCommit:o,onRemove:u})=>{let[l,y]=j(e!==void 0?String(e):""),[C,b]=j(!1),[g,S]=j(!1),h=e!==void 0;He(()=>{y(e!==void 0?String(e):""),b(!1)},[e]);let s=()=>{y(e!==void 0?String(e):"")},m=()=>{if(l.trim()===""){if(i){o(void 0),y("");return}s();return}let d=Number(l);if(!Number.isFinite(d)){s();return}let k=Math.max(0,d);if(k===e){s();return}o(k)};return Z("div",{style:ze,children:[M("span",{style:{fontSize:"10px",textTransform:"uppercase",fontWeight:600,letterSpacing:"0.05em"},children:t}),C?M("input",{value:l,onChange:d=>{let k=d.target.value.replace(/[^\d]/g,"");y(k)},onBlur:()=>{m(),b(!1)},onKeyDown:d=>{if(d.key==="Enter"){d.preventDefault(),d.currentTarget.blur(),b(!1);return}if(d.key==="Escape"){d.preventDefault(),s(),d.currentTarget.blur(),b(!1);return}d.key.length===1&&/[0-9]/.test(d.key)||d.key==="Backspace"||d.key==="Delete"||d.key==="Tab"||d.key==="ArrowLeft"||d.key==="ArrowRight"||d.key==="Home"||d.key==="End"||d.preventDefault()},placeholder:p,inputMode:"numeric",pattern:"[0-9]*","aria-label":t,style:Oe,autoFocus:!0}):h?Z("span",{style:{fontSize:"16px"},children:[n,e]}):c?M("button",{type:"button",style:{fontSize:"16px",color:"#737373",cursor:"pointer",border:"none",backgroundColor:"transparent",padding:0},onClick:()=>b(!0),"aria-label":f,children:"+"}):M("span",{style:{fontSize:"16px",color:"#737373"},children:"-"}),(!c||c&&C)&&M("span",{style:{color:"#737373",fontSize:"12px"},children:n}),!C&&(!c||h)&&M("button",{type:"button",style:{...We,backgroundColor:g?"#e5e5e5":"transparent"},"aria-label":f,title:f,onClick:()=>b(!0),onMouseEnter:()=>S(!0),onMouseLeave:()=>S(!1),children:M(_,{})}),a&&M(w,{onClick:u})]})},X=({priceRange:t,currency:e,onChange:p,onRemove:n})=>{let{t:i}=R(),a="Min",f="Max",c=i("smartFilter.priceRange.edit"),o=(u,l)=>{let y={min:t.min,max:t.max};u==="min"?(y.min=l,l!==void 0&&t.max!==void 0&&l>t.max&&(y.max=l)):(y.max=l,l!==void 0&&t.min!==void 0&&l<t.min&&(y.min=l)),(y.min!==t.min||y.max!==t.max)&&p(y)};return Z(Ke,{children:[M(de,{label:a,value:t.min,currency:e,editLabel:c,showRemoveButton:t.min!==void 0&&t.min!==0,onCommit:u=>o("min",u),onRemove:n}),M(de,{label:f,value:t.max,currency:e,isOptional:!0,showRemoveButton:t.max!==void 0,editLabel:c,showAddWhenEmpty:!0,onCommit:u=>o("max",u),onRemove:n})]})};import{jsx as N,jsxs as O}from"react/jsx-runtime";var Qe={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"16px",flexShrink:0,height:"34px"},me=[{value:"Cheap Eats",key:"cheapEats"},{value:"Mid Range",key:"midRange"},{value:"Fine Dining",key:"fineDining"}],J=({values:t,onChange:e,onRemove:p})=>{let{t:n}=R(),i=n("smartFilter.restaurantPriceLevel.label"),a=n("smartFilter.restaurantPriceLevel.remove"),f=n("smartFilter.restaurantPriceLevel.none"),c=o=>{let{value:u,checked:l}=o.target,y=u,C=new Set(t);l?C.add(y):C.delete(y);let b=me.filter(g=>C.has(g.value)).map(g=>g.value);e(b)};return O("div",{style:Qe,children:[O("div",{style:{display:"flex",alignItems:"center",gap:"8px",flexWrap:"wrap"},children:[N("span",{style:{fontSize:"10px",textTransform:"uppercase",fontWeight:600,letterSpacing:"0.05em"},children:i}),O("div",{style:{display:"flex",gap:"12px"},children:[me.map(o=>{let u=n(`smartFilter.restaurantPriceLevel.options.${o.key}`),l=`price-level-${o.key}`;return O("label",{htmlFor:l,style:{display:"flex",alignItems:"center",gap:"4px",fontSize:"12px",cursor:"pointer"},children:[N("input",{id:l,type:"checkbox",value:o.value,checked:t.includes(o.value),onChange:c,style:{accentColor:"#03852e",cursor:"pointer"}}),N("span",{children:u})]},o.value)}),t.length===0&&N("span",{style:{fontSize:"12px",color:"#737373"},children:f})]})]}),N(w,{onClick:p})]})};import{useEffect as qe,useRef as Ve,useState as ee}from"react";import{jsx as A,jsxs as Ge}from"react/jsx-runtime";var Ye={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"8px",flexShrink:0,userSelect:"none",height:"34px"},$e={backgroundColor:"#ececec",borderRadius:"2px",padding:"2px 8px",outline:"none",fontSize:"16px",minWidth:"8ch",border:"none"},Ue={padding:"4px",borderRadius:"50%",cursor:"pointer",transition:"background-color 0.2s",color:"#737373",border:"none",backgroundColor:"transparent",display:"flex",alignItems:"center",justifyContent:"center"},te=({value:t,onChange:e,onRemove:p})=>{let n=Ve(null),[i,a]=ee(t),[f,c]=ee(!1),[o,u]=ee(!1),{t:l}=R(),y=l("smartFilter.transformedQuery.remove"),C=l("smartFilter.transformedQuery.edit");qe(()=>{a(t),c(!1)},[t]);let b=()=>{let h=i.trim();if(!h.length){a(t);return}h!==t&&e(h)};return Ge("div",{style:Ye,children:[A(se,{style:{width:"16px",height:"16px",color:"#03852e"}}),f?A("input",{ref:n,value:i,onChange:h=>{a(h.target.value)},onBlur:()=>{b(),c(!1)},onKeyDown:h=>{if(h.key==="Enter"){h.preventDefault(),h.currentTarget.blur();return}if(h.key==="Escape"){h.preventDefault(),a(t),h.currentTarget.blur();return}},"aria-label":C,style:$e,autoFocus:!0}):A("span",{style:{fontSize:"16px"},children:t}),!f&&A("button",{type:"button",style:{...Ue,backgroundColor:o?"#e5e5e5":"transparent"},"aria-label":C,title:C,onClick:()=>c(!0),onMouseEnter:()=>u(!0),onMouseLeave:()=>u(!1),children:A(_,{})}),A(w,{onClick:p})]})};import{useCallback as ge,useEffect as je,useRef as Ze,useState as fe}from"react";var re=t=>{let e=Ze(null),[p,n]=fe(!0),[i,a]=fe(!0),f=ge(()=>{let o=e.current;if(!o){n(!0),a(!0);return}let{scrollLeft:u,scrollWidth:l,clientWidth:y}=o;n(u<=0),a(u+y>=l-1)},[]);je(()=>{let o=e.current;if(f(),!o)return;let u=()=>f();return o.addEventListener("scroll",u,{passive:!0}),window.addEventListener("resize",f),()=>{o.removeEventListener("scroll",u),window.removeEventListener("resize",f)}},[t,f]);let c=ge(o=>{let u=e.current;if(!u)return;let l=u.clientWidth*.7;u.scrollBy({left:o==="next"?l:-l,behavior:"smooth"})},[]);return{scrollerRef:e,atStart:p,atEnd:i,scrollByDir:c}};import{jsx as F,jsxs as be}from"react/jsx-runtime";var Xe={position:"relative",width:"100%"},Je={display:"flex",gap:"8px",overflowX:"auto",alignItems:"center",width:"100%",scrollbarWidth:"none",msOverflowStyle:"none"},ye={pointerEvents:"none",position:"absolute",top:0,bottom:0,width:"40px"},he={position:"absolute",top:"50%",transform:"translateY(-50%)",backgroundColor:"white",color:"#003c30",border:"1px solid #003c30",padding:"4px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 1px 3px rgba(0,0,0,0.1)",cursor:"pointer"},ne=({filters:t,currency:e,minRatingSuffix:p,clearAllLabel:n,previousFiltersLabel:i,nextFiltersLabel:a,formatCurrency:f,onFilterChange:c,onResetFilters:o,onClearAll:u})=>{let{scrollerRef:l,atStart:y,atEnd:C,scrollByDir:b}=re(t.length),[g,S]=W.useState(null),[h,s]=W.useState(!1),m=W.useCallback(r=>{c(t.filter(d=>d.id!==r))},[t,c]),x=W.useCallback((r,d)=>{let k=t.map(B=>B.id===r?{...B,...d}:B);c(k)},[t,c]);return be("div",{style:Xe,children:[be("div",{ref:l,style:{...Je,padding:"8px",WebkitOverflowScrolling:"touch"},children:[F("style",{children:`
+// src/index.tsx
+import React6 from "react";
+import {
+  MapFirstCore
+} from "@mapfirst.ai/core";
+import {
+  processApiFilters,
+  convertToApiFilters,
+  PropertiesFetchError,
+  fetchImages,
+  fetchProperties,
+  MapFirstCore as MapFirstCore2
+} from "@mapfirst.ai/core";
+
+// src/components/SmartFilter.tsx
+import { useCallback as useCallback3 } from "react";
+
+// src/components/smart-filter/FilterChips.tsx
+import React5 from "react";
+
+// src/components/smart-filter/CloseButton.tsx
+import React from "react";
+
+// src/components/Icons.tsx
+import { jsx, jsxs } from "react/jsx-runtime";
+var SearchIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: [
+      /* @__PURE__ */ jsx("circle", { cx: "11", cy: "11", r: "8" }),
+      /* @__PURE__ */ jsx("path", { d: "m21 21-4.35-4.35" })
+    ]
+  }
+);
+var CloseIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: [
+      /* @__PURE__ */ jsx("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+      /* @__PURE__ */ jsx("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+    ]
+  }
+);
+var EditIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: [
+      /* @__PURE__ */ jsx("path", { d: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
+      /* @__PURE__ */ jsx("path", { d: "M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" })
+    ]
+  }
+);
+var NextIcon = ({ className, style }) => /* @__PURE__ */ jsx(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: /* @__PURE__ */ jsx("polyline", { points: "9 18 15 12 9 6" })
+  }
+);
+var StarIcon = ({
+  className,
+  style,
+  fill = "none"
+}) => /* @__PURE__ */ jsx(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill,
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: /* @__PURE__ */ jsx("polygon", { points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" })
+  }
+);
+
+// src/components/smart-filter/CloseButton.tsx
+import { jsx as jsx2 } from "react/jsx-runtime";
+var closeButtonStyles = {
+  position: "absolute",
+  top: "-8px",
+  right: "-8px",
+  padding: "2px",
+  borderRadius: "50%",
+  backgroundColor: "white",
+  border: "1px solid #03852e",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transition: "background-color 0.2s"
+};
+var iconStyles = {
+  width: "17px",
+  height: "17px"
+};
+var CloseButton = ({ onClick, style }) => {
+  const [isHovering, setIsHovering] = React.useState(false);
+  return /* @__PURE__ */ jsx2(
+    "button",
+    {
+      style: {
+        ...closeButtonStyles,
+        backgroundColor: isHovering ? "#e5e5e5" : "white",
+        ...style
+      },
+      onClick,
+      onMouseEnter: () => setIsHovering(true),
+      onMouseLeave: () => setIsHovering(false),
+      "aria-label": "Remove filter",
+      children: /* @__PURE__ */ jsx2(CloseIcon, { style: iconStyles })
+    }
+  );
+};
+
+// src/components/smart-filter/Chip.tsx
+import { jsx as jsx3, jsxs as jsxs2 } from "react/jsx-runtime";
+var chipStyles = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexShrink: 0,
+  height: "34px"
+};
+var Chip = ({ label, icon, remove, style }) => {
+  return /* @__PURE__ */ jsxs2("div", { style: { ...chipStyles, ...style }, children: [
+    icon && /* @__PURE__ */ jsx3("span", { style: { display: "flex", alignItems: "center" }, children: icon }),
+    /* @__PURE__ */ jsx3("span", { style: { whiteSpace: "nowrap" }, children: label }),
+    /* @__PURE__ */ jsx3(CloseButton, { onClick: remove })
+  ] });
+};
+
+// src/components/smart-filter/MinRatingFilterChip.tsx
+import {
+  useState as useState2
+} from "react";
+
+// src/hooks/useTranslation.ts
+import { useCallback, useMemo, useState } from "react";
+var defaultTranslations = {
+  "smartFilter.typingPrompt": "Search for hotels, restaurants, or attractions...",
+  "smartFilter.nav.previous": "Previous filters",
+  "smartFilter.nav.next": "Next filters",
+  "smartFilter.toast.locationRequired": "Please select a location first",
+  "smartFilter.clearAll": "Clear all",
+  "smartFilter.minRating.suffix": "+",
+  "smartFilter.minRating.label": "{{value}}+",
+  "smartFilter.minRating.remove": "Remove rating filter",
+  "smartFilter.minRating.setTo": "Set rating to {{rating}}",
+  "smartFilter.priceRange.label": "Price Range",
+  "smartFilter.priceRange.remove": "Remove price filter",
+  "smartFilter.priceRange.edit": "Edit price",
+  "smartFilter.transformedQuery.remove": "Remove search query",
+  "smartFilter.transformedQuery.edit": "Edit search query",
+  "smartFilter.restaurantPriceLevel.label": "Price Level",
+  "smartFilter.restaurantPriceLevel.remove": "Remove price level filter",
+  "smartFilter.restaurantPriceLevel.none": "Any",
+  "smartFilter.restaurantPriceLevel.options.cheapEats": "Cheap Eats",
+  "smartFilter.restaurantPriceLevel.options.midRange": "Mid Range",
+  "smartFilter.restaurantPriceLevel.options.fineDining": "Fine Dining"
+};
+var formatCurrencyDefault = (value, currency = "USD") => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
+};
+var useTranslation = (customTranslations, customFormatCurrency) => {
+  const [locale, setLocale] = useState("en");
+  const translations = useMemo(
+    () => ({ ...defaultTranslations, ...customTranslations }),
+    [customTranslations]
+  );
+  const t = useCallback(
+    (key, params) => {
+      let translation = translations[key] || key;
+      if (params) {
+        Object.keys(params).forEach((paramKey) => {
+          translation = translation.replace(
+            new RegExp(`{{${paramKey}}}`, "g"),
+            String(params[paramKey])
+          );
+        });
+      }
+      return translation;
+    },
+    [translations]
+  );
+  const formatCurrency = useCallback(
+    (value, currency) => {
+      if (customFormatCurrency) {
+        return customFormatCurrency(value, currency);
+      }
+      return formatCurrencyDefault(value, currency);
+    },
+    [customFormatCurrency]
+  );
+  return {
+    t,
+    locale,
+    setLocale,
+    formatCurrency
+  };
+};
+
+// src/components/smart-filter/utils.tsx
+import { jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
+var STAR_BASE_STYLES = {
+  display: "block",
+  width: "12px",
+  height: "12px",
+  borderRadius: "50%",
+  border: "1px solid #03852e",
+  pointerEvents: "none"
+};
+var STAR_FULL_STYLES = {
+  ...STAR_BASE_STYLES,
+  backgroundColor: "#03852e"
+};
+var STAR_HALF_STYLES = {
+  ...STAR_BASE_STYLES,
+  background: "linear-gradient(90deg, #03852e 50%, transparent 50%)"
+};
+var MIN_RATING_LABEL_STYLES = {
+  display: "flex",
+  alignItems: "center",
+  gap: "4px"
+};
+var MIN_RATING_STARS_WRAPPER_STYLES = {
+  display: "flex",
+  gap: "1px",
+  userSelect: "none"
+};
+var renderStars = (rating) => {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  for (let i = 0; i < fullStars; i += 1) {
+    stars.push(/* @__PURE__ */ jsx4("span", { style: STAR_FULL_STYLES }, `full-${i}`));
+  }
+  if (hasHalfStar) {
+    stars.push(/* @__PURE__ */ jsx4("span", { style: STAR_HALF_STYLES }, "half"));
+  }
+  const remainingStars = Math.max(0, 5 - Math.ceil(rating));
+  for (let i = 0; i < remainingStars; i += 1) {
+    stars.push(/* @__PURE__ */ jsx4("span", { style: STAR_BASE_STYLES }, `empty-${i}`));
+  }
+  return stars;
+};
+var createMinRatingFilterLabel = (rating, suffix) => /* @__PURE__ */ jsxs3("span", { style: MIN_RATING_LABEL_STYLES, children: [
+  /* @__PURE__ */ jsx4("span", { style: MIN_RATING_STARS_WRAPPER_STYLES, children: renderStars(rating) }),
+  " ",
+  suffix
+] });
+var formatRatingValue = (rating) => rating.toFixed(1);
+var createPriceRangeFilterLabel = (min, max, currency, formatCurrencyFn) => `${formatCurrencyFn(min, currency)} - ${formatCurrencyFn(
+  max != null ? max : 0,
+  currency
+)}`;
+
+// src/components/smart-filter/MinRatingFilterChip.tsx
+import { jsx as jsx5, jsxs as jsxs4 } from "react/jsx-runtime";
+var chipContainerStyles = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  gap: "8px",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+  height: "34px"
+};
+var starContainerStyles = {
+  display: "flex",
+  gap: "1px",
+  userSelect: "none"
+};
+var circleBaseStyles = {
+  display: "block",
+  width: "12px",
+  height: "12px",
+  borderRadius: "50%",
+  border: "1px solid #03852e",
+  pointerEvents: "none"
+};
+var buttonBaseStyles = {
+  position: "absolute",
+  top: 0,
+  height: "100%",
+  cursor: "pointer",
+  backgroundColor: "transparent",
+  border: "none",
+  padding: 0
+};
+var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
+  const [hoverRating, setHoverRating] = useState2(null);
+  const { t } = useTranslation();
+  const displayRating = hoverRating != null ? hoverRating : rating;
+  const formatLabel = (value) => star && value ? value.toString() : t("smartFilter.minRating.label", { value: formatRatingValue(value) });
+  const removeLabel = t("smartFilter.minRating.remove");
+  const setLabel = (value) => t("smartFilter.minRating.setTo", { rating: formatRatingValue(value) });
+  const getFillForStar = (index) => {
+    const starNumber = index + 1;
+    if (displayRating >= starNumber) {
+      return "full";
+    }
+    if (displayRating >= starNumber - 0.5) {
+      return "half";
+    }
+    return "empty";
+  };
+  const handleSelect = (nextRating) => {
+    setHoverRating(null);
+    if (nextRating === rating) {
+      return;
+    }
+    onChange(nextRating);
+  };
+  const handleBlur = (event) => {
+    var _a;
+    const related = event.relatedTarget;
+    if (!related || !((_a = event.currentTarget.closest("[data-min-rating-chip]")) == null ? void 0 : _a.contains(related))) {
+      setHoverRating(null);
+    }
+  };
+  return /* @__PURE__ */ jsxs4("div", { style: chipContainerStyles, "data-min-rating-chip": true, children: [
+    /* @__PURE__ */ jsxs4(
+      "div",
+      {
+        style: { display: "flex", alignItems: "center", gap: "4px" },
+        onMouseLeave: () => setHoverRating(null),
+        children: [
+          /* @__PURE__ */ jsx5("div", { style: starContainerStyles, children: Array.from({ length: 5 }).map((_, index) => {
+            const fillState = getFillForStar(index);
+            const starNumber = index + 1;
+            const halfValue = starNumber - 0.5;
+            if (star) {
+              return /* @__PURE__ */ jsxs4(
+                "div",
+                {
+                  style: {
+                    position: "relative",
+                    width: "16px",
+                    height: "16px"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx5(
+                      StarIcon,
+                      {
+                        fill: displayRating >= starNumber ? "#03852e" : "none",
+                        style: {
+                          width: "16px",
+                          height: "16px",
+                          pointerEvents: "none"
+                        }
+                      }
+                    ),
+                    /* @__PURE__ */ jsx5(
+                      "button",
+                      {
+                        type: "button",
+                        style: {
+                          ...buttonBaseStyles,
+                          left: 0,
+                          width: "50%",
+                          borderRadius: "50% 0 0 50%"
+                        },
+                        onMouseEnter: () => setHoverRating(halfValue),
+                        onFocus: () => setHoverRating(halfValue),
+                        onBlur: handleBlur,
+                        onClick: () => handleSelect(halfValue),
+                        "aria-label": setLabel(halfValue),
+                        title: formatLabel(halfValue)
+                      }
+                    ),
+                    /* @__PURE__ */ jsx5(
+                      "button",
+                      {
+                        type: "button",
+                        style: {
+                          ...buttonBaseStyles,
+                          left: "50%",
+                          width: "50%",
+                          borderRadius: "0 50% 50% 0"
+                        },
+                        onMouseEnter: () => setHoverRating(starNumber),
+                        onFocus: () => setHoverRating(starNumber),
+                        onBlur: handleBlur,
+                        onClick: () => handleSelect(starNumber),
+                        "aria-label": setLabel(starNumber),
+                        title: formatLabel(starNumber)
+                      }
+                    )
+                  ]
+                },
+                index
+              );
+            }
+            const circleStyles = fillState === "full" ? { ...circleBaseStyles, backgroundColor: "#03852e" } : circleBaseStyles;
+            const halfCircleStyles = {
+              ...circleBaseStyles,
+              background: "linear-gradient(90deg, #03852e 50%, transparent 50%)"
+            };
+            return /* @__PURE__ */ jsxs4(
+              "div",
+              {
+                style: { position: "relative", width: "12px", height: "12px" },
+                children: [
+                  /* @__PURE__ */ jsx5(
+                    "span",
+                    {
+                      style: fillState === "half" ? halfCircleStyles : circleStyles
+                    }
+                  ),
+                  /* @__PURE__ */ jsx5(
+                    "button",
+                    {
+                      type: "button",
+                      style: {
+                        ...buttonBaseStyles,
+                        left: 0,
+                        width: "50%",
+                        borderRadius: "50% 0 0 50%",
+                        outline: "2px solid transparent",
+                        outlineOffset: "1px"
+                      },
+                      onMouseEnter: () => setHoverRating(halfValue),
+                      onFocus: () => setHoverRating(halfValue),
+                      onBlur: handleBlur,
+                      onClick: () => handleSelect(halfValue),
+                      "aria-label": setLabel(halfValue),
+                      title: formatLabel(halfValue)
+                    }
+                  ),
+                  /* @__PURE__ */ jsx5(
+                    "button",
+                    {
+                      type: "button",
+                      style: {
+                        ...buttonBaseStyles,
+                        left: "50%",
+                        width: "50%",
+                        borderRadius: "0 50% 50% 0",
+                        outline: "2px solid transparent",
+                        outlineOffset: "1px"
+                      },
+                      onMouseEnter: () => setHoverRating(starNumber),
+                      onFocus: () => setHoverRating(starNumber),
+                      onBlur: handleBlur,
+                      onClick: () => handleSelect(starNumber),
+                      "aria-label": setLabel(starNumber),
+                      title: formatLabel(starNumber)
+                    }
+                  )
+                ]
+              },
+              index
+            );
+          }) }),
+          /* @__PURE__ */ jsx5("span", { style: { whiteSpace: "nowrap" }, children: formatLabel(displayRating) })
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsx5(CloseButton, { onClick: onRemove })
+  ] });
+};
+
+// src/components/smart-filter/PriceRangeFilterChip.tsx
+import {
+  useEffect,
+  useState as useState3
+} from "react";
+import { Fragment, jsx as jsx6, jsxs as jsxs5 } from "react/jsx-runtime";
+var chipStyles2 = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexShrink: 0,
+  height: "34px"
+};
+var inputStyles = {
+  outline: "none",
+  fontSize: "16px",
+  backgroundColor: "transparent",
+  borderRadius: "2px",
+  padding: "2px 8px",
+  width: "64px",
+  textAlign: "center",
+  border: "none"
+};
+var editButtonStyles = {
+  padding: "4px",
+  borderRadius: "50%",
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+  border: "none",
+  backgroundColor: "transparent",
+  color: "#737373",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
+var PriceBoundaryChip = ({
+  label,
+  value,
+  placeholder,
+  currency,
+  isOptional = false,
+  showRemoveButton = false,
+  editLabel,
+  showAddWhenEmpty = false,
+  onCommit,
+  onRemove
+}) => {
+  const [draft, setDraft] = useState3(
+    value !== void 0 ? String(value) : ""
+  );
+  const [isEditing, setIsEditing] = useState3(false);
+  const [editHover, setEditHover] = useState3(false);
+  const hasValue = value !== void 0;
+  useEffect(() => {
+    setDraft(value !== void 0 ? String(value) : "");
+    setIsEditing(false);
+  }, [value]);
+  const resetDraft = () => {
+    setDraft(value !== void 0 ? String(value) : "");
+  };
+  const commitValue = () => {
+    if (draft.trim() === "") {
+      if (isOptional) {
+        onCommit(void 0);
+        setDraft("");
+        return;
+      }
+      resetDraft();
+      return;
+    }
+    const parsed = Number(draft);
+    if (!Number.isFinite(parsed)) {
+      resetDraft();
+      return;
+    }
+    const normalized = Math.max(0, parsed);
+    if (normalized === value) {
+      resetDraft();
+      return;
+    }
+    onCommit(normalized);
+  };
+  const handleChange = (event) => {
+    const next = event.target.value.replace(/[^\d]/g, "");
+    setDraft(next);
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.currentTarget.blur();
+      setIsEditing(false);
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      resetDraft();
+      event.currentTarget.blur();
+      setIsEditing(false);
+      return;
+    }
+    const allowed = event.key.length === 1 && /[0-9]/.test(event.key) || event.key === "Backspace" || event.key === "Delete" || event.key === "Tab" || event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End";
+    if (!allowed) {
+      event.preventDefault();
+    }
+  };
+  return /* @__PURE__ */ jsxs5("div", { style: chipStyles2, children: [
+    /* @__PURE__ */ jsx6(
+      "span",
+      {
+        style: {
+          fontSize: "10px",
+          textTransform: "uppercase",
+          fontWeight: 600,
+          letterSpacing: "0.05em"
+        },
+        children: label
+      }
+    ),
+    isEditing ? /* @__PURE__ */ jsx6(
+      "input",
+      {
+        value: draft,
+        onChange: handleChange,
+        onBlur: () => {
+          commitValue();
+          setIsEditing(false);
+        },
+        onKeyDown: handleKeyDown,
+        placeholder,
+        inputMode: "numeric",
+        pattern: "[0-9]*",
+        "aria-label": label,
+        style: inputStyles,
+        autoFocus: true
+      }
+    ) : hasValue ? /* @__PURE__ */ jsxs5("span", { style: { fontSize: "16px" }, children: [
+      currency,
+      value
+    ] }) : showAddWhenEmpty ? /* @__PURE__ */ jsx6(
+      "button",
+      {
+        type: "button",
+        style: {
+          fontSize: "16px",
+          color: "#737373",
+          cursor: "pointer",
+          border: "none",
+          backgroundColor: "transparent",
+          padding: 0
+        },
+        onClick: () => setIsEditing(true),
+        "aria-label": editLabel,
+        children: "+"
+      }
+    ) : /* @__PURE__ */ jsx6("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
+    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ jsx6("span", { style: { color: "#737373", fontSize: "12px" }, children: currency }),
+    !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ jsx6(
+      "button",
+      {
+        type: "button",
+        style: {
+          ...editButtonStyles,
+          backgroundColor: editHover ? "#e5e5e5" : "transparent"
+        },
+        "aria-label": editLabel,
+        title: editLabel,
+        onClick: () => setIsEditing(true),
+        onMouseEnter: () => setEditHover(true),
+        onMouseLeave: () => setEditHover(false),
+        children: /* @__PURE__ */ jsx6(EditIcon, {})
+      }
+    ),
+    showRemoveButton && /* @__PURE__ */ jsx6(CloseButton, { onClick: onRemove })
+  ] });
+};
+var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove }) => {
+  const { t } = useTranslation();
+  const minLabel = "Min";
+  const maxChipLabel = "Max";
+  const editLabel = t("smartFilter.priceRange.edit");
+  const handleBoundaryCommit = (boundary, nextValue) => {
+    const nextRange = {
+      min: priceRange.min,
+      max: priceRange.max
+    };
+    if (boundary === "min") {
+      nextRange.min = nextValue;
+      if (nextValue !== void 0 && priceRange.max !== void 0 && nextValue > priceRange.max) {
+        nextRange.max = nextValue;
+      }
+    } else {
+      nextRange.max = nextValue;
+      if (nextValue !== void 0 && priceRange.min !== void 0 && nextValue < priceRange.min) {
+        nextRange.min = nextValue;
+      }
+    }
+    if (nextRange.min !== priceRange.min || nextRange.max !== priceRange.max) {
+      onChange(nextRange);
+    }
+  };
+  return /* @__PURE__ */ jsxs5(Fragment, { children: [
+    /* @__PURE__ */ jsx6(
+      PriceBoundaryChip,
+      {
+        label: minLabel,
+        value: priceRange.min,
+        currency,
+        editLabel,
+        showRemoveButton: priceRange.min !== void 0 && priceRange.min !== 0,
+        onCommit: (value) => handleBoundaryCommit("min", value),
+        onRemove
+      }
+    ),
+    /* @__PURE__ */ jsx6(
+      PriceBoundaryChip,
+      {
+        label: maxChipLabel,
+        value: priceRange.max,
+        currency,
+        isOptional: true,
+        showRemoveButton: priceRange.max !== void 0,
+        editLabel,
+        showAddWhenEmpty: true,
+        onCommit: (value) => handleBoundaryCommit("max", value),
+        onRemove
+      }
+    )
+  ] });
+};
+
+// src/components/smart-filter/RestaurantPriceLevelChip.tsx
+import { jsx as jsx7, jsxs as jsxs6 } from "react/jsx-runtime";
+var chipStyles3 = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+  flexShrink: 0,
+  height: "34px"
+};
+var PRICE_LEVEL_OPTIONS = [
+  { value: "Cheap Eats", key: "cheapEats" },
+  { value: "Mid Range", key: "midRange" },
+  { value: "Fine Dining", key: "fineDining" }
+];
+var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
+  const { t } = useTranslation();
+  const label = t("smartFilter.restaurantPriceLevel.label");
+  const removeLabel = t("smartFilter.restaurantPriceLevel.remove");
+  const noneSelectedLabel = t("smartFilter.restaurantPriceLevel.none");
+  const handleChange = (event) => {
+    const { value, checked } = event.target;
+    const valueAsPriceLevel = value;
+    const selection = new Set(values);
+    if (checked) {
+      selection.add(valueAsPriceLevel);
+    } else {
+      selection.delete(valueAsPriceLevel);
+    }
+    const orderedSelection = PRICE_LEVEL_OPTIONS.filter(
+      (option) => selection.has(option.value)
+    ).map((option) => option.value);
+    onChange(orderedSelection);
+  };
+  return /* @__PURE__ */ jsxs6("div", { style: chipStyles3, children: [
+    /* @__PURE__ */ jsxs6(
+      "div",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          flexWrap: "wrap"
+        },
+        children: [
+          /* @__PURE__ */ jsx7(
+            "span",
+            {
+              style: {
+                fontSize: "10px",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                letterSpacing: "0.05em"
+              },
+              children: label
+            }
+          ),
+          /* @__PURE__ */ jsxs6("div", { style: { display: "flex", gap: "12px" }, children: [
+            PRICE_LEVEL_OPTIONS.map((option) => {
+              const optionLabel = t(
+                `smartFilter.restaurantPriceLevel.options.${option.key}`
+              );
+              const checkboxId = `price-level-${option.key}`;
+              return /* @__PURE__ */ jsxs6(
+                "label",
+                {
+                  htmlFor: checkboxId,
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "12px",
+                    cursor: "pointer"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx7(
+                      "input",
+                      {
+                        id: checkboxId,
+                        type: "checkbox",
+                        value: option.value,
+                        checked: values.includes(option.value),
+                        onChange: handleChange,
+                        style: { accentColor: "#03852e", cursor: "pointer" }
+                      }
+                    ),
+                    /* @__PURE__ */ jsx7("span", { children: optionLabel })
+                  ]
+                },
+                option.value
+              );
+            }),
+            values.length === 0 && /* @__PURE__ */ jsx7("span", { style: { fontSize: "12px", color: "#737373" }, children: noneSelectedLabel })
+          ] })
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsx7(CloseButton, { onClick: onRemove })
+  ] });
+};
+
+// src/components/smart-filter/TransformedQueryChip.tsx
+import {
+  useEffect as useEffect2,
+  useRef,
+  useState as useState4
+} from "react";
+import { jsx as jsx8, jsxs as jsxs7 } from "react/jsx-runtime";
+var chipStyles4 = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexShrink: 0,
+  userSelect: "none",
+  height: "34px"
+};
+var inputStyles2 = {
+  backgroundColor: "#ececec",
+  borderRadius: "2px",
+  padding: "2px 8px",
+  outline: "none",
+  fontSize: "16px",
+  minWidth: "8ch",
+  border: "none"
+};
+var editButtonStyles2 = {
+  padding: "4px",
+  borderRadius: "50%",
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+  color: "#737373",
+  border: "none",
+  backgroundColor: "transparent",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
+var TransformedQueryChip = ({ value, onChange, onRemove }) => {
+  const inputRef = useRef(null);
+  const [draft, setDraft] = useState4(value);
+  const [isEditing, setIsEditing] = useState4(false);
+  const [editHover, setEditHover] = useState4(false);
+  const { t } = useTranslation();
+  const removeLabel = t("smartFilter.transformedQuery.remove");
+  const editLabel = t("smartFilter.transformedQuery.edit");
+  useEffect2(() => {
+    setDraft(value);
+    setIsEditing(false);
+  }, [value]);
+  const applyChanges = () => {
+    const nextValue = draft.trim();
+    if (!nextValue.length) {
+      setDraft(value);
+      return;
+    }
+    if (nextValue === value) {
+      return;
+    }
+    onChange(nextValue);
+  };
+  const handleChange = (event) => {
+    setDraft(event.target.value);
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.currentTarget.blur();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setDraft(value);
+      event.currentTarget.blur();
+      return;
+    }
+  };
+  return /* @__PURE__ */ jsxs7("div", { style: chipStyles4, children: [
+    /* @__PURE__ */ jsx8(SearchIcon, { style: { width: "16px", height: "16px", color: "#03852e" } }),
+    isEditing ? /* @__PURE__ */ jsx8(
+      "input",
+      {
+        ref: inputRef,
+        value: draft,
+        onChange: handleChange,
+        onBlur: () => {
+          applyChanges();
+          setIsEditing(false);
+        },
+        onKeyDown: handleKeyDown,
+        "aria-label": editLabel,
+        style: inputStyles2,
+        autoFocus: true
+      }
+    ) : /* @__PURE__ */ jsx8("span", { style: { fontSize: "16px" }, children: value }),
+    !isEditing && /* @__PURE__ */ jsx8(
+      "button",
+      {
+        type: "button",
+        style: {
+          ...editButtonStyles2,
+          backgroundColor: editHover ? "#e5e5e5" : "transparent"
+        },
+        "aria-label": editLabel,
+        title: editLabel,
+        onClick: () => setIsEditing(true),
+        onMouseEnter: () => setEditHover(true),
+        onMouseLeave: () => setEditHover(false),
+        children: /* @__PURE__ */ jsx8(EditIcon, {})
+      }
+    ),
+    /* @__PURE__ */ jsx8(CloseButton, { onClick: onRemove })
+  ] });
+};
+
+// src/hooks/useFilterScroll.ts
+import { useCallback as useCallback2, useEffect as useEffect3, useRef as useRef2, useState as useState5 } from "react";
+var useFilterScroll = (dependency) => {
+  const scrollerRef = useRef2(null);
+  const [atStart, setAtStart] = useState5(true);
+  const [atEnd, setAtEnd] = useState5(true);
+  const updateScrollButtons = useCallback2(() => {
+    const el = scrollerRef.current;
+    if (!el) {
+      setAtStart(true);
+      setAtEnd(true);
+      return;
+    }
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setAtStart(scrollLeft <= 0);
+    setAtEnd(scrollLeft + clientWidth >= scrollWidth - 1);
+  }, []);
+  useEffect3(() => {
+    const el = scrollerRef.current;
+    updateScrollButtons();
+    if (!el) {
+      return;
+    }
+    const handleScroll = () => updateScrollButtons();
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateScrollButtons);
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateScrollButtons);
+    };
+  }, [dependency, updateScrollButtons]);
+  const scrollByDir = useCallback2((dir) => {
+    const el = scrollerRef.current;
+    if (!el) {
+      return;
+    }
+    const delta = el.clientWidth * 0.7;
+    el.scrollBy({
+      left: dir === "next" ? delta : -delta,
+      behavior: "smooth"
+    });
+  }, []);
+  return {
+    scrollerRef,
+    atStart,
+    atEnd,
+    scrollByDir
+  };
+};
+
+// src/components/smart-filter/FilterChips.tsx
+import { jsx as jsx9, jsxs as jsxs8 } from "react/jsx-runtime";
+var containerStyles = {
+  position: "relative",
+  width: "100%"
+};
+var scrollContainerBase = {
+  display: "flex",
+  gap: "8px",
+  overflowX: "auto",
+  alignItems: "center",
+  width: "100%",
+  scrollbarWidth: "none",
+  msOverflowStyle: "none"
+};
+var gradientStyles = {
+  pointerEvents: "none",
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  width: "40px"
+};
+var navButtonStyles = {
+  position: "absolute",
+  top: "50%",
+  transform: "translateY(-50%)",
+  backgroundColor: "white",
+  color: "#003c30",
+  border: "1px solid #003c30",
+  padding: "4px",
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  cursor: "pointer"
+};
+var FilterChips = ({
+  filters,
+  currency,
+  minRatingSuffix: _minRatingSuffix,
+  clearAllLabel,
+  previousFiltersLabel,
+  nextFiltersLabel,
+  formatCurrency: _formatCurrency,
+  onFilterChange,
+  onResetFilters: _onResetFilters,
+  onClearAll
+}) => {
+  const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
+    filters.length
+  );
+  const [navHover, setNavHover] = React5.useState(null);
+  const [clearHover, setClearHover] = React5.useState(false);
+  const removeFilter = React5.useCallback(
+    (filterId) => {
+      void onFilterChange(filters.filter((f) => f.id !== filterId));
+    },
+    [filters, onFilterChange]
+  );
+  const patchFilter = React5.useCallback(
+    (filterId, patch) => {
+      const nextFilters = filters.map(
+        (f) => f.id === filterId ? { ...f, ...patch } : f
+      );
+      void onFilterChange(nextFilters);
+    },
+    [filters, onFilterChange]
+  );
+  return /* @__PURE__ */ jsxs8("div", { style: containerStyles, children: [
+    /* @__PURE__ */ jsxs8(
+      "div",
+      {
+        ref: scrollerRef,
+        style: {
+          ...scrollContainerBase,
+          padding: "8px",
+          // Hide scrollbar for webkit browsers
+          WebkitOverflowScrolling: "touch"
+        },
+        children: [
+          /* @__PURE__ */ jsx9("style", { children: `
             div::-webkit-scrollbar {
               display: none;
             }
-          `}),t.map(r=>{var k,B;let d=()=>F(V,{label:r.label,icon:r.icon,remove:()=>m(r.id)},r.id);if(r.type==="minRating"||r.type==="starRating"){let I=(k=r.numericValue)!=null?k:Number(r.value);return Number.isFinite(I)?F(G,{star:r.type==="starRating",rating:I,onChange:ae=>{x(r.id,{numericValue:ae,value:String(ae)})},onRemove:()=>m(r.id)},r.id):d()}return r.type==="priceRange"&&r.priceRange?F(X,{priceRange:r.priceRange,currency:e,onChange:I=>{x(r.id,{priceRange:I})},onRemove:()=>m(r.id)},r.id):r.type==="transformed_query"?F(te,{value:r.value,onChange:I=>{x(r.id,{value:I})},onRemove:()=>m(r.id)},r.id):r.type==="selected_restaurant_price_levels"?F(J,{values:(B=r.priceLevels)!=null?B:[],onChange:I=>{x(r.id,{priceLevels:I})},onRemove:()=>m(r.id)},r.id):d()}),F("button",{style:{flexShrink:0,padding:"4px 16px",borderRadius:"9999px",cursor:"pointer",fontSize:"14px",userSelect:"none",backgroundColor:h?"#eee":"white",color:"black",border:"1px solid #03852e"},onClick:u,onMouseEnter:()=>s(!0),onMouseLeave:()=>s(!1),children:n})]}),!y&&F("div",{"aria-hidden":"true",style:{...ye,left:0,background:"linear-gradient(to right, white, transparent)"}}),!C&&F("div",{"aria-hidden":"true",style:{...ye,right:0,background:"linear-gradient(to left, white, transparent)"}}),!y&&F("button",{type:"button","aria-label":i,style:{...he,left:"4px",transform:"translateY(-50%) rotate(180deg)",backgroundColor:g==="prev"?"#e5e5e5":"white"},onClick:()=>b("prev"),onMouseEnter:()=>S("prev"),onMouseLeave:()=>S(null),children:F(K,{style:{width:"20px",height:"20px"}})}),!C&&F("button",{type:"button","aria-label":a,style:{...he,right:"4px",backgroundColor:g==="next"?"#e5e5e5":"white"},onClick:()=>b("next"),onMouseEnter:()=>S("next"),onMouseLeave:()=>S(null),children:F(K,{style:{width:"20px",height:"20px"}})})]})};import{jsx as Ce}from"react/jsx-runtime";var et={position:"relative",display:"flex",flexDirection:"column",gap:"8px",width:"100%"},tt=({filters:t,isSearching:e=!1,onFilterChange:p,customTranslations:n,currency:i="USD",containerStyle:a,style:f})=>{let{t:c,formatCurrency:o}=R(n),u=c("smartFilter.minRating.suffix"),l=c("smartFilter.nav.previous"),y=c("smartFilter.nav.next"),C=c("smartFilter.clearAll"),b=oe(async(h,s)=>{if(!e)try{await p(h)}catch(m){console.error("Filter change error:",m)}},[e,p]),g=oe(()=>{b([])},[b]),S=oe(()=>{b([],!0)},[b]);return Ce("div",{style:{...et,...a,...f},children:t.length>0&&Ce(ne,{filters:t,currency:i,minRatingSuffix:u,clearAllLabel:C,previousFiltersLabel:l,nextFiltersLabel:y,formatCurrency:o,onFilterChange:b,onResetFilters:g,onClearAll:S})})};function E(t,e,p){t(n=>n?{...n,[e]:p}:null)}function P(t,e,...p){var i;let n=(i=t.current.callbacks)==null?void 0:i[e];n==null||n(...p)}function ie(t,e,p,n){!t.current||!p||e.current||(t.current.attachMap(p,n),e.current=!0)}function Wr(t){let e=v.useRef(null),[p,n]=v.useState(null),i=v.useRef(t);v.useEffect(()=>{i.current=t}),v.useEffect(()=>{let s=i.current,m={adapter:null,...s,callbacks:{...s.callbacks,onPropertiesChange:r=>{E(n,"properties",r),P(i,"onPropertiesChange",r)},onSelectedPropertyChange:r=>{E(n,"selectedPropertyId",r),P(i,"onSelectedPropertyChange",r)},onPrimaryTypeChange:r=>{E(n,"primary",r),P(i,"onPrimaryTypeChange",r)},onFiltersChange:r=>{E(n,"filters",r),P(i,"onFiltersChange",r)},onBoundsChange:r=>{E(n,"bounds",r),P(i,"onBoundsChange",r)},onPendingBoundsChange:r=>{E(n,"pendingBounds",r),P(i,"onPendingBoundsChange",r)},onCenterChange:(r,d)=>{n(k=>k?{...k,center:r,zoom:d}:null),P(i,"onCenterChange",r,d)},onZoomChange:r=>{E(n,"zoom",r),P(i,"onZoomChange",r)},onActiveLocationChange:r=>{E(n,"activeLocation",r),P(i,"onActiveLocationChange",r)},onLoadingStateChange:r=>{E(n,"initialLoading",r),P(i,"onLoadingStateChange",r)},onSearchingStateChange:r=>{E(n,"isSearching",r),P(i,"onSearchingStateChange",r)}}},x=new rt(m);return e.current=x,n(x.getState()),()=>{x.destroy(),e.current=null,n(null)}},[]);let a=v.useCallback(s=>{e.current&&e.current.setPrimaryType(s)},[]),f=v.useCallback(s=>{e.current&&e.current.setSelectedMarker(s)},[]),c=v.useCallback((s,m=!0)=>{e.current&&e.current.setUseApi(s,m)},[]),o=v.useMemo(()=>({search:async s=>{if(!e.current)throw new Error("MapFirst instance not available");return await e.current.runPropertiesSearch(s)}}),[]),u=v.useMemo(()=>({search:async s=>{if(!e.current)throw new Error("MapFirst instance not available");return await e.current.runSmartFilterSearch(s)}}),[]),l=v.useMemo(()=>({perform:async()=>e.current?await e.current.performBoundsSearch():null}),[]),y=v.useRef(!1),C=v.useCallback((s,m,x)=>{ie(e,y,s,{platform:"maplibre",maplibregl:m,onMarkerClick:x==null?void 0:x.onMarkerClick})},[]),b=v.useRef(!1),g=v.useCallback((s,m,x)=>{ie(e,b,s,{platform:"google",google:m,onMarkerClick:x==null?void 0:x.onMarkerClick})},[]),S=v.useRef(!1),h=v.useCallback((s,m,x)=>{ie(e,S,s,{platform:"mapbox",mapboxgl:m,onMarkerClick:x==null?void 0:x.onMarkerClick})},[]);return{instance:e.current,state:p,setPrimaryType:a,setSelectedMarker:f,setUseApi:c,propertiesSearch:o,smartFilterSearch:u,boundsSearch:l,attachMapLibre:C,attachGoogle:g,attachMapbox:h}}export{V as Chip,le as CloseIcon,_ as EditIcon,ne as FilterChips,G as MinRatingFilterChip,K as NextIcon,X as PriceRangeFilterChip,J as RestaurantPriceLevelChip,se as SearchIcon,tt as SmartFilter,ce as StarIcon,te as TransformedQueryChip,Vr as convertToApiFilters,ft as createMinRatingFilterLabel,yt as createPriceRangeFilterLabel,$ as formatRatingValue,qr as processApiFilters,Be as renderStars,re as useFilterScroll,Wr as useMapFirst,R as useTranslation};
+          ` }),
+          filters.map((filter) => {
+            var _a, _b;
+            const renderStandardChip = () => /* @__PURE__ */ jsx9(
+              Chip,
+              {
+                label: filter.label,
+                icon: filter.icon,
+                remove: () => removeFilter(filter.id)
+              },
+              filter.id
+            );
+            if (filter.type === "minRating" || filter.type === "starRating") {
+              const currentRating = (_a = filter.numericValue) != null ? _a : Number(filter.value);
+              if (!Number.isFinite(currentRating)) {
+                return renderStandardChip();
+              }
+              return /* @__PURE__ */ jsx9(
+                MinRatingFilterChip,
+                {
+                  star: filter.type === "starRating",
+                  rating: currentRating,
+                  onChange: (nextRating) => {
+                    patchFilter(filter.id, {
+                      numericValue: nextRating,
+                      value: String(nextRating)
+                    });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            if (filter.type === "priceRange" && filter.priceRange) {
+              return /* @__PURE__ */ jsx9(
+                PriceRangeFilterChip,
+                {
+                  priceRange: filter.priceRange,
+                  currency,
+                  onChange: (nextRange) => {
+                    patchFilter(filter.id, { priceRange: nextRange });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            if (filter.type === "transformed_query") {
+              return /* @__PURE__ */ jsx9(
+                TransformedQueryChip,
+                {
+                  value: filter.value,
+                  onChange: (nextValue) => {
+                    patchFilter(filter.id, { value: nextValue });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            if (filter.type === "selected_restaurant_price_levels") {
+              return /* @__PURE__ */ jsx9(
+                RestaurantPriceLevelChip,
+                {
+                  values: (_b = filter.priceLevels) != null ? _b : [],
+                  onChange: (nextLevels) => {
+                    patchFilter(filter.id, { priceLevels: nextLevels });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            return renderStandardChip();
+          }),
+          /* @__PURE__ */ jsx9(
+            "button",
+            {
+              style: {
+                flexShrink: 0,
+                padding: "4px 16px",
+                borderRadius: "9999px",
+                cursor: "pointer",
+                fontSize: "14px",
+                userSelect: "none",
+                backgroundColor: clearHover ? "#eee" : "white",
+                color: "black",
+                border: "1px solid #03852e"
+              },
+              onClick: onClearAll,
+              onMouseEnter: () => setClearHover(true),
+              onMouseLeave: () => setClearHover(false),
+              children: clearAllLabel
+            }
+          )
+        ]
+      }
+    ),
+    !atStart && /* @__PURE__ */ jsx9(
+      "div",
+      {
+        "aria-hidden": "true",
+        style: {
+          ...gradientStyles,
+          left: 0,
+          background: "linear-gradient(to right, white, transparent)"
+        }
+      }
+    ),
+    !atEnd && /* @__PURE__ */ jsx9(
+      "div",
+      {
+        "aria-hidden": "true",
+        style: {
+          ...gradientStyles,
+          right: 0,
+          background: "linear-gradient(to left, white, transparent)"
+        }
+      }
+    ),
+    !atStart && /* @__PURE__ */ jsx9(
+      "button",
+      {
+        type: "button",
+        "aria-label": previousFiltersLabel,
+        style: {
+          ...navButtonStyles,
+          left: "4px",
+          transform: "translateY(-50%) rotate(180deg)",
+          backgroundColor: navHover === "prev" ? "#e5e5e5" : "white"
+        },
+        onClick: () => scrollByDir("prev"),
+        onMouseEnter: () => setNavHover("prev"),
+        onMouseLeave: () => setNavHover(null),
+        children: /* @__PURE__ */ jsx9(NextIcon, { style: { width: "20px", height: "20px" } })
+      }
+    ),
+    !atEnd && /* @__PURE__ */ jsx9(
+      "button",
+      {
+        type: "button",
+        "aria-label": nextFiltersLabel,
+        style: {
+          ...navButtonStyles,
+          right: "4px",
+          backgroundColor: navHover === "next" ? "#e5e5e5" : "white"
+        },
+        onClick: () => scrollByDir("next"),
+        onMouseEnter: () => setNavHover("next"),
+        onMouseLeave: () => setNavHover(null),
+        children: /* @__PURE__ */ jsx9(NextIcon, { style: { width: "20px", height: "20px" } })
+      }
+    )
+  ] });
+};
+
+// src/components/SmartFilter.tsx
+import { jsx as jsx10 } from "react/jsx-runtime";
+var containerStyles2 = {
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
+  width: "100%"
+};
+var SmartFilter = ({
+  filters,
+  isSearching = false,
+  onFilterChange,
+  customTranslations,
+  currency = "USD",
+  containerStyle,
+  style
+}) => {
+  const { t, formatCurrency } = useTranslation(customTranslations);
+  const minRatingSuffix = t("smartFilter.minRating.suffix");
+  const previousFiltersLabel = t("smartFilter.nav.previous");
+  const nextFiltersLabel = t("smartFilter.nav.next");
+  const clearAllLabel = t("smartFilter.clearAll");
+  const handleFilterChange = useCallback3(
+    async (nextFilters, clearAll) => {
+      if (isSearching) {
+        return;
+      }
+      try {
+        await onFilterChange(nextFilters);
+      } catch (error) {
+        console.error("Filter change error:", error);
+      }
+    },
+    [isSearching, onFilterChange]
+  );
+  const resetFilters = useCallback3(() => {
+    void handleFilterChange([]);
+  }, [handleFilterChange]);
+  const clearAllFilters = useCallback3(() => {
+    void handleFilterChange([], true);
+  }, [handleFilterChange]);
+  return /* @__PURE__ */ jsx10("div", { style: { ...containerStyles2, ...containerStyle, ...style }, children: filters.length > 0 && /* @__PURE__ */ jsx10(
+    FilterChips,
+    {
+      filters,
+      currency,
+      minRatingSuffix,
+      clearAllLabel,
+      previousFiltersLabel,
+      nextFiltersLabel,
+      formatCurrency,
+      onFilterChange: handleFilterChange,
+      onResetFilters: resetFilters,
+      onClearAll: clearAllFilters
+    }
+  ) });
+};
+
+// src/index.tsx
+function updateStateField(setState, key, value) {
+  setState((prev) => prev ? { ...prev, [key]: value } : null);
+}
+function forwardCallback(optionsRef, key, ...args) {
+  var _a;
+  const callback = (_a = optionsRef.current.callbacks) == null ? void 0 : _a[key];
+  callback == null ? void 0 : callback(...args);
+}
+function attachMapOnce(instanceRef, attachedRef, map, config) {
+  if (!instanceRef.current || !map || attachedRef.current) {
+    return;
+  }
+  instanceRef.current.attachMap(map, config);
+  attachedRef.current = true;
+}
+function useMapFirst(options) {
+  const instanceRef = React6.useRef(null);
+  const [state, setState] = React6.useState(null);
+  const optionsRef = React6.useRef(options);
+  React6.useEffect(() => {
+    optionsRef.current = options;
+  });
+  React6.useEffect(() => {
+    const opts = optionsRef.current;
+    const coreOptions = {
+      adapter: null,
+      // Will be set when attachMap is called
+      ...opts,
+      callbacks: {
+        ...opts.callbacks,
+        // Add internal callbacks to trigger React re-renders
+        onPropertiesChange: (properties) => {
+          updateStateField(setState, "properties", properties);
+          forwardCallback(optionsRef, "onPropertiesChange", properties);
+        },
+        onSelectedPropertyChange: (id) => {
+          updateStateField(setState, "selectedPropertyId", id);
+          forwardCallback(optionsRef, "onSelectedPropertyChange", id);
+        },
+        onPrimaryTypeChange: (type) => {
+          updateStateField(setState, "primary", type);
+          forwardCallback(optionsRef, "onPrimaryTypeChange", type);
+        },
+        onFiltersChange: (filters) => {
+          updateStateField(setState, "filters", filters);
+          forwardCallback(optionsRef, "onFiltersChange", filters);
+        },
+        onBoundsChange: (bounds) => {
+          updateStateField(setState, "bounds", bounds);
+          forwardCallback(optionsRef, "onBoundsChange", bounds);
+        },
+        onPendingBoundsChange: (pendingBounds) => {
+          updateStateField(setState, "pendingBounds", pendingBounds);
+          forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
+        },
+        onCenterChange: (center, zoom) => {
+          setState((prev) => prev ? { ...prev, center, zoom } : null);
+          forwardCallback(optionsRef, "onCenterChange", center, zoom);
+        },
+        onZoomChange: (zoom) => {
+          updateStateField(setState, "zoom", zoom);
+          forwardCallback(optionsRef, "onZoomChange", zoom);
+        },
+        onActiveLocationChange: (location) => {
+          updateStateField(setState, "activeLocation", location);
+          forwardCallback(optionsRef, "onActiveLocationChange", location);
+        },
+        onLoadingStateChange: (loading) => {
+          updateStateField(setState, "initialLoading", loading);
+          forwardCallback(optionsRef, "onLoadingStateChange", loading);
+        },
+        onSearchingStateChange: (searching) => {
+          updateStateField(setState, "isSearching", searching);
+          forwardCallback(optionsRef, "onSearchingStateChange", searching);
+        }
+      }
+    };
+    const instance = new MapFirstCore(coreOptions);
+    instanceRef.current = instance;
+    setState(instance.getState());
+    return () => {
+      instance.destroy();
+      instanceRef.current = null;
+      setState(null);
+    };
+  }, []);
+  const setPrimaryType = React6.useCallback((type) => {
+    if (instanceRef.current) {
+      instanceRef.current.setPrimaryType(type);
+    }
+  }, []);
+  const setSelectedMarker = React6.useCallback((id) => {
+    if (instanceRef.current) {
+      instanceRef.current.setSelectedMarker(id);
+    }
+  }, []);
+  const setUseApi = React6.useCallback(
+    (useApi, autoLoad = true) => {
+      if (instanceRef.current) {
+        instanceRef.current.setUseApi(useApi, autoLoad);
+      }
+    },
+    []
+  );
+  const propertiesSearch = React6.useMemo(
+    () => ({
+      search: async (options2) => {
+        if (!instanceRef.current) {
+          throw new Error("MapFirst instance not available");
+        }
+        return await instanceRef.current.runPropertiesSearch(options2);
+      }
+    }),
+    []
+  );
+  const smartFilterSearch = React6.useMemo(
+    () => ({
+      search: async (options2) => {
+        if (!instanceRef.current) {
+          throw new Error("MapFirst instance not available");
+        }
+        return await instanceRef.current.runSmartFilterSearch(options2);
+      }
+    }),
+    []
+  );
+  const boundsSearch = React6.useMemo(
+    () => ({
+      perform: async () => {
+        if (!instanceRef.current) {
+          return null;
+        }
+        return await instanceRef.current.performBoundsSearch();
+      }
+    }),
+    []
+  );
+  const mapLibreAttachedRef = React6.useRef(false);
+  const attachMapLibre = React6.useCallback(
+    (map, maplibregl, options2) => {
+      attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
+        platform: "maplibre",
+        maplibregl,
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+      });
+    },
+    []
+  );
+  const googleMapsAttachedRef = React6.useRef(false);
+  const attachGoogle = React6.useCallback(
+    (map, google, options2) => {
+      attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
+        platform: "google",
+        google,
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+      });
+    },
+    []
+  );
+  const mapboxAttachedRef = React6.useRef(false);
+  const attachMapbox = React6.useCallback(
+    (map, mapboxgl, options2) => {
+      attachMapOnce(instanceRef, mapboxAttachedRef, map, {
+        platform: "mapbox",
+        mapboxgl,
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+      });
+    },
+    []
+  );
+  return {
+    instance: instanceRef.current,
+    state,
+    setPrimaryType,
+    setSelectedMarker,
+    setUseApi,
+    propertiesSearch,
+    smartFilterSearch,
+    boundsSearch,
+    attachMapLibre,
+    attachGoogle,
+    attachMapbox
+  };
+}
+export {
+  Chip,
+  CloseIcon,
+  EditIcon,
+  FilterChips,
+  MapFirstCore2 as MapFirstCore,
+  MinRatingFilterChip,
+  NextIcon,
+  PriceRangeFilterChip,
+  PropertiesFetchError,
+  RestaurantPriceLevelChip,
+  SearchIcon,
+  SmartFilter,
+  StarIcon,
+  TransformedQueryChip,
+  convertToApiFilters,
+  createMinRatingFilterLabel,
+  createPriceRangeFilterLabel,
+  fetchImages,
+  fetchProperties,
+  formatRatingValue,
+  processApiFilters,
+  renderStars,
+  useFilterScroll,
+  useMapFirst,
+  useTranslation
+};
