@@ -29,7 +29,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          registry-url: https://registry.npmjs.org
           cache: pnpm
+
+      # setup-node writes _authToken=${NODE_AUTH_TOKEN} into .npmrc which
+      # conflicts with OIDC trusted publishing. Remove it so npm uses OIDC instead.
+      - name: Remove static npm auth token
+        run: npm config delete //registry.npmjs.org/:_authToken
+
+      # Trusted publishing requires npm >= 11.5.1
+      - name: Upgrade npm
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

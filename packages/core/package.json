@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mapfirst-ai/mapfirst-sdk.git",
+    "url": "git+https://github.com/mapfirst-ai/mapfirst-sdk.git",
     "directory": "packages/core"
   },
   "publishConfig": {
