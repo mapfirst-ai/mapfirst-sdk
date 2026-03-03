@@ -1,5 +1,3 @@
 packages:
   - packages/*
   - mapfirst-sdk-docs/
-overrides:
-  dist: link:packages/core/dist

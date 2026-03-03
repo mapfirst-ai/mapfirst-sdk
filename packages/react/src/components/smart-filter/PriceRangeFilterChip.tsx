@@ -11,8 +11,6 @@ import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
 import type { PriceRangeValue } from "./types";
 
-type Boundary = "min" | "max";
-
 const chipStyles: CSSProperties = {
   position: "relative",
   backgroundColor: "white",
@@ -53,14 +51,12 @@ const editButtonStyles: CSSProperties = {
 };
 
 interface PriceBoundaryChipProps {
-  boundary: Boundary;
   label: string;
   value?: number;
   placeholder?: string;
   currency: string;
   isOptional?: boolean;
   showRemoveButton?: boolean;
-  removeLabel?: string;
   editLabel?: string;
   showAddWhenEmpty?: boolean;
   onCommit: (value?: number) => void;
@@ -68,14 +64,12 @@ interface PriceBoundaryChipProps {
 }
 
 const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
-  boundary,
   label,
   value,
   placeholder,
   currency,
   isOptional = false,
   showRemoveButton = false,
-  removeLabel,
   editLabel,
   showAddWhenEmpty = false,
   onCommit,
@@ -244,10 +238,9 @@ export const PriceRangeFilterChip: FunctionComponent<{
 
   const minLabel = "Min";
   const maxChipLabel = "Max";
-  const removeLabel = t("smartFilter.priceRange.remove");
   const editLabel = t("smartFilter.priceRange.edit");
 
-  const handleBoundaryCommit = (boundary: Boundary, nextValue?: number) => {
+  const handleBoundaryCommit = (boundary: "min" | "max", nextValue?: number) => {
     const nextRange: PriceRangeValue = {
       min: priceRange.min,
       max: priceRange.max,
@@ -281,7 +274,6 @@ export const PriceRangeFilterChip: FunctionComponent<{
   return (
     <>
       <PriceBoundaryChip
-        boundary="min"
         label={minLabel}
         value={priceRange.min}
         currency={currency}
@@ -291,13 +283,11 @@ export const PriceRangeFilterChip: FunctionComponent<{
         onRemove={onRemove}
       />
       <PriceBoundaryChip
-        boundary="max"
         label={maxChipLabel}
         value={priceRange.max}
         currency={currency}
         isOptional
         showRemoveButton={priceRange.max !== undefined}
-        removeLabel={removeLabel}
         editLabel={editLabel}
         showAddWhenEmpty
         onCommit={(value) => handleBoundaryCommit("max", value)}

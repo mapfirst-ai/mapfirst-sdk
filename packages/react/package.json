@@ -1,6 +1,6 @@
 {
   "name": "@mapfirst.ai/react",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "description": "React hooks for MapFirst SDK - Reactive state management for map properties",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -18,7 +18,7 @@
     "EXAMPLES.md"
   ],
   "scripts": {
-    "build": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --clean",
+    "build": "tsup src/index.tsx --format esm,cjs --dts --clean",
     "prepublishOnly": "pnpm build"
   },
   "keywords": [
@@ -41,9 +41,9 @@
     "access": "public"
   },
   "peerDependencies": {
-    "react": ">=17 || >=18"
+    "react": ">=17"
   },
   "dependencies": {
-    "@mapfirst.ai/core": "^0.0.30"
+    "@mapfirst.ai/core": "workspace:*"
   }
 }

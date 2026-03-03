@@ -51,6 +51,8 @@ type HotelPricingAPIResponse = {
         isComplete: boolean;
         pollingLink?: string;
         results?: Property[];
+        invalidHotelIds?: string[];
+        unsupportedHotelIds?: string[];
     };
 };
 type PropertyAwardImage = {
@@ -154,12 +156,14 @@ type ViewStateSnapshot = {
     pitch: number;
 };
 
-type MapLibreMarkerHandle = {
-    setLngLat(lngLat: [number, number]): MapLibreMarkerHandle;
-    addTo(map: any): MapLibreMarkerHandle;
+type MapGLMarkerHandle = {
+    setLngLat(lngLat: [number, number]): MapGLMarkerHandle;
+    addTo(map: any): MapGLMarkerHandle;
     remove(): void;
     getElement(): HTMLElement;
 };
+
+type MapLibreMarkerHandle = MapGLMarkerHandle;
 type MapLibreNamespace = {
     Marker: new (options?: {
         element?: HTMLElement;
@@ -169,12 +173,7 @@ type MapLibreNamespace = {
 
 type GoogleMapsNamespace = any;
 
-type MapboxMarkerHandle = {
-    setLngLat(lngLat: [number, number]): MapboxMarkerHandle;
-    addTo(map: any): MapboxMarkerHandle;
-    remove(): void;
-    getElement(): HTMLElement;
-};
+type MapboxMarkerHandle = MapGLMarkerHandle;
 type MapboxNamespace = {
     Marker: new (options?: {
         element?: HTMLElement;
@@ -455,6 +454,8 @@ declare class MapFirstCore {
     private readonly fitBoundsPadding;
     constructor(options: MapFirstOptions);
     private hasMapInstance;
+    private assertPlatformSupportForNoApi;
+    private ensureApiEnabled;
     private initializeFromLocationData;
     private autoLoadProperties;
     attachMap(mapInstance: any, config: {
@@ -485,6 +486,7 @@ declare class MapFirstCore {
     setFlyToAnimating(animating: boolean): void;
     handleMapMoveEnd(bounds: MapBounds): void;
     flyMapTo(longitude: number, latitude: number, zoom?: number | null, animation?: boolean): void;
+    private extractPoiPoints;
     flyToPOIs(pois?: {
         lat: number;
         lng: number;

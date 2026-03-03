@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export type Locale = "en" | "es" | "de" | "fr" | "it" | "pt";
 
@@ -53,10 +53,13 @@ export const useTranslation = (
   customFormatCurrency?: FormatCurrencyFunction
 ) => {
   const [locale, setLocale] = useState<Locale>("en");
+  const translations = useMemo(
+    () => ({ ...defaultTranslations, ...customTranslations }),
+    [customTranslations]
+  );
 
   const t: TranslationFunction = useCallback(
     (key: string, params?: Record<string, any>) => {
-      const translations = { ...defaultTranslations, ...customTranslations };
       let translation = translations[key] || key;
 
       if (params) {
@@ -70,7 +73,7 @@ export const useTranslation = (
 
       return translation;
     },
-    [customTranslations]
+    [translations]
   );
 
   const formatCurrency = useCallback(

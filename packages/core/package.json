@@ -1,6 +1,6 @@
 {
   "name": "@mapfirst.ai/core",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "Core SDK for MapFirst - Multi-platform map markers and property visualization",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -17,7 +17,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs,iife --dts --sourcemap --global-name MapFirstCore --clean --inject-style",
+    "build": "tsup src/index.ts --format esm,cjs,iife --dts --global-name MapFirstCore --clean --inject-style",
     "prepublishOnly": "pnpm build"
   },
   "keywords": [

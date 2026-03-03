@@ -1,7 +1,12 @@
 import type { Property } from "./types";
 import { setupHoverCard } from "./marker";
-
-const LOADING_VIDEO_HTML = `<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>`;
+import {
+  LOADING_VIDEO_HTML,
+  getDotMarkerButtonClass,
+  getDotMarkerZIndex,
+  getPrimaryMarkerPillClass,
+  getPrimaryMarkerZIndex,
+} from "./marker-style-utils";
 
 /**
  * Utility functions to update marker DOM elements without recreating them
@@ -23,22 +28,16 @@ export function updatePrimaryMarkerElement(
       ?.classList.contains("mapfirst-marker-pill-pending") ?? false;
   // Update root z-index
   const root = element;
-  root.style.zIndex = isSelected ? "20" : isPrimaryType ? "12" : "11";
+  root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
 
   // Update pill classes
   const pill = root.querySelector(".mapfirst-marker-pill");
   if (pill) {
-    if (isPending) {
-      pill.className = "mapfirst-marker-pill mapfirst-marker-pill-pending";
-    } else {
-      pill.className = `mapfirst-marker-pill mapfirst-marker-pill-active${
-        isSelected
-          ? " mapfirst-marker-selected"
-          : !isPrimaryType
-          ? " mapfirst-marker-non-primary"
-          : ""
-      }`;
-    }
+    pill.className = getPrimaryMarkerPillClass(
+      isPending,
+      isPrimaryType,
+      isSelected,
+    );
   }
 
   // Update badge opacity for non-primary markers
@@ -154,23 +153,16 @@ export function updateDotMarkerElement(
 ) {
   // Update container z-index
   const container = element;
-  container.style.zIndex = isSelected ? "20" : isPrimaryType ? "3" : "1";
+  container.style.zIndex = String(getDotMarkerZIndex(isPrimaryType, isSelected));
 
   // Update button classes
   const button = container.querySelector(".mapfirst-dot-marker-button");
   if (button) {
-    if (isPending) {
-      button.className =
-        "mapfirst-dot-marker-button mapfirst-dot-marker-button-pending";
-    } else {
-      button.className = `mapfirst-dot-marker-button mapfirst-dot-marker-button-active${
-        isSelected
-          ? " mapfirst-dot-marker-selected"
-          : !isPrimaryType
-          ? " mapfirst-dot-marker-non-primary"
-          : ""
-      }`;
-    }
+    button.className = getDotMarkerButtonClass(
+      isPending,
+      isPrimaryType,
+      isSelected,
+    );
   }
 }
 

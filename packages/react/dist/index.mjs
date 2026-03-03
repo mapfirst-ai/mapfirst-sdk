@@ -1,6 +1,1549 @@
-import R from"react";import{MapFirstCore as Ge}from"@mapfirst.ai/core";import{processApiFilters as Dr,convertToApiFilters as Hr}from"@mapfirst.ai/core";import{useCallback as re}from"react";import de from"react";import he from"react";import{jsx as M,jsxs as V}from"react/jsx-runtime";var ne=({className:e,style:t})=>V("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:e,style:{width:"1em",height:"1em",...t},children:[M("circle",{cx:"11",cy:"11",r:"8"}),M("path",{d:"m21 21-4.35-4.35"})]}),oe=({className:e,style:t})=>V("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:e,style:{width:"1em",height:"1em",...t},children:[M("line",{x1:"18",y1:"6",x2:"6",y2:"18"}),M("line",{x1:"6",y1:"6",x2:"18",y2:"18"})]}),D=({className:e,style:t})=>V("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:e,style:{width:"1em",height:"1em",...t},children:[M("path",{d:"M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}),M("path",{d:"M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"})]}),Q=({className:e,style:t})=>M("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:e,style:{width:"1em",height:"1em",...t},children:M("polyline",{points:"9 18 15 12 9 6"})}),ie=({className:e,style:t,fill:p="none"})=>M("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",fill:p,stroke:"currentColor",strokeWidth:"2",strokeLinecap:"round",strokeLinejoin:"round",className:e,style:{width:"1em",height:"1em",...t},children:M("polygon",{points:"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"})});import{jsx as ae}from"react/jsx-runtime";var be={position:"absolute",top:"-8px",right:"-8px",padding:"2px",borderRadius:"50%",backgroundColor:"white",border:"1px solid #03852e",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background-color 0.2s"},Ce={width:"17px",height:"17px"},E=({onClick:e,style:t})=>{let[p,i]=he.useState(!1);return ae("button",{style:{...be,backgroundColor:p?"#e5e5e5":"white",...t},onClick:e,onMouseEnter:()=>i(!0),onMouseLeave:()=>i(!1),"aria-label":"Remove filter",children:ae(oe,{style:Ce})})};import{jsx as q,jsxs as ve}from"react/jsx-runtime";var xe={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"8px",flexShrink:0,height:"34px"},K=({label:e,icon:t,remove:p,style:i})=>ve("div",{style:{...xe,...i},children:[t&&q("span",{style:{display:"flex",alignItems:"center"},children:t}),q("span",{style:{whiteSpace:"nowrap"},children:e}),q(E,{onClick:p})]});import{useState as Le}from"react";import{useCallback as se,useState as Se}from"react";var ke={"smartFilter.typingPrompt":"Search for hotels, restaurants, or attractions...","smartFilter.nav.previous":"Previous filters","smartFilter.nav.next":"Next filters","smartFilter.toast.locationRequired":"Please select a location first","smartFilter.clearAll":"Clear all","smartFilter.minRating.suffix":"+","smartFilter.minRating.label":"{{value}}+","smartFilter.minRating.remove":"Remove rating filter","smartFilter.minRating.setTo":"Set rating to {{rating}}","smartFilter.priceRange.label":"Price Range","smartFilter.priceRange.remove":"Remove price filter","smartFilter.priceRange.edit":"Edit price","smartFilter.transformedQuery.remove":"Remove search query","smartFilter.transformedQuery.edit":"Edit search query","smartFilter.restaurantPriceLevel.label":"Price Level","smartFilter.restaurantPriceLevel.remove":"Remove price level filter","smartFilter.restaurantPriceLevel.none":"Any","smartFilter.restaurantPriceLevel.options.cheapEats":"Cheap Eats","smartFilter.restaurantPriceLevel.options.midRange":"Mid Range","smartFilter.restaurantPriceLevel.options.fineDining":"Fine Dining"},Fe=(e,t="USD")=>new Intl.NumberFormat("en-US",{style:"currency",currency:t,minimumFractionDigits:0,maximumFractionDigits:0}).format(e),w=(e,t)=>{let[p,i]=Se("en"),c=se((h,s)=>{let m={...ke,...e}[h]||h;return s&&Object.keys(s).forEach(g=>{m=m.replace(new RegExp(`{{${g}}}`,"g"),String(s[g]))}),m},[e]),y=se((h,s)=>t?t(h,s):Fe(h,s),[t]);return{t:c,locale:p,setLocale:i,formatCurrency:y}};import{jsx as H,jsxs as Pe}from"react/jsx-runtime";var Re=e=>{let t=[],p=Math.floor(e),i=e%1!==0,c={display:"block",width:"12px",height:"12px",borderRadius:"50%",border:"1px solid #03852e",pointerEvents:"none"},y={...c,backgroundColor:"#03852e"},h={...c,background:"linear-gradient(90deg, #03852e 50%, transparent 50%)"};for(let a=0;a<p;a+=1)t.push(H("span",{style:y},`full-${a}`));i&&t.push(H("span",{style:h},"half"));let s=Math.max(0,5-Math.ceil(e));for(let a=0;a<s;a+=1)t.push(H("span",{style:c},`empty-${a}`));return t},st=(e,t)=>Pe("span",{style:{display:"flex",alignItems:"center",gap:"4px"},children:[H("span",{style:{display:"flex",gap:"1px",userSelect:"none"},children:Re(e)})," ",t]}),$=e=>e.toFixed(1),lt=(e,t,p,i)=>`${i(e,p)} - ${i(t!=null?t:0,p)}`;import{jsx as T,jsxs as O}from"react/jsx-runtime";var we={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",gap:"8px",alignItems:"center",justifyContent:"center",flexShrink:0,height:"34px"},Me={display:"flex",gap:"1px",userSelect:"none"},U={display:"block",width:"12px",height:"12px",borderRadius:"50%",border:"1px solid #03852e",pointerEvents:"none"},z={position:"absolute",top:0,height:"100%",cursor:"pointer",backgroundColor:"transparent",border:"none",padding:0},_=({rating:e,onChange:t,onRemove:p,star:i=!1})=>{let[c,y]=Le(null),{t:h}=w(),s=c!=null?c:e,a=b=>i&&b?b.toString():h("smartFilter.minRating.label",{value:$(b)}),m=h("smartFilter.minRating.remove"),g=b=>h("smartFilter.minRating.setTo",{rating:$(b)}),x=b=>{let C=b+1;return s>=C?"full":s>=C-.5?"half":"empty"},f=b=>{y(null),b!==e&&t(b)},k=b=>{var v;let C=b.relatedTarget;(!C||!((v=b.currentTarget.closest("[data-min-rating-chip]"))!=null&&v.contains(C)))&&y(null)};return O("div",{style:we,"data-min-rating-chip":!0,children:[O("div",{style:{display:"flex",alignItems:"center",gap:"4px"},onMouseLeave:()=>y(null),children:[T("div",{style:Me,children:Array.from({length:5}).map((b,C)=>{let v=x(C),l=C+1,n=l-.5;if(i)return O("div",{style:{position:"relative",width:"16px",height:"16px"},children:[T(ie,{fill:s>=l?"#03852e":"none",style:{width:"16px",height:"16px",pointerEvents:"none"}}),T("button",{type:"button",style:{...z,left:0,width:"50%",borderRadius:"50% 0 0 50%"},onMouseEnter:()=>y(n),onFocus:()=>y(n),onBlur:k,onClick:()=>f(n),"aria-label":g(n),title:a(n)}),T("button",{type:"button",style:{...z,left:"50%",width:"50%",borderRadius:"0 50% 50% 0"},onMouseEnter:()=>y(l),onFocus:()=>y(l),onBlur:k,onClick:()=>f(l),"aria-label":g(l),title:a(l)})]},C);let S=v==="full"?{...U,backgroundColor:"#03852e"}:U,u={...U,background:"linear-gradient(90deg, #03852e 50%, transparent 50%)"};return O("div",{style:{position:"relative",width:"12px",height:"12px"},children:[T("span",{style:v==="half"?u:S}),T("button",{type:"button",style:{...z,left:0,width:"50%",borderRadius:"50% 0 0 50%",outline:"2px solid transparent",outlineOffset:"1px"},onMouseEnter:()=>y(n),onFocus:()=>y(n),onBlur:k,onClick:()=>f(n),"aria-label":g(n),title:a(n)}),T("button",{type:"button",style:{...z,left:"50%",width:"50%",borderRadius:"0 50% 50% 0",outline:"2px solid transparent",outlineOffset:"1px"},onMouseEnter:()=>y(l),onFocus:()=>y(l),onBlur:k,onClick:()=>f(l),"aria-label":g(l),title:a(l)})]},C)})}),T("span",{style:{whiteSpace:"nowrap"},children:a(s)})]}),T(E,{onClick:p})]})};import{useEffect as Ee,useState as G}from"react";import{Fragment as Ne,jsx as I,jsxs as Y}from"react/jsx-runtime";var Ie={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"8px",flexShrink:0,height:"34px"},Te={outline:"none",fontSize:"16px",backgroundColor:"transparent",borderRadius:"2px",padding:"2px 8px",width:"64px",textAlign:"center",border:"none"},Be={padding:"4px",borderRadius:"50%",cursor:"pointer",transition:"background-color 0.2s",border:"none",backgroundColor:"transparent",color:"#737373",display:"flex",alignItems:"center",justifyContent:"center"},le=({boundary:e,label:t,value:p,placeholder:i,currency:c,isOptional:y=!1,showRemoveButton:h=!1,removeLabel:s,editLabel:a,showAddWhenEmpty:m=!1,onCommit:g,onRemove:x})=>{let[f,k]=G(p!==void 0?String(p):""),[b,C]=G(!1),[v,l]=G(!1),n=p!==void 0;Ee(()=>{k(p!==void 0?String(p):""),C(!1)},[p]);let S=()=>{k(p!==void 0?String(p):"")},u=()=>{if(f.trim()===""){if(y){g(void 0),k("");return}S();return}let r=Number(f);if(!Number.isFinite(r)){S();return}let F=Math.max(0,r);if(F===p){S();return}g(F)};return Y("div",{style:Ie,children:[I("span",{style:{fontSize:"10px",textTransform:"uppercase",fontWeight:600,letterSpacing:"0.05em"},children:t}),b?I("input",{value:f,onChange:r=>{let F=r.target.value.replace(/[^\d]/g,"");k(F)},onBlur:()=>{u(),C(!1)},onKeyDown:r=>{if(r.key==="Enter"){r.preventDefault(),r.currentTarget.blur(),C(!1);return}if(r.key==="Escape"){r.preventDefault(),S(),r.currentTarget.blur(),C(!1);return}r.key.length===1&&/[0-9]/.test(r.key)||r.key==="Backspace"||r.key==="Delete"||r.key==="Tab"||r.key==="ArrowLeft"||r.key==="ArrowRight"||r.key==="Home"||r.key==="End"||r.preventDefault()},placeholder:i,inputMode:"numeric",pattern:"[0-9]*","aria-label":t,style:Te,autoFocus:!0}):n?Y("span",{style:{fontSize:"16px"},children:[c,p]}):m?I("button",{type:"button",style:{fontSize:"16px",color:"#737373",cursor:"pointer",border:"none",backgroundColor:"transparent",padding:0},onClick:()=>C(!0),"aria-label":a,children:"+"}):I("span",{style:{fontSize:"16px",color:"#737373"},children:"-"}),(!m||m&&b)&&I("span",{style:{color:"#737373",fontSize:"12px"},children:c}),!b&&(!m||n)&&I("button",{type:"button",style:{...Be,backgroundColor:v?"#e5e5e5":"transparent"},"aria-label":a,title:a,onClick:()=>C(!0),onMouseEnter:()=>l(!0),onMouseLeave:()=>l(!1),children:I(D,{})}),h&&I(E,{onClick:x})]})},Z=({priceRange:e,currency:t,onChange:p,onRemove:i})=>{let{t:c}=w(),y="Min",h="Max",s=c("smartFilter.priceRange.remove"),a=c("smartFilter.priceRange.edit"),m=(g,x)=>{let f={min:e.min,max:e.max};g==="min"?(f.min=x,x!==void 0&&e.max!==void 0&&x>e.max&&(f.max=x)):(f.max=x,x!==void 0&&e.min!==void 0&&x<e.min&&(f.min=x)),(f.min!==e.min||f.max!==e.max)&&p(f)};return Y(Ne,{children:[I(le,{boundary:"min",label:y,value:e.min,currency:t,editLabel:a,showRemoveButton:e.min!==void 0&&e.min!==0,onCommit:g=>m("min",g),onRemove:i}),I(le,{boundary:"max",label:h,value:e.max,currency:t,isOptional:!0,showRemoveButton:e.max!==void 0,removeLabel:s,editLabel:a,showAddWhenEmpty:!0,onCommit:g=>m("max",g),onRemove:i})]})};import{jsx as A,jsxs as W}from"react/jsx-runtime";var Ae={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"16px",flexShrink:0,height:"34px"},ce=[{value:"Cheap Eats",key:"cheapEats"},{value:"Mid Range",key:"midRange"},{value:"Fine Dining",key:"fineDining"}],j=({values:e,onChange:t,onRemove:p})=>{let{t:i}=w(),c=i("smartFilter.restaurantPriceLevel.label"),y=i("smartFilter.restaurantPriceLevel.remove"),h=i("smartFilter.restaurantPriceLevel.none"),s=a=>{let{value:m,checked:g}=a.target,x=m,f=new Set(e);g?f.add(x):f.delete(x);let k=ce.filter(b=>f.has(b.value)).map(b=>b.value);t(k)};return W("div",{style:Ae,children:[W("div",{style:{display:"flex",alignItems:"center",gap:"8px",flexWrap:"wrap"},children:[A("span",{style:{fontSize:"10px",textTransform:"uppercase",fontWeight:600,letterSpacing:"0.05em"},children:c}),W("div",{style:{display:"flex",gap:"12px"},children:[ce.map(a=>{let m=i(`smartFilter.restaurantPriceLevel.options.${a.key}`),g=`price-level-${a.key}`;return W("label",{htmlFor:g,style:{display:"flex",alignItems:"center",gap:"4px",fontSize:"12px",cursor:"pointer"},children:[A("input",{id:g,type:"checkbox",value:a.value,checked:e.includes(a.value),onChange:s,style:{accentColor:"#03852e",cursor:"pointer"}}),A("span",{children:m})]},a.value)}),e.length===0&&A("span",{style:{fontSize:"12px",color:"#737373"},children:h})]})]}),A(E,{onClick:p})]})};import{useEffect as De,useRef as He,useState as X}from"react";import{jsx as N,jsxs as We}from"react/jsx-runtime";var ze={position:"relative",backgroundColor:"white",color:"black",fontSize:"14px",borderRadius:"9999px",padding:"0 16px",paddingRight:"20px",border:"1px solid #03852e",display:"flex",alignItems:"center",gap:"8px",flexShrink:0,userSelect:"none",height:"34px"},Oe={backgroundColor:"#ececec",borderRadius:"2px",padding:"2px 8px",outline:"none",fontSize:"16px",minWidth:"8ch",border:"none"},_e={padding:"4px",borderRadius:"50%",cursor:"pointer",transition:"background-color 0.2s",color:"#737373",border:"none",backgroundColor:"transparent",display:"flex",alignItems:"center",justifyContent:"center"},J=({value:e,onChange:t,onRemove:p})=>{let i=He(null),[c,y]=X(e),[h,s]=X(!1),[a,m]=X(!1),{t:g}=w(),x=g("smartFilter.transformedQuery.remove"),f=g("smartFilter.transformedQuery.edit");De(()=>{y(e),s(!1)},[e]);let k=()=>{let v=c.trim();if(!v.length){y(e);return}v!==e&&t(v)};return We("div",{style:ze,children:[N(ne,{style:{width:"16px",height:"16px",color:"#03852e"}}),h?N("input",{ref:i,value:c,onChange:v=>{y(v.target.value)},onBlur:()=>{k(),s(!1)},onKeyDown:v=>{if(v.key==="Enter"){v.preventDefault(),v.currentTarget.blur();return}if(v.key==="Escape"){v.preventDefault(),y(e),v.currentTarget.blur();return}},"aria-label":f,style:Oe,autoFocus:!0}):N("span",{style:{fontSize:"16px"},children:e}),!h&&N("button",{type:"button",style:{..._e,backgroundColor:a?"#e5e5e5":"transparent"},"aria-label":f,title:f,onClick:()=>s(!0),onMouseEnter:()=>m(!0),onMouseLeave:()=>m(!1),children:N(D,{})}),N(E,{onClick:p})]})};import{useCallback as pe,useEffect as Qe,useRef as Ve,useState as ue}from"react";var ee=e=>{let t=Ve(null),[p,i]=ue(!0),[c,y]=ue(!0),h=pe(()=>{let a=t.current;if(!a){i(!0),y(!0);return}let{scrollLeft:m,scrollWidth:g,clientWidth:x}=a;i(m<=0),y(m+x>=g-1)},[]);Qe(()=>{let a=t.current;if(h(),!a)return;let m=()=>h();return a.addEventListener("scroll",m,{passive:!0}),window.addEventListener("resize",h),()=>{a.removeEventListener("scroll",m),window.removeEventListener("resize",h)}},[e,h]);let s=pe(a=>{let m=t.current;if(!m)return;let g=m.clientWidth*.7;m.scrollBy({left:a==="next"?g:-g,behavior:"smooth"})},[]);return{scrollerRef:t,atStart:p,atEnd:c,scrollByDir:s}};import{jsx as L,jsxs as ye}from"react/jsx-runtime";var qe={position:"relative",width:"100%"},Ke={display:"flex",gap:"8px",overflowX:"auto",alignItems:"center",width:"100%",scrollbarWidth:"none",msOverflowStyle:"none"},me={pointerEvents:"none",position:"absolute",top:0,bottom:0,width:"40px"},ge={position:"absolute",top:"50%",transform:"translateY(-50%)",backgroundColor:"white",color:"#003c30",border:"1px solid #003c30",padding:"4px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 1px 3px rgba(0,0,0,0.1)",cursor:"pointer"},te=({filters:e,currency:t,minRatingSuffix:p,clearAllLabel:i,previousFiltersLabel:c,nextFiltersLabel:y,formatCurrency:h,onFilterChange:s,onResetFilters:a,onClearAll:m})=>{let{scrollerRef:g,atStart:x,atEnd:f,scrollByDir:k}=ee(e.length),[b,C]=de.useState(null),[v,l]=de.useState(!1);return ye("div",{style:qe,children:[ye("div",{ref:g,style:{...Ke,padding:"8px",WebkitOverflowScrolling:"touch"},children:[L("style",{children:`
+// src/index.tsx
+import React6 from "react";
+import {
+  MapFirstCore
+} from "@mapfirst.ai/core";
+import {
+  processApiFilters,
+  convertToApiFilters,
+  PropertiesFetchError,
+  fetchImages,
+  fetchProperties,
+  MapFirstCore as MapFirstCore2
+} from "@mapfirst.ai/core";
+
+// src/components/SmartFilter.tsx
+import { useCallback as useCallback3 } from "react";
+
+// src/components/smart-filter/FilterChips.tsx
+import React5 from "react";
+
+// src/components/smart-filter/CloseButton.tsx
+import React from "react";
+
+// src/components/Icons.tsx
+import { jsx, jsxs } from "react/jsx-runtime";
+var SearchIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: [
+      /* @__PURE__ */ jsx("circle", { cx: "11", cy: "11", r: "8" }),
+      /* @__PURE__ */ jsx("path", { d: "m21 21-4.35-4.35" })
+    ]
+  }
+);
+var CloseIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: [
+      /* @__PURE__ */ jsx("line", { x1: "18", y1: "6", x2: "6", y2: "18" }),
+      /* @__PURE__ */ jsx("line", { x1: "6", y1: "6", x2: "18", y2: "18" })
+    ]
+  }
+);
+var EditIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: [
+      /* @__PURE__ */ jsx("path", { d: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
+      /* @__PURE__ */ jsx("path", { d: "M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" })
+    ]
+  }
+);
+var NextIcon = ({ className, style }) => /* @__PURE__ */ jsx(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: /* @__PURE__ */ jsx("polyline", { points: "9 18 15 12 9 6" })
+  }
+);
+var StarIcon = ({
+  className,
+  style,
+  fill = "none"
+}) => /* @__PURE__ */ jsx(
+  "svg",
+  {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill,
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    className,
+    style: { width: "1em", height: "1em", ...style },
+    children: /* @__PURE__ */ jsx("polygon", { points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" })
+  }
+);
+
+// src/components/smart-filter/CloseButton.tsx
+import { jsx as jsx2 } from "react/jsx-runtime";
+var closeButtonStyles = {
+  position: "absolute",
+  top: "-8px",
+  right: "-8px",
+  padding: "2px",
+  borderRadius: "50%",
+  backgroundColor: "white",
+  border: "1px solid #03852e",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transition: "background-color 0.2s"
+};
+var iconStyles = {
+  width: "17px",
+  height: "17px"
+};
+var CloseButton = ({ onClick, style }) => {
+  const [isHovering, setIsHovering] = React.useState(false);
+  return /* @__PURE__ */ jsx2(
+    "button",
+    {
+      style: {
+        ...closeButtonStyles,
+        backgroundColor: isHovering ? "#e5e5e5" : "white",
+        ...style
+      },
+      onClick,
+      onMouseEnter: () => setIsHovering(true),
+      onMouseLeave: () => setIsHovering(false),
+      "aria-label": "Remove filter",
+      children: /* @__PURE__ */ jsx2(CloseIcon, { style: iconStyles })
+    }
+  );
+};
+
+// src/components/smart-filter/Chip.tsx
+import { jsx as jsx3, jsxs as jsxs2 } from "react/jsx-runtime";
+var chipStyles = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexShrink: 0,
+  height: "34px"
+};
+var Chip = ({ label, icon, remove, style }) => {
+  return /* @__PURE__ */ jsxs2("div", { style: { ...chipStyles, ...style }, children: [
+    icon && /* @__PURE__ */ jsx3("span", { style: { display: "flex", alignItems: "center" }, children: icon }),
+    /* @__PURE__ */ jsx3("span", { style: { whiteSpace: "nowrap" }, children: label }),
+    /* @__PURE__ */ jsx3(CloseButton, { onClick: remove })
+  ] });
+};
+
+// src/components/smart-filter/MinRatingFilterChip.tsx
+import {
+  useState as useState2
+} from "react";
+
+// src/hooks/useTranslation.ts
+import { useCallback, useMemo, useState } from "react";
+var defaultTranslations = {
+  "smartFilter.typingPrompt": "Search for hotels, restaurants, or attractions...",
+  "smartFilter.nav.previous": "Previous filters",
+  "smartFilter.nav.next": "Next filters",
+  "smartFilter.toast.locationRequired": "Please select a location first",
+  "smartFilter.clearAll": "Clear all",
+  "smartFilter.minRating.suffix": "+",
+  "smartFilter.minRating.label": "{{value}}+",
+  "smartFilter.minRating.remove": "Remove rating filter",
+  "smartFilter.minRating.setTo": "Set rating to {{rating}}",
+  "smartFilter.priceRange.label": "Price Range",
+  "smartFilter.priceRange.remove": "Remove price filter",
+  "smartFilter.priceRange.edit": "Edit price",
+  "smartFilter.transformedQuery.remove": "Remove search query",
+  "smartFilter.transformedQuery.edit": "Edit search query",
+  "smartFilter.restaurantPriceLevel.label": "Price Level",
+  "smartFilter.restaurantPriceLevel.remove": "Remove price level filter",
+  "smartFilter.restaurantPriceLevel.none": "Any",
+  "smartFilter.restaurantPriceLevel.options.cheapEats": "Cheap Eats",
+  "smartFilter.restaurantPriceLevel.options.midRange": "Mid Range",
+  "smartFilter.restaurantPriceLevel.options.fineDining": "Fine Dining"
+};
+var formatCurrencyDefault = (value, currency = "USD") => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
+};
+var useTranslation = (customTranslations, customFormatCurrency) => {
+  const [locale, setLocale] = useState("en");
+  const translations = useMemo(
+    () => ({ ...defaultTranslations, ...customTranslations }),
+    [customTranslations]
+  );
+  const t = useCallback(
+    (key, params) => {
+      let translation = translations[key] || key;
+      if (params) {
+        Object.keys(params).forEach((paramKey) => {
+          translation = translation.replace(
+            new RegExp(`{{${paramKey}}}`, "g"),
+            String(params[paramKey])
+          );
+        });
+      }
+      return translation;
+    },
+    [translations]
+  );
+  const formatCurrency = useCallback(
+    (value, currency) => {
+      if (customFormatCurrency) {
+        return customFormatCurrency(value, currency);
+      }
+      return formatCurrencyDefault(value, currency);
+    },
+    [customFormatCurrency]
+  );
+  return {
+    t,
+    locale,
+    setLocale,
+    formatCurrency
+  };
+};
+
+// src/components/smart-filter/utils.tsx
+import { jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
+var STAR_BASE_STYLES = {
+  display: "block",
+  width: "12px",
+  height: "12px",
+  borderRadius: "50%",
+  border: "1px solid #03852e",
+  pointerEvents: "none"
+};
+var STAR_FULL_STYLES = {
+  ...STAR_BASE_STYLES,
+  backgroundColor: "#03852e"
+};
+var STAR_HALF_STYLES = {
+  ...STAR_BASE_STYLES,
+  background: "linear-gradient(90deg, #03852e 50%, transparent 50%)"
+};
+var MIN_RATING_LABEL_STYLES = {
+  display: "flex",
+  alignItems: "center",
+  gap: "4px"
+};
+var MIN_RATING_STARS_WRAPPER_STYLES = {
+  display: "flex",
+  gap: "1px",
+  userSelect: "none"
+};
+var renderStars = (rating) => {
+  const stars = [];
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 !== 0;
+  for (let i = 0; i < fullStars; i += 1) {
+    stars.push(/* @__PURE__ */ jsx4("span", { style: STAR_FULL_STYLES }, `full-${i}`));
+  }
+  if (hasHalfStar) {
+    stars.push(/* @__PURE__ */ jsx4("span", { style: STAR_HALF_STYLES }, "half"));
+  }
+  const remainingStars = Math.max(0, 5 - Math.ceil(rating));
+  for (let i = 0; i < remainingStars; i += 1) {
+    stars.push(/* @__PURE__ */ jsx4("span", { style: STAR_BASE_STYLES }, `empty-${i}`));
+  }
+  return stars;
+};
+var createMinRatingFilterLabel = (rating, suffix) => /* @__PURE__ */ jsxs3("span", { style: MIN_RATING_LABEL_STYLES, children: [
+  /* @__PURE__ */ jsx4("span", { style: MIN_RATING_STARS_WRAPPER_STYLES, children: renderStars(rating) }),
+  " ",
+  suffix
+] });
+var formatRatingValue = (rating) => rating.toFixed(1);
+var createPriceRangeFilterLabel = (min, max, currency, formatCurrencyFn) => `${formatCurrencyFn(min, currency)} - ${formatCurrencyFn(
+  max != null ? max : 0,
+  currency
+)}`;
+
+// src/components/smart-filter/MinRatingFilterChip.tsx
+import { jsx as jsx5, jsxs as jsxs4 } from "react/jsx-runtime";
+var chipContainerStyles = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  gap: "8px",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+  height: "34px"
+};
+var starContainerStyles = {
+  display: "flex",
+  gap: "1px",
+  userSelect: "none"
+};
+var circleBaseStyles = {
+  display: "block",
+  width: "12px",
+  height: "12px",
+  borderRadius: "50%",
+  border: "1px solid #03852e",
+  pointerEvents: "none"
+};
+var buttonBaseStyles = {
+  position: "absolute",
+  top: 0,
+  height: "100%",
+  cursor: "pointer",
+  backgroundColor: "transparent",
+  border: "none",
+  padding: 0
+};
+var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
+  const [hoverRating, setHoverRating] = useState2(null);
+  const { t } = useTranslation();
+  const displayRating = hoverRating != null ? hoverRating : rating;
+  const formatLabel = (value) => star && value ? value.toString() : t("smartFilter.minRating.label", { value: formatRatingValue(value) });
+  const removeLabel = t("smartFilter.minRating.remove");
+  const setLabel = (value) => t("smartFilter.minRating.setTo", { rating: formatRatingValue(value) });
+  const getFillForStar = (index) => {
+    const starNumber = index + 1;
+    if (displayRating >= starNumber) {
+      return "full";
+    }
+    if (displayRating >= starNumber - 0.5) {
+      return "half";
+    }
+    return "empty";
+  };
+  const handleSelect = (nextRating) => {
+    setHoverRating(null);
+    if (nextRating === rating) {
+      return;
+    }
+    onChange(nextRating);
+  };
+  const handleBlur = (event) => {
+    var _a;
+    const related = event.relatedTarget;
+    if (!related || !((_a = event.currentTarget.closest("[data-min-rating-chip]")) == null ? void 0 : _a.contains(related))) {
+      setHoverRating(null);
+    }
+  };
+  return /* @__PURE__ */ jsxs4("div", { style: chipContainerStyles, "data-min-rating-chip": true, children: [
+    /* @__PURE__ */ jsxs4(
+      "div",
+      {
+        style: { display: "flex", alignItems: "center", gap: "4px" },
+        onMouseLeave: () => setHoverRating(null),
+        children: [
+          /* @__PURE__ */ jsx5("div", { style: starContainerStyles, children: Array.from({ length: 5 }).map((_, index) => {
+            const fillState = getFillForStar(index);
+            const starNumber = index + 1;
+            const halfValue = starNumber - 0.5;
+            if (star) {
+              return /* @__PURE__ */ jsxs4(
+                "div",
+                {
+                  style: {
+                    position: "relative",
+                    width: "16px",
+                    height: "16px"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx5(
+                      StarIcon,
+                      {
+                        fill: displayRating >= starNumber ? "#03852e" : "none",
+                        style: {
+                          width: "16px",
+                          height: "16px",
+                          pointerEvents: "none"
+                        }
+                      }
+                    ),
+                    /* @__PURE__ */ jsx5(
+                      "button",
+                      {
+                        type: "button",
+                        style: {
+                          ...buttonBaseStyles,
+                          left: 0,
+                          width: "50%",
+                          borderRadius: "50% 0 0 50%"
+                        },
+                        onMouseEnter: () => setHoverRating(halfValue),
+                        onFocus: () => setHoverRating(halfValue),
+                        onBlur: handleBlur,
+                        onClick: () => handleSelect(halfValue),
+                        "aria-label": setLabel(halfValue),
+                        title: formatLabel(halfValue)
+                      }
+                    ),
+                    /* @__PURE__ */ jsx5(
+                      "button",
+                      {
+                        type: "button",
+                        style: {
+                          ...buttonBaseStyles,
+                          left: "50%",
+                          width: "50%",
+                          borderRadius: "0 50% 50% 0"
+                        },
+                        onMouseEnter: () => setHoverRating(starNumber),
+                        onFocus: () => setHoverRating(starNumber),
+                        onBlur: handleBlur,
+                        onClick: () => handleSelect(starNumber),
+                        "aria-label": setLabel(starNumber),
+                        title: formatLabel(starNumber)
+                      }
+                    )
+                  ]
+                },
+                index
+              );
+            }
+            const circleStyles = fillState === "full" ? { ...circleBaseStyles, backgroundColor: "#03852e" } : circleBaseStyles;
+            const halfCircleStyles = {
+              ...circleBaseStyles,
+              background: "linear-gradient(90deg, #03852e 50%, transparent 50%)"
+            };
+            return /* @__PURE__ */ jsxs4(
+              "div",
+              {
+                style: { position: "relative", width: "12px", height: "12px" },
+                children: [
+                  /* @__PURE__ */ jsx5(
+                    "span",
+                    {
+                      style: fillState === "half" ? halfCircleStyles : circleStyles
+                    }
+                  ),
+                  /* @__PURE__ */ jsx5(
+                    "button",
+                    {
+                      type: "button",
+                      style: {
+                        ...buttonBaseStyles,
+                        left: 0,
+                        width: "50%",
+                        borderRadius: "50% 0 0 50%",
+                        outline: "2px solid transparent",
+                        outlineOffset: "1px"
+                      },
+                      onMouseEnter: () => setHoverRating(halfValue),
+                      onFocus: () => setHoverRating(halfValue),
+                      onBlur: handleBlur,
+                      onClick: () => handleSelect(halfValue),
+                      "aria-label": setLabel(halfValue),
+                      title: formatLabel(halfValue)
+                    }
+                  ),
+                  /* @__PURE__ */ jsx5(
+                    "button",
+                    {
+                      type: "button",
+                      style: {
+                        ...buttonBaseStyles,
+                        left: "50%",
+                        width: "50%",
+                        borderRadius: "0 50% 50% 0",
+                        outline: "2px solid transparent",
+                        outlineOffset: "1px"
+                      },
+                      onMouseEnter: () => setHoverRating(starNumber),
+                      onFocus: () => setHoverRating(starNumber),
+                      onBlur: handleBlur,
+                      onClick: () => handleSelect(starNumber),
+                      "aria-label": setLabel(starNumber),
+                      title: formatLabel(starNumber)
+                    }
+                  )
+                ]
+              },
+              index
+            );
+          }) }),
+          /* @__PURE__ */ jsx5("span", { style: { whiteSpace: "nowrap" }, children: formatLabel(displayRating) })
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsx5(CloseButton, { onClick: onRemove })
+  ] });
+};
+
+// src/components/smart-filter/PriceRangeFilterChip.tsx
+import {
+  useEffect,
+  useState as useState3
+} from "react";
+import { Fragment, jsx as jsx6, jsxs as jsxs5 } from "react/jsx-runtime";
+var chipStyles2 = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexShrink: 0,
+  height: "34px"
+};
+var inputStyles = {
+  outline: "none",
+  fontSize: "16px",
+  backgroundColor: "transparent",
+  borderRadius: "2px",
+  padding: "2px 8px",
+  width: "64px",
+  textAlign: "center",
+  border: "none"
+};
+var editButtonStyles = {
+  padding: "4px",
+  borderRadius: "50%",
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+  border: "none",
+  backgroundColor: "transparent",
+  color: "#737373",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
+var PriceBoundaryChip = ({
+  label,
+  value,
+  placeholder,
+  currency,
+  isOptional = false,
+  showRemoveButton = false,
+  editLabel,
+  showAddWhenEmpty = false,
+  onCommit,
+  onRemove
+}) => {
+  const [draft, setDraft] = useState3(
+    value !== void 0 ? String(value) : ""
+  );
+  const [isEditing, setIsEditing] = useState3(false);
+  const [editHover, setEditHover] = useState3(false);
+  const hasValue = value !== void 0;
+  useEffect(() => {
+    setDraft(value !== void 0 ? String(value) : "");
+    setIsEditing(false);
+  }, [value]);
+  const resetDraft = () => {
+    setDraft(value !== void 0 ? String(value) : "");
+  };
+  const commitValue = () => {
+    if (draft.trim() === "") {
+      if (isOptional) {
+        onCommit(void 0);
+        setDraft("");
+        return;
+      }
+      resetDraft();
+      return;
+    }
+    const parsed = Number(draft);
+    if (!Number.isFinite(parsed)) {
+      resetDraft();
+      return;
+    }
+    const normalized = Math.max(0, parsed);
+    if (normalized === value) {
+      resetDraft();
+      return;
+    }
+    onCommit(normalized);
+  };
+  const handleChange = (event) => {
+    const next = event.target.value.replace(/[^\d]/g, "");
+    setDraft(next);
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.currentTarget.blur();
+      setIsEditing(false);
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      resetDraft();
+      event.currentTarget.blur();
+      setIsEditing(false);
+      return;
+    }
+    const allowed = event.key.length === 1 && /[0-9]/.test(event.key) || event.key === "Backspace" || event.key === "Delete" || event.key === "Tab" || event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "Home" || event.key === "End";
+    if (!allowed) {
+      event.preventDefault();
+    }
+  };
+  return /* @__PURE__ */ jsxs5("div", { style: chipStyles2, children: [
+    /* @__PURE__ */ jsx6(
+      "span",
+      {
+        style: {
+          fontSize: "10px",
+          textTransform: "uppercase",
+          fontWeight: 600,
+          letterSpacing: "0.05em"
+        },
+        children: label
+      }
+    ),
+    isEditing ? /* @__PURE__ */ jsx6(
+      "input",
+      {
+        value: draft,
+        onChange: handleChange,
+        onBlur: () => {
+          commitValue();
+          setIsEditing(false);
+        },
+        onKeyDown: handleKeyDown,
+        placeholder,
+        inputMode: "numeric",
+        pattern: "[0-9]*",
+        "aria-label": label,
+        style: inputStyles,
+        autoFocus: true
+      }
+    ) : hasValue ? /* @__PURE__ */ jsxs5("span", { style: { fontSize: "16px" }, children: [
+      currency,
+      value
+    ] }) : showAddWhenEmpty ? /* @__PURE__ */ jsx6(
+      "button",
+      {
+        type: "button",
+        style: {
+          fontSize: "16px",
+          color: "#737373",
+          cursor: "pointer",
+          border: "none",
+          backgroundColor: "transparent",
+          padding: 0
+        },
+        onClick: () => setIsEditing(true),
+        "aria-label": editLabel,
+        children: "+"
+      }
+    ) : /* @__PURE__ */ jsx6("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
+    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ jsx6("span", { style: { color: "#737373", fontSize: "12px" }, children: currency }),
+    !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ jsx6(
+      "button",
+      {
+        type: "button",
+        style: {
+          ...editButtonStyles,
+          backgroundColor: editHover ? "#e5e5e5" : "transparent"
+        },
+        "aria-label": editLabel,
+        title: editLabel,
+        onClick: () => setIsEditing(true),
+        onMouseEnter: () => setEditHover(true),
+        onMouseLeave: () => setEditHover(false),
+        children: /* @__PURE__ */ jsx6(EditIcon, {})
+      }
+    ),
+    showRemoveButton && /* @__PURE__ */ jsx6(CloseButton, { onClick: onRemove })
+  ] });
+};
+var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove }) => {
+  const { t } = useTranslation();
+  const minLabel = "Min";
+  const maxChipLabel = "Max";
+  const editLabel = t("smartFilter.priceRange.edit");
+  const handleBoundaryCommit = (boundary, nextValue) => {
+    const nextRange = {
+      min: priceRange.min,
+      max: priceRange.max
+    };
+    if (boundary === "min") {
+      nextRange.min = nextValue;
+      if (nextValue !== void 0 && priceRange.max !== void 0 && nextValue > priceRange.max) {
+        nextRange.max = nextValue;
+      }
+    } else {
+      nextRange.max = nextValue;
+      if (nextValue !== void 0 && priceRange.min !== void 0 && nextValue < priceRange.min) {
+        nextRange.min = nextValue;
+      }
+    }
+    if (nextRange.min !== priceRange.min || nextRange.max !== priceRange.max) {
+      onChange(nextRange);
+    }
+  };
+  return /* @__PURE__ */ jsxs5(Fragment, { children: [
+    /* @__PURE__ */ jsx6(
+      PriceBoundaryChip,
+      {
+        label: minLabel,
+        value: priceRange.min,
+        currency,
+        editLabel,
+        showRemoveButton: priceRange.min !== void 0 && priceRange.min !== 0,
+        onCommit: (value) => handleBoundaryCommit("min", value),
+        onRemove
+      }
+    ),
+    /* @__PURE__ */ jsx6(
+      PriceBoundaryChip,
+      {
+        label: maxChipLabel,
+        value: priceRange.max,
+        currency,
+        isOptional: true,
+        showRemoveButton: priceRange.max !== void 0,
+        editLabel,
+        showAddWhenEmpty: true,
+        onCommit: (value) => handleBoundaryCommit("max", value),
+        onRemove
+      }
+    )
+  ] });
+};
+
+// src/components/smart-filter/RestaurantPriceLevelChip.tsx
+import { jsx as jsx7, jsxs as jsxs6 } from "react/jsx-runtime";
+var chipStyles3 = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+  flexShrink: 0,
+  height: "34px"
+};
+var PRICE_LEVEL_OPTIONS = [
+  { value: "Cheap Eats", key: "cheapEats" },
+  { value: "Mid Range", key: "midRange" },
+  { value: "Fine Dining", key: "fineDining" }
+];
+var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
+  const { t } = useTranslation();
+  const label = t("smartFilter.restaurantPriceLevel.label");
+  const removeLabel = t("smartFilter.restaurantPriceLevel.remove");
+  const noneSelectedLabel = t("smartFilter.restaurantPriceLevel.none");
+  const handleChange = (event) => {
+    const { value, checked } = event.target;
+    const valueAsPriceLevel = value;
+    const selection = new Set(values);
+    if (checked) {
+      selection.add(valueAsPriceLevel);
+    } else {
+      selection.delete(valueAsPriceLevel);
+    }
+    const orderedSelection = PRICE_LEVEL_OPTIONS.filter(
+      (option) => selection.has(option.value)
+    ).map((option) => option.value);
+    onChange(orderedSelection);
+  };
+  return /* @__PURE__ */ jsxs6("div", { style: chipStyles3, children: [
+    /* @__PURE__ */ jsxs6(
+      "div",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          flexWrap: "wrap"
+        },
+        children: [
+          /* @__PURE__ */ jsx7(
+            "span",
+            {
+              style: {
+                fontSize: "10px",
+                textTransform: "uppercase",
+                fontWeight: 600,
+                letterSpacing: "0.05em"
+              },
+              children: label
+            }
+          ),
+          /* @__PURE__ */ jsxs6("div", { style: { display: "flex", gap: "12px" }, children: [
+            PRICE_LEVEL_OPTIONS.map((option) => {
+              const optionLabel = t(
+                `smartFilter.restaurantPriceLevel.options.${option.key}`
+              );
+              const checkboxId = `price-level-${option.key}`;
+              return /* @__PURE__ */ jsxs6(
+                "label",
+                {
+                  htmlFor: checkboxId,
+                  style: {
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "12px",
+                    cursor: "pointer"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx7(
+                      "input",
+                      {
+                        id: checkboxId,
+                        type: "checkbox",
+                        value: option.value,
+                        checked: values.includes(option.value),
+                        onChange: handleChange,
+                        style: { accentColor: "#03852e", cursor: "pointer" }
+                      }
+                    ),
+                    /* @__PURE__ */ jsx7("span", { children: optionLabel })
+                  ]
+                },
+                option.value
+              );
+            }),
+            values.length === 0 && /* @__PURE__ */ jsx7("span", { style: { fontSize: "12px", color: "#737373" }, children: noneSelectedLabel })
+          ] })
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsx7(CloseButton, { onClick: onRemove })
+  ] });
+};
+
+// src/components/smart-filter/TransformedQueryChip.tsx
+import {
+  useEffect as useEffect2,
+  useRef,
+  useState as useState4
+} from "react";
+import { jsx as jsx8, jsxs as jsxs7 } from "react/jsx-runtime";
+var chipStyles4 = {
+  position: "relative",
+  backgroundColor: "white",
+  color: "black",
+  fontSize: "14px",
+  borderRadius: "9999px",
+  padding: "0 16px",
+  paddingRight: "20px",
+  border: "1px solid #03852e",
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  flexShrink: 0,
+  userSelect: "none",
+  height: "34px"
+};
+var inputStyles2 = {
+  backgroundColor: "#ececec",
+  borderRadius: "2px",
+  padding: "2px 8px",
+  outline: "none",
+  fontSize: "16px",
+  minWidth: "8ch",
+  border: "none"
+};
+var editButtonStyles2 = {
+  padding: "4px",
+  borderRadius: "50%",
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+  color: "#737373",
+  border: "none",
+  backgroundColor: "transparent",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
+var TransformedQueryChip = ({ value, onChange, onRemove }) => {
+  const inputRef = useRef(null);
+  const [draft, setDraft] = useState4(value);
+  const [isEditing, setIsEditing] = useState4(false);
+  const [editHover, setEditHover] = useState4(false);
+  const { t } = useTranslation();
+  const removeLabel = t("smartFilter.transformedQuery.remove");
+  const editLabel = t("smartFilter.transformedQuery.edit");
+  useEffect2(() => {
+    setDraft(value);
+    setIsEditing(false);
+  }, [value]);
+  const applyChanges = () => {
+    const nextValue = draft.trim();
+    if (!nextValue.length) {
+      setDraft(value);
+      return;
+    }
+    if (nextValue === value) {
+      return;
+    }
+    onChange(nextValue);
+  };
+  const handleChange = (event) => {
+    setDraft(event.target.value);
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.currentTarget.blur();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setDraft(value);
+      event.currentTarget.blur();
+      return;
+    }
+  };
+  return /* @__PURE__ */ jsxs7("div", { style: chipStyles4, children: [
+    /* @__PURE__ */ jsx8(SearchIcon, { style: { width: "16px", height: "16px", color: "#03852e" } }),
+    isEditing ? /* @__PURE__ */ jsx8(
+      "input",
+      {
+        ref: inputRef,
+        value: draft,
+        onChange: handleChange,
+        onBlur: () => {
+          applyChanges();
+          setIsEditing(false);
+        },
+        onKeyDown: handleKeyDown,
+        "aria-label": editLabel,
+        style: inputStyles2,
+        autoFocus: true
+      }
+    ) : /* @__PURE__ */ jsx8("span", { style: { fontSize: "16px" }, children: value }),
+    !isEditing && /* @__PURE__ */ jsx8(
+      "button",
+      {
+        type: "button",
+        style: {
+          ...editButtonStyles2,
+          backgroundColor: editHover ? "#e5e5e5" : "transparent"
+        },
+        "aria-label": editLabel,
+        title: editLabel,
+        onClick: () => setIsEditing(true),
+        onMouseEnter: () => setEditHover(true),
+        onMouseLeave: () => setEditHover(false),
+        children: /* @__PURE__ */ jsx8(EditIcon, {})
+      }
+    ),
+    /* @__PURE__ */ jsx8(CloseButton, { onClick: onRemove })
+  ] });
+};
+
+// src/hooks/useFilterScroll.ts
+import { useCallback as useCallback2, useEffect as useEffect3, useRef as useRef2, useState as useState5 } from "react";
+var useFilterScroll = (dependency) => {
+  const scrollerRef = useRef2(null);
+  const [atStart, setAtStart] = useState5(true);
+  const [atEnd, setAtEnd] = useState5(true);
+  const updateScrollButtons = useCallback2(() => {
+    const el = scrollerRef.current;
+    if (!el) {
+      setAtStart(true);
+      setAtEnd(true);
+      return;
+    }
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setAtStart(scrollLeft <= 0);
+    setAtEnd(scrollLeft + clientWidth >= scrollWidth - 1);
+  }, []);
+  useEffect3(() => {
+    const el = scrollerRef.current;
+    updateScrollButtons();
+    if (!el) {
+      return;
+    }
+    const handleScroll = () => updateScrollButtons();
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateScrollButtons);
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateScrollButtons);
+    };
+  }, [dependency, updateScrollButtons]);
+  const scrollByDir = useCallback2((dir) => {
+    const el = scrollerRef.current;
+    if (!el) {
+      return;
+    }
+    const delta = el.clientWidth * 0.7;
+    el.scrollBy({
+      left: dir === "next" ? delta : -delta,
+      behavior: "smooth"
+    });
+  }, []);
+  return {
+    scrollerRef,
+    atStart,
+    atEnd,
+    scrollByDir
+  };
+};
+
+// src/components/smart-filter/FilterChips.tsx
+import { jsx as jsx9, jsxs as jsxs8 } from "react/jsx-runtime";
+var containerStyles = {
+  position: "relative",
+  width: "100%"
+};
+var scrollContainerBase = {
+  display: "flex",
+  gap: "8px",
+  overflowX: "auto",
+  alignItems: "center",
+  width: "100%",
+  scrollbarWidth: "none",
+  msOverflowStyle: "none"
+};
+var gradientStyles = {
+  pointerEvents: "none",
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  width: "40px"
+};
+var navButtonStyles = {
+  position: "absolute",
+  top: "50%",
+  transform: "translateY(-50%)",
+  backgroundColor: "white",
+  color: "#003c30",
+  border: "1px solid #003c30",
+  padding: "4px",
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  cursor: "pointer"
+};
+var FilterChips = ({
+  filters,
+  currency,
+  minRatingSuffix: _minRatingSuffix,
+  clearAllLabel,
+  previousFiltersLabel,
+  nextFiltersLabel,
+  formatCurrency: _formatCurrency,
+  onFilterChange,
+  onResetFilters: _onResetFilters,
+  onClearAll
+}) => {
+  const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
+    filters.length
+  );
+  const [navHover, setNavHover] = React5.useState(null);
+  const [clearHover, setClearHover] = React5.useState(false);
+  const removeFilter = React5.useCallback(
+    (filterId) => {
+      void onFilterChange(filters.filter((f) => f.id !== filterId));
+    },
+    [filters, onFilterChange]
+  );
+  const patchFilter = React5.useCallback(
+    (filterId, patch) => {
+      const nextFilters = filters.map(
+        (f) => f.id === filterId ? { ...f, ...patch } : f
+      );
+      void onFilterChange(nextFilters);
+    },
+    [filters, onFilterChange]
+  );
+  return /* @__PURE__ */ jsxs8("div", { style: containerStyles, children: [
+    /* @__PURE__ */ jsxs8(
+      "div",
+      {
+        ref: scrollerRef,
+        style: {
+          ...scrollContainerBase,
+          padding: "8px",
+          // Hide scrollbar for webkit browsers
+          WebkitOverflowScrolling: "touch"
+        },
+        children: [
+          /* @__PURE__ */ jsx9("style", { children: `
             div::-webkit-scrollbar {
               display: none;
             }
-          `}),e.map(n=>{var u,o,d;let S=()=>L(K,{label:n.label,icon:n.icon,remove:()=>{s(e.filter(r=>r.id!==n.id))}},n.id);if(n.type==="minRating"){let r=(u=n.numericValue)!=null?u:Number(n.value);return Number.isFinite(r)?L(_,{rating:r,onChange:F=>{let P=e.map(B=>B.id===n.id?{...B,numericValue:F,value:String(F)}:B);s(P)},onRemove:()=>void s(e.filter(F=>F.id!==n.id))},n.id):S()}if(n.type==="starRating"){let r=(o=n.numericValue)!=null?o:Number(n.value);return Number.isFinite(r)?L(_,{star:!0,rating:r,onChange:F=>{let P=e.map(B=>B.id===n.id?{...B,numericValue:F,value:String(F)}:B);s(P)},onRemove:()=>void s(e.filter(F=>F.id!==n.id))},n.id):S()}return n.type==="priceRange"&&n.priceRange?L(Z,{priceRange:n.priceRange,currency:t,onChange:r=>{let F=e.map(P=>P.id===n.id?{...P,priceRange:r}:P);s(F)},onRemove:()=>void s(e.filter(r=>r.id!==n.id))},n.id):n.type==="transformed_query"?L(J,{value:n.value,onChange:r=>{let F=e.map(P=>P.id===n.id?{...P,value:r}:P);s(F)},onRemove:()=>void s(e.filter(r=>r.id!==n.id))},n.id):n.type==="selected_restaurant_price_levels"?L(j,{values:(d=n.priceLevels)!=null?d:[],onChange:r=>{let F=e.map(P=>P.id===n.id?{...P,priceLevels:r}:P);s(F)},onRemove:()=>void s(e.filter(r=>r.id!==n.id))},n.id):S()}),L("button",{style:{flexShrink:0,padding:"4px 16px",borderRadius:"9999px",cursor:"pointer",fontSize:"14px",userSelect:"none",backgroundColor:v?"#eee":"white",color:"black",border:"1px solid #03852e"},onClick:m,onMouseEnter:()=>l(!0),onMouseLeave:()=>l(!1),children:i})]}),!x&&L("div",{"aria-hidden":"true",style:{...me,left:0,background:"linear-gradient(to right, white, transparent)"}}),!f&&L("div",{"aria-hidden":"true",style:{...me,right:0,background:"linear-gradient(to left, white, transparent)"}}),!x&&L("button",{type:"button","aria-label":c,style:{...ge,left:"4px",transform:"translateY(-50%) rotate(180deg)",backgroundColor:b==="prev"?"#e5e5e5":"white"},onClick:()=>k("prev"),onMouseEnter:()=>C("prev"),onMouseLeave:()=>C(null),children:L(Q,{style:{width:"20px",height:"20px"}})}),!f&&L("button",{type:"button","aria-label":y,style:{...ge,right:"4px",backgroundColor:b==="next"?"#e5e5e5":"white"},onClick:()=>k("next"),onMouseEnter:()=>C("next"),onMouseLeave:()=>C(null),children:L(Q,{style:{width:"20px",height:"20px"}})})]})};import{jsx as fe}from"react/jsx-runtime";var $e={position:"relative",display:"flex",flexDirection:"column",gap:"8px",width:"100%"},Ue=({filters:e,isSearching:t=!1,onFilterChange:p,customTranslations:i,currency:c="USD",containerStyle:y,style:h})=>{let{t:s,formatCurrency:a}=w(i),m=s("smartFilter.minRating.suffix"),g=s("smartFilter.nav.previous"),x=s("smartFilter.nav.next"),f=s("smartFilter.clearAll"),k=re(async(v,l)=>{if(!t)try{await p(v)}catch(n){console.error("Filter change error:",n)}},[t,p]),b=re(()=>{k([])},[k]),C=re(()=>{k([],!0)},[k]);return fe("div",{style:{...$e,...y},children:e.length>0&&fe(te,{filters:e,currency:c,minRatingSuffix:m,clearAllLabel:f,previousFiltersLabel:g,nextFiltersLabel:x,formatCurrency:a,onFilterChange:k,onResetFilters:b,onClearAll:C})})};function Br(e){let t=R.useRef(null),[p,i]=R.useState(null),c=R.useRef(e);R.useEffect(()=>{c.current=e}),R.useEffect(()=>{let l=c.current,n={adapter:null,...l,callbacks:{...l.callbacks,onPropertiesChange:u=>{var o,d;i(r=>r?{...r,properties:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onPropertiesChange)==null||d.call(o,u)},onSelectedPropertyChange:u=>{var o,d;i(r=>r?{...r,selectedPropertyId:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onSelectedPropertyChange)==null||d.call(o,u)},onPrimaryTypeChange:u=>{var o,d;i(r=>r?{...r,primary:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onPrimaryTypeChange)==null||d.call(o,u)},onFiltersChange:u=>{var o,d;i(r=>r?{...r,filters:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onFiltersChange)==null||d.call(o,u)},onBoundsChange:u=>{var o,d;i(r=>r?{...r,bounds:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onBoundsChange)==null||d.call(o,u)},onPendingBoundsChange:u=>{var o,d;i(r=>r?{...r,pendingBounds:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onPendingBoundsChange)==null||d.call(o,u)},onCenterChange:(u,o)=>{var d,r;i(F=>F?{...F,center:u,zoom:o}:null),(r=(d=c.current.callbacks)==null?void 0:d.onCenterChange)==null||r.call(d,u,o)},onZoomChange:u=>{var o,d;i(r=>r?{...r,zoom:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onZoomChange)==null||d.call(o,u)},onActiveLocationChange:u=>{var o,d;i(r=>r?{...r,activeLocation:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onActiveLocationChange)==null||d.call(o,u)},onLoadingStateChange:u=>{var o,d;i(r=>r?{...r,initialLoading:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onLoadingStateChange)==null||d.call(o,u)},onSearchingStateChange:u=>{var o,d;i(r=>r?{...r,isSearching:u}:null),(d=(o=c.current.callbacks)==null?void 0:o.onSearchingStateChange)==null||d.call(o,u)}}},S=new Ge(n);return t.current=S,i(S.getState()),()=>{S.destroy(),t.current=null,i(null)}},[]);let y=R.useCallback(l=>{t.current&&t.current.setPrimaryType(l)},[]),h=R.useCallback(l=>{t.current&&t.current.setSelectedMarker(l)},[]),s=R.useCallback((l,n=!0)=>{t.current&&t.current.setUseApi(l,n)},[]),a=R.useMemo(()=>({search:async l=>{if(!t.current)throw new Error("MapFirst instance not available");return await t.current.runPropertiesSearch(l)}}),[]),m=R.useMemo(()=>({search:async l=>{if(!t.current)throw new Error("MapFirst instance not available");return await t.current.runSmartFilterSearch(l)}}),[]),g=R.useMemo(()=>({perform:async()=>t.current?await t.current.performBoundsSearch():null}),[]),x=R.useRef(!1),f=R.useCallback((l,n,S)=>{t.current&&l&&!x.current&&(t.current.attachMap(l,{platform:"maplibre",maplibregl:n,onMarkerClick:S==null?void 0:S.onMarkerClick}),x.current=!0)},[]),k=R.useRef(!1),b=R.useCallback((l,n,S)=>{t.current&&l&&!k.current&&(t.current.attachMap(l,{platform:"google",google:n,onMarkerClick:S==null?void 0:S.onMarkerClick}),k.current=!0)},[]),C=R.useRef(!1),v=R.useCallback((l,n,S)=>{t.current&&l&&!C.current&&(t.current.attachMap(l,{platform:"mapbox",mapboxgl:n,onMarkerClick:S==null?void 0:S.onMarkerClick}),C.current=!0)},[]);return{instance:t.current,state:p,setPrimaryType:y,setSelectedMarker:h,setUseApi:s,propertiesSearch:a,smartFilterSearch:m,boundsSearch:g,attachMapLibre:f,attachGoogle:b,attachMapbox:v}}export{K as Chip,oe as CloseIcon,D as EditIcon,te as FilterChips,_ as MinRatingFilterChip,Q as NextIcon,Z as PriceRangeFilterChip,j as RestaurantPriceLevelChip,ne as SearchIcon,Ue as SmartFilter,ie as StarIcon,J as TransformedQueryChip,Hr as convertToApiFilters,st as createMinRatingFilterLabel,lt as createPriceRangeFilterLabel,$ as formatRatingValue,Dr as processApiFilters,Re as renderStars,ee as useFilterScroll,Br as useMapFirst,w as useTranslation};
-//# sourceMappingURL=index.mjs.map
+          ` }),
+          filters.map((filter) => {
+            var _a, _b;
+            const renderStandardChip = () => /* @__PURE__ */ jsx9(
+              Chip,
+              {
+                label: filter.label,
+                icon: filter.icon,
+                remove: () => removeFilter(filter.id)
+              },
+              filter.id
+            );
+            if (filter.type === "minRating" || filter.type === "starRating") {
+              const currentRating = (_a = filter.numericValue) != null ? _a : Number(filter.value);
+              if (!Number.isFinite(currentRating)) {
+                return renderStandardChip();
+              }
+              return /* @__PURE__ */ jsx9(
+                MinRatingFilterChip,
+                {
+                  star: filter.type === "starRating",
+                  rating: currentRating,
+                  onChange: (nextRating) => {
+                    patchFilter(filter.id, {
+                      numericValue: nextRating,
+                      value: String(nextRating)
+                    });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            if (filter.type === "priceRange" && filter.priceRange) {
+              return /* @__PURE__ */ jsx9(
+                PriceRangeFilterChip,
+                {
+                  priceRange: filter.priceRange,
+                  currency,
+                  onChange: (nextRange) => {
+                    patchFilter(filter.id, { priceRange: nextRange });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            if (filter.type === "transformed_query") {
+              return /* @__PURE__ */ jsx9(
+                TransformedQueryChip,
+                {
+                  value: filter.value,
+                  onChange: (nextValue) => {
+                    patchFilter(filter.id, { value: nextValue });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            if (filter.type === "selected_restaurant_price_levels") {
+              return /* @__PURE__ */ jsx9(
+                RestaurantPriceLevelChip,
+                {
+                  values: (_b = filter.priceLevels) != null ? _b : [],
+                  onChange: (nextLevels) => {
+                    patchFilter(filter.id, { priceLevels: nextLevels });
+                  },
+                  onRemove: () => removeFilter(filter.id)
+                },
+                filter.id
+              );
+            }
+            return renderStandardChip();
+          }),
+          /* @__PURE__ */ jsx9(
+            "button",
+            {
+              style: {
+                flexShrink: 0,
+                padding: "4px 16px",
+                borderRadius: "9999px",
+                cursor: "pointer",
+                fontSize: "14px",
+                userSelect: "none",
+                backgroundColor: clearHover ? "#eee" : "white",
+                color: "black",
+                border: "1px solid #03852e"
+              },
+              onClick: onClearAll,
+              onMouseEnter: () => setClearHover(true),
+              onMouseLeave: () => setClearHover(false),
+              children: clearAllLabel
+            }
+          )
+        ]
+      }
+    ),
+    !atStart && /* @__PURE__ */ jsx9(
+      "div",
+      {
+        "aria-hidden": "true",
+        style: {
+          ...gradientStyles,
+          left: 0,
+          background: "linear-gradient(to right, white, transparent)"
+        }
+      }
+    ),
+    !atEnd && /* @__PURE__ */ jsx9(
+      "div",
+      {
+        "aria-hidden": "true",
+        style: {
+          ...gradientStyles,
+          right: 0,
+          background: "linear-gradient(to left, white, transparent)"
+        }
+      }
+    ),
+    !atStart && /* @__PURE__ */ jsx9(
+      "button",
+      {
+        type: "button",
+        "aria-label": previousFiltersLabel,
+        style: {
+          ...navButtonStyles,
+          left: "4px",
+          transform: "translateY(-50%) rotate(180deg)",
+          backgroundColor: navHover === "prev" ? "#e5e5e5" : "white"
+        },
+        onClick: () => scrollByDir("prev"),
+        onMouseEnter: () => setNavHover("prev"),
+        onMouseLeave: () => setNavHover(null),
+        children: /* @__PURE__ */ jsx9(NextIcon, { style: { width: "20px", height: "20px" } })
+      }
+    ),
+    !atEnd && /* @__PURE__ */ jsx9(
+      "button",
+      {
+        type: "button",
+        "aria-label": nextFiltersLabel,
+        style: {
+          ...navButtonStyles,
+          right: "4px",
+          backgroundColor: navHover === "next" ? "#e5e5e5" : "white"
+        },
+        onClick: () => scrollByDir("next"),
+        onMouseEnter: () => setNavHover("next"),
+        onMouseLeave: () => setNavHover(null),
+        children: /* @__PURE__ */ jsx9(NextIcon, { style: { width: "20px", height: "20px" } })
+      }
+    )
+  ] });
+};
+
+// src/components/SmartFilter.tsx
+import { jsx as jsx10 } from "react/jsx-runtime";
+var containerStyles2 = {
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
+  width: "100%"
+};
+var SmartFilter = ({
+  filters,
+  isSearching = false,
+  onFilterChange,
+  customTranslations,
+  currency = "USD",
+  containerStyle,
+  style
+}) => {
+  const { t, formatCurrency } = useTranslation(customTranslations);
+  const minRatingSuffix = t("smartFilter.minRating.suffix");
+  const previousFiltersLabel = t("smartFilter.nav.previous");
+  const nextFiltersLabel = t("smartFilter.nav.next");
+  const clearAllLabel = t("smartFilter.clearAll");
+  const handleFilterChange = useCallback3(
+    async (nextFilters, clearAll) => {
+      if (isSearching) {
+        return;
+      }
+      try {
+        await onFilterChange(nextFilters);
+      } catch (error) {
+        console.error("Filter change error:", error);
+      }
+    },
+    [isSearching, onFilterChange]
+  );
+  const resetFilters = useCallback3(() => {
+    void handleFilterChange([]);
+  }, [handleFilterChange]);
+  const clearAllFilters = useCallback3(() => {
+    void handleFilterChange([], true);
+  }, [handleFilterChange]);
+  return /* @__PURE__ */ jsx10("div", { style: { ...containerStyles2, ...containerStyle, ...style }, children: filters.length > 0 && /* @__PURE__ */ jsx10(
+    FilterChips,
+    {
+      filters,
+      currency,
+      minRatingSuffix,
+      clearAllLabel,
+      previousFiltersLabel,
+      nextFiltersLabel,
+      formatCurrency,
+      onFilterChange: handleFilterChange,
+      onResetFilters: resetFilters,
+      onClearAll: clearAllFilters
+    }
+  ) });
+};
+
+// src/index.tsx
+function updateStateField(setState, key, value) {
+  setState((prev) => prev ? { ...prev, [key]: value } : null);
+}
+function forwardCallback(optionsRef, key, ...args) {
+  var _a;
+  const callback = (_a = optionsRef.current.callbacks) == null ? void 0 : _a[key];
+  callback == null ? void 0 : callback(...args);
+}
+function attachMapOnce(instanceRef, attachedRef, map, config) {
+  if (!instanceRef.current || !map || attachedRef.current) {
+    return;
+  }
+  instanceRef.current.attachMap(map, config);
+  attachedRef.current = true;
+}
+function useMapFirst(options) {
+  const instanceRef = React6.useRef(null);
+  const [state, setState] = React6.useState(null);
+  const optionsRef = React6.useRef(options);
+  React6.useEffect(() => {
+    optionsRef.current = options;
+  });
+  React6.useEffect(() => {
+    const opts = optionsRef.current;
+    const coreOptions = {
+      adapter: null,
+      // Will be set when attachMap is called
+      ...opts,
+      callbacks: {
+        ...opts.callbacks,
+        // Add internal callbacks to trigger React re-renders
+        onPropertiesChange: (properties) => {
+          updateStateField(setState, "properties", properties);
+          forwardCallback(optionsRef, "onPropertiesChange", properties);
+        },
+        onSelectedPropertyChange: (id) => {
+          updateStateField(setState, "selectedPropertyId", id);
+          forwardCallback(optionsRef, "onSelectedPropertyChange", id);
+        },
+        onPrimaryTypeChange: (type) => {
+          updateStateField(setState, "primary", type);
+          forwardCallback(optionsRef, "onPrimaryTypeChange", type);
+        },
+        onFiltersChange: (filters) => {
+          updateStateField(setState, "filters", filters);
+          forwardCallback(optionsRef, "onFiltersChange", filters);
+        },
+        onBoundsChange: (bounds) => {
+          updateStateField(setState, "bounds", bounds);
+          forwardCallback(optionsRef, "onBoundsChange", bounds);
+        },
+        onPendingBoundsChange: (pendingBounds) => {
+          updateStateField(setState, "pendingBounds", pendingBounds);
+          forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
+        },
+        onCenterChange: (center, zoom) => {
+          setState((prev) => prev ? { ...prev, center, zoom } : null);
+          forwardCallback(optionsRef, "onCenterChange", center, zoom);
+        },
+        onZoomChange: (zoom) => {
+          updateStateField(setState, "zoom", zoom);
+          forwardCallback(optionsRef, "onZoomChange", zoom);
+        },
+        onActiveLocationChange: (location) => {
+          updateStateField(setState, "activeLocation", location);
+          forwardCallback(optionsRef, "onActiveLocationChange", location);
+        },
+        onLoadingStateChange: (loading) => {
+          updateStateField(setState, "initialLoading", loading);
+          forwardCallback(optionsRef, "onLoadingStateChange", loading);
+        },
+        onSearchingStateChange: (searching) => {
+          updateStateField(setState, "isSearching", searching);
+          forwardCallback(optionsRef, "onSearchingStateChange", searching);
+        }
+      }
+    };
+    const instance = new MapFirstCore(coreOptions);
+    instanceRef.current = instance;
+    setState(instance.getState());
+    return () => {
+      instance.destroy();
+      instanceRef.current = null;
+      setState(null);
+    };
+  }, []);
+  const setPrimaryType = React6.useCallback((type) => {
+    if (instanceRef.current) {
+      instanceRef.current.setPrimaryType(type);
+    }
+  }, []);
+  const setSelectedMarker = React6.useCallback((id) => {
+    if (instanceRef.current) {
+      instanceRef.current.setSelectedMarker(id);
+    }
+  }, []);
+  const setUseApi = React6.useCallback(
+    (useApi, autoLoad = true) => {
+      if (instanceRef.current) {
+        instanceRef.current.setUseApi(useApi, autoLoad);
+      }
+    },
+    []
+  );
+  const propertiesSearch = React6.useMemo(
+    () => ({
+      search: async (options2) => {
+        if (!instanceRef.current) {
+          throw new Error("MapFirst instance not available");
+        }
+        return await instanceRef.current.runPropertiesSearch(options2);
+      }
+    }),
+    []
+  );
+  const smartFilterSearch = React6.useMemo(
+    () => ({
+      search: async (options2) => {
+        if (!instanceRef.current) {
+          throw new Error("MapFirst instance not available");
+        }
+        return await instanceRef.current.runSmartFilterSearch(options2);
+      }
+    }),
+    []
+  );
+  const boundsSearch = React6.useMemo(
+    () => ({
+      perform: async () => {
+        if (!instanceRef.current) {
+          return null;
+        }
+        return await instanceRef.current.performBoundsSearch();
+      }
+    }),
+    []
+  );
+  const mapLibreAttachedRef = React6.useRef(false);
+  const attachMapLibre = React6.useCallback(
+    (map, maplibregl, options2) => {
+      attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
+        platform: "maplibre",
+        maplibregl,
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+      });
+    },
+    []
+  );
+  const googleMapsAttachedRef = React6.useRef(false);
+  const attachGoogle = React6.useCallback(
+    (map, google, options2) => {
+      attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
+        platform: "google",
+        google,
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+      });
+    },
+    []
+  );
+  const mapboxAttachedRef = React6.useRef(false);
+  const attachMapbox = React6.useCallback(
+    (map, mapboxgl, options2) => {
+      attachMapOnce(instanceRef, mapboxAttachedRef, map, {
+        platform: "mapbox",
+        mapboxgl,
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+      });
+    },
+    []
+  );
+  return {
+    instance: instanceRef.current,
+    state,
+    setPrimaryType,
+    setSelectedMarker,
+    setUseApi,
+    propertiesSearch,
+    smartFilterSearch,
+    boundsSearch,
+    attachMapLibre,
+    attachGoogle,
+    attachMapbox
+  };
+}
+export {
+  Chip,
+  CloseIcon,
+  EditIcon,
+  FilterChips,
+  MapFirstCore2 as MapFirstCore,
+  MinRatingFilterChip,
+  NextIcon,
+  PriceRangeFilterChip,
+  PropertiesFetchError,
+  RestaurantPriceLevelChip,
+  SearchIcon,
+  SmartFilter,
+  StarIcon,
+  TransformedQueryChip,
+  convertToApiFilters,
+  createMinRatingFilterLabel,
+  createPriceRangeFilterLabel,
+  fetchImages,
+  fetchProperties,
+  formatRatingValue,
+  processApiFilters,
+  renderStars,
+  useFilterScroll,
+  useMapFirst,
+  useTranslation
+};

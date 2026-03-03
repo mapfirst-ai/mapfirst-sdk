@@ -1,33 +1,2621 @@
-"use strict";var MapFirstCore=(()=>{var O=Object.defineProperty;var le=Object.getOwnPropertyDescriptor;var ce=Object.getOwnPropertyNames;var me=Object.prototype.hasOwnProperty;var de=(i,e)=>{for(var t in e)O(i,t,{get:e[t],enumerable:!0})},ue=(i,e,t,a)=>{if(e&&typeof e=="object"||typeof e=="function")for(let r of ce(e))!me.call(i,r)&&r!==t&&O(i,r,{get:()=>e[r],enumerable:!(a=le(e,r))||a.enumerable});return i};var fe=i=>ue(O({},"__esModule",{value:!0}),i);var _e={};de(_e,{MapFirstCore:()=>V,PropertiesFetchError:()=>F,convertToApiFilters:()=>ae,fetchImages:()=>$,fetchProperties:()=>oe,processApiFilters:()=>re});function z(i,{insertAt:e}={}){if(!i||typeof document=="undefined")return;let t=document.head||document.getElementsByTagName("head")[0],a=document.createElement("style");a.type="text/css",e==="top"&&t.firstChild?t.insertBefore(a,t.firstChild):t.appendChild(a),a.styleSheet?a.styleSheet.cssText=i:a.appendChild(document.createTextNode(i))}z(`.mapfirst-marker-root{display:flex;z-index:20;flex-direction:column;align-items:center;pointer-events:auto}.mapfirst-marker-pill{border:2px solid;border-radius:999px;padding:8px;font-size:16px;font-weight:600;font-family:system-ui,-apple-system,sans-serif;box-shadow:0 4px 6px #6b728080;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .2s;transform-origin:center bottom}.mapfirst-marker-pill-pending{background:#ffffff80;backdrop-filter:blur(4px);border-color:transparent;cursor:default}.mapfirst-marker-pill-active{background:#012b11;border-color:#fff;color:#fff;cursor:pointer}.mapfirst-marker-pill-active.mapfirst-marker-non-primary{background:#ffffffb3;border-color:#03852e80;color:#03852e80;padding:4px}.mapfirst-marker-pill-active.mapfirst-marker-selected{background:#fff;border-color:#03852e;color:#03852e;transform:scale(1.2)}.mapfirst-marker-pill-active:hover{transform:scale(1.2)}.mapfirst-marker-badge{position:absolute;top:-12px;right:-20px}.mapfirst-marker-award-container{position:relative;width:32px;height:32px}.mapfirst-marker-award-back{position:absolute;stroke:#f5f5f5;stroke-width:2px}.mapfirst-marker-award-dot{position:absolute;top:6.2px;left:6.3px;width:18.5px;height:18.5px;border-radius:50%;z-index:1}.mapfirst-marker-award-dot-type-0{background:#ffef0e}.mapfirst-marker-award-dot-type-1{background:#01ea5b}.mapfirst-marker-award-front{position:relative;z-index:2;color:#012b11}.mapfirst-marker-rating-badge{display:flex;align-items:center;justify-content:center;border-radius:999px;background:#03852e;color:#fff;font-size:12px;line-height:1;box-shadow:0 2px 4px #0003;padding:2px 6px;border:2px solid #ffffff;font-weight:400}.mapfirst-marker-content{display:flex;align-items:center}.mapfirst-marker-loading-video{width:20px;height:20px;display:block}.mapfirst-dot-marker-container{display:flex;z-index:10;align-items:center;justify-content:center;pointer-events:auto}.mapfirst-dot-marker-button{width:20px;height:20px;border-radius:999px;border:2px solid #ffffff;box-shadow:0 2px 4px #6b728066;transition:transform .2s;outline:none;transform-origin:center center}.mapfirst-dot-marker-button-pending{background:#d1d5db;cursor:default}.mapfirst-dot-marker-button-active{background:#012b11;cursor:pointer}.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary{background:#ffffffb3;border-color:#03852e33}.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected{background:#fff;border-color:#03852e}.mapfirst-dot-marker-button-active:hover{transform:scale(1.2)}.mapfirst-dot-marker-button-active:focus{outline:2px solid #ffffff;outline-offset:2px}.mapfirst-property-hover-card{position:absolute;width:270px;background:#fff;border-radius:8px;box-shadow:0 4px 12px #00000026;overflow:hidden;display:flex;pointer-events:auto;z-index:9999;transition:opacity .2s;height:120px;text-decoration:none;color:inherit}.mapfirst-property-hover-card img{width:120px;height:120px;object-fit:cover;flex-shrink:0}.mapfirst-property-hover-image{width:120px;height:120px;flex-shrink:0}.mapfirst-property-hover-image-placeholder{background-color:#e5e7eb}.mapfirst-property-hover-details{display:flex;flex-direction:column;padding:8px 12px;flex:1;gap:4px}.mapfirst-property-hover-name{font-size:12px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3}.mapfirst-property-hover-rating{display:flex;align-items:center;gap:4px;font-size:12px}.mapfirst-property-hover-rating .rating-value{font-weight:600;color:#1a1a1a}.mapfirst-property-hover-rating .stars{display:flex;gap:1px;font-size:10px;line-height:1;align-items:center}.mapfirst-property-hover-rating .reviews{color:#666;font-size:11px}.mapfirst-property-hover-price{font-size:12px;color:#666;margin-top:2px}.mapfirst-property-hover-price strong{color:#1a1a1a;font-weight:600}.mapfirst-property-hover-learn-more{font-size:12px;color:#03852e;text-decoration:none;font-weight:500;margin-top:auto;pointer-events:auto;display:inline-block}.mapfirst-property-hover-learn-more:hover{text-decoration:underline}
-`);var he='<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 3.953a7.442 7.442 0 1 0 .001 14.884A7.442 7.442 0 0 0 12 3.953m0 14.05a6.61 6.61 0 1 1 0-13.218 6.61 6.61 0 0 1 0 13.219M10.343 11.9a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.821 0m5.134 0a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.82 0m.82-1.897.84-.913h-1.863A5.8 5.8 0 0 0 12 8.08a5.77 5.77 0 0 0-3.27 1.008H6.862l.84.913a2.567 2.567 0 1 0 3.475 3.78l.823.896.823-.895a2.568 2.568 0 1 0 3.474-3.78m-6.865 3.634a1.738 1.738 0 1 1 0-3.476 1.738 1.738 0 0 1 0 3.476M12 11.85c0-1.143-.832-2.124-1.929-2.543A5 5 0 0 1 12 8.92a5 5 0 0 1 1.928.386c-1.096.42-1.927 1.4-1.927 2.543m2.566 1.787a1.738 1.738 0 1 1 .001-3.476 1.738 1.738 0 0 1 0 3.476m-8.456 3.719s-.377-.946-1.396-1.903c-1.02-.957-2.303-1.132-2.303-1.132s.457 1.02 1.54 2.04c1.086 1.017 2.159.995 2.159.995m2.568 1.41s-.524-.511-1.479-.883-1.861-.191-1.861-.191.598.54 1.615.935c1.016.397 1.725.139 1.725.139m2.493.505s-.545-.224-1.357-.196-1.415.47-1.415.47.608.222 1.473.193 1.3-.467 1.3-.467m-6.186-4.203s-.175-1.008-.974-2.154c-.8-1.147-2.015-1.578-2.015-1.578s.238 1.098 1.089 2.319c.85 1.22 1.9 1.413 1.9 1.413m-1.003-3.071s.195-1.021-.134-2.393c-.328-1.371-1.294-2.21-1.294-2.21s-.17 1.128.18 2.589c.35 1.46 1.248 2.014 1.248 2.014"></path><path d="M17.887 17.355s.377-.946 1.396-1.903c1.02-.957 2.303-1.132 2.303-1.132s-.457 1.02-1.54 2.04c-1.086 1.017-2.159.995-2.159.995m-2.567 1.41s.524-.511 1.479-.883 1.861-.191 1.861-.191-.598.54-1.615.935c-1.016.397-1.725.139-1.725.139m-2.493.505s.545-.224 1.357-.196 1.415.47 1.415.47-.608.222-1.473.193-1.3-.467-1.3-.467m6.186-4.203s.175-1.008.974-2.154c.8-1.147 2.015-1.578 2.015-1.578s-.238 1.098-1.089 2.319c-.85 1.22-1.9 1.413-1.9 1.413m1.003-3.071s-.195-1.021.133-2.393c.33-1.371 1.293-2.21 1.293-2.21s.17 1.128-.18 2.589c-.349 1.46-1.246 2.014-1.246 2.014M12 20.047a.413.413 0 1 0 0-.827.413.413 0 0 0 0 .827"></path></svg>',ge='<svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 3.953a7.442 7.442 0 1 0 .001 14.884A7.442 7.442 0 0 0 12 3.953m0 14.05a6.61 6.61 0 1 1 0-13.218 6.61 6.61 0 0 1 0 13.219M10.343 11.9a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.821 0m5.134 0a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.82 0m.82-1.897.84-.913h-1.863A5.8 5.8 0 0 0 12 8.08a5.77 5.77 0 0 0-3.27 1.008H6.862l.84.913a2.567 2.567 0 1 0 3.475 3.78l.823.896.823-.895a2.568 2.568 0 1 0 3.474-3.78m-6.865 3.634a1.738 1.738 0 1 1 0-3.476 1.738 1.738 0 0 1 0 3.476M12 11.85c0-1.143-.832-2.124-1.929-2.543A5 5 0 0 1 12 8.92a5 5 0 0 1 1.928.386c-1.096.42-1.927 1.4-1.927 2.543m2.566 1.787a1.738 1.738 0 1 1 .001-3.476 1.738 1.738 0 0 1 0 3.476m-8.456 3.719s-.377-.946-1.396-1.903c-1.02-.957-2.303-1.132-2.303-1.132s.457 1.02 1.54 2.04c1.086 1.017 2.159.995 2.159.995m2.568 1.41s-.524-.511-1.479-.883-1.861-.191-1.861-.191.598.54 1.615.935c1.016.397 1.725.139 1.725.139m2.493.505s-.545-.224-1.357-.196-1.415.47-1.415.47.608.222 1.473.193 1.3-.467 1.3-.467m-6.186-4.203s-.175-1.008-.974-2.154c-.8-1.147-2.015-1.578-2.015-1.578s.238 1.098 1.089 2.319c.85 1.22 1.9 1.413 1.9 1.413m-1.003-3.071s.195-1.021-.134-2.393c-.328-1.371-1.294-2.21-1.294-2.21s-.17 1.128.18 2.589c.35 1.46 1.248 2.014 1.248 2.014"></path><path d="M17.887 17.355s.377-.946 1.396-1.903c1.02-.957 2.303-1.132 2.303-1.132s-.457 1.02-1.54 2.04c-1.086 1.017-2.159.995-2.159.995m-2.567 1.41s.524-.511 1.479-.883 1.861-.191 1.861-.191-.598.54-1.615.935c-1.016.397-1.725.139-1.725.139m-2.493.505s.545-.224 1.357-.196 1.415.47 1.415.47-.608.222-1.473.193-1.3-.467-1.3-.467m6.186-4.203s.175-1.008.974-2.154c.8-1.147 2.015-1.578 2.015-1.578s-.238 1.098-1.089 2.319c-.85 1.22-1.9 1.413-1.9 1.413m1.003-3.071s-.195-1.021.133-2.393c.33-1.371 1.293-2.21 1.293-2.21s.17 1.128-.18 2.589c-.349 1.46-1.246 2.014-1.246 2.014M12 20.047a.413.413 0 1 0 0-.827.413.413 0 0 0 0 .827"></path></svg>',ye='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.051 6.549v.003l1.134 1.14 3.241-3.25.003-.002 1.134 1.136-3.243 3.252 1.134 1.14a1 1 0 0 0 .09-.008c.293-.05.573-.324.72-.474l.005-.006 2.596-2.603L22 8.016l-2.597 2.604a3.73 3.73 0 0 1-1.982 1.015 4.3 4.3 0 0 1-3.162-.657l-.023-.016-.026-.018-1.366 1.407 8.509 8.512L20.219 22l-.002-.002-6.654-6.663-2.597 2.76-7.3-7.315C1.967 8.948 1.531 6.274 2.524 4.198c.241-.504.566-.973.978-1.386l8.154 8.416 1.418-1.423-.039-.045c-.858-1.002-1.048-2.368-.62-3.595a4.15 4.15 0 0 1 .983-1.561L16 2l1.135 1.138-2.598 2.602-.047.045c-.16.151-.394.374-.433.678zM3.809 5.523c-.362 1.319-.037 2.905 1.06 4.103L10.93 15.7l1.408-1.496zM2.205 20.697 3.34 21.84l4.543-4.552-1.135-1.143z"/></svg>',be='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56 7.5H3.75a.25.25 0 0 0-.25.25v10c0 .138.112.25.25.25h16.5a.25.25 0 0 0 .25-.25v-10a.25.25 0 0 0-.25-.25h-3.81l-2-2H9.56zM8.94 4h6.12l2 2h3.19c.966 0 1.75.784 1.75 1.75v10a1.75 1.75 0 0 1-1.75 1.75H3.75A1.75 1.75 0 0 1 2 17.75v-10C2 6.784 2.784 6 3.75 6h3.19z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 9.25a2.75 2.75 0 1 0 0 5.5 2.75 2.75 0 0 0 0-5.5M7.75 12a4.25 4.25 0 1 1 8.5 0 4.25 4.25 0 0 1-8.5 0"/></svg>',Me='<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>';function E(i,e,t,a){if(i.dataset.hasHoverCard==="true")return;i.dataset.hasHoverCard="true";let r=ve(t),n=null,s=null,m=null,p=()=>{n&&(clearTimeout(n),n=null),s&&(clearTimeout(s),s=null),m&&(cancelAnimationFrame(m),m=null),r.parentElement&&r.remove()},f=()=>{if(r.parentElement){let o=i.parentElement;for(;o&&getComputedStyle(o).position==="static";)o=o.parentElement;o&&(Z(r,i,o),m=requestAnimationFrame(f))}},y=(o=!1)=>{s&&(clearTimeout(s),s=null);let d=()=>{let u=i.parentElement;for(;u&&getComputedStyle(u).position==="static";)u=u.parentElement;u&&(u.appendChild(r),Z(r,i,u),Pe(r,t),m=requestAnimationFrame(f))};o?d():n=setTimeout(d,300)},M=()=>{a||(n&&(clearTimeout(n),n=null),m&&(cancelAnimationFrame(m),m=null),s=setTimeout(()=>{r.parentElement&&r.remove()},100))};a&&y(!0),e.addEventListener("mouseenter",()=>y(!1)),e.addEventListener("mouseleave",M),r.addEventListener("mouseenter",()=>{s&&(clearTimeout(s),s=null),!m&&r.parentElement&&(m=requestAnimationFrame(f))}),r.addEventListener("mouseleave",M);let l=new MutationObserver(o=>{for(let d of o)for(let u of d.removedNodes)if(u===i||u.contains(i)){p(),l.disconnect();return}});if(i.parentElement)l.observe(i.parentElement,{childList:!0,subtree:!0});else{let o=setInterval(()=>{i.parentElement&&(l.observe(i.parentElement,{childList:!0,subtree:!0}),clearInterval(o))},100)}}function ke(i){return`https://api.mapfirst.ai/static/images/${i.toLowerCase().replace(/\s+/g,"").replace(/&/g,"")}.webp`}function ve(i){var p,f,y,M,l,o;let e=(y=(f=(p=i.pricing)==null?void 0:p.offer)==null?void 0:f.clickUrl)!=null?y:i.url,t=document.createElement(e?"a":"div");t.className="mapfirst-property-hover-card",t.setAttribute("data-marker-id",i.tripadvisor_id.toString()),e&&(t.href=e,t.target="_blank");let a=i.rating||0,r=i.reviews||0,n=(o=(l=(M=i.pricing)==null?void 0:M.offer)==null?void 0:l.displayPrice)!=null?o:i.price_level,s=()=>{let d=Math.floor(a),u=a%1!==0,b=[],g=`
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border: 1px solid #03852e;
-      border-radius: 9999px;
-    `;for(let h=0;h<d;h++)b.push(`<span style="${g} background-color: #03852e;"></span>`);u&&b.push(`<span style="${g} background: linear-gradient(90deg, #03852e 50%, transparent 50%);"></span>`);let c=5-Math.ceil(a);for(let h=0;h<c;h++)b.push(`<span style="${g}"></span>`);return b.join("")},m=ke(i.type);return t.innerHTML=`
-    <div 
-      class="mapfirst-property-hover-image mapfirst-property-hover-image-placeholder"
-      data-tripadvisor-id="${i.tripadvisor_id}"
-      data-default-image="${m}"
-    ></div>
-    <div class="mapfirst-property-hover-details">
-      <div class="mapfirst-property-hover-name">${i.name}</div>
-      <div class="mapfirst-property-hover-rating">
-        <span class="rating-value">${a.toFixed(1)}</span>
-        <span class="stars">${s()}</span>
-        <span class="reviews">(${r})</span>
-      </div>
-      ${i.type==="Accommodation"&&n?`
-        <div class="mapfirst-property-hover-price">
-          Starting at <strong>${n}</strong>
-        </div>
-      `:""}
-      ${e?`
-        <span class="mapfirst-property-hover-learn-more">
-          Learn More
-        </span>
-      `:""}
-    </div>
-  `,t}function Pe(i,e){let t=i.querySelector(".mapfirst-property-hover-image");if(t&&e.tripadvisor_id&&!t.dataset.imageLoaded){t.dataset.imageLoaded="loading";let a=t.dataset.defaultImage;$(e.tripadvisor_id,1).then(r=>{if(r&&t){let n=document.createElement("img");n.src=r,n.alt=e.name,n.style.width="100%",n.style.height="100%",n.style.objectFit="cover",t.innerHTML="",t.appendChild(n),t.classList.remove("mapfirst-property-hover-image-placeholder"),t.dataset.imageLoaded="true"}else throw new Error("No image URL")}).catch(()=>{if(a&&t){let r=document.createElement("img");r.src=a,r.alt=e.name,r.style.width="100%",r.style.height="100%",r.style.objectFit="cover",t.innerHTML="",t.appendChild(r),t.classList.remove("mapfirst-property-hover-image-placeholder"),t.dataset.imageLoaded="false"}})}}function Z(i,e,t){let a=e.getBoundingClientRect(),r=t.getBoundingClientRect(),n=270,s=120,m=12,p=r.right-a.right,f=a.left-r.left,y=r.bottom-a.bottom,M=a.top-r.top,l=a.left-r.left+a.width/2-n/2,o=a.top-r.top+a.height+m;l<0?l=8:l+n>r.width&&(l=r.width-n-8),y<s+m&&M>y&&(o=a.top-r.top-s-m),i.style.left=`${l}px`,i.style.top=`${o}px`}function W(i,e,t,a){var u,b,g,c,h,v,A,T,x;if(typeof document=="undefined")return null;let r=i.marker,n=r.type===e,s=t===r.tripadvisor_id,m=r.type==="Accommodation",p=(b=(u=r.pricing)==null?void 0:u.offer)==null?void 0:b.displayPrice,f=m&&!p,y=(()=>{if(r.rating===void 0||r.rating===null)return null;let L=typeof r.rating=="number"?r.rating:Number(r.rating);return Number.isNaN(L)||L<=0?null:L.toFixed(1)})(),M=document.createElement("div");M.className="mapfirst-marker-root",M.style.zIndex=s?"20":n?"12":"11";let l=(h=(c=(g=r.pricing)==null?void 0:g.offer)==null?void 0:c.clickUrl)!=null?h:r.url,o=document.createElement(l?"a":"div");if(l&&(o.href=l,o.target="_blank",o.style.textDecoration="none"),o.className=f?"mapfirst-marker-pill mapfirst-marker-pill-pending":`mapfirst-marker-pill mapfirst-marker-pill-active${s?" mapfirst-marker-selected":n?"":" mapfirst-marker-non-primary"}`,!f&&((v=r.awards)!=null&&v.length||y)){let L=document.createElement("div");if(L.className="mapfirst-marker-badge",n||(L.style.opacity="0.2"),L.className="mapfirst-marker-badge",(A=r.awards)!=null&&A.length&&r.awards[0].type){let k=document.createElement("div");k.className="mapfirst-marker-award-container";let P=document.createElement("div");P.className="mapfirst-marker-award-back",P.innerHTML=ge;let C=document.createElement("div");C.className=`mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${r.awards[0].type}`;let w=document.createElement("div");w.className="mapfirst-marker-award-front",w.innerHTML=he,k.appendChild(P),k.appendChild(C),k.appendChild(w),L.appendChild(k)}else y&&(L.className="mapfirst-marker-badge mapfirst-marker-rating-badge",L.textContent=y);o.appendChild(L)}let d=document.createElement("span");return d.className="mapfirst-marker-content",m?(x=(T=r.pricing)==null?void 0:T.offer)!=null&&x.displayPrice?(d.innerHTML=r.pricing.offer.displayPrice,d.dataset.price=r.pricing.offer.displayPrice):(d.innerHTML=Me,d.dataset.price=""):r.type==="Eat & Drink"?d.innerHTML=ye:r.type==="Attraction"&&(d.innerHTML=be),o.appendChild(d),o.addEventListener("click",L=>{L.stopPropagation(),f||a==null||a(r)}),f||E(M,o,r,s),M.appendChild(o),M}function X(i,e,t,a){var M,l,o;if(typeof document=="undefined")return null;let r=i.marker,n=r.type===e,s=t===r.tripadvisor_id,p=r.type==="Accommodation"&&((l=(M=r.pricing)==null?void 0:M.offer)==null?void 0:l.availability)!=="available",f=document.createElement("div");f.className="mapfirst-dot-marker-container",f.style.zIndex=s?"20":n?"3":"1";let y=document.createElement("div");return y.className=p?"mapfirst-dot-marker-button mapfirst-dot-marker-button-pending":`mapfirst-dot-marker-button mapfirst-dot-marker-button-active${s?" mapfirst-dot-marker-selected":n?"":" mapfirst-dot-marker-non-primary"}`,y.title=(o=r.name)!=null?o:String(r.tripadvisor_id),y.addEventListener("click",d=>{d.stopPropagation(),p||a==null||a(r)}),f.appendChild(y),p||E(f,y,r,s),f}var xe='<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>';function q(i,e,t,a,r){var f,y,M,l,o,d,u,b,g,c;let n=(y=(f=i.querySelector(".mapfirst-marker-pill"))==null?void 0:f.classList.contains("mapfirst-marker-pill-pending"))!=null?y:!1,s=i;s.style.zIndex=t?"20":e?"12":"11";let m=s.querySelector(".mapfirst-marker-pill");m&&(a?m.className="mapfirst-marker-pill mapfirst-marker-pill-pending":m.className=`mapfirst-marker-pill mapfirst-marker-pill-active${t?" mapfirst-marker-selected":e?"":" mapfirst-marker-non-primary"}`);let p=s.querySelector(".mapfirst-marker-badge");if(p instanceof HTMLElement&&(p.style.opacity=!e&&!t?"0.2":""),n&&!a&&r){let h=s.querySelector(".mapfirst-marker-pill");h instanceof HTMLElement&&E(s,h,r,t)}if(r&&r.type==="Accommodation"){let h=s.querySelector(".mapfirst-marker-content");if(h instanceof HTMLElement){let v=(l=(M=r.pricing)==null?void 0:M.offer)==null?void 0:l.displayPrice;h.dataset.price!==v&&(v?(h.innerHTML=v,h.dataset.price=v):(h.innerHTML=xe,h.dataset.price=""))}}if(r){let h=document.querySelector(`.mapfirst-property-hover-card[data-marker-id="${r.tripadvisor_id}"]`);if(h){let v=r.rating||0,A=r.reviews||0,T=(u=(d=(o=r.pricing)==null?void 0:o.offer)==null?void 0:d.displayPrice)!=null?u:r.price_level,x=h.querySelector(".rating-value");if(x){let P=v.toFixed(1);x.textContent!==P&&(x.textContent=P)}let L=h.querySelector(".reviews");if(L){let P=`(${A})`;L.textContent!==P&&(L.textContent=P)}if(r.type==="Accommodation"&&T){let P=h.querySelector(".mapfirst-property-hover-price");if(!P){P=document.createElement("div"),P.className="mapfirst-property-hover-price";let C=h.querySelector(".mapfirst-property-hover-details"),w=h.querySelector(".mapfirst-property-hover-learn-more");C&&(w?C.insertBefore(P,w):C.appendChild(P))}if(P){let C=`Starting at <strong>${T}</strong>`;P.innerHTML!==C&&(P.innerHTML=C)}}let k=(c=(g=(b=r.pricing)==null?void 0:b.offer)==null?void 0:g.clickUrl)!=null?c:r.url;k&&h instanceof HTMLAnchorElement&&h.href!==k&&(h.href=k)}}}function j(i,e,t,a){let r=i;r.style.zIndex=t?"20":e?"3":"1";let n=r.querySelector(".mapfirst-dot-marker-button");n&&(a?n.className="mapfirst-dot-marker-button mapfirst-dot-marker-button-pending":n.className=`mapfirst-dot-marker-button mapfirst-dot-marker-button-active${t?" mapfirst-dot-marker-selected":e?"":" mapfirst-dot-marker-non-primary"}`)}function J(i){let e=i.match(/^(?:primary|dot)-(\d+)-/);return e?parseInt(e[1],10):null}var I=class{constructor(e,t){this.markerCache=new Map;this.primaryType="Accommodation";this.selectedMarkerId=null;this.mapInstance=e,this.onMarkerClick=t}render(e,t,a){var n,s,m,p,f,y,M,l;t&&t!==this.primaryType&&(this.primaryType=t),a!==void 0&&(this.selectedMarkerId=a);let r=new Set(e.map(o=>o.key));for(let[o,d]of this.markerCache.entries())r.has(o)||(this.removeMarkerFromMap(d.marker),this.markerCache.delete(o));for(let o of e){let d=Le(o.marker.location);if(!d)continue;let u=this.markerCache.get(o.key);if(u){let b=o.marker.type===this.primaryType,g=this.selectedMarkerId===o.marker.tripadvisor_id,c=o.marker.type==="Accommodation",h=o.kind==="primary"?c&&!((s=(n=o.marker.pricing)==null?void 0:n.offer)!=null&&s.displayPrice):c&&((p=(m=o.marker.pricing)==null?void 0:m.offer)==null?void 0:p.availability)!=="available",v=this.getMarkerElement(u.marker);v&&(o.kind==="primary"?q(v,b,g,h,o.marker):j(v,b,g,h));try{this.updateMarkerPosition(u.marker,d)}catch{this.removeMarkerFromMap(u.marker),this.markerCache.delete(o.key),this.createAndAddMarker(o,d)}}else{let b=o.marker.tripadvisor_id,g,c;for(let[h,v]of this.markerCache.entries())if(J(h)===b&&v.kind===o.kind){g=v,c=h;break}if(g&&c){let h=o.marker.type===this.primaryType,v=this.selectedMarkerId===o.marker.tripadvisor_id,A=o.marker.type==="Accommodation",T=o.kind==="primary"?A&&!((y=(f=o.marker.pricing)==null?void 0:f.offer)!=null&&y.displayPrice):A&&((l=(M=o.marker.pricing)==null?void 0:M.offer)==null?void 0:l.availability)!=="available",x=this.getMarkerElement(g.marker);x&&(o.kind==="primary"?q(x,h,v,T,o.marker):j(x,h,v,T)),this.updateMarkerZIndex(g.marker,o,h,v),this.markerCache.delete(c),this.markerCache.set(o.key,g);try{this.updateMarkerPosition(g.marker,d)}catch{}}else this.createAndAddMarker(o,d)}}}destroy(){for(let e of this.markerCache.values())this.removeMarkerFromMap(e.marker);this.markerCache.clear()}createAndAddMarker(e,t){let a=e.kind==="primary"?W(e,this.primaryType,this.selectedMarkerId,this.onMarkerClick):X(e,this.primaryType,this.selectedMarkerId,this.onMarkerClick);if(!a)return;let r=e.marker.type===this.primaryType,n=this.selectedMarkerId===e.marker.tripadvisor_id;try{let s=this.createMarker(a,t,e,r,n);s&&this.markerCache.set(e.key,{key:e.key,marker:s,kind:e.kind,parentId:e.kind==="dot"?e.parentId:void 0})}catch(s){console.error("Error creating marker",s)}}updateMarkerZIndex(e,t,a,r){}};function Le(i){return typeof(i==null?void 0:i.lon)!="number"||typeof(i==null?void 0:i.lat)!="number"||Number.isNaN(i.lon)||Number.isNaN(i.lat)?null:{lon:i.lon,lat:i.lat}}var B=class extends I{constructor(e){var t;super(e.mapInstance,e.onMarkerClick),this.MarkerCtor=(t=e.maplibregl)==null?void 0:t.Marker}render(e,t,a){this.MarkerCtor&&super.render(e,t,a)}createMarker(e,t,a){return this.MarkerCtor?new this.MarkerCtor({element:e,anchor:a.kind==="primary"?"bottom":"center"}).setLngLat([t.lon,t.lat]).addTo(this.mapInstance):null}removeMarkerFromMap(e){try{e.remove()}catch{}}updateMarkerPosition(e,t){e.setLngLat([t.lon,t.lat])}getMarkerElement(e){return e.getElement()}};var _=class extends I{constructor(e){super(e.mapInstance,e.onMarkerClick),this.google=e.google}render(e,t,a){var r,n;if(!((n=(r=this.google)==null?void 0:r.marker)!=null&&n.AdvancedMarkerElement)){console.warn("AdvancedMarkerElement not available");return}super.render(e,t,a)}createMarker(e,t,a,r,n){var m,p;if(!((p=(m=this.google)==null?void 0:m.marker)!=null&&p.AdvancedMarkerElement))return null;let s=a.kind==="primary"?n?20:r?12:11:n?20:r?3:1;return new this.google.marker.AdvancedMarkerElement({map:this.mapInstance,position:{lat:t.lat,lng:t.lon},content:e,zIndex:s})}removeMarkerFromMap(e){try{e.map=null}catch(t){console.error("Error removing marker",t)}}updateMarkerPosition(e,t){e.position={lat:t.lat,lng:t.lon}}getMarkerElement(e){let t=e.content;return t instanceof HTMLElement?t:null}updateMarkerZIndex(e,t,a,r){let n=t.kind==="primary"?r?20:a?12:11:r?20:a?3:1;e.zIndex=n}};var R=class extends I{constructor(e){var t;super(e.mapInstance,e.onMarkerClick),this.MarkerCtor=(t=e.mapboxgl)==null?void 0:t.Marker}render(e,t,a){this.MarkerCtor&&super.render(e,t,a)}createMarker(e,t,a){return this.MarkerCtor?new this.MarkerCtor({element:e,anchor:a.kind==="primary"?"bottom":"center"}).setLngLat([t.lon,t.lat]).addTo(this.mapInstance):null}removeMarkerFromMap(e){try{e.remove()}catch{}}updateMarkerPosition(e,t){e.setLngLat([t.lon,t.lat])}getMarkerElement(e){return e.getElement()}};var S=class{constructor(e){this.map=e}getMap(){return this.map}setupImpressionTracking(e){if(typeof window=="undefined"||!window.IntersectionObserver)return;let t=this.getContainer();if(!t)return;let a=new IntersectionObserver(s=>{s.forEach(m=>{m.isIntersecting&&(e(),a.disconnect())})},{threshold:.1});a.observe(t);let r=()=>a.disconnect(),n=this.cleanup.bind(this);this.cleanup=()=>{r(),n()}}};var H=class extends S{constructor(t){super(t);this.cleanupFns=[]}initialize(t){return this.markerManager=new B({mapInstance:this.map,maplibregl:t.maplibregl,onMarkerClick:t.onMarkerClick}),t.onRefresh&&this.attachEventListeners(t.onRefresh),t.onMapMoveEnd&&this.attachBoundsTracking(t.onMapMoveEnd),this.markerManager}attachBoundsTracking(t){if(!this.map||typeof this.map.on!="function")return;let a=()=>{let n=this.getMapBounds();t(n)},r=()=>{let n=this.getMapBounds();t(n)};this.map.loaded&&this.map.loaded()?r():(this.map.once("load",r),this.cleanupFns.push(()=>{typeof this.map.off=="function"&&this.map.off("load",r)})),this.map.on("moveend",a),this.cleanupFns.push(()=>{typeof this.map.off=="function"&&this.map.off("moveend",a)})}attachEventListeners(t){if(!this.map||typeof this.map.on!="function")return;["move","zoom","dragend","pitch","rotate"].forEach(r=>{this.map.on(r,t),this.cleanupFns.push(()=>{typeof this.map.off=="function"&&this.map.off(r,t)})})}getMarkerManager(){return this.markerManager}getContainer(){var t,a;return((a=(t=this.map)==null?void 0:t.getContainer)==null?void 0:a.call(t))||null}cleanup(){for(let t of this.cleanupFns)try{t()}catch{}this.cleanupFns.length=0}getMap(){return this.map}getCenter(){let t=this.map.getCenter();return{lng:t.lng,lat:t.lat}}getZoom(){return this.map.getZoom()}getBearing(){return this.map.getBearing()}getPitch(){return this.map.getPitch()}getMapBounds(){let t=this.map.getBounds(),a=t.getSouthWest(),r=t.getNorthEast();return{sw:{lat:a.lat,lng:a.lng},ne:{lat:r.lat,lng:r.lng}}}project(t){return this.map.project({lng:t[0],lat:t[1]})}on(t,a){this.map.on(t,a)}off(t,a){this.map.off(t,a)}resize(){this.map.resize()}remove(){this.cleanup(),this.map.remove()}};var D=class extends S{constructor(t){super(t);this.cleanupFns=[];this.initializeOverlayView()}initialize(t){return this.markerManager=new _({mapInstance:this.map,google:t.google,onMarkerClick:t.onMarkerClick}),t.onRefresh&&this.attachEventListeners(t.onRefresh),t.onMapMoveEnd&&this.attachBoundsTracking(t.onMapMoveEnd,t.google),this.markerManager}attachBoundsTracking(t,a){if(!this.map)return;let r=()=>{let s=this.getMapBounds();t(s)};r();let n=a.event.addListener(this.map,"idle",r);this.cleanupFns.push(()=>{a.event.removeListener(n)})}attachEventListeners(t){let a=["center_changed","zoom_changed","drag","heading_changed","tilt_changed"],r=[];a.forEach(n=>{let s=this.map.addListener(n,t);r.push(s)}),this.cleanupFns.push(()=>{r.forEach(n=>{try{n.remove()}catch{}})})}getMarkerManager(){return this.markerManager}getContainer(){var t,a;return((a=(t=this.map)==null?void 0:t.getDiv)==null?void 0:a.call(t))||null}cleanup(){for(let t of this.cleanupFns)try{t()}catch{}this.cleanupFns.length=0}initializeOverlayView(){var r;let t=(r=globalThis.google)==null?void 0:r.maps;if(!t)return;let a=t.OverlayView;a&&(this.overlayView=new a,this.overlayView.draw=function(){},this.overlayView.setMap(this.map))}getMap(){return this.map}getCenter(){let t=this.map.getCenter();return t?{lng:t.lng(),lat:t.lat()}:{lng:0,lat:0}}getZoom(){var t;return(t=this.map.getZoom())!=null?t:0}getBearing(){var t;return(t=this.map.getHeading())!=null?t:0}getPitch(){var t;return(t=this.map.getTilt())!=null?t:0}getMapBounds(){let t=this.map.getBounds();if(!t)return{sw:{lat:0,lng:0},ne:{lat:0,lng:0}};let a=t.getSouthWest(),r=t.getNorthEast();return{sw:{lat:a.lat(),lng:a.lng()},ne:{lat:r.lat(),lng:r.lng()}}}project(t){var m;if(!this.overlayView)return{x:0,y:0};let a=this.overlayView.getProjection();if(!a)return{x:0,y:0};let r=(m=globalThis.google)==null?void 0:m.maps;if(!r)return{x:0,y:0};let n=new r.LatLng(t[1],t[0]),s=a.fromLatLngToContainerPixel(n);return s?{x:s.x,y:s.y}:{x:0,y:0}}on(t,a){this.map.addListener(t,a)}off(t,a){var n;let r=(n=globalThis.google)==null?void 0:n.maps;r!=null&&r.event&&r.event.clearListeners(this.map,t)}resize(){var a;let t=(a=globalThis.google)==null?void 0:a.maps;t!=null&&t.event&&t.event.trigger(this.map,"resize")}remove(){this.cleanup(),this.overlayView&&(this.overlayView.setMap(null),this.overlayView=null)}};var N=class extends S{constructor(t){super(t);this.cleanupFns=[]}initialize(t){return this.markerManager=new R({mapInstance:this.map,mapboxgl:t.mapboxgl,onMarkerClick:t.onMarkerClick}),t.onRefresh&&this.attachEventListeners(t.onRefresh),t.onMapMoveEnd&&this.attachBoundsTracking(t.onMapMoveEnd),this.markerManager}attachBoundsTracking(t){if(!this.map||typeof this.map.on!="function")return;let a=()=>{let n=this.getMapBounds();t(n)},r=()=>{let n=this.getMapBounds();t(n)};this.map.loaded&&this.map.loaded()?r():(this.map.once("load",r),this.cleanupFns.push(()=>{typeof this.map.off=="function"&&this.map.off("load",r)})),this.map.on("moveend",a),this.cleanupFns.push(()=>{typeof this.map.off=="function"&&this.map.off("moveend",a)})}attachEventListeners(t){if(!this.map||typeof this.map.on!="function")return;["move","zoom","dragend","pitch","rotate"].forEach(r=>{this.map.on(r,t),this.cleanupFns.push(()=>{typeof this.map.off=="function"&&this.map.off(r,t)})})}getMarkerManager(){return this.markerManager}getContainer(){var t,a;return((a=(t=this.map)==null?void 0:t.getContainer)==null?void 0:a.call(t))||null}cleanup(){for(let t of this.cleanupFns)try{t()}catch{}this.cleanupFns.length=0}getMap(){return this.map}getCenter(){let t=this.map.getCenter();return{lng:t.lng,lat:t.lat}}getZoom(){return this.map.getZoom()}getBearing(){return this.map.getBearing()}getPitch(){return this.map.getPitch()}getMapBounds(){let t=this.map.getBounds(),a=t.getSouthWest(),r=t.getNorthEast();return{sw:{lat:a.lat,lng:a.lng},ne:{lat:r.lat,lng:r.lng}}}project(t){return this.map.project({lng:t[0],lat:t[1]})}on(t,a){this.map.on(t,a)}off(t,a){this.map.off(t,a)}resize(){this.map.resize()}remove(){this.cleanup(),this.map.remove()}};function ee(i){let e=i.getCenter();return{longitude:e.lng,latitude:e.lat,zoom:i.getZoom(),bearing:i.getBearing(),pitch:i.getPitch()}}var Te=[{zoom:6,threshold:120},{zoom:8,threshold:108},{zoom:10,threshold:92},{zoom:12,threshold:80},{zoom:14,threshold:68},{zoom:16,threshold:56}];function te(i){for(let e of Te)if(i<=e.zoom)return e.threshold;return 48}function G({primaryType:i,markers:e,map:t,selectedMarkerId:a,zoom:r,collisionThresholdPx:n,dotCollisionThresholdPx:s}){if(!e.length)return[];if(!t)return e.map(u=>({kind:"primary",marker:u,key:`primary-${u.tripadvisor_id}`}));let m=e.map((u,b)=>{let g=u.location;if(typeof(g==null?void 0:g.lon)!="number"||typeof(g==null?void 0:g.lat)!="number")return null;let{x:c,y:h}=t.project([g.lon,g.lat]);return{marker:u,index:b,x:c,y:h}}).filter(u=>!!u);if(!m.length)return[];let p=te(r),f=Ce(r),y=m.map((u,b)=>b),M=u=>y[u]===u?u:(y[u]=M(y[u]),y[u]),l=(u,b)=>{let g=M(u),c=M(b);g!==c&&(y[c]=g)};for(let u=0;u<m.length;u+=1)for(let b=u+1;b<m.length;b+=1){let g=m[u].x-m[b].x,c=m[u].y-m[b].y;Math.hypot(g,c)<=p&&l(u,b)}let o=new Map;for(let u of m){let b=M(u.index),g=o.get(b);g?g.push(u):o.set(b,[u])}let d=[];return o.forEach(u=>{var x,L;if(u.length===1){let[{marker:k}]=u,P=k.type===i,C=a===k.tripadvisor_id;d.push({kind:"primary",marker:k,key:`primary-${k.tripadvisor_id}-p${P?1:0}-s${C?1:0}-${(x=k.pricing)==null?void 0:x.availability}`});return}let b=[...u].sort((k,P)=>we(P.marker,k.marker,i)),[g,...c]=b,h=g.marker.type===i,v=a===g.marker.tripadvisor_id;if(d.push({kind:"primary",marker:g.marker,key:`primary-${g.marker.tripadvisor_id}-p${h?1:0}-s${v?1:0}-${(L=g.marker.pricing)==null?void 0:L.availability}`}),!c.length)return;let A=[],T=[];if(c.forEach(k=>{var P;if(a&&k.marker.tripadvisor_id===a){let C=k.marker.type===i;d.push({kind:"primary",marker:k.marker,key:`primary-${k.marker.tripadvisor_id}-p${C?1:0}-s1-${(P=k.marker.pricing)==null?void 0:P.availability}`});return}Ae(g,k)<=f?A.push(k):T.push(k)}),A.forEach(k=>{var C;let P=k.marker.type===i;d.push({kind:"dot",marker:k.marker,key:`dot-${k.marker.tripadvisor_id}-p${P?1:0}-s0-${(C=k.marker.pricing)==null?void 0:C.availability}`,parentId:g.marker.tripadvisor_id})}),T.length){let k=G({markers:T.map(P=>P.marker),map:t,selectedMarkerId:a,zoom:r,primaryType:i,collisionThresholdPx:n,dotCollisionThresholdPx:s});d.push(...k)}}),d}function Ae(i,e){return Math.hypot(i.x-e.x,i.y-e.y)}function Ce(i){let e=te(i);return Math.max(48,e)}function we(i,e,t){var p,f;let a=i.type===t,r=e.type===t;if(a&&!r)return 1;if(!a&&r)return-1;let n=Y(i)-Y(e);if(n!==0)return n;let s=Q(i)-Q(e);if(s!==0)return s;let m=((p=i.reviews)!=null?p:0)-((f=e.reviews)!=null?f:0);return m!==0?m:i.tripadvisor_id-e.tripadvisor_id}function Y(i){if(typeof i.rating=="number")return i.rating;if(i.rating===void 0||i.rating===null)return-1/0;let e=Number(i.rating);return Number.isNaN(e)?-1/0:e}function Q(i){var t,a,r;if(!((a=(t=i.pricing)==null?void 0:t.offer)!=null&&a.price))return-1/0;let e=Number(((r=i.pricing.offer.displayPrice)!=null?r:"0").replace(/[^0-9.,-]+/g,"").replace(/,/g,""));return Number.isNaN(e)?-1/0:e}function re(i){let e=[];return i.amenities&&Array.isArray(i.amenities)&&i.amenities.forEach(t=>{e.push({id:`amenity-${t}`,label:t,type:"amenity",value:t})}),i.hotelStyle&&Array.isArray(i.hotelStyle)&&i.hotelStyle.forEach(t=>{e.push({id:`hotelStyle-${t}`,label:t,type:"hotelStyle",value:t})}),i.price&&e.push({id:"priceRange",label:"Price Range",type:"priceRange",value:`${i.price.min}-${i.price.max}`,priceRange:i.price}),typeof i.minRating=="number"&&Number.isFinite(i.minRating)&&e.push({id:"minRating",label:`${i.minRating}+`,type:"minRating",value:String(i.minRating),numericValue:i.minRating}),typeof i.starRating=="number"&&Number.isFinite(i.starRating)&&e.push({id:"starRating",label:`${i.starRating} Stars`,type:"starRating",value:String(i.starRating),numericValue:i.starRating}),i.transformed_query&&e.push({id:"transformed_query",label:i.transformed_query,type:"transformed_query",value:i.transformed_query}),i.selected_restaurant_price_levels&&e.push({id:"selected_restaurant_price_levels",label:i.selected_restaurant_price_levels.join(", "),type:"selected_restaurant_price_levels",value:i.selected_restaurant_price_levels.join(", "),priceLevels:i.selected_restaurant_price_levels}),e}function ae(i){return i.map(e=>{let t={id:e.id,label:typeof e.label=="string"?e.label:String(e.label||""),type:e.type,value:e.value};if(e.numericValue!==void 0&&(t.numericValue=e.numericValue),e.priceRange){let a=e.priceRange.min,r=e.priceRange.max;a!==void 0&&(t.priceRange={min:a,...r!==void 0&&{max:r}})}return e.priceLevels&&(t.priceLevels=e.priceLevels),t})}var Ie={prod:"https://api.mapfirst.ai",test:"https://api.mapfirst.ai/test"},F=class extends Error{constructor({message:e,status:t,code:a}){super(e),this.name="PropertiesFetchError",this.status=t,this.code=a}};async function $(i,e=1){try{let t=await fetch(`https://l4detuz832.execute-api.us-east-1.amazonaws.com/dev/photo?id=${i}&limit=${e}`);if(!t.ok)return null;let a=await t.json();if(a.photos&&a.photos.length>0){let r=a.photos[0].FullSizeURL.url;if((await fetch(r)).ok)return r}return null}catch(t){return console.debug("Failed to fetch images:",t),null}}async function oe(i,e,t,{signal:a}={}){var s,m;let r;try{document.referrer&&(r=document.referrer)}catch(p){console.error(p)}let n=await fetch(i,{method:"POST",headers:{"Content-Type":"application/json","X-Source":"SDK",...t&&{"X-API-Key":t},...r&&{"X-Referer":r}},body:JSON.stringify(e),signal:a});if(!n.ok){let p=`Unexpected response: ${n.status}`,f;try{let y=await n.json();p=(m=(s=y.detail)!=null?s:y.error)!=null?m:p,f=y.code}catch{}throw new F({message:p,status:n.status,code:f})}return await n.json()}function ie(i){return typeof i=="string"?i:i.toISOString().slice(0,10)}var ne="Accommodation";function Se(){let e=new Date(Date.now()+864e6),t=(6-e.getDay()+7)%7,a=new Date(e.getTime()+t*864e5),r=a.getDay(),n=r===0?6:6-r,s=new Date(a.getTime()+(n+1)*864e5);return{checkIn:a,checkOut:s}}var V=class{constructor(e){this.options=e;this.adapter=null;this.properties=[];this.selectedMarkerId=null;this.destroyed=!1;this.clusterItems=[];this.isMapAttached=!1;var r,n,s,m,p,f,y,M,l,o,d,u,b,g,c,h,v,A,T,x,L;if(this.properties=[...(r=e.properties)!=null?r:[]],this.primaryType=e.primaryType,this.selectedMarkerId=(n=e.selectedMarkerId)!=null?n:null,this.useApi=(s=e.useApi)!=null?s:!0,this.environment=(m=e.environment)!=null?m:"prod",this.apiUrl=(p=e.apiUrl)!=null?p:Ie[this.environment],this.apiKey=e.apiKey,this.requestBody=e.requestBody,this.currentPlatform=e.platform,!this.useApi&&e.platform&&e.platform!=="maplibre")throw new Error("When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.");let t=se(e);this.fitBoundsPadding={top:(y=(f=e.fitBoundsPadding)==null?void 0:f.top)!=null?y:t?0:50,bottom:(l=(M=e.fitBoundsPadding)==null?void 0:M.bottom)!=null?l:t?0:160,left:(d=(o=e.fitBoundsPadding)==null?void 0:o.left)!=null?d:t?0:50,right:(b=(u=e.fitBoundsPadding)==null?void 0:u.right)!=null?b:t?0:50};let a=Se();this.state={center:(g=e.initialLocationData)!=null&&g.latitude&&e.initialLocationData.longitude?[e.initialLocationData.latitude,e.initialLocationData.longitude]:[0,0],zoom:(h=(c=e.initialLocationData)==null?void 0:c.zoom)!=null?h:0,bounds:(A=(v=e.initialLocationData)==null?void 0:v.bounds)!=null?A:null,pendingBounds:null,tempBounds:null,properties:this.properties,primary:(T=this.primaryType)!=null?T:ne,selectedPropertyId:this.selectedMarkerId,initialLoading:!0,isSearching:!1,firstCallDone:!1,filters:{checkIn:a.checkIn,checkOut:a.checkOut,numAdults:2,numRooms:1,...((x=e.initialLocationData)==null?void 0:x.currency)&&{currency:e.initialLocationData.currency}},activeLocation:{country:"",location_id:null,locationName:"",coordinates:[0,0]},isFlyToAnimating:!1,...e.state},this.callbacks=(L=e.callbacks)!=null?L:{},this.hasMapInstance(e)&&(this.adapter=this.createAdapter(e),this.isMapAttached=!0,this.refresh()),e.initialLocationData?this.initializeFromLocationData(e.initialLocationData):this.requestBody&&this.isMapAttached&&this.autoLoadProperties()}hasMapInstance(e){return!!("adapter"in e&&e.adapter||"mapInstance"in e&&e.mapInstance)}async initializeFromLocationData(e){var t;if(!this.useApi){console.warn("initializeFromLocationData requires API usage. Set useApi to true.");return}try{let{city:a,state:r,country:n,query:s,latitude:m,longitude:p,radius:f,bounds:y}=e,M={filters:this.getFilters(),initial:!0,query:s,latitude:m,longitude:p,radius:f,bounds:y},l=[a,r].filter(Boolean).join(", ");if(n||l){let o=await fetch(`${this.apiUrl}/geo-lookup2?${new URLSearchParams({...n&&{country_code:n},...l&&{q:l}}).toString()}`,{headers:{...this.apiKey&&{"X-API-Key":this.apiKey}}});if(o.ok){let d=await o.json();M.city=["country","island","state"].includes(d.type)?void 0:d.name,M.state=d.type==="state"?d.name:["country","island","county"].includes(d.type)?void 0:d.state,M.country=["country","island"].includes(d.type)?d.name:d.country,M.location_id=d.id,M.latitude=d.lat,M.longitude=d.lon,this.setActiveLocation({city:a,state:r,country:n,location_id:(t=d.id)!=null?t:null,locationName:[a,r,n].filter(Boolean).join(", "),...d.lon&&d.lat&&{coordinates:[d.lat,d.lon]}}),d.lon&&d.lat&&this.setState({center:[d.lat,d.lon],zoom:a?12:r?8:5})}else this.handleError(new Error(`Geo mapping fetch failed: ${o.statusText}`),"initializeFromLocationData")}this.requestBody=M,this.isMapAttached&&await this.autoLoadProperties()}catch(a){this.handleError(a,"initializeFromLocationData")}}async autoLoadProperties(){if(!this.useApi){console.warn("autoLoadProperties requires API usage. Set useApi to true.");return}if(!this.requestBody)return;let e={filters:this.getFilters(),initial:!0,...this.requestBody};await this.runPropertiesSearch({body:e,onError:t=>{var a,r;this.handleError(t,"autoLoadProperties"),(r=(a=this.callbacks).onPropertiesLoadError)==null||r.call(a,t)}})}attachMap(e,t){if(!this.useApi&&t.platform!=="maplibre")throw new Error("When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.");if(this.isMapAttached&&(console.warn("Map is already attached. Destroying previous adapter."),this.adapter)){let r=this.adapter.getMarkerManager();r==null||r.destroy(),this.adapter.cleanup()}let a={...this.options,platform:t.platform,mapInstance:e,maplibregl:t.maplibregl,google:t.google,mapboxgl:t.mapboxgl,onMarkerClick:t.onMarkerClick};this.currentPlatform=t.platform,this.adapter=this.createAdapter(a),this.isMapAttached=!0,this.refresh(),this.requestBody&&!this.state.firstCallDone&&this.autoLoadProperties()}createAdapter(e){return Ee(e)&&e.mapInstance?this.initializeAdapter(new H(e.mapInstance),{maplibregl:e.maplibregl,onMarkerClick:e.onMarkerClick}):se(e)&&e.mapInstance?this.initializeAdapter(new D(e.mapInstance),{google:e.google,onMarkerClick:e.onMarkerClick}):Be(e)&&e.mapInstance?this.initializeAdapter(new N(e.mapInstance),{mapboxgl:e.mapboxgl,onMarkerClick:e.onMarkerClick}):"adapter"in e&&e.adapter?e.adapter:null}initializeAdapter(e,t){return e.initialize({...t,onMarkerClick:a=>{var r;a.location&&this.flyMapTo(a.location.lon,a.location.lat,14),a.type!==this.primaryType&&this.setPrimaryType(a.type),this.setSelectedMarker(a.tripadvisor_id===this.selectedMarkerId?null:a.tripadvisor_id),(r=t.onMarkerClick)==null||r.call(t,a)},onRefresh:()=>this.refresh(),onMapMoveEnd:a=>{this.state.tempBounds===null?(this.setTempBounds(a),this.setPendingBounds(null)):this.handleMapMoveEnd(a)}}),this.useApi&&e.setupImpressionTracking(()=>{}),e}_setProperties(e){var t,a;this.ensureAlive(),this.properties=[...e.filter(r=>{var n;return r.type==="Accommodation"?((n=r.pricing)==null?void 0:n.availability)!=="unavailable":!0})],this.updateState({properties:this.properties}),(a=(t=this.callbacks).onPropertiesChange)==null||a.call(t,e),this.refresh()}addProperty(e){var t,a;this.ensureAlive(),this.properties=[...this.properties,e],this.updateState({properties:this.properties}),(a=(t=this.callbacks).onPropertiesChange)==null||a.call(t,this.properties),this.refresh()}clearProperties(){var e,t;this.ensureAlive(),this.properties=[],this.updateState({properties:[]}),(t=(e=this.callbacks).onPropertiesChange)==null||t.call(e,[]),this.refresh()}setPrimaryType(e){var t,a;this.ensureAlive(),this.primaryType!==e&&(this.primaryType=e,this.updateState({primary:e}),(a=(t=this.callbacks).onPrimaryTypeChange)==null||a.call(t,e),this.refresh())}setSelectedMarker(e){var t,a;if(this.ensureAlive(),this.selectedMarkerId!==e){if(e!==null){let r=this.properties.find(n=>n.tripadvisor_id===e);r&&r.type!==this.primaryType&&this.setPrimaryType(r.type)}this.selectedMarkerId=e,this.updateState({selectedPropertyId:e}),(a=(t=this.callbacks).onSelectedPropertyChange)==null||a.call(t,e),this.refresh()}}getState(){return{...this.state}}handleError(e,t="MapFirstCore"){let a=e instanceof Error?e.message:String(e),r=e instanceof Error?e:new Error(a);console.error(`[${t}]`,a),this.callbacks.onError&&this.callbacks.onError(r,t)}updateState(e){this.state={...this.state,...e}}setState(e){var a,r,n,s,m,p,f,y,M,l,o,d,u,b,g,c;let t={...this.state};this.updateState(e),e.center!==void 0&&e.center!==t.center&&((r=(a=this.callbacks).onCenterChange)==null||r.call(a,e.center,this.state.zoom)),e.zoom!==void 0&&e.zoom!==t.zoom&&((s=(n=this.callbacks).onZoomChange)==null||s.call(n,e.zoom)),e.bounds!==void 0&&e.bounds!==t.bounds&&((p=(m=this.callbacks).onBoundsChange)==null||p.call(m,e.bounds)),e.pendingBounds!==void 0&&e.pendingBounds!==t.pendingBounds&&((y=(f=this.callbacks).onPendingBoundsChange)==null||y.call(f,e.pendingBounds)),e.filters!==void 0&&e.filters!==t.filters&&((l=(M=this.callbacks).onFiltersChange)==null||l.call(M,e.filters)),e.activeLocation!==void 0&&e.activeLocation!==t.activeLocation&&((d=(o=this.callbacks).onActiveLocationChange)==null||d.call(o,e.activeLocation)),e.initialLoading!==void 0&&e.initialLoading!==t.initialLoading&&((b=(u=this.callbacks).onLoadingStateChange)==null||b.call(u,e.initialLoading)),e.isSearching!==void 0&&e.isSearching!==t.isSearching&&((c=(g=this.callbacks).onSearchingStateChange)==null||c.call(g,e.isSearching))}setFilters(e){this.setState({filters:e})}setActiveLocation(e){this.setState({activeLocation:e})}setBounds(e){this.setState({bounds:e})}setPendingBounds(e){this.setState({pendingBounds:e})}setTempBounds(e){this.setState({tempBounds:e})}setLoading(e){this.setState({initialLoading:e})}setSearching(e){this.setState({isSearching:e})}setFlyToAnimating(e){this.setState({isFlyToAnimating:e})}handleMapMoveEnd(e){if(this.state.isFlyToAnimating){this.setState({isFlyToAnimating:!1,tempBounds:e,pendingBounds:null});return}let t=this.state.tempBounds;if(!t){this.setState({tempBounds:e,pendingBounds:e});return}let a=.01;Math.abs(e.sw.lat-t.sw.lat)>a||Math.abs(e.sw.lng-t.sw.lng)>a||Math.abs(e.ne.lat-t.ne.lat)>a||Math.abs(e.ne.lng-t.ne.lng)>a?this.setState({pendingBounds:e}):this.setState({pendingBounds:null})}flyMapTo(e,t,a,r=!0){if(this.ensureAlive(),this.setState({center:[t,e]}),typeof a=="number"&&this.setState({zoom:a}),!this.adapter)return;let n=this.adapter.getMap();if(n){if(this.currentPlatform==="google"){this.setFlyToAnimating(!1),n.setCenter({lat:t,lng:e}),a!==null&&typeof a=="number"&&n.setZoom(a!=null?a:13);return}if(r===!1){this.setFlyToAnimating(!1),n.jumpTo&&n.jumpTo({center:[e,t],...a!==null&&{zoom:a!=null?a:13}});return}this.setFlyToAnimating(!0),n.flyTo&&n.flyTo({center:[e,t],...a!==null&&{zoom:a!=null?a:13}})}}flyToPOIs(e,t,a=!0){var s,m;if(this.ensureAlive(),!this.adapter)return;let r=this.adapter.getMap();if(!r)return;let n=e;if((!n||n.length===0)&&(n=this.properties.filter(p=>p.location!==void 0&&(t!==void 0?p.type===t:!0)).map(p=>({lat:p.location.lat,lng:p.location.lon}))),!(!n||n.length===0)){if(n.length===1){let p=n[0];this.currentPlatform==="google"?(r.setCenter({lat:p.lat,lng:p.lng}),r.setZoom(13)):r.flyTo&&r.flyTo({center:[p.lng,p.lat],zoom:13})}else if(this.currentPlatform==="google"){let p=(m=(s=window.google)==null?void 0:s.maps)==null?void 0:m.LatLngBounds;if(p){let f=new p;n.forEach(y=>{f.extend({lat:y.lat,lng:y.lng})}),a&&this.setFlyToAnimating(!0),r.fitBounds(f,this.fitBoundsPadding)}}else if(r.fitBounds){let p=[[n[0].lng,n[0].lat],[n[0].lng,n[0].lat]];n.forEach(f=>{p[0][0]=Math.min(p[0][0],f.lng),p[0][1]=Math.min(p[0][1],f.lat),p[1][0]=Math.max(p[1][0],f.lng),p[1][1]=Math.max(p[1][1],f.lat)}),a&&this.setFlyToAnimating(!0),r.fitBounds(p,{padding:this.fitBoundsPadding,animate:a})}}}getFilters(){let e={...this.state.filters};return e.checkIn instanceof Date&&(e.checkIn=ie(e.checkIn)),e.checkOut instanceof Date&&(e.checkOut=ie(e.checkOut)),e}async pollForPricing({pollingLink:e,maxAttempts:t=15,delayMs:a=2e3,isCancelled:r,price:n,limit:s}){var l,o,d,u,b;if(this.ensureAlive(),!this.useApi)return console.warn("pollForPricing requires API usage. Set useApi to true."),{completed:!1};if(!e)return{completed:!1};let m=!1,p,f=this.getFilters();s&&(f.limit=s);let y={filters:f,pollingLink:e},M;try{document.referrer&&(M=document.referrer)}catch(g){console.error(g)}for(let g=0;g<t;g++){if(r!=null&&r())return{completed:m,pollData:p};try{let c=await fetch(`${this.apiUrl}/ta-polling?pollingNumber=${g}`,{method:"POST",body:JSON.stringify(y),headers:{"Content-Type":"application/json","X-Source":"SDK",...this.apiKey&&{"X-API-Key":this.apiKey},...M&&{"X-Referer":M}}});if(!c.ok)throw new F({message:`Poll failed: ${c.status}`,status:c.status});if(p=await c.json(),r!=null&&r())return{completed:m,pollData:p};let h=(o=(l=p==null?void 0:p.success)==null?void 0:l.results)!=null?o:[];if(h.length>0&&this.setProperties(v=>{let A=new Set(h.map(x=>x.tripadvisor_id)),T=v.filter(x=>x.type!=="Accommodation"||A.has(x.tripadvisor_id));return h.forEach(x=>{var k,P,C,w,U,K;if(!x.location)return;(P=(k=x.pricing)==null?void 0:k.offer)!=null&&P.price&&n&&(((w=(C=x.pricing)==null?void 0:C.offer)==null?void 0:w.price)<(n==null?void 0:n.min)||((K=(U=x.pricing)==null?void 0:U.offer)==null?void 0:K.price)>(n==null?void 0:n.max))&&(x.pricing.availability="unavailable");let L=T.findIndex(pe=>pe.tripadvisor_id===x.tripadvisor_id);L>=0?T[L]=x:T.push(x)}),T}),(d=p==null?void 0:p.success)!=null&&d.isComplete){m=!0,this.setSearching(!1);break}}catch(c){this.handleError(c,"pollForPricing"),(b=(u=this.callbacks).onPropertiesLoadError)==null||b.call(u,c);break}g<t-1&&await new Promise(c=>setTimeout(c,a))}return{completed:m,pollData:p}}setProperties(e){let t=e(this.properties);this._setProperties(t)}mostCommonTypeFromProperties(e){let t=e.reduce((a,r)=>(a[r.type]=(a[r.type]||0)+1,a),{});return Object.entries(t).reduce((a,r)=>t[a[0]]>t[r[0]]?a:r)[0]}async runPropertiesSearch({body:e,beforeApplyProperties:t,smartFiltersClearable:a,onError:r}){var n,s,m,p,f,y,M;if(this.ensureAlive(),!this.useApi)return console.warn("runPropertiesSearch requires API usage. Set useApi to true."),r==null||r(new Error("API usage is disabled")),null;this.setState({firstCallDone:!1}),this.setSearching(!0),this.clearProperties();try{let l=await oe(`${this.apiUrl}/properties`,e,this.apiKey);this.updateActiveLocationFromResponse(l);let o=null,d=30,u=l.filters.primary_type;if(t){let c=t(l);o=(n=c.price)!=null?n:null,d=(s=c.limit)!=null?s:30}let b=l.properties.some(c=>!!c.location),g=o?l.properties.map(c=>{var h;return(h=c.pricing)!=null&&h.offer?{...c,pricing:{...c.pricing,availability:c.pricing.offer.price&&(c.pricing.offer.price<o.min||c.pricing.offer.price>o.max)?"unavailable":c.pricing.availability}}:c}):l.properties;if(this._setProperties(g),b&&this.flyToPOIs(l.properties.filter(c=>!!c.location&&(l.filters.primary_type?c.type===l.filters.primary_type:!0)).map(c=>({lat:c.location.lat,lng:c.location.lon})),void 0,e.initial!==!0),l.filters.primary_type&&l.properties.filter(c=>{var h;return c.type===l.filters.primary_type&&(c.type==="Accommodation"?((h=c.pricing)==null?void 0:h.availability)!=="unavailable":!0)}).length>0)u=l.filters.primary_type,this.setPrimaryType(l.filters.primary_type);else if(l.properties.length>0){let c=this.mostCommonTypeFromProperties(l.properties);this.setPrimaryType(c),u=c}if(this.setState({firstCallDone:!0}),l.isComplete===!1&&l.pollingLink){let{completed:c,pollData:h}=await this.pollForPricing({pollingLink:l.pollingLink,...o&&{price:o},...d&&{limit:d}});if(c&&((m=h==null?void 0:h.success)!=null&&m.results)&&h.success.results.filter(v=>{var A;return v.type===l.filters.primary_type&&(v.type==="Accommodation"?((A=v.pricing)==null?void 0:A.availability)!=="unavailable":!0)}).length===0&&u&&u!==l.filters.primary_type){let v=this.mostCommonTypeFromProperties(l.properties);this.setPrimaryType(v)}c&&this.refresh()}else l.isComplete===!0&&this.setSearching(!1);return b||(l.properties.some(c=>!!c.location)?this.flyToPOIs(l.properties.filter(c=>!!c.location&&(l.filters.primary_type?c.type===l.filters.primary_type:!0)).map(c=>({lat:c.location.lat,lng:c.location.lon})),void 0,e.initial!==!0):(p=l.filters.location)!=null&&p.latitude&&((f=l.filters.location)!=null&&f.longitude)&&this.flyMapTo(l.filters.location.longitude,l.filters.location.latitude,12,e.initial!==!0)),l}catch(l){return this.handleError(l,"runPropertiesSearch"),r==null||r(l),(M=(y=this.callbacks).onPropertiesLoadError)==null||M.call(y,l),this.clearProperties(),this.setState({firstCallDone:!0}),this.setSearching(!1),null}}async performBoundsSearch(){var n;if(this.ensureAlive(),!this.useApi)return console.warn("performBoundsSearch requires API usage. Set useApi to true."),null;if(!this.state.pendingBounds)return null;let e=this.getFilters(),t={bounds:this.state.pendingBounds,filters:e},a=(n=e==null?void 0:e.price)!=null?n:void 0,r=await this.runPropertiesSearch({body:t,beforeApplyProperties:()=>({price:a!=null?a:null})});return r&&(this.setBounds(this.state.pendingBounds),this.setTempBounds(this.state.pendingBounds),this.setPendingBounds(null)),r}updateActiveLocationFromResponse(e){var m,p,f,y;let t=(m=e.location_id)!=null?m:null,a=(f=(p=e.filters.location)==null?void 0:p.city)!=null?f:void 0,r=((y=e.filters.location)==null?void 0:y.country)||"",n=e.filters.location?[e.filters.location.latitude,e.filters.location.longitude]:void 0;if(!n)return;let s=this.state.activeLocation;(t!==(s==null?void 0:s.location_id)||a!==(s==null?void 0:s.city)||r!==(s==null?void 0:s.country))&&this.setActiveLocation({city:a,country:r,location_id:t,locationName:a&&r?`${a}, ${r}`:r||"",coordinates:n})}async runSmartFilterSearch({query:e,filters:t,onProcessFilters:a,onError:r}){if(this.ensureAlive(),!this.useApi)return console.warn("runSmartFilterSearch requires API usage. Set useApi to true."),r==null||r(new Error("API usage is disabled")),null;let n=this.getFilters(),s=this.getState();if(t&&t.length>0){let p=new Set,f=new Set,y,M,l,o,d,u;t.forEach(b=>{var g,c,h;switch(b.type){case"amenity":p.add(b.value);break;case"hotelStyle":f.add(b.value);break;case"priceRange":b.priceRange&&(y={min:b.priceRange.min,max:(g=b.priceRange.max)!=null?g:0});break;case"minRating":M=(c=b.numericValue)!=null?c:Number(b.value);break;case"starRating":l=(h=b.numericValue)!=null?h:Number(b.value);break;case"primary_type":o=b.propertyType;break;case"transformed_query":d=b.value;break;case"selected_restaurant_price_levels":u=b.priceLevels;break}}),n={...n,...p.size>0&&{amenities:Array.from(p)},...f.size>0&&{hotelStyle:Array.from(f)},...y&&{price:y},...M!==void 0&&{minRating:M},...l!==void 0&&{starRating:l},...o&&{primary_type:o},...d&&{transformed_query:d},...u&&{selected_restaurant_price_levels:u}}}else e||(n.minRating=4);let m={filters:n,...e&&{query:e},...s.bounds?{bounds:s.bounds}:s.activeLocation.location_id?{location_id:s.activeLocation.location_id}:s.activeLocation.coordinates?{latitude:s.activeLocation.coordinates[0],longitude:s.activeLocation.coordinates[1]}:{}};return this.runPropertiesSearch({body:m,beforeApplyProperties:a?p=>{var y,M;let f=a(p.filters,p.location_id);return{price:(y=f.price)!=null?y:null,limit:(M=f.limit)!=null?M:30}}:void 0,smartFiltersClearable:!!e,onError:r})}getClusters(){return this.ensureAlive(),[...this.clusterItems]}setUseApi(e,t=!0){this.ensureAlive(),this.useApi=e,!e&&this.currentPlatform&&this.currentPlatform!=="maplibre"&&console.warn("When useApi is false, only maplibre platform is supported. Please switch to maplibre."),e||this.clearProperties(),e&&t&&(this.options.initialLocationData?this.initializeFromLocationData(this.options.initialLocationData):this.requestBody&&this.isMapAttached&&this.autoLoadProperties())}setApiKey(e){this.ensureAlive();let t=this.apiKey;this.apiKey=e,t!==this.apiKey&&this.isMapAttached&&(this.refresh(),this.useApi&&(this.options.initialLocationData?this.initializeFromLocationData(this.options.initialLocationData):this.requestBody&&this.autoLoadProperties()))}getApiKey(){return this.apiKey}refresh(){var r,n,s;if(this.ensureAlive(),!this.adapter)return;let e=this.safeExtractViewState(),t=this.resolvePrimaryType();this.clusterItems=G({primaryType:t,markers:this.properties,map:this.adapter,selectedMarkerId:this.selectedMarkerId,zoom:(r=e==null?void 0:e.zoom)!=null?r:0}),this.adapter.getMarkerManager().render(this.clusterItems,t,this.selectedMarkerId),(s=(n=this.options).onClusterUpdate)==null||s.call(n,this.clusterItems,e)}destroy(){this.destroyed||(this.adapter&&(this.adapter.getMarkerManager().destroy(),this.adapter.cleanup()),this.clusterItems=[],this.properties=[],this.destroyed=!0,this.isMapAttached=!1)}resolvePrimaryType(){var e,t,a;return(a=(t=this.primaryType)!=null?t:(e=this.properties.find(r=>r.type))==null?void 0:e.type)!=null?a:ne}safeExtractViewState(){if(!this.adapter)return null;try{return ee(this.adapter)}catch{return null}}ensureAlive(){if(this.destroyed)throw new Error("MapFirstCore instance has been destroyed")}};function Ee(i){return i.platform==="maplibre"}function se(i){return i.platform==="google"}function Be(i){return i.platform==="mapbox"}return fe(_e);})();
-//# sourceMappingURL=index.global.js.map
+"use strict";
+var MapFirstCore = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/index.ts
+  var index_exports = {};
+  __export(index_exports, {
+    MapFirstCore: () => MapFirstCore,
+    PropertiesFetchError: () => PropertiesFetchError,
+    convertToApiFilters: () => convertToApiFilters,
+    fetchImages: () => fetchImages,
+    fetchProperties: () => fetchProperties,
+    processApiFilters: () => processApiFilters
+  });
+
+  // #style-inject:#style-inject
+  function styleInject(css, { insertAt } = {}) {
+    if (!css || typeof document === "undefined") return;
+    const head = document.head || document.getElementsByTagName("head")[0];
+    const style = document.createElement("style");
+    style.type = "text/css";
+    if (insertAt === "top") {
+      if (head.firstChild) {
+        head.insertBefore(style, head.firstChild);
+      } else {
+        head.appendChild(style);
+      }
+    } else {
+      head.appendChild(style);
+    }
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+  }
+
+  // src/markers.css
+  styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #d1d5db;\n  cursor: default;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n");
+
+  // src/marker-style-utils.ts
+  var PRIMARY_Z_INDEX = {
+    selected: 20,
+    primary: 12,
+    secondary: 11
+  };
+  var DOT_Z_INDEX = {
+    selected: 20,
+    primary: 3,
+    secondary: 1
+  };
+  var LOADING_VIDEO_HTML = `<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>`;
+  function getPrimaryMarkerZIndex(isPrimaryType, isSelected) {
+    if (isSelected) return PRIMARY_Z_INDEX.selected;
+    return isPrimaryType ? PRIMARY_Z_INDEX.primary : PRIMARY_Z_INDEX.secondary;
+  }
+  function getDotMarkerZIndex(isPrimaryType, isSelected) {
+    if (isSelected) return DOT_Z_INDEX.selected;
+    return isPrimaryType ? DOT_Z_INDEX.primary : DOT_Z_INDEX.secondary;
+  }
+  function getPrimaryMarkerPillClass(isPending, isPrimaryType, isSelected) {
+    if (isPending) {
+      return "mapfirst-marker-pill mapfirst-marker-pill-pending";
+    }
+    return `mapfirst-marker-pill mapfirst-marker-pill-active${isSelected ? " mapfirst-marker-selected" : !isPrimaryType ? " mapfirst-marker-non-primary" : ""}`;
+  }
+  function getDotMarkerButtonClass(isPending, isPrimaryType, isSelected) {
+    if (isPending) {
+      return "mapfirst-dot-marker-button mapfirst-dot-marker-button-pending";
+    }
+    return `mapfirst-dot-marker-button mapfirst-dot-marker-button-active${isSelected ? " mapfirst-dot-marker-selected" : !isPrimaryType ? " mapfirst-dot-marker-non-primary" : ""}`;
+  }
+
+  // src/marker.ts
+  var AWARD_SVG = `<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M12 3.953a7.442 7.442 0 1 0 .001 14.884A7.442 7.442 0 0 0 12 3.953m0 14.05a6.61 6.61 0 1 1 0-13.218 6.61 6.61 0 0 1 0 13.219M10.343 11.9a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.821 0m5.134 0a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.82 0m.82-1.897.84-.913h-1.863A5.8 5.8 0 0 0 12 8.08a5.77 5.77 0 0 0-3.27 1.008H6.862l.84.913a2.567 2.567 0 1 0 3.475 3.78l.823.896.823-.895a2.568 2.568 0 1 0 3.474-3.78m-6.865 3.634a1.738 1.738 0 1 1 0-3.476 1.738 1.738 0 0 1 0 3.476M12 11.85c0-1.143-.832-2.124-1.929-2.543A5 5 0 0 1 12 8.92a5 5 0 0 1 1.928.386c-1.096.42-1.927 1.4-1.927 2.543m2.566 1.787a1.738 1.738 0 1 1 .001-3.476 1.738 1.738 0 0 1 0 3.476m-8.456 3.719s-.377-.946-1.396-1.903c-1.02-.957-2.303-1.132-2.303-1.132s.457 1.02 1.54 2.04c1.086 1.017 2.159.995 2.159.995m2.568 1.41s-.524-.511-1.479-.883-1.861-.191-1.861-.191.598.54 1.615.935c1.016.397 1.725.139 1.725.139m2.493.505s-.545-.224-1.357-.196-1.415.47-1.415.47.608.222 1.473.193 1.3-.467 1.3-.467m-6.186-4.203s-.175-1.008-.974-2.154c-.8-1.147-2.015-1.578-2.015-1.578s.238 1.098 1.089 2.319c.85 1.22 1.9 1.413 1.9 1.413m-1.003-3.071s.195-1.021-.134-2.393c-.328-1.371-1.294-2.21-1.294-2.21s-.17 1.128.18 2.589c.35 1.46 1.248 2.014 1.248 2.014"></path><path d="M17.887 17.355s.377-.946 1.396-1.903c1.02-.957 2.303-1.132 2.303-1.132s-.457 1.02-1.54 2.04c-1.086 1.017-2.159.995-2.159.995m-2.567 1.41s.524-.511 1.479-.883 1.861-.191 1.861-.191-.598.54-1.615.935c-1.016.397-1.725.139-1.725.139m-2.493.505s.545-.224 1.357-.196 1.415.47 1.415.47-.608.222-1.473.193-1.3-.467-1.3-.467m6.186-4.203s.175-1.008.974-2.154c.8-1.147 2.015-1.578 2.015-1.578s-.238 1.098-1.089 2.319c-.85 1.22-1.9 1.413-1.9 1.413m1.003-3.071s-.195-1.021.133-2.393c.33-1.371 1.293-2.21 1.293-2.21s.17 1.128-.18 2.589c-.349 1.46-1.246 2.014-1.246 2.014M12 20.047a.413.413 0 1 0 0-.827.413.413 0 0 0 0 .827"></path></svg>`;
+  var AWARD_BACK_SVG = `<svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 3.953a7.442 7.442 0 1 0 .001 14.884A7.442 7.442 0 0 0 12 3.953m0 14.05a6.61 6.61 0 1 1 0-13.218 6.61 6.61 0 0 1 0 13.219M10.343 11.9a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.821 0m5.134 0a.91.91 0 1 1-1.821 0 .91.91 0 0 1 1.82 0m.82-1.897.84-.913h-1.863A5.8 5.8 0 0 0 12 8.08a5.77 5.77 0 0 0-3.27 1.008H6.862l.84.913a2.567 2.567 0 1 0 3.475 3.78l.823.896.823-.895a2.568 2.568 0 1 0 3.474-3.78m-6.865 3.634a1.738 1.738 0 1 1 0-3.476 1.738 1.738 0 0 1 0 3.476M12 11.85c0-1.143-.832-2.124-1.929-2.543A5 5 0 0 1 12 8.92a5 5 0 0 1 1.928.386c-1.096.42-1.927 1.4-1.927 2.543m2.566 1.787a1.738 1.738 0 1 1 .001-3.476 1.738 1.738 0 0 1 0 3.476m-8.456 3.719s-.377-.946-1.396-1.903c-1.02-.957-2.303-1.132-2.303-1.132s.457 1.02 1.54 2.04c1.086 1.017 2.159.995 2.159.995m2.568 1.41s-.524-.511-1.479-.883-1.861-.191-1.861-.191.598.54 1.615.935c1.016.397 1.725.139 1.725.139m2.493.505s-.545-.224-1.357-.196-1.415.47-1.415.47.608.222 1.473.193 1.3-.467 1.3-.467m-6.186-4.203s-.175-1.008-.974-2.154c-.8-1.147-2.015-1.578-2.015-1.578s.238 1.098 1.089 2.319c.85 1.22 1.9 1.413 1.9 1.413m-1.003-3.071s.195-1.021-.134-2.393c-.328-1.371-1.294-2.21-1.294-2.21s-.17 1.128.18 2.589c.35 1.46 1.248 2.014 1.248 2.014"></path><path d="M17.887 17.355s.377-.946 1.396-1.903c1.02-.957 2.303-1.132 2.303-1.132s-.457 1.02-1.54 2.04c-1.086 1.017-2.159.995-2.159.995m-2.567 1.41s.524-.511 1.479-.883 1.861-.191 1.861-.191-.598.54-1.615.935c-1.016.397-1.725.139-1.725.139m-2.493.505s.545-.224 1.357-.196 1.415.47 1.415.47-.608.222-1.473.193-1.3-.467-1.3-.467m6.186-4.203s.175-1.008.974-2.154c.8-1.147 2.015-1.578 2.015-1.578s-.238 1.098-1.089 2.319c-.85 1.22-1.9 1.413-1.9 1.413m1.003-3.071s-.195-1.021.133-2.393c.33-1.371 1.293-2.21 1.293-2.21s.17 1.128-.18 2.589c-.349 1.46-1.246 2.014-1.246 2.014M12 20.047a.413.413 0 1 0 0-.827.413.413 0 0 0 0 .827"></path></svg>`;
+  var EAT_DRINK_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.051 6.549v.003l1.134 1.14 3.241-3.25.003-.002 1.134 1.136-3.243 3.252 1.134 1.14a1 1 0 0 0 .09-.008c.293-.05.573-.324.72-.474l.005-.006 2.596-2.603L22 8.016l-2.597 2.604a3.73 3.73 0 0 1-1.982 1.015 4.3 4.3 0 0 1-3.162-.657l-.023-.016-.026-.018-1.366 1.407 8.509 8.512L20.219 22l-.002-.002-6.654-6.663-2.597 2.76-7.3-7.315C1.967 8.948 1.531 6.274 2.524 4.198c.241-.504.566-.973.978-1.386l8.154 8.416 1.418-1.423-.039-.045c-.858-1.002-1.048-2.368-.62-3.595a4.15 4.15 0 0 1 .983-1.561L16 2l1.135 1.138-2.598 2.602-.047.045c-.16.151-.394.374-.433.678zM3.809 5.523c-.362 1.319-.037 2.905 1.06 4.103L10.93 15.7l1.408-1.496zM2.205 20.697 3.34 21.84l4.543-4.552-1.135-1.143z"/></svg>`;
+  var ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56 7.5H3.75a.25.25 0 0 0-.25.25v10c0 .138.112.25.25.25h16.5a.25.25 0 0 0 .25-.25v-10a.25.25 0 0 0-.25-.25h-3.81l-2-2H9.56zM8.94 4h6.12l2 2h3.19c.966 0 1.75.784 1.75 1.75v10a1.75 1.75 0 0 1-1.75 1.75H3.75A1.75 1.75 0 0 1 2 17.75v-10C2 6.784 2.784 6 3.75 6h3.19z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 9.25a2.75 2.75 0 1 0 0 5.5 2.75 2.75 0 0 0 0-5.5M7.75 12a4.25 4.25 0 1 1 8.5 0 4.25 4.25 0 0 1-8.5 0"/></svg>`;
+  var STAR_BASE_STYLE = "display:inline-block;width:8px;height:8px;border:1px solid #03852e;border-radius:9999px;";
+  var STAR_HALF_STYLE = "linear-gradient(90deg, #03852e 50%, transparent 50%)";
+  var STAR_KIND_CACHE = /* @__PURE__ */ new Map();
+  function setupHoverCard(root, pill, marker, isSelected) {
+    if (root.dataset.hasHoverCard === "true") return;
+    root.dataset.hasHoverCard = "true";
+    const propertyCard = createPropertyCard(marker);
+    let hoverTimeout = null;
+    let hideTimeout = null;
+    let positionUpdateFrame = null;
+    const cleanupCard = () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      if (positionUpdateFrame) {
+        cancelAnimationFrame(positionUpdateFrame);
+        positionUpdateFrame = null;
+      }
+      if (propertyCard.parentElement) {
+        propertyCard.remove();
+      }
+    };
+    const updateCardPosition = () => {
+      if (propertyCard.parentElement) {
+        let mapContainer = root.parentElement;
+        while (mapContainer && getComputedStyle(mapContainer).position === "static") {
+          mapContainer = mapContainer.parentElement;
+        }
+        if (mapContainer) {
+          positionCard(propertyCard, root, mapContainer);
+          positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+        }
+      }
+    };
+    const showCard = (immediate = false) => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      const doShow = () => {
+        let mapContainer = root.parentElement;
+        while (mapContainer && getComputedStyle(mapContainer).position === "static") {
+          mapContainer = mapContainer.parentElement;
+        }
+        if (mapContainer) {
+          mapContainer.appendChild(propertyCard);
+          positionCard(propertyCard, root, mapContainer);
+          loadCardImage(propertyCard, marker);
+          positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+        }
+      };
+      if (immediate) {
+        doShow();
+      } else {
+        hoverTimeout = setTimeout(doShow, 300);
+      }
+    };
+    const hideCard = () => {
+      if (isSelected) return;
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+      if (positionUpdateFrame) {
+        cancelAnimationFrame(positionUpdateFrame);
+        positionUpdateFrame = null;
+      }
+      hideTimeout = setTimeout(() => {
+        if (propertyCard.parentElement) {
+          propertyCard.remove();
+        }
+      }, 100);
+    };
+    if (isSelected) {
+      showCard(true);
+    }
+    pill.addEventListener("mouseenter", () => showCard(false));
+    pill.addEventListener("mouseleave", hideCard);
+    propertyCard.addEventListener("mouseenter", () => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      if (!positionUpdateFrame && propertyCard.parentElement) {
+        positionUpdateFrame = requestAnimationFrame(updateCardPosition);
+      }
+    });
+    propertyCard.addEventListener("mouseleave", hideCard);
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const removedNode of mutation.removedNodes) {
+          if (removedNode === root || removedNode.contains(root)) {
+            cleanupCard();
+            observer.disconnect();
+            return;
+          }
+        }
+      }
+    });
+    if (root.parentElement) {
+      observer.observe(root.parentElement, { childList: true, subtree: true });
+    } else {
+      const checkParent = setInterval(() => {
+        if (root.parentElement) {
+          observer.observe(root.parentElement, {
+            childList: true,
+            subtree: true
+          });
+          clearInterval(checkParent);
+        }
+      }, 100);
+    }
+  }
+  function getDefaultImageForType(type) {
+    const normalizedType = type.toLowerCase().replace(/\s+/g, "").replace(/&/g, "");
+    return `https://api.mapfirst.ai/static/images/${normalizedType}.webp`;
+  }
+  function createPropertyCard(marker) {
+    var _a, _b, _c, _d, _e, _f, _g;
+    const url = (_c = (_b = (_a = marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.clickUrl) != null ? _c : marker.url;
+    const rating = marker.rating || 0;
+    const reviews = marker.reviews || 0;
+    const displayPrice = (_f = (_e = (_d = marker.pricing) == null ? void 0 : _d.offer) == null ? void 0 : _e.displayPrice) != null ? _f : marker.price_level;
+    const defaultImageUrl = getDefaultImageForType(marker.type);
+    const card = document.createElement(url ? "a" : "div");
+    card.className = "mapfirst-property-hover-card";
+    card.setAttribute("data-marker-id", marker.tripadvisor_id.toString());
+    if (url) {
+      card.href = url;
+      card.target = "_blank";
+    }
+    const imageContainer = document.createElement("div");
+    imageContainer.className = "mapfirst-property-hover-image mapfirst-property-hover-image-placeholder";
+    imageContainer.dataset.tripadvisorId = marker.tripadvisor_id.toString();
+    imageContainer.dataset.defaultImage = defaultImageUrl;
+    const details = document.createElement("div");
+    details.className = "mapfirst-property-hover-details";
+    const name = document.createElement("div");
+    name.className = "mapfirst-property-hover-name";
+    name.textContent = (_g = marker.name) != null ? _g : "";
+    const ratingContainer = document.createElement("div");
+    ratingContainer.className = "mapfirst-property-hover-rating";
+    const ratingValue = document.createElement("span");
+    ratingValue.className = "rating-value";
+    ratingValue.textContent = rating.toFixed(1);
+    const stars = document.createElement("span");
+    stars.className = "stars";
+    stars.appendChild(renderCardStars(rating));
+    const reviewsText = document.createElement("span");
+    reviewsText.className = "reviews";
+    reviewsText.textContent = `(${reviews})`;
+    ratingContainer.append(ratingValue, stars, reviewsText);
+    details.append(name, ratingContainer);
+    if (marker.type === "Accommodation" && displayPrice) {
+      const price = document.createElement("div");
+      price.className = "mapfirst-property-hover-price";
+      price.append("Starting at ");
+      const strong = document.createElement("strong");
+      strong.textContent = displayPrice;
+      price.appendChild(strong);
+      details.appendChild(price);
+    }
+    if (url) {
+      const learnMore = document.createElement("span");
+      learnMore.className = "mapfirst-property-hover-learn-more";
+      learnMore.textContent = "Learn More";
+      details.appendChild(learnMore);
+    }
+    card.append(imageContainer, details);
+    return card;
+  }
+  function renderCardStars(rating) {
+    const fragment = document.createDocumentFragment();
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    const cacheKey = `${fullStars}:${hasHalfStar}`;
+    const cached = STAR_KIND_CACHE.get(cacheKey);
+    if (cached) {
+      for (const star of cached) {
+        fragment.appendChild(createCardStar(star));
+      }
+      return fragment;
+    }
+    const stars = [];
+    for (let i = 0; i < fullStars; i += 1) {
+      stars.push("full");
+    }
+    if (hasHalfStar) {
+      stars.push("half");
+    }
+    const remainingStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < remainingStars; i += 1) {
+      stars.push("empty");
+    }
+    STAR_KIND_CACHE.set(cacheKey, stars);
+    for (const star of stars) {
+      fragment.appendChild(createCardStar(star));
+    }
+    return fragment;
+  }
+  function createCardStar(kind) {
+    const star = document.createElement("span");
+    star.style.cssText = STAR_BASE_STYLE;
+    if (kind === "full") {
+      star.style.backgroundColor = "#03852e";
+    } else if (kind === "half") {
+      star.style.background = STAR_HALF_STYLE;
+    }
+    return star;
+  }
+  function loadCardImage(card, marker) {
+    const imgContainer = card.querySelector(
+      ".mapfirst-property-hover-image"
+    );
+    if (imgContainer && marker.tripadvisor_id && !imgContainer.dataset.imageLoaded) {
+      imgContainer.dataset.imageLoaded = "loading";
+      const defaultImageUrl = imgContainer.dataset.defaultImage;
+      fetchImages(marker.tripadvisor_id, 1).then((imageUrl) => {
+        if (imageUrl && imgContainer) {
+          setCardImage(imgContainer, imageUrl, marker.name);
+          imgContainer.classList.remove(
+            "mapfirst-property-hover-image-placeholder"
+          );
+          imgContainer.dataset.imageLoaded = "true";
+        } else {
+          throw new Error("No image URL");
+        }
+      }).catch(() => {
+        if (defaultImageUrl && imgContainer) {
+          setCardImage(imgContainer, defaultImageUrl, marker.name);
+          imgContainer.classList.remove(
+            "mapfirst-property-hover-image-placeholder"
+          );
+          imgContainer.dataset.imageLoaded = "false";
+        }
+      });
+    }
+  }
+  function setCardImage(container, imageUrl, alt) {
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = alt != null ? alt : "";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    container.innerHTML = "";
+    container.appendChild(img);
+  }
+  function positionCard(card, markerElement, mapContainer) {
+    const markerRect = markerElement.getBoundingClientRect();
+    const containerRect = mapContainer.getBoundingClientRect();
+    const cardWidth = 270;
+    const cardHeight = 120;
+    const offset = 12;
+    const spaceRight = containerRect.right - markerRect.right;
+    const spaceLeft = markerRect.left - containerRect.left;
+    const spaceBottom = containerRect.bottom - markerRect.bottom;
+    const spaceTop = markerRect.top - containerRect.top;
+    let left = markerRect.left - containerRect.left + markerRect.width / 2 - cardWidth / 2;
+    let top = markerRect.top - containerRect.top + markerRect.height + offset;
+    if (left < 0) {
+      left = 8;
+    } else if (left + cardWidth > containerRect.width) {
+      left = containerRect.width - cardWidth - 8;
+    }
+    if (spaceBottom < cardHeight + offset && spaceTop > spaceBottom) {
+      top = markerRect.top - containerRect.top - cardHeight - offset;
+    }
+    card.style.left = `${left}px`;
+    card.style.top = `${top}px`;
+  }
+  function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    if (typeof document === "undefined") {
+      return null;
+    }
+    const marker = item.marker;
+    const isPrimaryType = marker.type === primaryType;
+    const isSelected = selectedMarkerId === marker.tripadvisor_id;
+    const isAccommodation = marker.type === "Accommodation";
+    const hasPrice = (_b = (_a = marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.displayPrice;
+    const isPending = isAccommodation && !hasPrice;
+    const ratingLabel = (() => {
+      if (marker.rating === void 0 || marker.rating === null) return null;
+      const numeric = typeof marker.rating === "number" ? marker.rating : Number(marker.rating);
+      if (Number.isNaN(numeric) || numeric <= 0) return null;
+      return numeric.toFixed(1);
+    })();
+    const root = document.createElement("div");
+    root.className = "mapfirst-marker-root";
+    root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
+    const markerUrl = (_e = (_d = (_c = marker.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.clickUrl) != null ? _e : marker.url;
+    const pill = document.createElement(markerUrl ? "a" : "div");
+    if (markerUrl) {
+      pill.href = markerUrl;
+      pill.target = "_blank";
+      pill.style.textDecoration = "none";
+    }
+    pill.className = getPrimaryMarkerPillClass(
+      isPending,
+      isPrimaryType,
+      isSelected
+    );
+    if (!isPending && (((_f = marker.awards) == null ? void 0 : _f.length) || ratingLabel)) {
+      const badge = document.createElement("div");
+      badge.className = "mapfirst-marker-badge";
+      if (!isPrimaryType) {
+        badge.style.opacity = "0.2";
+      }
+      badge.className = "mapfirst-marker-badge";
+      if (((_g = marker.awards) == null ? void 0 : _g.length) && marker.awards[0].type) {
+        const awardContainer = document.createElement("div");
+        awardContainer.className = "mapfirst-marker-award-container";
+        const backLayer = document.createElement("div");
+        backLayer.className = "mapfirst-marker-award-back";
+        backLayer.innerHTML = AWARD_BACK_SVG;
+        const colorDot = document.createElement("div");
+        colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${marker.awards[0].type}`;
+        const frontLayer = document.createElement("div");
+        frontLayer.className = "mapfirst-marker-award-front";
+        frontLayer.innerHTML = AWARD_SVG;
+        awardContainer.appendChild(backLayer);
+        awardContainer.appendChild(colorDot);
+        awardContainer.appendChild(frontLayer);
+        badge.appendChild(awardContainer);
+      } else if (ratingLabel) {
+        badge.className = "mapfirst-marker-badge mapfirst-marker-rating-badge";
+        badge.textContent = ratingLabel;
+      }
+      pill.appendChild(badge);
+    }
+    const content = document.createElement("span");
+    content.className = "mapfirst-marker-content";
+    if (isAccommodation) {
+      if ((_i = (_h = marker.pricing) == null ? void 0 : _h.offer) == null ? void 0 : _i.displayPrice) {
+        content.innerHTML = marker.pricing.offer.displayPrice;
+        content.dataset.price = marker.pricing.offer.displayPrice;
+      } else {
+        content.innerHTML = LOADING_VIDEO_HTML;
+        content.dataset.price = "";
+      }
+    } else if (marker.type === "Eat & Drink") {
+      content.innerHTML = EAT_DRINK_SVG;
+    } else if (marker.type === "Attraction") {
+      content.innerHTML = ATTRACTION_SVG;
+    }
+    pill.appendChild(content);
+    pill.addEventListener("click", (evt) => {
+      evt.stopPropagation();
+      if (!isPending) {
+        onMarkerClick == null ? void 0 : onMarkerClick(marker);
+      }
+    });
+    if (!isPending) {
+      setupHoverCard(root, pill, marker, isSelected);
+    }
+    root.appendChild(pill);
+    return root;
+  }
+
+  // src/dotmarker.ts
+  function createDotMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick) {
+    var _a, _b, _c;
+    if (typeof document === "undefined") {
+      return null;
+    }
+    const marker = item.marker;
+    const isPrimaryType = marker.type === primaryType;
+    const isSelected = selectedMarkerId === marker.tripadvisor_id;
+    const isAccommodation = marker.type === "Accommodation";
+    const isPending = isAccommodation && ((_b = (_a = marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.availability) !== "available";
+    const container = document.createElement("div");
+    container.className = "mapfirst-dot-marker-container";
+    container.style.zIndex = String(getDotMarkerZIndex(isPrimaryType, isSelected));
+    const button = document.createElement("div");
+    button.className = getDotMarkerButtonClass(
+      isPending,
+      isPrimaryType,
+      isSelected
+    );
+    button.title = (_c = marker.name) != null ? _c : String(marker.tripadvisor_id);
+    button.addEventListener("click", (evt) => {
+      evt.stopPropagation();
+      if (!isPending) {
+        onMarkerClick == null ? void 0 : onMarkerClick(marker);
+      }
+    });
+    container.appendChild(button);
+    if (!isPending) {
+      setupHoverCard(container, button, marker, isSelected);
+    }
+    return container;
+  }
+
+  // src/marker-updater.ts
+  function updatePrimaryMarkerElement(element, isPrimaryType, isSelected, isPending, marker) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+    const wasPending = (_b = (_a = element.querySelector(".mapfirst-marker-pill")) == null ? void 0 : _a.classList.contains("mapfirst-marker-pill-pending")) != null ? _b : false;
+    const root = element;
+    root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
+    const pill = root.querySelector(".mapfirst-marker-pill");
+    if (pill) {
+      pill.className = getPrimaryMarkerPillClass(
+        isPending,
+        isPrimaryType,
+        isSelected
+      );
+    }
+    const badge = root.querySelector(".mapfirst-marker-badge");
+    if (badge instanceof HTMLElement) {
+      badge.style.opacity = !isPrimaryType && !isSelected ? "0.2" : "";
+    }
+    if (wasPending && !isPending && marker) {
+      const pill2 = root.querySelector(".mapfirst-marker-pill");
+      if (pill2 instanceof HTMLElement) {
+        setupHoverCard(root, pill2, marker, isSelected);
+      }
+    }
+    if (marker && marker.type === "Accommodation") {
+      const content = root.querySelector(".mapfirst-marker-content");
+      if (content instanceof HTMLElement) {
+        const displayPrice = (_d = (_c = marker.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.displayPrice;
+        const currentPrice = content.dataset.price;
+        if (currentPrice !== displayPrice) {
+          if (displayPrice) {
+            content.innerHTML = displayPrice;
+            content.dataset.price = displayPrice;
+          } else {
+            content.innerHTML = LOADING_VIDEO_HTML;
+            content.dataset.price = "";
+          }
+        }
+      }
+    }
+    if (marker) {
+      const hoverCard = document.querySelector(
+        `.mapfirst-property-hover-card[data-marker-id="${marker.tripadvisor_id}"]`
+      );
+      if (hoverCard) {
+        const rating = marker.rating || 0;
+        const reviews = marker.reviews || 0;
+        const displayPrice = (_g = (_f = (_e = marker.pricing) == null ? void 0 : _e.offer) == null ? void 0 : _f.displayPrice) != null ? _g : marker.price_level;
+        const ratingValueEl = hoverCard.querySelector(".rating-value");
+        if (ratingValueEl) {
+          const newRating = rating.toFixed(1);
+          if (ratingValueEl.textContent !== newRating) {
+            ratingValueEl.textContent = newRating;
+          }
+        }
+        const reviewsEl = hoverCard.querySelector(".reviews");
+        if (reviewsEl) {
+          const newReviews = `(${reviews})`;
+          if (reviewsEl.textContent !== newReviews) {
+            reviewsEl.textContent = newReviews;
+          }
+        }
+        if (marker.type === "Accommodation" && displayPrice) {
+          let priceEl = hoverCard.querySelector(".mapfirst-property-hover-price");
+          if (!priceEl) {
+            priceEl = document.createElement("div");
+            priceEl.className = "mapfirst-property-hover-price";
+            const detailsEl = hoverCard.querySelector(
+              ".mapfirst-property-hover-details"
+            );
+            const learnMoreEl = hoverCard.querySelector(
+              ".mapfirst-property-hover-learn-more"
+            );
+            if (detailsEl) {
+              if (learnMoreEl) {
+                detailsEl.insertBefore(priceEl, learnMoreEl);
+              } else {
+                detailsEl.appendChild(priceEl);
+              }
+            }
+          }
+          if (priceEl) {
+            const newPriceHtml = `Starting at <strong>${displayPrice}</strong>`;
+            if (priceEl.innerHTML !== newPriceHtml) {
+              priceEl.innerHTML = newPriceHtml;
+            }
+          }
+        }
+        const url = (_j = (_i = (_h = marker.pricing) == null ? void 0 : _h.offer) == null ? void 0 : _i.clickUrl) != null ? _j : marker.url;
+        if (url && hoverCard instanceof HTMLAnchorElement && hoverCard.href !== url) {
+          hoverCard.href = url;
+        }
+      }
+    }
+  }
+  function updateDotMarkerElement(element, isPrimaryType, isSelected, isPending) {
+    const container = element;
+    container.style.zIndex = String(getDotMarkerZIndex(isPrimaryType, isSelected));
+    const button = container.querySelector(".mapfirst-dot-marker-button");
+    if (button) {
+      button.className = getDotMarkerButtonClass(
+        isPending,
+        isPrimaryType,
+        isSelected
+      );
+    }
+  }
+  function extractMarkerIdFromKey(key) {
+    const match = key.match(/^(?:primary|dot)-(\d+)-/);
+    return match ? parseInt(match[1], 10) : null;
+  }
+
+  // src/adapters/markermanager.ts
+  var BaseMarkerManager = class {
+    constructor(mapInstance, onMarkerClick) {
+      this.markerCache = /* @__PURE__ */ new Map();
+      this.primaryType = "Accommodation";
+      this.selectedMarkerId = null;
+      this.mapInstance = mapInstance;
+      this.onMarkerClick = onMarkerClick;
+    }
+    render(items, primaryType, selectedMarkerId) {
+      if (primaryType && primaryType !== this.primaryType) {
+        this.primaryType = primaryType;
+      }
+      if (selectedMarkerId !== void 0) {
+        this.selectedMarkerId = selectedMarkerId;
+      }
+      const newKeys = new Set(items.map((item) => item.key));
+      for (const [key, entry] of this.markerCache.entries()) {
+        if (!newKeys.has(key)) {
+          this.removeMarkerFromMap(entry.marker);
+          this.markerCache.delete(key);
+        }
+      }
+      for (const item of items) {
+        const coords = safeLatLon(item.marker.location);
+        if (!coords) continue;
+        const existing = this.markerCache.get(item.key);
+        if (existing) {
+          const displayState = this.getDisplayState(item);
+          this.updateMarkerElement(existing.marker, item, displayState);
+          try {
+            this.updateMarkerPosition(existing.marker, coords);
+          } catch {
+            this.removeMarkerFromMap(existing.marker);
+            this.markerCache.delete(item.key);
+            this.createAndAddMarker(item, coords);
+          }
+        } else {
+          const existingMatch = this.findMatchingMarkerEntry(item);
+          const existingEntry = existingMatch == null ? void 0 : existingMatch.entry;
+          const existingKey = existingMatch == null ? void 0 : existingMatch.key;
+          if (existingEntry && existingKey) {
+            const displayState = this.getDisplayState(item);
+            this.updateMarkerElement(existingEntry.marker, item, displayState);
+            this.updateMarkerZIndex(
+              existingEntry.marker,
+              item,
+              displayState.isPrimaryType,
+              displayState.isSelected
+            );
+            this.markerCache.delete(existingKey);
+            this.markerCache.set(item.key, {
+              ...existingEntry,
+              key: item.key,
+              parentId: item.kind === "dot" ? item.parentId : void 0
+            });
+            try {
+              this.updateMarkerPosition(existingEntry.marker, coords);
+            } catch {
+            }
+          } else {
+            this.createAndAddMarker(item, coords);
+          }
+        }
+      }
+    }
+    destroy() {
+      for (const entry of this.markerCache.values()) {
+        this.removeMarkerFromMap(entry.marker);
+      }
+      this.markerCache.clear();
+    }
+    createAndAddMarker(item, coords) {
+      const element = item.kind === "primary" ? createPrimaryMarkerElement(
+        item,
+        this.primaryType,
+        this.selectedMarkerId,
+        this.onMarkerClick
+      ) : createDotMarkerElement(
+        item,
+        this.primaryType,
+        this.selectedMarkerId,
+        this.onMarkerClick
+      );
+      if (!element) return;
+      const displayState = this.getDisplayState(item);
+      try {
+        const marker = this.createMarker(
+          element,
+          coords,
+          item,
+          displayState.isPrimaryType,
+          displayState.isSelected
+        );
+        if (marker) {
+          this.markerCache.set(item.key, {
+            key: item.key,
+            marker,
+            kind: item.kind,
+            parentId: item.kind === "dot" ? item.parentId : void 0
+          });
+        }
+      } catch (error) {
+        console.error("Error creating marker", error);
+      }
+    }
+    updateMarkerZIndex(marker, item, isPrimaryType, isSelected) {
+    }
+    getDisplayState(item) {
+      var _a, _b, _c, _d;
+      const isPrimaryType = item.marker.type === this.primaryType;
+      const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
+      const isAccommodation = item.marker.type === "Accommodation";
+      const isPending = item.kind === "primary" ? isAccommodation && !((_b = (_a = item.marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.displayPrice) : isAccommodation && ((_d = (_c = item.marker.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.availability) !== "available";
+      return { isPrimaryType, isSelected, isPending };
+    }
+    updateMarkerElement(marker, item, displayState) {
+      const element = this.getMarkerElement(marker);
+      if (!element) {
+        return;
+      }
+      if (item.kind === "primary") {
+        updatePrimaryMarkerElement(
+          element,
+          displayState.isPrimaryType,
+          displayState.isSelected,
+          displayState.isPending,
+          item.marker
+        );
+        return;
+      }
+      updateDotMarkerElement(
+        element,
+        displayState.isPrimaryType,
+        displayState.isSelected,
+        displayState.isPending
+      );
+    }
+    findMatchingMarkerEntry(item) {
+      const markerId = item.marker.tripadvisor_id;
+      for (const [key, entry] of this.markerCache.entries()) {
+        if (extractMarkerIdFromKey(key) === markerId && entry.kind === item.kind) {
+          return { key, entry };
+        }
+      }
+      return null;
+    }
+  };
+  function safeLatLon(location) {
+    if (typeof (location == null ? void 0 : location.lon) !== "number" || typeof (location == null ? void 0 : location.lat) !== "number") {
+      return null;
+    }
+    if (Number.isNaN(location.lon) || Number.isNaN(location.lat)) {
+      return null;
+    }
+    return { lon: location.lon, lat: location.lat };
+  }
+
+  // src/adapters/mapgl/markermanager.ts
+  var BaseMapGLMarkerManager = class extends BaseMarkerManager {
+    constructor(options) {
+      var _a;
+      super(options.mapInstance, options.onMarkerClick);
+      this.MarkerCtor = (_a = options.namespace) == null ? void 0 : _a.Marker;
+    }
+    render(items, primaryType, selectedMarkerId) {
+      if (!this.MarkerCtor) {
+        return;
+      }
+      super.render(items, primaryType, selectedMarkerId);
+    }
+    createMarker(element, coords, item) {
+      if (!this.MarkerCtor) return null;
+      return new this.MarkerCtor({
+        element,
+        anchor: item.kind === "primary" ? "bottom" : "center"
+      }).setLngLat([coords.lon, coords.lat]).addTo(this.mapInstance);
+    }
+    removeMarkerFromMap(marker) {
+      try {
+        marker.remove();
+      } catch {
+      }
+    }
+    updateMarkerPosition(marker, coords) {
+      marker.setLngLat([coords.lon, coords.lat]);
+    }
+    getMarkerElement(marker) {
+      return marker.getElement();
+    }
+  };
+
+  // src/adapters/maplibre/markermanager.ts
+  var MapLibreMarkerManager = class extends BaseMapGLMarkerManager {
+    constructor(options) {
+      super({
+        mapInstance: options.mapInstance,
+        namespace: options.maplibregl,
+        onMarkerClick: options.onMarkerClick
+      });
+    }
+  };
+
+  // src/adapters/google/markermanager.ts
+  var GoogleMapsMarkerManager = class extends BaseMarkerManager {
+    constructor(options) {
+      super(options.mapInstance, options.onMarkerClick);
+      this.google = options.google;
+    }
+    render(items, primaryType, selectedMarkerId) {
+      var _a, _b;
+      if (!((_b = (_a = this.google) == null ? void 0 : _a.marker) == null ? void 0 : _b.AdvancedMarkerElement)) {
+        console.warn("AdvancedMarkerElement not available");
+        return;
+      }
+      super.render(items, primaryType, selectedMarkerId);
+    }
+    createMarker(element, coords, item, isPrimaryType, isSelected) {
+      var _a, _b;
+      if (!((_b = (_a = this.google) == null ? void 0 : _a.marker) == null ? void 0 : _b.AdvancedMarkerElement)) return null;
+      const zIndex = item.kind === "primary" ? getPrimaryMarkerZIndex(isPrimaryType, isSelected) : getDotMarkerZIndex(isPrimaryType, isSelected);
+      return new this.google.marker.AdvancedMarkerElement({
+        map: this.mapInstance,
+        position: { lat: coords.lat, lng: coords.lon },
+        content: element,
+        zIndex
+      });
+    }
+    removeMarkerFromMap(marker) {
+      try {
+        marker.map = null;
+      } catch (error) {
+        console.error("Error removing marker", error);
+      }
+    }
+    updateMarkerPosition(marker, coords) {
+      marker.position = { lat: coords.lat, lng: coords.lon };
+    }
+    getMarkerElement(marker) {
+      const element = marker.content;
+      return element instanceof HTMLElement ? element : null;
+    }
+    updateMarkerZIndex(marker, item, isPrimaryType, isSelected) {
+      marker.zIndex = item.kind === "primary" ? getPrimaryMarkerZIndex(isPrimaryType, isSelected) : getDotMarkerZIndex(isPrimaryType, isSelected);
+    }
+  };
+
+  // src/adapters/mapbox/markermanager.ts
+  var MapboxMarkerManager = class extends BaseMapGLMarkerManager {
+    constructor(options) {
+      super({
+        mapInstance: options.mapInstance,
+        namespace: options.mapboxgl,
+        onMarkerClick: options.onMarkerClick
+      });
+    }
+  };
+
+  // src/adapters/index.ts
+  var MapAdapter = class {
+    constructor(map) {
+      this.map = map;
+    }
+    /**
+     * Get the underlying map instance
+     * @returns {any} The native map instance
+     */
+    getMap() {
+      return this.map;
+    }
+    /**
+     * Set up impression tracking when map becomes visible
+     * @param {() => void} onImpression Callback to invoke when map is visible
+     */
+    setupImpressionTracking(onImpression) {
+      if (typeof window === "undefined" || !window.IntersectionObserver) {
+        return;
+      }
+      const container = this.getContainer();
+      if (!container) {
+        return;
+      }
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              onImpression();
+              observer.disconnect();
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(container);
+      const cleanup = () => observer.disconnect();
+      const originalCleanup = this.cleanup.bind(this);
+      this.cleanup = () => {
+        cleanup();
+        originalCleanup();
+      };
+    }
+  };
+
+  // src/adapters/mapgl/adapter.ts
+  var MAP_GL_REFRESH_EVENTS = ["move", "zoom", "dragend", "pitch", "rotate"];
+  var BaseMapGLAdapter = class extends MapAdapter {
+    constructor(map, markerManagerFactory) {
+      super(map);
+      this.markerManagerFactory = markerManagerFactory;
+      this.cleanupFns = [];
+    }
+    initialize(options) {
+      this.markerManager = this.markerManagerFactory({
+        mapInstance: this.map,
+        namespace: this.getNamespace(options),
+        onMarkerClick: options.onMarkerClick
+      });
+      if (options.onRefresh) {
+        this.attachEventListeners(options.onRefresh);
+      }
+      if (options.onMapMoveEnd) {
+        this.attachBoundsTracking(options.onMapMoveEnd);
+      }
+      return this.markerManager;
+    }
+    attachBoundsTracking(onMapMoveEnd) {
+      if (!this.map || typeof this.map.on !== "function") {
+        return;
+      }
+      const handleMoveEnd = () => {
+        const bounds = this.getMapBounds();
+        onMapMoveEnd(bounds);
+      };
+      const handleLoad = () => {
+        const bounds = this.getMapBounds();
+        onMapMoveEnd(bounds);
+      };
+      if (this.map.loaded && this.map.loaded()) {
+        handleLoad();
+      } else {
+        this.map.once("load", handleLoad);
+        this.cleanupFns.push(() => {
+          if (typeof this.map.off === "function") {
+            this.map.off("load", handleLoad);
+          }
+        });
+      }
+      this.map.on("moveend", handleMoveEnd);
+      this.cleanupFns.push(() => {
+        if (typeof this.map.off === "function") {
+          this.map.off("moveend", handleMoveEnd);
+        }
+      });
+    }
+    attachEventListeners(onRefresh) {
+      if (!this.map || typeof this.map.on !== "function") {
+        return;
+      }
+      MAP_GL_REFRESH_EVENTS.forEach((eventName) => {
+        this.map.on(eventName, onRefresh);
+        this.cleanupFns.push(() => {
+          if (typeof this.map.off === "function") {
+            this.map.off(eventName, onRefresh);
+          }
+        });
+      });
+    }
+    getMarkerManager() {
+      return this.markerManager;
+    }
+    getContainer() {
+      var _a, _b;
+      return ((_b = (_a = this.map) == null ? void 0 : _a.getContainer) == null ? void 0 : _b.call(_a)) || null;
+    }
+    cleanup() {
+      for (const cleanup of this.cleanupFns) {
+        try {
+          cleanup();
+        } catch {
+        }
+      }
+      this.cleanupFns.length = 0;
+    }
+    getMap() {
+      return this.map;
+    }
+    getCenter() {
+      const center = this.map.getCenter();
+      return { lng: center.lng, lat: center.lat };
+    }
+    getZoom() {
+      return this.map.getZoom();
+    }
+    getBearing() {
+      return this.map.getBearing();
+    }
+    getPitch() {
+      return this.map.getPitch();
+    }
+    getMapBounds() {
+      const bounds = this.map.getBounds();
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+      return {
+        sw: { lat: sw.lat, lng: sw.lng },
+        ne: { lat: ne.lat, lng: ne.lng }
+      };
+    }
+    project(lngLat) {
+      return this.map.project({ lng: lngLat[0], lat: lngLat[1] });
+    }
+    on(event, handler) {
+      this.map.on(event, handler);
+    }
+    off(event, handler) {
+      this.map.off(event, handler);
+    }
+    resize() {
+      this.map.resize();
+    }
+    remove() {
+      this.cleanup();
+      this.map.remove();
+    }
+  };
+
+  // src/adapters/maplibre/index.ts
+  var MapLibreAdapter = class extends BaseMapGLAdapter {
+    constructor(map) {
+      super(map, ({ mapInstance, namespace, onMarkerClick }) => {
+        return new MapLibreMarkerManager({
+          mapInstance,
+          maplibregl: namespace,
+          onMarkerClick
+        });
+      });
+    }
+    getNamespace(options) {
+      return options.maplibregl;
+    }
+  };
+
+  // src/adapters/google/index.ts
+  var GoogleMapsAdapter = class extends MapAdapter {
+    constructor(map) {
+      super(map);
+      this.cleanupFns = [];
+      this.initializeOverlayView();
+    }
+    initialize(options) {
+      this.markerManager = new GoogleMapsMarkerManager({
+        mapInstance: this.map,
+        google: options.google,
+        onMarkerClick: options.onMarkerClick
+      });
+      if (options.onRefresh) {
+        this.attachEventListeners(options.onRefresh);
+      }
+      if (options.onMapMoveEnd) {
+        this.attachBoundsTracking(options.onMapMoveEnd, options.google);
+      }
+      return this.markerManager;
+    }
+    attachBoundsTracking(onMapMoveEnd, google) {
+      if (!this.map) {
+        return;
+      }
+      const handleIdle = () => {
+        const bounds = this.getMapBounds();
+        onMapMoveEnd(bounds);
+      };
+      handleIdle();
+      const listener = google.event.addListener(this.map, "idle", handleIdle);
+      this.cleanupFns.push(() => {
+        google.event.removeListener(listener);
+      });
+    }
+    attachEventListeners(onRefresh) {
+      const events = [
+        "center_changed",
+        "zoom_changed",
+        "drag",
+        "heading_changed",
+        "tilt_changed"
+      ];
+      const listeners = [];
+      events.forEach((eventName) => {
+        const listener = this.map.addListener(eventName, onRefresh);
+        listeners.push(listener);
+      });
+      this.cleanupFns.push(() => {
+        listeners.forEach((listener) => {
+          try {
+            listener.remove();
+          } catch {
+          }
+        });
+      });
+    }
+    getMarkerManager() {
+      return this.markerManager;
+    }
+    getContainer() {
+      var _a, _b;
+      return ((_b = (_a = this.map) == null ? void 0 : _a.getDiv) == null ? void 0 : _b.call(_a)) || null;
+    }
+    cleanup() {
+      for (const cleanup of this.cleanupFns) {
+        try {
+          cleanup();
+        } catch {
+        }
+      }
+      this.cleanupFns.length = 0;
+    }
+    initializeOverlayView() {
+      var _a;
+      const googleMaps = (_a = globalThis.google) == null ? void 0 : _a.maps;
+      if (!googleMaps) return;
+      const OverlayView = googleMaps.OverlayView;
+      if (!OverlayView) return;
+      this.overlayView = new OverlayView();
+      this.overlayView.draw = function() {
+      };
+      this.overlayView.setMap(this.map);
+    }
+    getMap() {
+      return this.map;
+    }
+    getCenter() {
+      const center = this.map.getCenter();
+      if (!center) {
+        return { lng: 0, lat: 0 };
+      }
+      return { lng: center.lng(), lat: center.lat() };
+    }
+    getZoom() {
+      var _a;
+      return (_a = this.map.getZoom()) != null ? _a : 0;
+    }
+    getBearing() {
+      var _a;
+      return (_a = this.map.getHeading()) != null ? _a : 0;
+    }
+    getPitch() {
+      var _a;
+      return (_a = this.map.getTilt()) != null ? _a : 0;
+    }
+    getMapBounds() {
+      const bounds = this.map.getBounds();
+      if (!bounds) {
+        return {
+          sw: { lat: 0, lng: 0 },
+          ne: { lat: 0, lng: 0 }
+        };
+      }
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+      return {
+        sw: { lat: sw.lat(), lng: sw.lng() },
+        ne: { lat: ne.lat(), lng: ne.lng() }
+      };
+    }
+    project(lngLat) {
+      var _a;
+      if (!this.overlayView) {
+        return { x: 0, y: 0 };
+      }
+      const projection = this.overlayView.getProjection();
+      if (!projection) {
+        return { x: 0, y: 0 };
+      }
+      const googleMaps = (_a = globalThis.google) == null ? void 0 : _a.maps;
+      if (!googleMaps) {
+        return { x: 0, y: 0 };
+      }
+      const latLng = new googleMaps.LatLng(lngLat[1], lngLat[0]);
+      const point = projection.fromLatLngToContainerPixel(latLng);
+      if (!point) {
+        return { x: 0, y: 0 };
+      }
+      return {
+        x: point.x,
+        y: point.y
+      };
+    }
+    on(event, handler) {
+      this.map.addListener(event, handler);
+    }
+    off(event, handler) {
+      var _a;
+      const googleMaps = (_a = globalThis.google) == null ? void 0 : _a.maps;
+      if (googleMaps == null ? void 0 : googleMaps.event) {
+        googleMaps.event.clearListeners(this.map, event);
+      }
+    }
+    resize() {
+      var _a;
+      const googleMaps = (_a = globalThis.google) == null ? void 0 : _a.maps;
+      if (googleMaps == null ? void 0 : googleMaps.event) {
+        googleMaps.event.trigger(this.map, "resize");
+      }
+    }
+    remove() {
+      this.cleanup();
+      if (this.overlayView) {
+        this.overlayView.setMap(null);
+        this.overlayView = null;
+      }
+    }
+  };
+
+  // src/adapters/mapbox/index.ts
+  var MapboxAdapter = class extends BaseMapGLAdapter {
+    constructor(map) {
+      super(map, ({ mapInstance, namespace, onMarkerClick }) => {
+        return new MapboxMarkerManager({
+          mapInstance,
+          mapboxgl: namespace,
+          onMarkerClick
+        });
+      });
+    }
+    getNamespace(options) {
+      return options.mapboxgl;
+    }
+  };
+
+  // src/utils/clustering.ts
+  function extractViewState(mapInstance) {
+    const center = mapInstance.getCenter();
+    return {
+      longitude: center.lng,
+      latitude: center.lat,
+      zoom: mapInstance.getZoom(),
+      bearing: mapInstance.getBearing(),
+      pitch: mapInstance.getPitch()
+    };
+  }
+  var COLLISION_THRESHOLD_PX_ZOOM_BREAKPOINTS = [
+    { zoom: 6, threshold: 120 },
+    { zoom: 8, threshold: 108 },
+    { zoom: 10, threshold: 92 },
+    { zoom: 12, threshold: 80 },
+    { zoom: 14, threshold: 68 },
+    { zoom: 16, threshold: 56 }
+  ];
+  function resolveCollisionThreshold(zoom) {
+    for (const breakpoint of COLLISION_THRESHOLD_PX_ZOOM_BREAKPOINTS) {
+      if (zoom <= breakpoint.zoom) {
+        return breakpoint.threshold;
+      }
+    }
+    return 48;
+  }
+  function clusterMarkers({
+    primaryType,
+    markers,
+    map,
+    selectedMarkerId,
+    zoom,
+    collisionThresholdPx,
+    dotCollisionThresholdPx
+  }) {
+    if (!markers.length) return [];
+    if (!map) {
+      return markers.map((marker) => createSimplePrimaryClusterItem(marker));
+    }
+    const projected = markers.map((marker, index) => {
+      const location = marker.location;
+      if (typeof (location == null ? void 0 : location.lon) !== "number" || typeof (location == null ? void 0 : location.lat) !== "number") {
+        return null;
+      }
+      const { x, y } = map.project([location.lon, location.lat]);
+      return { marker, x, y };
+    }).filter((value) => Boolean(value)).map((value, index) => ({ ...value, index }));
+    if (!projected.length) {
+      return [];
+    }
+    const threshold = resolveCollisionThreshold(zoom);
+    const dotThreshold = resolveDotCollisionThreshold(zoom);
+    const parent = projected.map((_, idx) => idx);
+    const find = (i) => {
+      if (parent[i] === i) return i;
+      parent[i] = find(parent[i]);
+      return parent[i];
+    };
+    const union = (a, b) => {
+      const rootA = find(a);
+      const rootB = find(b);
+      if (rootA === rootB) return;
+      parent[rootB] = rootA;
+    };
+    for (let i = 0; i < projected.length; i += 1) {
+      for (let j = i + 1; j < projected.length; j += 1) {
+        const dx = projected[i].x - projected[j].x;
+        const dy = projected[i].y - projected[j].y;
+        if (Math.hypot(dx, dy) <= threshold) {
+          union(i, j);
+        }
+      }
+    }
+    const groups = /* @__PURE__ */ new Map();
+    for (const item of projected) {
+      const root = find(item.index);
+      const group = groups.get(root);
+      if (group) {
+        group.push(item);
+      } else {
+        groups.set(root, [item]);
+      }
+    }
+    const clustered = [];
+    groups.forEach((groupItems) => {
+      if (groupItems.length === 1) {
+        const [{ marker }] = groupItems;
+        clustered.push(
+          createPrimaryClusterItem(marker, primaryType, selectedMarkerId)
+        );
+        return;
+      }
+      const sorted = [...groupItems].sort(
+        (a, b) => compareMarkers(b.marker, a.marker, primaryType)
+      );
+      const [primary, ...rest] = sorted;
+      clustered.push(
+        createPrimaryClusterItem(primary.marker, primaryType, selectedMarkerId)
+      );
+      if (!rest.length) return;
+      const dotCandidates = [];
+      const remainder = [];
+      rest.forEach((item) => {
+        if (selectedMarkerId && item.marker.tripadvisor_id === selectedMarkerId) {
+          clustered.push(createPrimaryClusterItem(item.marker, primaryType, true));
+          return;
+        }
+        if (distancePx(primary, item) <= dotThreshold) {
+          dotCandidates.push(item);
+        } else {
+          remainder.push(item);
+        }
+      });
+      dotCandidates.forEach((item) => {
+        clustered.push(createDotClusterItem(item.marker, primaryType, primary));
+      });
+      if (remainder.length) {
+        const followUp = clusterMarkers({
+          markers: remainder.map((item) => item.marker),
+          map,
+          selectedMarkerId,
+          zoom,
+          primaryType,
+          collisionThresholdPx,
+          dotCollisionThresholdPx
+        });
+        clustered.push(...followUp);
+      }
+    });
+    return clustered;
+  }
+  function createSimplePrimaryClusterItem(marker) {
+    return {
+      kind: "primary",
+      marker,
+      key: `primary-${marker.tripadvisor_id}`
+    };
+  }
+  function createPrimaryClusterItem(marker, primaryType, selected) {
+    const isPrimary = marker.type === primaryType;
+    const isSelected = typeof selected === "boolean" ? selected : selected === marker.tripadvisor_id;
+    return {
+      kind: "primary",
+      marker,
+      key: buildClusterKey("primary", marker, isPrimary, isSelected)
+    };
+  }
+  function createDotClusterItem(marker, primaryType, parent) {
+    const isPrimary = marker.type === primaryType;
+    return {
+      kind: "dot",
+      marker,
+      key: buildClusterKey("dot", marker, isPrimary, false),
+      parentId: parent.marker.tripadvisor_id
+    };
+  }
+  function buildClusterKey(kind, marker, isPrimary, isSelected) {
+    var _a;
+    return `${kind}-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${isSelected ? 1 : 0}-${(_a = marker.pricing) == null ? void 0 : _a.availability}`;
+  }
+  function distancePx(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+  function resolveDotCollisionThreshold(zoom) {
+    const base = resolveCollisionThreshold(zoom);
+    return Math.max(48, base);
+  }
+  function compareMarkers(a, b, primaryType) {
+    var _a, _b;
+    const aIsPrimary = a.type === primaryType;
+    const bIsPrimary = b.type === primaryType;
+    if (aIsPrimary && !bIsPrimary) return 1;
+    if (!aIsPrimary && bIsPrimary) return -1;
+    const ratingDiff = resolveRating(a) - resolveRating(b);
+    if (ratingDiff !== 0) return ratingDiff;
+    const priceDiff = resolvePrice(a) - resolvePrice(b);
+    if (priceDiff !== 0) return priceDiff;
+    const reviewsDiff = ((_a = a.reviews) != null ? _a : 0) - ((_b = b.reviews) != null ? _b : 0);
+    if (reviewsDiff !== 0) return reviewsDiff;
+    return a.tripadvisor_id - b.tripadvisor_id;
+  }
+  function resolveRating(marker) {
+    if (typeof marker.rating === "number") return marker.rating;
+    if (marker.rating === void 0 || marker.rating === null) return -Infinity;
+    const parsed = Number(marker.rating);
+    return Number.isNaN(parsed) ? -Infinity : parsed;
+  }
+  function resolvePrice(marker) {
+    var _a, _b, _c;
+    if (!((_b = (_a = marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.price)) return -Infinity;
+    const numeric = Number(
+      ((_c = marker.pricing.offer.displayPrice) != null ? _c : "0").replace(/[^0-9.,-]+/g, "").replace(/,/g, "")
+    );
+    return Number.isNaN(numeric) ? -Infinity : numeric;
+  }
+
+  // src/utils/filters.ts
+  function processApiFilters(apiFilters) {
+    const filters = [];
+    const addBasicFilters = (values, type, prefix) => {
+      if (!values || !Array.isArray(values)) return;
+      values.forEach((value) => {
+        filters.push({
+          id: `${prefix}-${value}`,
+          label: value,
+          type,
+          value
+        });
+      });
+    };
+    addBasicFilters(apiFilters.amenities, "amenity", "amenity");
+    addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
+    if (apiFilters.price) {
+      filters.push({
+        id: "priceRange",
+        label: "Price Range",
+        type: "priceRange",
+        value: `${apiFilters.price.min}-${apiFilters.price.max}`,
+        priceRange: apiFilters.price
+      });
+    }
+    if (typeof apiFilters.minRating === "number" && Number.isFinite(apiFilters.minRating)) {
+      filters.push({
+        id: "minRating",
+        label: `${apiFilters.minRating}+`,
+        type: "minRating",
+        value: String(apiFilters.minRating),
+        numericValue: apiFilters.minRating
+      });
+    }
+    if (typeof apiFilters.starRating === "number" && Number.isFinite(apiFilters.starRating)) {
+      filters.push({
+        id: "starRating",
+        label: `${apiFilters.starRating} Stars`,
+        type: "starRating",
+        value: String(apiFilters.starRating),
+        numericValue: apiFilters.starRating
+      });
+    }
+    if (apiFilters.transformed_query) {
+      filters.push({
+        id: "transformed_query",
+        label: apiFilters.transformed_query,
+        type: "transformed_query",
+        value: apiFilters.transformed_query
+      });
+    }
+    if (apiFilters.selected_restaurant_price_levels) {
+      const joinedPriceLevels = apiFilters.selected_restaurant_price_levels.join(
+        ", "
+      );
+      filters.push({
+        id: "selected_restaurant_price_levels",
+        label: joinedPriceLevels,
+        type: "selected_restaurant_price_levels",
+        value: joinedPriceLevels,
+        priceLevels: apiFilters.selected_restaurant_price_levels
+      });
+    }
+    return filters;
+  }
+  function convertToApiFilters(filters) {
+    return filters.map((filter) => {
+      const apiFilter = {
+        id: filter.id,
+        label: typeof filter.label === "string" ? filter.label : String(filter.label || ""),
+        type: filter.type,
+        value: filter.value
+      };
+      if (filter.numericValue !== void 0) {
+        apiFilter.numericValue = filter.numericValue;
+      }
+      if (filter.priceRange) {
+        const min = filter.priceRange.min;
+        const max = filter.priceRange.max;
+        if (min !== void 0) {
+          apiFilter.priceRange = {
+            min,
+            ...max !== void 0 && { max }
+          };
+        }
+      }
+      if (filter.priceLevels) {
+        apiFilter.priceLevels = filter.priceLevels;
+      }
+      return apiFilter;
+    });
+  }
+
+  // src/index.ts
+  var API_URLS = {
+    prod: "https://api.mapfirst.ai",
+    test: "https://api.mapfirst.ai/test"
+  };
+  var API_DISABLED_ERROR_MESSAGE = "API usage is disabled";
+  var USE_API_FALSE_PLATFORM_ERROR = "When useApi is false, only maplibre platform is supported. Google Maps and Mapbox require API usage.";
+  var USE_API_FALSE_PLATFORM_WARNING = "When useApi is false, only maplibre platform is supported. Please switch to maplibre.";
+  function getDocumentReferrer() {
+    try {
+      return document.referrer || void 0;
+    } catch (error) {
+      console.error(error);
+      return void 0;
+    }
+  }
+  function createSdkHeaders(apiKey, referrer) {
+    return {
+      "Content-Type": "application/json",
+      "X-Source": "SDK",
+      ...apiKey && { "X-API-Key": apiKey },
+      ...referrer && { "X-Referer": referrer }
+    };
+  }
+  var PropertiesFetchError = class extends Error {
+    constructor({
+      message,
+      status,
+      code
+    }) {
+      super(message);
+      this.name = "PropertiesFetchError";
+      this.status = status;
+      this.code = code;
+    }
+  };
+  async function fetchImages(tripadvisorId, limit = 1) {
+    try {
+      const response = await fetch(
+        `https://l4detuz832.execute-api.us-east-1.amazonaws.com/dev/photo?id=${tripadvisorId}&limit=${limit}`
+      );
+      if (!response.ok) {
+        return null;
+      }
+      const data = await response.json();
+      if (data.photos && data.photos.length > 0) {
+        const imageUrl = data.photos[0]["FullSizeURL"].url;
+        const imageResponse = await fetch(imageUrl);
+        if (imageResponse.ok) {
+          return imageUrl;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.debug("Failed to fetch images:", error);
+      return null;
+    }
+  }
+  async function fetchProperties(url, body, apiKey, { signal } = {}) {
+    var _a, _b;
+    const referrer = getDocumentReferrer();
+    const response = await fetch(url, {
+      method: "POST",
+      headers: createSdkHeaders(apiKey, referrer),
+      body: JSON.stringify(body),
+      signal
+    });
+    if (!response.ok) {
+      let message = `Unexpected response: ${response.status}`;
+      let code;
+      try {
+        const errorBody = await response.json();
+        message = (_b = (_a = errorBody.detail) != null ? _a : errorBody.error) != null ? _b : message;
+        code = errorBody.code;
+      } catch {
+      }
+      throw new PropertiesFetchError({ message, status: response.status, code });
+    }
+    return await response.json();
+  }
+  function toISO(date) {
+    if (typeof date === "string") return date;
+    return date.toISOString().slice(0, 10);
+  }
+  var DEFAULT_PRIMARY_TYPE = "Accommodation";
+  function getDefaultDates() {
+    const dayMs = 24 * 60 * 60 * 1e3;
+    const base = new Date(Date.now() + 10 * dayMs);
+    const daysUntilSaturday = (6 - base.getDay() + 7) % 7;
+    const checkIn = new Date(base.getTime() + daysUntilSaturday * dayMs);
+    const startDay = checkIn.getDay();
+    const daysUntilWeekend = startDay === 0 ? 6 : 6 - startDay;
+    const checkOut = new Date(checkIn.getTime() + (daysUntilWeekend + 1) * dayMs);
+    return { checkIn, checkOut };
+  }
+  var MapFirstCore = class {
+    constructor(options) {
+      this.options = options;
+      this.adapter = null;
+      this.properties = [];
+      this.selectedMarkerId = null;
+      this.destroyed = false;
+      this.clusterItems = [];
+      this.isMapAttached = false;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u;
+      this.properties = [...(_a = options.properties) != null ? _a : []];
+      this.primaryType = options.primaryType;
+      this.selectedMarkerId = (_b = options.selectedMarkerId) != null ? _b : null;
+      this.useApi = (_c = options.useApi) != null ? _c : true;
+      this.environment = (_d = options.environment) != null ? _d : "prod";
+      this.apiUrl = (_e = options.apiUrl) != null ? _e : API_URLS[this.environment];
+      this.apiKey = options.apiKey;
+      this.requestBody = options.requestBody;
+      this.currentPlatform = options.platform;
+      this.assertPlatformSupportForNoApi(options.platform, "throw");
+      const isGoogleMaps = isGoogleMapsOptions(options);
+      this.fitBoundsPadding = {
+        top: (_g = (_f = options.fitBoundsPadding) == null ? void 0 : _f.top) != null ? _g : isGoogleMaps ? 0 : 50,
+        bottom: (_i = (_h = options.fitBoundsPadding) == null ? void 0 : _h.bottom) != null ? _i : isGoogleMaps ? 0 : 160,
+        left: (_k = (_j = options.fitBoundsPadding) == null ? void 0 : _j.left) != null ? _k : isGoogleMaps ? 0 : 50,
+        right: (_m = (_l = options.fitBoundsPadding) == null ? void 0 : _l.right) != null ? _m : isGoogleMaps ? 0 : 50
+      };
+      const defaultDates = getDefaultDates();
+      this.state = {
+        center: ((_n = options.initialLocationData) == null ? void 0 : _n.latitude) && options.initialLocationData.longitude ? [
+          options.initialLocationData.latitude,
+          options.initialLocationData.longitude
+        ] : [0, 0],
+        zoom: (_p = (_o = options.initialLocationData) == null ? void 0 : _o.zoom) != null ? _p : 0,
+        bounds: (_r = (_q = options.initialLocationData) == null ? void 0 : _q.bounds) != null ? _r : null,
+        pendingBounds: null,
+        tempBounds: null,
+        properties: this.properties,
+        primary: (_s = this.primaryType) != null ? _s : DEFAULT_PRIMARY_TYPE,
+        selectedPropertyId: this.selectedMarkerId,
+        initialLoading: true,
+        isSearching: false,
+        firstCallDone: false,
+        filters: {
+          checkIn: defaultDates.checkIn,
+          checkOut: defaultDates.checkOut,
+          numAdults: 2,
+          numRooms: 1,
+          ...((_t = options.initialLocationData) == null ? void 0 : _t.currency) && {
+            currency: options.initialLocationData.currency
+          }
+        },
+        activeLocation: {
+          country: "",
+          location_id: null,
+          locationName: "",
+          coordinates: [0, 0]
+        },
+        isFlyToAnimating: false,
+        ...options.state
+      };
+      this.callbacks = (_u = options.callbacks) != null ? _u : {};
+      if (this.hasMapInstance(options)) {
+        this.adapter = this.createAdapter(options);
+        this.isMapAttached = true;
+        this.refresh();
+      }
+      if (options.initialLocationData) {
+        this.initializeFromLocationData(options.initialLocationData);
+      } else if (this.requestBody && this.isMapAttached) {
+        this.autoLoadProperties();
+      }
+    }
+    hasMapInstance(options) {
+      if ("adapter" in options && options.adapter) return true;
+      if ("mapInstance" in options && options.mapInstance) return true;
+      return false;
+    }
+    assertPlatformSupportForNoApi(platform, mode) {
+      if (this.useApi || !platform || platform === "maplibre") {
+        return;
+      }
+      if (mode === "throw") {
+        throw new Error(USE_API_FALSE_PLATFORM_ERROR);
+      }
+      console.warn(USE_API_FALSE_PLATFORM_WARNING);
+    }
+    ensureApiEnabled(method, onError) {
+      if (this.useApi) return true;
+      console.warn(`${method} requires API usage. Set useApi to true.`);
+      onError == null ? void 0 : onError(new Error(API_DISABLED_ERROR_MESSAGE));
+      return false;
+    }
+    async initializeFromLocationData(locationData) {
+      var _a;
+      if (!this.ensureApiEnabled("initializeFromLocationData")) {
+        return;
+      }
+      try {
+        const {
+          city,
+          state,
+          country,
+          query,
+          latitude,
+          longitude,
+          radius,
+          bounds
+        } = locationData;
+        const requestBody = {
+          filters: this.getFilters(),
+          initial: true,
+          query,
+          latitude,
+          longitude,
+          radius,
+          bounds
+        };
+        const location = [city, state].filter(Boolean).join(", ");
+        if (country || location) {
+          const geoResponse = await fetch(
+            `${this.apiUrl}/geo-lookup2?${new URLSearchParams({
+              ...country && { country_code: country },
+              ...location && { q: location }
+            }).toString()}`,
+            {
+              headers: {
+                ...this.apiKey && {
+                  "X-API-Key": this.apiKey
+                }
+              }
+            }
+          );
+          if (geoResponse.ok) {
+            const place = await geoResponse.json();
+            requestBody.city = !["country", "island", "state"].includes(
+              place.type
+            ) ? place.name : void 0;
+            requestBody.state = place.type === "state" ? place.name : !["country", "island", "county"].includes(place.type) ? place.state : void 0;
+            requestBody.country = ["country", "island"].includes(place.type) ? place.name : place.country;
+            requestBody.location_id = place.id;
+            requestBody.latitude = place.lat;
+            requestBody.longitude = place.lon;
+            this.setActiveLocation({
+              city,
+              state,
+              country,
+              location_id: (_a = place.id) != null ? _a : null,
+              locationName: [city, state, country].filter(Boolean).join(", "),
+              ...place.lon && place.lat && { coordinates: [place.lat, place.lon] }
+            });
+            if (place.lon && place.lat) {
+              this.setState({
+                center: [place.lat, place.lon],
+                zoom: city ? 12 : state ? 8 : 5
+              });
+            }
+          } else {
+            this.handleError(
+              new Error(`Geo mapping fetch failed: ${geoResponse.statusText}`),
+              "initializeFromLocationData"
+            );
+          }
+        }
+        this.requestBody = requestBody;
+        if (this.isMapAttached) {
+          await this.autoLoadProperties();
+        }
+      } catch (error) {
+        this.handleError(error, "initializeFromLocationData");
+      }
+    }
+    async autoLoadProperties() {
+      if (!this.ensureApiEnabled("autoLoadProperties")) {
+        return;
+      }
+      if (!this.requestBody) return;
+      const defaultRequestBody = {
+        filters: this.getFilters(),
+        initial: true,
+        ...this.requestBody
+      };
+      await this.runPropertiesSearch({
+        body: defaultRequestBody,
+        onError: (error) => {
+          var _a, _b;
+          this.handleError(error, "autoLoadProperties");
+          (_b = (_a = this.callbacks).onPropertiesLoadError) == null ? void 0 : _b.call(_a, error);
+        }
+      });
+    }
+    attachMap(mapInstance, config) {
+      this.assertPlatformSupportForNoApi(config.platform, "throw");
+      if (this.isMapAttached) {
+        console.warn("Map is already attached. Destroying previous adapter.");
+        if (this.adapter) {
+          const markerManager = this.adapter.getMarkerManager();
+          markerManager == null ? void 0 : markerManager.destroy();
+          this.adapter.cleanup();
+        }
+      }
+      const adapterConfig = {
+        ...this.options,
+        platform: config.platform,
+        mapInstance,
+        maplibregl: config.maplibregl,
+        google: config.google,
+        mapboxgl: config.mapboxgl,
+        onMarkerClick: config.onMarkerClick
+      };
+      this.currentPlatform = config.platform;
+      this.adapter = this.createAdapter(adapterConfig);
+      this.isMapAttached = true;
+      this.refresh();
+      if (this.requestBody && !this.state.firstCallDone) {
+        this.autoLoadProperties();
+      }
+    }
+    createAdapter(options) {
+      if (isMapLibreOptions(options) && options.mapInstance) {
+        return this.initializeAdapter(new MapLibreAdapter(options.mapInstance), {
+          maplibregl: options.maplibregl,
+          onMarkerClick: options.onMarkerClick
+        });
+      }
+      if (isGoogleMapsOptions(options) && options.mapInstance) {
+        return this.initializeAdapter(
+          new GoogleMapsAdapter(options.mapInstance),
+          { google: options.google, onMarkerClick: options.onMarkerClick }
+        );
+      }
+      if (isMapboxOptions(options) && options.mapInstance) {
+        return this.initializeAdapter(new MapboxAdapter(options.mapInstance), {
+          mapboxgl: options.mapboxgl,
+          onMarkerClick: options.onMarkerClick
+        });
+      }
+      if ("adapter" in options && options.adapter) {
+        return options.adapter;
+      }
+      return null;
+    }
+    initializeAdapter(adapter, config) {
+      adapter.initialize({
+        ...config,
+        onMarkerClick: (marker) => {
+          var _a;
+          if (marker.location) {
+            this.flyMapTo(marker.location.lon, marker.location.lat, 14);
+          }
+          if (marker.type !== this.primaryType) {
+            this.setPrimaryType(marker.type);
+          }
+          this.setSelectedMarker(
+            marker.tripadvisor_id === this.selectedMarkerId ? null : marker.tripadvisor_id
+          );
+          (_a = config.onMarkerClick) == null ? void 0 : _a.call(config, marker);
+        },
+        onRefresh: () => this.refresh(),
+        onMapMoveEnd: (bounds) => {
+          if (this.state.tempBounds === null) {
+            this.setTempBounds(bounds);
+            this.setPendingBounds(null);
+          } else {
+            this.handleMapMoveEnd(bounds);
+          }
+        }
+      });
+      if (this.useApi) {
+        adapter.setupImpressionTracking(() => {
+        });
+      }
+      return adapter;
+    }
+    _setProperties(properties) {
+      var _a, _b;
+      this.ensureAlive();
+      this.properties = [
+        ...properties.filter(
+          (x) => {
+            var _a2, _b2, _c, _d, _e, _f;
+            return !!x.location && (x.type !== "Accommodation" || ((_b2 = (_a2 = x.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" || ((_d = (_c = x.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.availability) === "pending" || ((_f = (_e = x.pricing) == null ? void 0 : _e.offer) == null ? void 0 : _f.displayPrice));
+          }
+        )
+      ];
+      this.updateState({
+        properties: this.properties
+      });
+      (_b = (_a = this.callbacks).onPropertiesChange) == null ? void 0 : _b.call(_a, properties);
+      this.refresh();
+    }
+    addProperty(property) {
+      var _a, _b;
+      this.ensureAlive();
+      this.properties = [...this.properties, property];
+      this.updateState({ properties: this.properties });
+      (_b = (_a = this.callbacks).onPropertiesChange) == null ? void 0 : _b.call(_a, this.properties);
+      this.refresh();
+    }
+    clearProperties() {
+      var _a, _b;
+      this.ensureAlive();
+      this.properties = [];
+      this.updateState({ properties: [] });
+      (_b = (_a = this.callbacks).onPropertiesChange) == null ? void 0 : _b.call(_a, []);
+      this.refresh();
+    }
+    setPrimaryType(primary) {
+      var _a, _b;
+      this.ensureAlive();
+      if (this.primaryType === primary) return;
+      this.primaryType = primary;
+      this.updateState({ primary });
+      (_b = (_a = this.callbacks).onPrimaryTypeChange) == null ? void 0 : _b.call(_a, primary);
+      this.refresh();
+    }
+    setSelectedMarker(markerId) {
+      var _a, _b;
+      this.ensureAlive();
+      if (this.selectedMarkerId === markerId) return;
+      if (markerId !== null) {
+        const marker = this.properties.find((p) => p.tripadvisor_id === markerId);
+        if (marker && marker.type !== this.primaryType) {
+          this.setPrimaryType(marker.type);
+        }
+      }
+      this.selectedMarkerId = markerId;
+      this.updateState({ selectedPropertyId: markerId });
+      (_b = (_a = this.callbacks).onSelectedPropertyChange) == null ? void 0 : _b.call(_a, markerId);
+      this.refresh();
+    }
+    // State management methods
+    getState() {
+      return { ...this.state };
+    }
+    // Centralized error handler
+    handleError(error, context = "MapFirstCore") {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorObj = error instanceof Error ? error : new Error(errorMessage);
+      console.error(`[${context}]`, errorMessage);
+      if (this.callbacks.onError) {
+        this.callbacks.onError(errorObj, context);
+      }
+    }
+    updateState(update) {
+      this.state = { ...this.state, ...update };
+    }
+    setState(newState) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+      const prevState = { ...this.state };
+      this.updateState(newState);
+      if (newState.center !== void 0 && newState.center !== prevState.center) {
+        (_b = (_a = this.callbacks).onCenterChange) == null ? void 0 : _b.call(_a, newState.center, this.state.zoom);
+      }
+      if (newState.zoom !== void 0 && newState.zoom !== prevState.zoom) {
+        (_d = (_c = this.callbacks).onZoomChange) == null ? void 0 : _d.call(_c, newState.zoom);
+      }
+      if (newState.bounds !== void 0 && newState.bounds !== prevState.bounds) {
+        (_f = (_e = this.callbacks).onBoundsChange) == null ? void 0 : _f.call(_e, newState.bounds);
+      }
+      if (newState.pendingBounds !== void 0 && newState.pendingBounds !== prevState.pendingBounds) {
+        (_h = (_g = this.callbacks).onPendingBoundsChange) == null ? void 0 : _h.call(_g, newState.pendingBounds);
+      }
+      if (newState.filters !== void 0 && newState.filters !== prevState.filters) {
+        (_j = (_i = this.callbacks).onFiltersChange) == null ? void 0 : _j.call(_i, newState.filters);
+      }
+      if (newState.activeLocation !== void 0 && newState.activeLocation !== prevState.activeLocation) {
+        (_l = (_k = this.callbacks).onActiveLocationChange) == null ? void 0 : _l.call(_k, newState.activeLocation);
+      }
+      if (newState.initialLoading !== void 0 && newState.initialLoading !== prevState.initialLoading) {
+        (_n = (_m = this.callbacks).onLoadingStateChange) == null ? void 0 : _n.call(_m, newState.initialLoading);
+      }
+      if (newState.isSearching !== void 0 && newState.isSearching !== prevState.isSearching) {
+        (_p = (_o = this.callbacks).onSearchingStateChange) == null ? void 0 : _p.call(_o, newState.isSearching);
+      }
+    }
+    setFilters(filters) {
+      this.setState({ filters });
+    }
+    setActiveLocation(location) {
+      this.setState({ activeLocation: location });
+    }
+    setBounds(bounds) {
+      this.setState({ bounds });
+    }
+    setPendingBounds(bounds) {
+      this.setState({ pendingBounds: bounds });
+    }
+    setTempBounds(bounds) {
+      this.setState({ tempBounds: bounds });
+    }
+    setLoading(loading) {
+      this.setState({ initialLoading: loading });
+    }
+    setSearching(searching) {
+      this.setState({ isSearching: searching });
+    }
+    setFlyToAnimating(animating) {
+      this.setState({ isFlyToAnimating: animating });
+    }
+    handleMapMoveEnd(bounds) {
+      if (this.state.isFlyToAnimating) {
+        this.setState({
+          isFlyToAnimating: false,
+          tempBounds: bounds,
+          pendingBounds: null
+        });
+        return;
+      }
+      const tempBounds = this.state.tempBounds;
+      if (!tempBounds) {
+        this.setState({
+          tempBounds: bounds,
+          pendingBounds: bounds
+        });
+        return;
+      }
+      const delta = 0.01;
+      const hasChanged = Math.abs(bounds.sw.lat - tempBounds.sw.lat) > delta || Math.abs(bounds.sw.lng - tempBounds.sw.lng) > delta || Math.abs(bounds.ne.lat - tempBounds.ne.lat) > delta || Math.abs(bounds.ne.lng - tempBounds.ne.lng) > delta;
+      if (hasChanged) {
+        this.setState({ pendingBounds: bounds });
+      } else {
+        this.setState({ pendingBounds: null });
+      }
+    }
+    flyMapTo(longitude, latitude, zoom, animation = true) {
+      this.ensureAlive();
+      this.setState({ center: [latitude, longitude] });
+      if (typeof zoom === "number") {
+        this.setState({ zoom });
+      }
+      if (!this.adapter) return;
+      const mapInstance = this.adapter.getMap();
+      if (!mapInstance) return;
+      if (this.currentPlatform === "google") {
+        this.setFlyToAnimating(false);
+        mapInstance.setCenter({ lat: latitude, lng: longitude });
+        if (zoom !== null && typeof zoom === "number") {
+          mapInstance.setZoom(zoom != null ? zoom : 13);
+        }
+        return;
+      }
+      if (animation === false) {
+        this.setFlyToAnimating(false);
+        if (mapInstance.jumpTo) {
+          mapInstance.jumpTo({
+            center: [longitude, latitude],
+            ...zoom !== null && { zoom: zoom != null ? zoom : 13 }
+          });
+        }
+        return;
+      }
+      this.setFlyToAnimating(true);
+      if (mapInstance.flyTo) {
+        mapInstance.flyTo({
+          center: [longitude, latitude],
+          ...zoom !== null && { zoom: zoom != null ? zoom : 13 }
+        });
+      }
+    }
+    extractPoiPoints(properties, type) {
+      return properties.filter(
+        (property) => property.location !== void 0 && (type !== void 0 ? property.type === type : true)
+      ).map((property) => ({
+        lat: property.location.lat,
+        lng: property.location.lon
+      }));
+    }
+    flyToPOIs(pois, type, animate = true) {
+      var _a, _b;
+      this.ensureAlive();
+      if (!this.adapter) return;
+      const mapInstance = this.adapter.getMap();
+      if (!mapInstance) return;
+      let points = pois;
+      if (!points || points.length === 0) {
+        points = this.extractPoiPoints(this.properties, type);
+      }
+      if (!points || points.length === 0) return;
+      if (points.length === 1) {
+        const poi = points[0];
+        if (this.currentPlatform === "google") {
+          mapInstance.setCenter({ lat: poi.lat, lng: poi.lng });
+          mapInstance.setZoom(13);
+        } else if (mapInstance.flyTo) {
+          mapInstance.flyTo({
+            center: [poi.lng, poi.lat],
+            zoom: 13
+          });
+        }
+      } else {
+        if (this.currentPlatform === "google") {
+          const LatLngBounds = (_b = (_a = window.google) == null ? void 0 : _a.maps) == null ? void 0 : _b.LatLngBounds;
+          if (LatLngBounds) {
+            const bounds = new LatLngBounds();
+            points.forEach((poi) => {
+              bounds.extend({ lat: poi.lat, lng: poi.lng });
+            });
+            if (animate) {
+              this.setFlyToAnimating(true);
+            }
+            mapInstance.fitBounds(bounds, this.fitBoundsPadding);
+          }
+        } else if (mapInstance.fitBounds) {
+          const bounds = [
+            [points[0].lng, points[0].lat],
+            [points[0].lng, points[0].lat]
+          ];
+          points.forEach((poi) => {
+            bounds[0][0] = Math.min(bounds[0][0], poi.lng);
+            bounds[0][1] = Math.min(bounds[0][1], poi.lat);
+            bounds[1][0] = Math.max(bounds[1][0], poi.lng);
+            bounds[1][1] = Math.max(bounds[1][1], poi.lat);
+          });
+          if (animate) {
+            this.setFlyToAnimating(true);
+          }
+          mapInstance.fitBounds(bounds, {
+            padding: this.fitBoundsPadding,
+            animate
+          });
+        }
+      }
+    }
+    getFilters() {
+      const filters = { ...this.state.filters };
+      if (filters.checkIn instanceof Date) {
+        filters.checkIn = toISO(filters.checkIn);
+      }
+      if (filters.checkOut instanceof Date) {
+        filters.checkOut = toISO(filters.checkOut);
+      }
+      return filters;
+    }
+    async pollForPricing({
+      pollingLink,
+      maxAttempts = 15,
+      delayMs = 2e3,
+      isCancelled,
+      price,
+      limit
+    }) {
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+      this.ensureAlive();
+      if (!this.ensureApiEnabled("pollForPricing")) {
+        return { completed: false };
+      }
+      if (!pollingLink) {
+        return { completed: false };
+      }
+      let completed = false;
+      let pollData = void 0;
+      const filters = this.getFilters();
+      if (limit) {
+        filters.limit = limit;
+      }
+      const body = {
+        filters,
+        pollingLink
+      };
+      const referrer = getDocumentReferrer();
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        if (isCancelled == null ? void 0 : isCancelled()) {
+          return { completed, pollData };
+        }
+        try {
+          const pollResp = await fetch(
+            `${this.apiUrl}/ta-polling?pollingNumber=${attempt}`,
+            {
+              method: "POST",
+              body: JSON.stringify(body),
+              headers: createSdkHeaders(this.apiKey, referrer)
+            }
+          );
+          if (!pollResp.ok) {
+            throw new PropertiesFetchError({
+              message: `Poll failed: ${pollResp.status}`,
+              status: pollResp.status
+            });
+          }
+          pollData = await pollResp.json();
+          if (isCancelled == null ? void 0 : isCancelled()) {
+            return { completed, pollData };
+          }
+          const results = (_b = (_a = pollData == null ? void 0 : pollData.success) == null ? void 0 : _a.results) != null ? _b : [];
+          const unsupportedIds = new Set(
+            (_e = (_d = (_c = pollData == null ? void 0 : pollData.success) == null ? void 0 : _c.invalidHotelIds) == null ? void 0 : _d.map(Number)) != null ? _e : []
+          );
+          const unsupportedIds2 = new Set(
+            (_h = (_g = (_f = pollData == null ? void 0 : pollData.success) == null ? void 0 : _f.unsupportedHotelIds) == null ? void 0 : _g.map(Number)) != null ? _h : []
+          );
+          if (results.length > 0 || unsupportedIds.size > 0) {
+            this.setProperties((prev) => {
+              var _a2;
+              const updatedProperties = prev.filter(
+                (property) => !unsupportedIds.has(property.tripadvisor_id) && !unsupportedIds2.has(property.tripadvisor_id)
+              );
+              results.forEach((property) => {
+                var _a3, _b2, _c2, _d2, _e2, _f2;
+                if (!property.location) return;
+                if (((_b2 = (_a3 = property.pricing) == null ? void 0 : _a3.offer) == null ? void 0 : _b2.price) && price && (((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.price) < (price == null ? void 0 : price.min) || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.price) > (price == null ? void 0 : price.max))) {
+                  property.pricing.availability = "unavailable";
+                }
+                const existingIndex = updatedProperties.findIndex(
+                  (h) => h.tripadvisor_id === property.tripadvisor_id
+                );
+                if (existingIndex >= 0) {
+                  updatedProperties[existingIndex] = property;
+                } else {
+                  updatedProperties.push(property);
+                }
+              });
+              if ((_a2 = pollData == null ? void 0 : pollData.success) == null ? void 0 : _a2.isComplete) {
+                return updatedProperties.filter(
+                  (property) => {
+                    var _a3, _b2, _c2, _d2, _e2, _f2;
+                    return property.type !== "Accommodation" || ((_b2 = (_a3 = property.pricing) == null ? void 0 : _a3.offer) == null ? void 0 : _b2.availability) === "available" || ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.availability) === "pending" || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.displayPrice);
+                  }
+                );
+              }
+              return updatedProperties;
+            });
+          }
+          if ((_i = pollData == null ? void 0 : pollData.success) == null ? void 0 : _i.isComplete) {
+            completed = true;
+            this.setSearching(false);
+            break;
+          }
+        } catch (error) {
+          this.handleError(error, "pollForPricing");
+          (_k = (_j = this.callbacks).onPropertiesLoadError) == null ? void 0 : _k.call(_j, error);
+          break;
+        }
+        if (attempt < maxAttempts - 1) {
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+      }
+      return { completed, pollData };
+    }
+    setProperties(updater) {
+      const updatedProperties = updater(this.properties);
+      this._setProperties(updatedProperties);
+    }
+    mostCommonTypeFromProperties(properties) {
+      const typeCounts = properties.reduce(
+        (counts, property) => {
+          counts[property.type] = (counts[property.type] || 0) + 1;
+          return counts;
+        },
+        {}
+      );
+      return Object.entries(typeCounts).reduce(
+        (a, b) => typeCounts[a[0]] > typeCounts[b[0]] ? a : b
+      )[0];
+    }
+    async runPropertiesSearch({
+      body,
+      beforeApplyProperties,
+      smartFiltersClearable,
+      onError
+    }) {
+      var _a, _b, _c, _d, _e, _f, _g;
+      this.ensureAlive();
+      if (!this.ensureApiEnabled("runPropertiesSearch", onError)) {
+        return null;
+      }
+      this.setState({ firstCallDone: false });
+      this.setSearching(true);
+      this.clearProperties();
+      try {
+        const data = await fetchProperties(
+          `${this.apiUrl}/properties`,
+          body,
+          this.apiKey
+        );
+        this.updateActiveLocationFromResponse(data);
+        let price = null;
+        let limit = 30;
+        let primary_type = data.filters.primary_type;
+        if (beforeApplyProperties) {
+          const result = beforeApplyProperties(data);
+          price = (_a = result.price) != null ? _a : null;
+          limit = (_b = result.limit) != null ? _b : 30;
+        }
+        const flown = data.properties.some((x) => !!x.location);
+        const primaryTypePoiPoints = this.extractPoiPoints(
+          data.properties,
+          data.filters.primary_type
+        );
+        const filteredProperties = price ? data.properties.map(
+          (x) => {
+            var _a2;
+            return ((_a2 = x.pricing) == null ? void 0 : _a2.offer) ? {
+              ...x,
+              pricing: {
+                ...x.pricing,
+                availability: x.pricing.offer.price && (x.pricing.offer.price < price.min || x.pricing.offer.price > price.max) ? "unavailable" : x.pricing.availability
+              }
+            } : x;
+          }
+        ) : data.properties;
+        this._setProperties(filteredProperties);
+        if (flown) {
+          this.flyToPOIs(primaryTypePoiPoints, void 0, body.initial !== true);
+        }
+        if (data.filters.primary_type && data.properties.filter(
+          (property) => {
+            var _a2, _b2, _c2, _d2, _e2, _f2;
+            return property.type === data.filters.primary_type && (property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" || ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.availability) === "pending" || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.displayPrice));
+          }
+        ).length > 0) {
+          primary_type = data.filters.primary_type;
+          this.setPrimaryType(data.filters.primary_type);
+        } else if (data.properties.length > 0) {
+          const mostCommonType = this.mostCommonTypeFromProperties(
+            data.properties
+          );
+          this.setPrimaryType(mostCommonType);
+          primary_type = mostCommonType;
+        }
+        this.setState({ firstCallDone: true });
+        if (data.isComplete === false && data.pollingLink) {
+          const { completed, pollData } = await this.pollForPricing({
+            pollingLink: data.pollingLink,
+            ...price && { price },
+            ...limit && { limit }
+          });
+          if (completed && ((_c = pollData == null ? void 0 : pollData.success) == null ? void 0 : _c.results) && pollData.success.results.filter(
+            (property) => {
+              var _a2;
+              return property.type === data.filters.primary_type && (property.type === "Accommodation" ? ((_a2 = property.pricing) == null ? void 0 : _a2.availability) !== "unavailable" : true);
+            }
+          ).length === 0 && primary_type && primary_type !== data.filters.primary_type) {
+            const mostCommonType = this.mostCommonTypeFromProperties(
+              data.properties
+            );
+            this.setPrimaryType(mostCommonType);
+          }
+          if (completed) {
+            this.refresh();
+          }
+        } else if (data.isComplete === true) {
+          this.setSearching(false);
+        }
+        if (!flown) {
+          if (((_d = data.filters.location) == null ? void 0 : _d.latitude) && ((_e = data.filters.location) == null ? void 0 : _e.longitude)) {
+            this.flyMapTo(
+              data.filters.location.longitude,
+              data.filters.location.latitude,
+              12,
+              body.initial !== true
+            );
+          }
+        }
+        return data;
+      } catch (error) {
+        this.handleError(error, "runPropertiesSearch");
+        onError == null ? void 0 : onError(error);
+        (_g = (_f = this.callbacks).onPropertiesLoadError) == null ? void 0 : _g.call(_f, error);
+        this.clearProperties();
+        this.setState({ firstCallDone: true });
+        this.setSearching(false);
+        return null;
+      }
+    }
+    async performBoundsSearch() {
+      var _a;
+      this.ensureAlive();
+      if (!this.ensureApiEnabled("performBoundsSearch")) {
+        return null;
+      }
+      if (!this.state.pendingBounds) {
+        return null;
+      }
+      const filters = this.getFilters();
+      const body = {
+        bounds: this.state.pendingBounds,
+        filters
+      };
+      const priceFilter = (_a = filters == null ? void 0 : filters.price) != null ? _a : void 0;
+      const result = await this.runPropertiesSearch({
+        body,
+        beforeApplyProperties: () => {
+          return { price: priceFilter != null ? priceFilter : null };
+        }
+      });
+      if (result) {
+        this.setBounds(this.state.pendingBounds);
+        this.setTempBounds(this.state.pendingBounds);
+        this.setPendingBounds(null);
+      }
+      return result;
+    }
+    updateActiveLocationFromResponse(data) {
+      var _a, _b, _c, _d;
+      const newLocationId = (_a = data.location_id) != null ? _a : null;
+      const newCity = (_c = (_b = data.filters.location) == null ? void 0 : _b.city) != null ? _c : void 0;
+      const newCountry = ((_d = data.filters.location) == null ? void 0 : _d.country) || "";
+      const newCoordinates = data.filters.location ? [data.filters.location.latitude, data.filters.location.longitude] : void 0;
+      if (!newCoordinates) return;
+      const currentLocation = this.state.activeLocation;
+      if (newLocationId !== (currentLocation == null ? void 0 : currentLocation.location_id) || newCity !== (currentLocation == null ? void 0 : currentLocation.city) || newCountry !== (currentLocation == null ? void 0 : currentLocation.country)) {
+        this.setActiveLocation({
+          city: newCity,
+          country: newCountry,
+          location_id: newLocationId,
+          locationName: newCity && newCountry ? `${newCity}, ${newCountry}` : newCountry || "",
+          coordinates: newCoordinates
+        });
+      }
+    }
+    async runSmartFilterSearch({
+      query,
+      filters,
+      onProcessFilters,
+      onError
+    }) {
+      this.ensureAlive();
+      if (!this.ensureApiEnabled("runSmartFilterSearch", onError)) {
+        return null;
+      }
+      let filterPayload = this.getFilters();
+      const state = this.getState();
+      if (filters && filters.length > 0) {
+        const amenities = /* @__PURE__ */ new Set();
+        const hotelStyle = /* @__PURE__ */ new Set();
+        let price;
+        let minRating;
+        let starRating;
+        let primary_type;
+        let transformed_query;
+        let selected_restaurant_price_levels;
+        filters.forEach((filter) => {
+          var _a, _b, _c;
+          switch (filter.type) {
+            case "amenity":
+              amenities.add(filter.value);
+              break;
+            case "hotelStyle":
+              hotelStyle.add(filter.value);
+              break;
+            case "priceRange":
+              if (filter.priceRange) {
+                price = {
+                  min: filter.priceRange.min,
+                  max: (_a = filter.priceRange.max) != null ? _a : 0
+                };
+              }
+              break;
+            case "minRating":
+              minRating = (_b = filter.numericValue) != null ? _b : Number(filter.value);
+              break;
+            case "starRating":
+              starRating = (_c = filter.numericValue) != null ? _c : Number(filter.value);
+              break;
+            case "primary_type":
+              primary_type = filter.propertyType;
+              break;
+            case "transformed_query":
+              transformed_query = filter.value;
+              break;
+            case "selected_restaurant_price_levels":
+              selected_restaurant_price_levels = filter.priceLevels;
+              break;
+          }
+        });
+        filterPayload = {
+          ...filterPayload,
+          ...amenities.size > 0 && { amenities: Array.from(amenities) },
+          ...hotelStyle.size > 0 && { hotelStyle: Array.from(hotelStyle) },
+          ...price && { price },
+          ...minRating !== void 0 && { minRating },
+          ...starRating !== void 0 && { starRating },
+          ...primary_type && { primary_type },
+          ...transformed_query && { transformed_query },
+          ...selected_restaurant_price_levels && {
+            selected_restaurant_price_levels
+          }
+        };
+      } else if (!query) {
+        filterPayload.minRating = 4;
+      }
+      const body = {
+        filters: filterPayload,
+        ...query && { query },
+        ...state.bounds ? { bounds: state.bounds } : state.activeLocation.location_id ? { location_id: state.activeLocation.location_id } : state.activeLocation.coordinates ? {
+          latitude: state.activeLocation.coordinates[0],
+          longitude: state.activeLocation.coordinates[1]
+        } : {}
+      };
+      return this.runPropertiesSearch({
+        body,
+        beforeApplyProperties: onProcessFilters ? (data) => {
+          var _a, _b;
+          const result = onProcessFilters(data.filters, data.location_id);
+          return {
+            price: (_a = result.price) != null ? _a : null,
+            limit: (_b = result.limit) != null ? _b : 30
+          };
+        } : void 0,
+        smartFiltersClearable: !!query,
+        onError
+      });
+    }
+    getClusters() {
+      this.ensureAlive();
+      return [...this.clusterItems];
+    }
+    setUseApi(useApi, autoLoad = true) {
+      this.ensureAlive();
+      this.useApi = useApi;
+      if (!useApi) {
+        this.assertPlatformSupportForNoApi(this.currentPlatform, "warn");
+      }
+      if (!useApi) {
+        this.clearProperties();
+      }
+      if (useApi && autoLoad) {
+        if (this.options.initialLocationData) {
+          this.initializeFromLocationData(this.options.initialLocationData);
+        } else if (this.requestBody && this.isMapAttached) {
+          this.autoLoadProperties();
+        }
+      }
+    }
+    setApiKey(apiKey) {
+      this.ensureAlive();
+      const oldKey = this.apiKey;
+      this.apiKey = apiKey;
+      if (oldKey !== this.apiKey && this.isMapAttached) {
+        this.refresh();
+        if (this.useApi) {
+          if (this.options.initialLocationData) {
+            this.initializeFromLocationData(this.options.initialLocationData);
+          } else if (this.requestBody) {
+            this.autoLoadProperties();
+          }
+        }
+      }
+    }
+    getApiKey() {
+      return this.apiKey;
+    }
+    refresh() {
+      var _a, _b, _c;
+      this.ensureAlive();
+      if (!this.adapter) return;
+      const viewState = this.safeExtractViewState();
+      const primaryType = this.resolvePrimaryType();
+      this.clusterItems = clusterMarkers({
+        primaryType,
+        markers: this.properties,
+        map: this.adapter,
+        selectedMarkerId: this.selectedMarkerId,
+        zoom: (_a = viewState == null ? void 0 : viewState.zoom) != null ? _a : 0
+      });
+      const markerManager = this.adapter.getMarkerManager();
+      markerManager.render(this.clusterItems, primaryType, this.selectedMarkerId);
+      (_c = (_b = this.options).onClusterUpdate) == null ? void 0 : _c.call(_b, this.clusterItems, viewState);
+    }
+    destroy() {
+      if (this.destroyed) {
+        return;
+      }
+      if (this.adapter) {
+        const markerManager = this.adapter.getMarkerManager();
+        markerManager.destroy();
+        this.adapter.cleanup();
+      }
+      this.clusterItems = [];
+      this.properties = [];
+      this.destroyed = true;
+      this.isMapAttached = false;
+    }
+    resolvePrimaryType() {
+      var _a, _b, _c;
+      return (_c = (_b = this.primaryType) != null ? _b : (_a = this.properties.find((marker) => marker.type)) == null ? void 0 : _a.type) != null ? _c : DEFAULT_PRIMARY_TYPE;
+    }
+    safeExtractViewState() {
+      if (!this.adapter) return null;
+      try {
+        return extractViewState(this.adapter);
+      } catch {
+        return null;
+      }
+    }
+    ensureAlive() {
+      if (this.destroyed) {
+        throw new Error("MapFirstCore instance has been destroyed");
+      }
+    }
+  };
+  function isMapLibreOptions(options) {
+    return options.platform === "maplibre";
+  }
+  function isGoogleMapsOptions(options) {
+    return options.platform === "google";
+  }
+  function isMapboxOptions(options) {
+    return options.platform === "mapbox";
+  }
+  return __toCommonJS(index_exports);
+})();

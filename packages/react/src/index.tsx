@@ -11,11 +11,39 @@ import {
   type PropertyType,
 } from "@mapfirst.ai/core";
 
-// Export filter utilities from core
+// Re-export all of @mapfirst.ai/core so users only need @mapfirst.ai/react.
+// SmartFilter and Locale are excluded here because the react package provides
+// its own versions (SmartFilter component, Locale from useTranslation).
+export type {
+  Property,
+  PropertyType,
+  PriceLevel,
+  Price,
+  FilterSchema,
+  ApiFiltersResponse,
+  MapBounds,
+  ViewState,
+  ActiveLocation,
+  FilterState,
+  MapState,
+  MapStateCallbacks,
+  MapStateUpdate,
+  MapLibreNamespace,
+  GoogleMapsNamespace,
+  MapboxNamespace,
+  Environment,
+  TripAdvisorImage,
+  TripAdvisorImageResponse,
+  BaseMapFirstOptions,
+  MapFirstOptions,
+} from "@mapfirst.ai/core";
 export {
   processApiFilters,
   convertToApiFilters,
-  type ApiFiltersResponse,
+  PropertiesFetchError,
+  fetchImages,
+  fetchProperties,
+  MapFirstCore,
 } from "@mapfirst.ai/core";
 
 // Export all components
@@ -62,6 +90,42 @@ type SmartFilter = {
   propertyType?: PropertyType;
   priceLevels?: any[];
 };
+
+type StateSetter = React.Dispatch<React.SetStateAction<MapState | null>>;
+
+function updateStateField<K extends keyof MapState>(
+  setState: StateSetter,
+  key: K,
+  value: MapState[K],
+) {
+  setState((prev) => (prev ? { ...prev, [key]: value } : null));
+}
+
+function forwardCallback(
+  optionsRef: React.MutableRefObject<BaseMapFirstOptions>,
+  key: keyof NonNullable<BaseMapFirstOptions["callbacks"]>,
+  ...args: any[]
+) {
+  const callback = optionsRef.current.callbacks?.[key] as
+    | ((...callbackArgs: any[]) => void)
+    | undefined;
+  callback?.(...args);
+}
+
+type AttachMapConfig = Parameters<MapFirstCore["attachMap"]>[1];
+
+function attachMapOnce(
+  instanceRef: React.MutableRefObject<MapFirstCore | null>,
+  attachedRef: React.MutableRefObject<boolean>,
+  map: any,
+  config: AttachMapConfig,
+) {
+  if (!instanceRef.current || !map || attachedRef.current) {
+    return;
+  }
+  instanceRef.current.attachMap(map, config);
+  attachedRef.current = true;
+}
 
 /**
  * Comprehensive hook for MapFirst SDK with all functionality in one place.
@@ -136,56 +200,48 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         ...opts.callbacks,
         // Add internal callbacks to trigger React re-renders
         onPropertiesChange: (properties) => {
-          setState((prev) => (prev ? { ...prev, properties } : null));
-          optionsRef.current.callbacks?.onPropertiesChange?.(properties);
+          updateStateField(setState, "properties", properties);
+          forwardCallback(optionsRef, "onPropertiesChange", properties);
         },
         onSelectedPropertyChange: (id) => {
-          setState((prev) =>
-            prev ? { ...prev, selectedPropertyId: id } : null
-          );
-          optionsRef.current.callbacks?.onSelectedPropertyChange?.(id);
+          updateStateField(setState, "selectedPropertyId", id);
+          forwardCallback(optionsRef, "onSelectedPropertyChange", id);
         },
         onPrimaryTypeChange: (type) => {
-          setState((prev) => (prev ? { ...prev, primary: type } : null));
-          optionsRef.current.callbacks?.onPrimaryTypeChange?.(type);
+          updateStateField(setState, "primary", type);
+          forwardCallback(optionsRef, "onPrimaryTypeChange", type);
         },
         onFiltersChange: (filters) => {
-          setState((prev) => (prev ? { ...prev, filters } : null));
-          optionsRef.current.callbacks?.onFiltersChange?.(filters);
+          updateStateField(setState, "filters", filters);
+          forwardCallback(optionsRef, "onFiltersChange", filters);
         },
         onBoundsChange: (bounds) => {
-          setState((prev) => (prev ? { ...prev, bounds } : null));
-          optionsRef.current.callbacks?.onBoundsChange?.(bounds);
+          updateStateField(setState, "bounds", bounds);
+          forwardCallback(optionsRef, "onBoundsChange", bounds);
         },
         onPendingBoundsChange: (pendingBounds) => {
-          setState((prev) => (prev ? { ...prev, pendingBounds } : null));
-          optionsRef.current.callbacks?.onPendingBoundsChange?.(pendingBounds);
+          updateStateField(setState, "pendingBounds", pendingBounds);
+          forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
         },
         onCenterChange: (center, zoom) => {
           setState((prev) => (prev ? { ...prev, center, zoom } : null));
-          optionsRef.current.callbacks?.onCenterChange?.(center, zoom);
+          forwardCallback(optionsRef, "onCenterChange", center, zoom);
         },
         onZoomChange: (zoom) => {
-          setState((prev) => (prev ? { ...prev, zoom } : null));
-          optionsRef.current.callbacks?.onZoomChange?.(zoom);
+          updateStateField(setState, "zoom", zoom);
+          forwardCallback(optionsRef, "onZoomChange", zoom);
         },
         onActiveLocationChange: (location) => {
-          setState((prev) =>
-            prev ? { ...prev, activeLocation: location } : null
-          );
-          optionsRef.current.callbacks?.onActiveLocationChange?.(location);
+          updateStateField(setState, "activeLocation", location);
+          forwardCallback(optionsRef, "onActiveLocationChange", location);
         },
         onLoadingStateChange: (loading) => {
-          setState((prev) =>
-            prev ? { ...prev, initialLoading: loading } : null
-          );
-          optionsRef.current.callbacks?.onLoadingStateChange?.(loading);
+          updateStateField(setState, "initialLoading", loading);
+          forwardCallback(optionsRef, "onLoadingStateChange", loading);
         },
         onSearchingStateChange: (searching) => {
-          setState((prev) =>
-            prev ? { ...prev, isSearching: searching } : null
-          );
-          optionsRef.current.callbacks?.onSearchingStateChange?.(searching);
+          updateStateField(setState, "isSearching", searching);
+          forwardCallback(optionsRef, "onSearchingStateChange", searching);
         },
       },
     };
@@ -225,7 +281,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         instanceRef.current.setUseApi(useApi, autoLoad);
       }
     },
-    []
+    [],
   );
 
   // Properties search
@@ -247,7 +303,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         return await instanceRef.current.runPropertiesSearch(options);
       },
     }),
-    []
+    [],
   );
 
   // Smart filter search
@@ -258,7 +314,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         filters?: SmartFilter[];
         onProcessFilters?: (
           filters: any,
-          location_id?: number
+          location_id?: number,
         ) => {
           smartFilters?: SmartFilter[];
           price?: any;
@@ -274,7 +330,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         return await instanceRef.current.runSmartFilterSearch(options);
       },
     }),
-    []
+    [],
   );
 
   // Bounds search
@@ -288,7 +344,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
         return await instanceRef.current.performBoundsSearch();
       },
     }),
-    []
+    [],
   );
 
   // Map attachment helpers
@@ -297,18 +353,15 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       maplibregl: MapLibreNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void }
+      options?: { onMarkerClick?: (marker: Property) => void },
     ) => {
-      if (instanceRef.current && map && !mapLibreAttachedRef.current) {
-        instanceRef.current.attachMap(map, {
-          platform: "maplibre",
-          maplibregl,
-          onMarkerClick: options?.onMarkerClick,
-        });
-        mapLibreAttachedRef.current = true;
-      }
+      attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
+        platform: "maplibre",
+        maplibregl,
+        onMarkerClick: options?.onMarkerClick,
+      });
     },
-    []
+    [],
   );
 
   const googleMapsAttachedRef = React.useRef(false);
@@ -316,18 +369,15 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       google: GoogleMapsNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void }
+      options?: { onMarkerClick?: (marker: Property) => void },
     ) => {
-      if (instanceRef.current && map && !googleMapsAttachedRef.current) {
-        instanceRef.current.attachMap(map, {
-          platform: "google",
-          google,
-          onMarkerClick: options?.onMarkerClick,
-        });
-        googleMapsAttachedRef.current = true;
-      }
+      attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
+        platform: "google",
+        google,
+        onMarkerClick: options?.onMarkerClick,
+      });
     },
-    []
+    [],
   );
 
   const mapboxAttachedRef = React.useRef(false);
@@ -335,18 +385,15 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       mapboxgl: MapboxNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void }
+      options?: { onMarkerClick?: (marker: Property) => void },
     ) => {
-      if (instanceRef.current && map && !mapboxAttachedRef.current) {
-        instanceRef.current.attachMap(map, {
-          platform: "mapbox",
-          mapboxgl,
-          onMarkerClick: options?.onMarkerClick,
-        });
-        mapboxAttachedRef.current = true;
-      }
+      attachMapOnce(instanceRef, mapboxAttachedRef, map, {
+        platform: "mapbox",
+        mapboxgl,
+        onMarkerClick: options?.onMarkerClick,
+      });
     },
-    []
+    [],
   );
 
   return {

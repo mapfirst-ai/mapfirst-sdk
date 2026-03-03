@@ -66,13 +66,13 @@ const navButtonStyles: CSSProperties = {
 export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   filters,
   currency,
-  minRatingSuffix,
+  minRatingSuffix: _minRatingSuffix,
   clearAllLabel,
   previousFiltersLabel,
   nextFiltersLabel,
-  formatCurrency,
+  formatCurrency: _formatCurrency,
   onFilterChange,
-  onResetFilters,
+  onResetFilters: _onResetFilters,
   onClearAll,
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
@@ -80,6 +80,21 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   );
   const [navHover, setNavHover] = React.useState<"prev" | "next" | null>(null);
   const [clearHover, setClearHover] = React.useState(false);
+  const removeFilter = React.useCallback(
+    (filterId: string) => {
+      void onFilterChange(filters.filter((f) => f.id !== filterId));
+    },
+    [filters, onFilterChange]
+  );
+  const patchFilter = React.useCallback(
+    (filterId: string, patch: Partial<Filter>) => {
+      const nextFilters = filters.map((f) =>
+        f.id === filterId ? { ...f, ...patch } : f
+      );
+      void onFilterChange(nextFilters);
+    },
+    [filters, onFilterChange]
+  );
 
   return (
     <div style={containerStyles}>
@@ -105,13 +120,11 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
               key={filter.id}
               label={filter.label}
               icon={filter.icon}
-              remove={() => {
-                void onFilterChange(filters.filter((f) => f.id !== filter.id));
-              }}
+              remove={() => removeFilter(filter.id)}
             />
           );
 
-          if (filter.type === "minRating") {
+          if (filter.type === "minRating" || filter.type === "starRating") {
             const currentRating = filter.numericValue ?? Number(filter.value);
             if (!Number.isFinite(currentRating)) {
               return renderStandardChip();
@@ -119,53 +132,16 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
 
             return (
               <MinRatingFilterChip
+                star={filter.type === "starRating"}
                 key={filter.id}
                 rating={currentRating}
                 onChange={(nextRating) => {
-                  const nextFilters = filters.map((f) =>
-                    f.id === filter.id
-                      ? {
-                          ...f,
-                          numericValue: nextRating,
-                          value: String(nextRating),
-                        }
-                      : f
-                  );
-                  void onFilterChange(nextFilters);
+                  patchFilter(filter.id, {
+                    numericValue: nextRating,
+                    value: String(nextRating),
+                  });
                 }}
-                onRemove={() =>
-                  void onFilterChange(filters.filter((f) => f.id !== filter.id))
-                }
-              />
-            );
-          }
-
-          if (filter.type === "starRating") {
-            const currentRating = filter.numericValue ?? Number(filter.value);
-            if (!Number.isFinite(currentRating)) {
-              return renderStandardChip();
-            }
-
-            return (
-              <MinRatingFilterChip
-                star
-                key={filter.id}
-                rating={currentRating}
-                onChange={(nextRating) => {
-                  const nextFilters = filters.map((f) =>
-                    f.id === filter.id
-                      ? {
-                          ...f,
-                          numericValue: nextRating,
-                          value: String(nextRating),
-                        }
-                      : f
-                  );
-                  void onFilterChange(nextFilters);
-                }}
-                onRemove={() =>
-                  void onFilterChange(filters.filter((f) => f.id !== filter.id))
-                }
+                onRemove={() => removeFilter(filter.id)}
               />
             );
           }
@@ -177,19 +153,9 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                 priceRange={filter.priceRange}
                 currency={currency}
                 onChange={(nextRange) => {
-                  const nextFilters = filters.map((f) =>
-                    f.id === filter.id
-                      ? {
-                          ...f,
-                          priceRange: nextRange,
-                        }
-                      : f
-                  );
-                  void onFilterChange(nextFilters);
+                  patchFilter(filter.id, { priceRange: nextRange });
                 }}
-                onRemove={() =>
-                  void onFilterChange(filters.filter((f) => f.id !== filter.id))
-                }
+                onRemove={() => removeFilter(filter.id)}
               />
             );
           }
@@ -200,19 +166,9 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                 key={filter.id}
                 value={filter.value}
                 onChange={(nextValue) => {
-                  const nextFilters = filters.map((f) =>
-                    f.id === filter.id
-                      ? {
-                          ...f,
-                          value: nextValue,
-                        }
-                      : f
-                  );
-                  void onFilterChange(nextFilters);
+                  patchFilter(filter.id, { value: nextValue });
                 }}
-                onRemove={() =>
-                  void onFilterChange(filters.filter((f) => f.id !== filter.id))
-                }
+                onRemove={() => removeFilter(filter.id)}
               />
             );
           }
@@ -223,19 +179,9 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                 key={filter.id}
                 values={filter.priceLevels ?? []}
                 onChange={(nextLevels) => {
-                  const nextFilters = filters.map((f) =>
-                    f.id === filter.id
-                      ? {
-                          ...f,
-                          priceLevels: nextLevels,
-                        }
-                      : f
-                  );
-                  void onFilterChange(nextFilters);
+                  patchFilter(filter.id, { priceLevels: nextLevels });
                 }}
-                onRemove={() =>
-                  void onFilterChange(filters.filter((f) => f.id !== filter.id))
-                }
+                onRemove={() => removeFilter(filter.id)}
               />
             );
           }
