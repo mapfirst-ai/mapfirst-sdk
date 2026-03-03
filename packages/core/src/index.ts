@@ -695,9 +695,7 @@ export class MapFirstCore {
         (x) =>
           !!x.location &&
           (x.type !== "Accommodation" ||
-            x.pricing?.offer?.availability === "available" ||
-            x.pricing?.offer?.availability === "pending" ||
-            x.pricing?.offer?.displayPrice),
+            (x.pricing && x.pricing?.offer?.availability !== "unavailable")),
       ),
     ];
     this.updateState({
