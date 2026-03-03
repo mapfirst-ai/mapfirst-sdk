@@ -14,7 +14,7 @@ jobs:
     # with a branch protection rule: only allow tags from the "main" branch.
     environment: npm
     permissions:
-      contents: read
+      contents: write
       id-token: write # required for npm trusted publishing (OIDC) + provenance
       # One-time setup on npmjs.com per package:
       # Package → Settings → Publishing → GitHub Actions → add this repo + workflow path
@@ -78,3 +78,10 @@ jobs:
             exit 1
           fi
           cd packages/react && npm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }}
+
+      # ── GitHub Release ────────────────────────────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ steps.dist_tag.outputs.tag == 'next' }}
+          generate_release_notes: true
