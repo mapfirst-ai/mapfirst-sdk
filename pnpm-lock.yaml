@@ -45,11 +45,11 @@ importers:
         specifier: 3.9.2
         version: 3.9.2(@algolia/client-search@4.25.3)(@mdx-js/react@3.1.1(@types/react@19.2.4)(react@19.2.0))(@types/react@19.2.4)(esbuild@0.27.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(search-insights@2.17.3)(typescript@5.6.3)
       '@mapfirst.ai/core':
-        specifier: ^0.0.30
-        version: 0.0.30
+        specifier: ^0.0.32
+        version: 0.0.32
       '@mapfirst.ai/react':
-        specifier: ^0.0.36
-        version: 0.0.36(react@19.2.0)
+        specifier: ^0.0.38
+        version: 0.0.38(react@19.2.0)
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.1.1(@types/react@19.2.4)(react@19.2.0)
@@ -1605,13 +1605,13 @@ packages:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
 
-  '@mapfirst.ai/core@0.0.30':
-    resolution: {integrity: sha512-8ETFyIFVOinqGKdtnkNgIvEDSGf+lV4oEGb5lS7KBKjqxc6WWROIlyFs28Rns9kQO/HlNxqBZ3FZWfBdjDefmw==}
+  '@mapfirst.ai/core@0.0.32':
+    resolution: {integrity: sha512-ftvc8D8pUUZe3hJSBJJEMOYcjqYNmyQT86FJDKBs7g8tdhoHuNuZPXOA+BmcJbbNk/b5zlo8PZ6JObke/TWZNA==}
 
-  '@mapfirst.ai/react@0.0.36':
-    resolution: {integrity: sha512-Cr+XUFLyZyb6MCcnrAHJiQ0PgMwi/g0pKvfoNshp4135+2fuzX3Ojija3/TmC8QnPaIePAxeGf7QRW9MzFYvGw==}
+  '@mapfirst.ai/react@0.0.38':
+    resolution: {integrity: sha512-WWrZZlaW/xsT+SYklgbiq+hotFgr6uiu8dyN2cXaRZ5J05g6WlgfKbY5g+18knWqt0KIM4e9xjjTvpfXOHlOXg==}
     peerDependencies:
-      react: '>=17 || >=18'
+      react: '>=17'
 
   '@maplibre/maplibre-gl-style-spec@24.3.1':
     resolution: {integrity: sha512-TUM5JD40H2mgtVXl5IwWz03BuQabw8oZQLJTmPpJA0YTYF+B+oZppy5lNMO6bMvHzB+/5mxqW9VLG3wFdeqtOw==}
@@ -8088,11 +8088,11 @@ snapshots:
 
   '@mapbox/whoots-js@3.1.0': {}
 
-  '@mapfirst.ai/core@0.0.30': {}
+  '@mapfirst.ai/core@0.0.32': {}
 
-  '@mapfirst.ai/react@0.0.36(react@19.2.0)':
+  '@mapfirst.ai/react@0.0.38(react@19.2.0)':
     dependencies:
-      '@mapfirst.ai/core': 0.0.30
+      '@mapfirst.ai/core': link:packages/core
       react: 19.2.0
 
   '@maplibre/maplibre-gl-style-spec@24.3.1':
