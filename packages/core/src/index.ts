@@ -691,10 +691,13 @@ export class MapFirstCore {
   _setProperties(properties: Property[]) {
     this.ensureAlive();
     this.properties = [
-      ...properties.filter((x) =>
-        x.type === "Accommodation"
-          ? x.pricing?.availability !== "unavailable"
-          : true,
+      ...properties.filter(
+        (x) =>
+          !!x.location &&
+          (x.type !== "Accommodation" ||
+            x.pricing?.offer?.availability === "available" ||
+            x.pricing?.offer?.availability === "pending" ||
+            x.pricing?.offer?.displayPrice),
       ),
     ];
     this.updateState({
@@ -1085,13 +1088,19 @@ export class MapFirstCore {
         }
 
         const results = pollData?.success?.results ?? [];
-        if (results.length > 0) {
+        const unsupportedIds = new Set(
+          pollData?.success?.invalidHotelIds?.map(Number) ?? [],
+        );
+        const unsupportedIds2 = new Set(
+          pollData?.success?.unsupportedHotelIds?.map(Number) ?? [],
+        );
+
+        if (results.length > 0 || unsupportedIds.size > 0) {
           this.setProperties((prev) => {
-            const resultIds = new Set(results.map((h) => h.tripadvisor_id));
             const updatedProperties = prev.filter(
               (property) =>
-                property.type !== "Accommodation" ||
-                resultIds.has(property.tripadvisor_id),
+                !unsupportedIds.has(property.tripadvisor_id) &&
+                !unsupportedIds2.has(property.tripadvisor_id),
             );
 
             results.forEach((property) => {
@@ -1113,6 +1122,18 @@ export class MapFirstCore {
                 updatedProperties.push(property);
               }
             });
+
+            // When isComplete, remove hotels without a valid offer/availability
+            if (pollData?.success?.isComplete) {
+              return updatedProperties.filter(
+                (property) =>
+                  property.type !== "Accommodation" ||
+                  property.pricing?.offer?.availability === "available" ||
+                  property.pricing?.offer?.availability === "pending" ||
+                  property.pricing?.offer?.displayPrice,
+              );
+            }
+
             return updatedProperties;
           });
         }
@@ -1232,11 +1253,7 @@ export class MapFirstCore {
 
       // Fly to POIs if properties have locations
       if (flown) {
-        this.flyToPOIs(
-          primaryTypePoiPoints,
-          undefined,
-          body.initial !== true,
-        );
+        this.flyToPOIs(primaryTypePoiPoints, undefined, body.initial !== true);
       }
 
       // Determine and set primary type
@@ -1245,9 +1262,10 @@ export class MapFirstCore {
         data.properties.filter(
           (property) =>
             property.type === data.filters.primary_type &&
-            (property.type === "Accommodation"
-              ? property.pricing?.availability !== "unavailable"
-              : true),
+            (property.type !== "Accommodation" ||
+              property.pricing?.offer?.availability === "available" ||
+              property.pricing?.offer?.availability === "pending" ||
+              property.pricing?.offer?.displayPrice),
         ).length > 0
       ) {
         primary_type = data.filters.primary_type;
@@ -1300,7 +1318,10 @@ export class MapFirstCore {
 
       // Fly to POIs if not already done
       if (!flown) {
-        if (data.filters.location?.latitude && data.filters.location?.longitude) {
+        if (
+          data.filters.location?.latitude &&
+          data.filters.location?.longitude
+        ) {
           this.flyMapTo(
             data.filters.location.longitude,
             data.filters.location.latitude,
