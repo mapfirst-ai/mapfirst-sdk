@@ -4,19 +4,19 @@ sidebar_position: 1
 
 # Searching for Properties
 
-Learn how to implement different types of searches in MapFirst SDK.
+MapFirst SDK gives you three powerful ways to search for properties — each designed for different user experiences. This guide covers all three with complete code examples.
 
-## Types of Searches
+:::tip Which search method should I use?
+- **Properties Search** — Best for structured forms where users pick a city, dates, and filters.
+- **Smart Filter Search** — Best for search bars where users type natural language queries like *"romantic hotels near the beach."*
+- **Bounds Search** — Best for "search this area" buttons that re-query based on the visible map.
+:::
 
-MapFirst SDK supports three types of searches:
-
-1. **Properties Search** - Location-based search with filters
-2. **Smart Filter Search** - AI-powered natural language search
-3. **Bounds Search** - Search within visible map area
+---
 
 ## Properties Search
 
-Search by city, country, and various filters.
+The most common search method. Specify a city and country, along with optional date and guest filters, and the SDK returns matching properties.
 
 ### React Example
 
@@ -81,9 +81,15 @@ mapFirst.runPropertiesSearch({
 });
 ```
 
+---
+
 ## Smart Filter Search
 
-Use natural language to search for properties with AI-powered filters.
+Smart Filter Search uses AI to parse natural language queries into structured filters. Type something like *"boutique hotels with rooftop bar near the river"* and the SDK will extract the right filters automatically.
+
+:::info How it works
+When you call `smartFilterSearch.search()`, the SDK sends your query to the MapFirst AI backend. The response includes both matching properties **and** a set of filter objects that you can display as interactive chips using the [SmartFilter component](../components/smart-filter).
+:::
 
 ### React Example
 
@@ -189,11 +195,15 @@ mapFirst.runSmartFilterSearch({
 });
 ```
 
-For more details on the SmartFilter component, see the [SmartFilter Component Guide](../components/smart-filter).
+:::tip Want interactive filter chips?
+Pair Smart Filter Search with the [SmartFilter component](../components/smart-filter) to display AI-generated filters as toggleable chips that users can modify in real time.
+:::
+
+---
 
 ## Bounds Search
 
-Search within the current map viewport.
+Bounds Search queries properties within the current visible area of the map. This is perfect for a "Search this area" button that appears when users pan or zoom the map.
 
 ### React Example
 
@@ -221,9 +231,11 @@ document.getElementById("search-btn").addEventListener("click", async () => {
 });
 ```
 
+---
+
 ## Filtering by Property Type
 
-Switch between different property types.
+Switch between hotels, restaurants, and attractions. Changing the property type updates the markers on the map immediately.
 
 ### React Example
 
@@ -250,7 +262,11 @@ function TypeFilter() {
 mapFirst.setPrimaryType("Restaurant");
 ```
 
+---
+
 ## Handling Search Results
+
+Once a search completes, the `state.properties` array contains all matching results. Here's how to display and filter them.
 
 ### Display Results
 
@@ -282,10 +298,13 @@ function SearchResults() {
 
 ### Filter Results Locally
 
+You can also filter properties on the client side without making another API call:
+
 ```typescript
 function FilteredResults() {
   const { state } = useMapFirst({
-
+    apiKey: "your-api-key",
+  });
 
   // Filter by rating
   const highRated = state.properties.filter((p) => p.rating >= 4.5);
@@ -302,9 +321,15 @@ function FilteredResults() {
 }
 ```
 
+---
+
 ## Advanced Search Patterns
 
+These patterns help you build more polished, production-ready search experiences.
+
 ### Debounced Search
+
+Avoid making an API call on every keystroke — wait until the user stops typing:
 
 ```typescript
 import { useState, useEffect } from "react";
@@ -337,6 +362,8 @@ function DebouncedSearch() {
 ```
 
 ### Search on Map Move
+
+Automatically re-search whenever the user pans or zooms the map:
 
 ```typescript
 function AutoSearch() {
@@ -372,17 +399,27 @@ function AutoSearch() {
 }
 ```
 
+---
+
 ## Best Practices
 
-1. **Always handle loading states** - Show feedback during searches
-2. **Debounce user input** - Avoid excessive API calls
-3. **Cache results** - Store previous searches when appropriate
-4. **Handle errors** - Use `onError` callback to handle failures
-5. **Validate dates** - Ensure check-in is before check-out
-6. **Set appropriate zoom** - Use bounds search for detailed area exploration
+:::caution Avoid excessive API calls
+Always debounce user-triggered searches (especially on keystroke or map move) and disable the search button while `state.isSearching` is `true`. This prevents duplicate requests and unexpected behavior.
+:::
 
-## See Also
+1. **Always handle loading states** — Show a spinner or disable the button during searches so users know something is happening.
+2. **Debounce user input** — Wait 300–500ms after the last keystroke before firing a smart search.
+3. **Cache results** — Store previous searches when appropriate to avoid redundant API calls.
+4. **Handle errors gracefully** — Use the `onError` callback or a try/catch block to surface meaningful error messages.
+5. **Validate dates** — Ensure check-in is before check-out, and both are in the future.
+6. **Use bounds search wisely** — Show a "Search this area" button when `state.pendingBounds` is set, rather than auto-searching on every pan.
 
-- [useMapFirst API](../api/use-mapfirst)
-- [MapFirstCore API](../api/core)
-- [Basic Map Example](../examples/basic-map)
+---
+
+## Next Steps
+
+- **[useMapFirst API](../api/use-mapfirst)** — Full hook reference with all parameters and return values.
+- **[MapFirstCore API](../api/core)** — Core class docs for vanilla JavaScript.
+- **[SmartFilter Component](../components/smart-filter)** — Display AI-generated filter chips.
+- **[Custom POIs](./custom-pois)** — Search by coordinates, radius, or bounds.
+- **[Basic Map Example](../examples/basic-map)** — A complete, copy-paste example.

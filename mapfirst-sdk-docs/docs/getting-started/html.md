@@ -4,11 +4,17 @@ sidebar_position: 2
 
 # HTML/JavaScript Setup
 
-Use MapFirst SDK in any HTML page without a framework. Perfect for simple websites, prototypes, or integrating into existing applications.
+No framework? No problem. MapFirst SDK works in any HTML page with a simple `<script>` tag. This guide walks you through setting up a fully interactive map with property search — zero build tools required.
 
-## Quick Start
+:::info When to use this approach
+Choose the HTML/JavaScript setup if you're working with a static site, a CMS like WordPress, a server-rendered app (PHP, Django, Rails), or just want a quick prototype. For React apps, see the [React Setup](./react) guide instead.
+:::
 
-Here's a complete working example:
+---
+
+## Step 1 — Add a Basic Map
+
+Here's a complete, copy-paste example that gives you a working map with search in a single HTML file:
 
 ```html
 <!DOCTYPE html>
@@ -128,9 +134,15 @@ Here's a complete working example:
 </html>
 ```
 
-> See [Property Type Reference](../api/core#property) for complete type definitions.
+:::tip Want property type definitions?
+See the [Property type reference](../api/core#property) for the full `Property` interface and all related types.
+:::
 
-## Using Mapbox
+---
+
+## Step 2 — Try Other Map Providers
+
+### Mapbox GL JS
 
 ```html
 <!DOCTYPE html>
@@ -178,7 +190,7 @@ Here's a complete working example:
 </html>
 ```
 
-## Using Google Maps
+### Google Maps
 
 ```html
 <!DOCTYPE html>
@@ -229,9 +241,13 @@ Here's a complete working example:
 </html>
 ```
 
-## Common Methods
+---
 
-### Basic Search
+## Step 3 — Learn the Core Methods
+
+Here's a quick reference of the methods you'll use most often.
+
+### Search by Location
 
 ```javascript
 await mapFirst.runPropertiesSearch({
@@ -249,7 +265,9 @@ await mapFirst.runPropertiesSearch({
 });
 ```
 
-### Smart Search
+### AI-Powered Smart Search
+
+Search with natural language — the SDK extracts filters automatically:
 
 ```javascript
 await mapFirst.runSmartFilterSearch({
@@ -257,13 +275,17 @@ await mapFirst.runSmartFilterSearch({
 });
 ```
 
-### Bounds Search
+### Search Visible Area
+
+Search within whatever the user is currently looking at on the map:
 
 ```javascript
 await mapFirst.performBoundsSearch();
 ```
 
-### Event Callbacks
+### Listen to Events
+
+Pass callbacks to react to state changes in real time:
 
 ```javascript
 const mapFirst = new MapFirstCore({
@@ -287,7 +309,9 @@ const mapFirst = new MapFirstCore({
 });
 ```
 
-### Map Controls
+### Control the Map
+
+Navigate, switch property types, and manage selections programmatically:
 
 ```javascript
 // Fly to location
@@ -300,22 +324,11 @@ mapFirst.setPrimaryType("Restaurant");
 mapFirst.setSelectedMarker(123456);
 ```
 
-// Select a marker
-mapFirst.setSelectedMarker(123456);
+---
 
-// Clear selection
-mapFirst.setSelectedMarker(null);
+## Full Example — Search UI with Filters
 
-// Get current state
-const state = mapFirst.getState();
-console.log("Current properties:", state.properties);
-console.log("Is searching:", state.isSearching);
-
-````
-
-## Complete Example with Search UI
-
-Here's a full example with a search interface:
+Here's a more complete example with a search panel, property type selector, date pickers, and result count:
 
 ```html
 <!DOCTYPE html>
@@ -514,34 +527,29 @@ Here's a full example with a search interface:
     </script>
   </body>
 </html>
-````
+```
 
-## Next Steps
-
-- [API Reference](../api/core) - Learn about all available methods
-- [Examples](../examples/basic-map) - See more complete examples
-- [Searching Guide](../guides/searching) - Learn different search techniques
+---
 
 ## Troubleshooting
 
-### SDK Not Loading
-
-Make sure the script tag is loaded before your code runs:
+:::caution SDK not loading?
+Make sure the `<script>` tag for `@mapfirst.ai/core` is loaded **before** your code runs. The SDK attaches itself to `window.MapFirstCore`:
 
 ```html
 <script src="https://unpkg.com/@mapfirst.ai/core@latest/dist/index.global.js"></script>
 <script>
-  // Wait for SDK to load
   if (window.MapFirstCore) {
     const { MapFirstCore } = window.MapFirstCore;
     // Your code here
   }
 </script>
 ```
+:::
 
-### Map Not Displaying
+### Map not displaying?
 
-Ensure the map container has explicit dimensions:
+Ensure the map container has **explicit dimensions**. Without a height, the map will collapse to zero:
 
 ```css
 #map {
@@ -550,10 +558,23 @@ Ensure the map container has explicit dimensions:
 }
 ```
 
-### Console Errors
+### Console errors?
 
-Check browser console for specific errors. Common issues:
+Check your browser console for specific error messages. Common causes:
 
-- Missing API keys (Mapbox, Google Maps)
-- Incorrect map library version
-- Network issues loading CDN resources
+- **Missing API keys** — Mapbox and Google Maps require their own API keys in addition to your MapFirst key.
+- **Wrong library version** — MapFirst SDK requires MapLibre GL JS v5+ or Mapbox GL JS v2+.
+- **Network issues** — CDN resources may be blocked by ad blockers or corporate firewalls.
+- **CORS errors** — Make sure you're loading the SDK from the official CDN (`unpkg.com`).
+
+---
+
+## Next Steps
+
+Now that you have a working map, explore these guides to build richer experiences:
+
+- **[API Reference](../api/core)** — Complete `MapFirstCore` class documentation.
+- **[Searching Guide](../guides/searching)** — Learn location search, smart search, and bounds search.
+- **[Customizing Markers](../guides/customizing-markers)** — Style markers with CSS to match your brand.
+- **[Fetching Images](../guides/fetching-images)** — Display property photos from TripAdvisor.
+- **[Examples](../examples/basic-map)** — More complete examples to copy and adapt.

@@ -4,17 +4,27 @@ sidebar_position: 1
 
 # SmartFilter Component
 
-The `SmartFilter` component provides an elegant way to display and manage filter chips after performing an AI-powered search. It shows active filters as interactive chips that users can modify or remove.
+The `SmartFilter` component renders AI-generated search filters as interactive, toggleable chips. After a user performs a natural language search (e.g., *"hotels near the beach with a pool"*), the SDK extracts structured filters — and this component displays them in a clean, user-friendly UI that lets users modify or remove individual filters in real time.
+
+:::tip When to use this
+Use `SmartFilter` whenever you're using the `smartFilterSearch` method. It turns the raw filter data from the AI response into a polished set of chips that your users can interact with — no custom UI work needed.
+:::
+
+---
 
 ## Installation
 
-The SmartFilter component is included in the `@mapfirst.ai/react` package:
+The `SmartFilter` component is included in the `@mapfirst.ai/react` package:
 
 ```bash
 npm install @mapfirst.ai/react
 ```
 
+---
+
 ## Basic Usage
+
+Here's the minimal setup — render the component when filters are available, and pass a callback to handle changes:
 
 ```tsx
 import { useState } from "react";
@@ -63,6 +73,8 @@ function MyComponent() {
 }
 ```
 
+---
+
 ## Props
 
 ### `filters` (required)
@@ -79,11 +91,15 @@ interface Filter {
 }
 ```
 
+---
+
 ### `isSearching`
 
 - **Type:** `boolean`
 - **Default:** `false`
 - **Description:** Indicates if a search is currently in progress. When true, filter modifications are disabled to prevent conflicts.
+
+---
 
 ### `onFilterChange` (required)
 
@@ -97,10 +113,14 @@ const handleFilterChange = async (updatedFilters: Filter[]) => {
 };
 ```
 
+---
+
 ### `customTranslations`
 
 - **Type:** `Record<string, string>`
 - **Description:** Custom translations for filter labels and UI text
+
+---
 
 ### `currency`
 
@@ -108,19 +128,25 @@ const handleFilterChange = async (updatedFilters: Filter[]) => {
 - **Default:** `"USD"`
 - **Description:** Currency code for displaying price filters (e.g., "USD", "EUR", "GBP")
 
+---
+
 ### `style`
 
 - **Type:** `CSSProperties`
 - **Description:** Custom styles for the component wrapper
+
+---
 
 ### `containerStyle`
 
 - **Type:** `CSSProperties`
 - **Description:** Custom styles for the container element
 
+---
+
 ## Complete Example with Search
 
-Here's a complete example showing SmartFilter integrated with search functionality:
+Here's a full example showing `SmartFilter` integrated with AI search. The filters appear after the first search and update the results when modified:
 
 ```tsx
 import { useState, useCallback } from "react";
@@ -232,9 +258,11 @@ function SearchWithFilters() {
 }
 ```
 
+---
+
 ## Filter Types
 
-The SmartFilter component supports various filter types:
+The `SmartFilter` component supports various filter types. These are generated automatically by the AI search engine — you don't need to create them manually:
 
 ### Price Range
 
@@ -246,6 +274,8 @@ The SmartFilter component supports various filter types:
 }
 ```
 
+---
+
 ### Rating
 
 ```tsx
@@ -255,6 +285,8 @@ The SmartFilter component supports various filter types:
   value: 4 // Minimum rating
 }
 ```
+
+---
 
 ### Amenities
 
@@ -266,6 +298,8 @@ The SmartFilter component supports various filter types:
 }
 ```
 
+---
+
 ### Property Type
 
 ```tsx
@@ -276,9 +310,13 @@ The SmartFilter component supports various filter types:
 }
 ```
 
+---
+
 ## Styling
 
 ### Custom Styles
+
+Override the component's default look by passing inline styles:
 
 ```tsx
 <SmartFilter
@@ -296,7 +334,11 @@ The SmartFilter component supports various filter types:
 />
 ```
 
+---
+
 ### Custom Translations
+
+Override the default English labels for internationalization or branding:
 
 ```tsx
 <SmartFilter
@@ -311,15 +353,25 @@ The SmartFilter component supports various filter types:
 />
 ```
 
+---
+
 ## Best Practices
 
-1. **Conditional Rendering**: Only render SmartFilter when there are active filters
-2. **Disable During Search**: Use `isSearching` prop to prevent modifications during active searches
-3. **Persist State**: Store filters in state to maintain them across re-renders
-4. **Re-run Searches**: Trigger a new search when filters change to update results
-5. **Currency Consistency**: Use the same currency across your application
+:::caution Don't forget to disable during search
+Always pass `isSearching={state?.isSearching}` to prevent users from modifying filters while a search is in progress. Changing filters mid-search can cause race conditions and unexpected results.
+:::
 
-## See Also
+1. **Conditional Rendering** — Only render `SmartFilter` when `filters.length > 0`. This avoids showing an empty container before the first search.
+2. **Disable During Search** — Use the `isSearching` prop to prevent modifications during active searches.
+3. **Persist State** — Store filters in React state to maintain them across re-renders and component updates.
+4. **Re-run Searches on Change** — Trigger a new search in your `onFilterChange` callback so results update immediately when a user removes or toggles a filter.
+5. **Currency Consistency** — Use the same `currency` value here as you do in your search parameters. Mismatched currencies will cause confusing price filter labels.
 
-- [useMapFirst Hook](../api/use-mapfirst) - Main React hook for MapFirst SDK
-- [Searching Guide](../guides/searching) - Learn about smart search functionality
+---
+
+## Next Steps
+
+- **[useMapFirst Hook](../api/use-mapfirst)** — Full hook reference, including `smartFilterSearch`.
+- **[Searching Guide](../guides/searching)** — Learn all three search methods, including smart search.
+- **[Smart Filter Search Example](../examples/smart-filter-search)** — Complete, copy-paste example with filters and a map.
+- **[Fetching Images](../guides/fetching-images)** — Display property photos alongside your filter results.

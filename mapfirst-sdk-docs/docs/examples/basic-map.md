@@ -4,7 +4,17 @@ sidebar_position: 1
 
 # Basic Map Example
 
-A complete example showing how to create a basic map with MapFirst SDK.
+A complete, copy-paste example that gives you a working map with property search, type switching, and marker interaction. This is the fastest way to see the SDK in action.
+
+:::tip What you'll build
+By the end of this example, you'll have a map that:
+- Displays property markers for a city (Paris)
+- Lets users switch between Hotels, Restaurants, and Attractions
+- Shows a property count and loading state
+- Responds to marker clicks with property details
+:::
+
+---
 
 ## React Example
 
@@ -135,7 +145,11 @@ export default function BasicMap() {
 }
 ```
 
+---
+
 ## HTML/JavaScript Example
+
+The same functionality works without React — just include the SDK via CDN and use the `MapFirstCore` class directly:
 
 ```html
 <!DOCTYPE html>
@@ -332,18 +346,29 @@ export default function BasicMap() {
 </html>
 ```
 
-## Key Features Demonstrated
+---
 
-1. **Map Initialization** - Create and configure the map
-2. **MapFirst Integration** - Attach MapFirst SDK to the map
-3. **Property Type Switching** - Toggle between Hotels, Restaurants, and Attractions
-4. **Search Functionality** - Search for properties in a location
-5. **Marker Interaction** - Handle clicks on property markers
-6. **State Management** - Display property count and loading states
-7. **Error Handling** - Catch and display errors
+## What This Example Demonstrates
 
-## See Also
+| Feature | How it's used |
+|---|---|
+| **Map Initialization** | Creates a MapLibre GL JS map with the MapFirst tile style |
+| **SDK Attachment** | Connects the map to MapFirst for automatic marker rendering |
+| **Property Type Switching** | Toggles between Hotels, Restaurants, and Attractions |
+| **Search** | Runs a location-based search with date and guest filters |
+| **Marker Interaction** | Handles clicks on property markers |
+| **State Tracking** | Displays property count and loading state in real time |
 
-- [useMapFirst API](../api/use-mapfirst)
-- [Searching Guide](../guides/searching)
-- [Map Integration Guide](../guides/map-integration)
+:::tip Try it live
+Open the [Playground](/playground) to experiment with these features in your browser — no setup required.
+:::
+
+---
+
+## Next Steps
+
+- **[useMapFirst API](../api/use-mapfirst)** — Full hook reference with all parameters and return values.
+- **[Searching Guide](../guides/searching)** — Learn smart search, bounds search, and advanced patterns.
+- **[Map Integration Guide](../guides/map-integration)** — Set up Mapbox or Google Maps instead of MapLibre.
+- **[Smart Filter Search Example](./smart-filter-search)** — Add AI-powered natural language search.
+- **[Property Details Example](./property-details)** — Build a sidebar with images, ratings, and pricing.
