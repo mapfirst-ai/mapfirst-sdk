@@ -1126,9 +1126,8 @@ export class MapFirstCore {
               return updatedProperties.filter(
                 (property) =>
                   property.type !== "Accommodation" ||
-                  property.pricing?.offer?.availability === "available" ||
-                  property.pricing?.offer?.availability === "pending" ||
-                  property.pricing?.offer?.displayPrice,
+                  (property.pricing?.offer?.availability === "available" &&
+                    property.pricing?.offer?.displayPrice),
               );
             }
 
@@ -1213,6 +1212,15 @@ export class MapFirstCore {
       let limit: number = 30;
       let primary_type: PropertyType | undefined = data.filters.primary_type;
 
+      if (data.isComplete) {
+        data.properties = data.properties.filter(
+          (property) =>
+            property.type !== "Accommodation" ||
+            (property.pricing?.offer?.availability === "available" &&
+              property.pricing?.offer?.displayPrice),
+        );
+      }
+
       if (beforeApplyProperties) {
         const result = beforeApplyProperties(data);
         price = result.price ?? null;
@@ -1260,10 +1268,9 @@ export class MapFirstCore {
         data.properties.filter(
           (property) =>
             property.type === data.filters.primary_type &&
-            (property.type !== "Accommodation" ||
-              property.pricing?.offer?.availability === "available" ||
-              property.pricing?.offer?.availability === "pending" ||
-              property.pricing?.offer?.displayPrice),
+            (property.type === "Accommodation"
+              ? property.pricing?.availability !== "unavailable"
+              : true),
         ).length > 0
       ) {
         primary_type = data.filters.primary_type;
