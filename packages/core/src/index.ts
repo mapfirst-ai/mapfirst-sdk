@@ -690,14 +690,7 @@ export class MapFirstCore {
 
   _setProperties(properties: Property[]) {
     this.ensureAlive();
-    this.properties = [
-      ...properties.filter(
-        (x) =>
-          !!x.location &&
-          (x.type !== "Accommodation" ||
-            (x.pricing && x.pricing?.offer?.availability !== "unavailable")),
-      ),
-    ];
+    this.properties = [...properties.filter((x) => !!x.location)];
     this.updateState({
       properties: this.properties,
     });
