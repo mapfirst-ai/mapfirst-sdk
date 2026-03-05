@@ -1233,15 +1233,17 @@ export class MapFirstCore {
             x.pricing?.offer
               ? {
                   ...x,
-                  pricing: {
-                    ...x.pricing,
-                    availability:
-                      x.pricing.offer.price &&
-                      (x.pricing.offer.price < price.min ||
-                        x.pricing.offer.price > price.max)
-                        ? ("unavailable" as const)
-                        : x.pricing.availability,
-                  },
+                  ...(x.pricing?.offer && {
+                    pricing: {
+                      ...x.pricing,
+                      availability: x.pricing.offer.price
+                        ? x.pricing.offer.price < price.min ||
+                          x.pricing.offer.price > price.max
+                          ? "unavailable"
+                          : x.pricing.availability
+                        : "unavailable",
+                    },
+                  }),
                 }
               : x,
           )
