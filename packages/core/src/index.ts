@@ -806,6 +806,18 @@ export class MapFirstCore {
     ) {
       this.callbacks.onSearchingStateChange?.(newState.isSearching);
     }
+    if (
+      newState.firstCallDone !== undefined &&
+      newState.firstCallDone !== prevState.firstCallDone
+    ) {
+      this.callbacks.onFirstCallDoneChange?.(newState.firstCallDone);
+    }
+    if (
+      newState.isFlyToAnimating !== undefined &&
+      newState.isFlyToAnimating !== prevState.isFlyToAnimating
+    ) {
+      this.callbacks.onIsFlyToAnimatingChange?.(newState.isFlyToAnimating);
+    }
   }
 
   setFilters(filters: FilterState) {

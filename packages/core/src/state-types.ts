@@ -73,6 +73,8 @@ export interface MapStateCallbacks {
   // Loading callbacks
   onLoadingStateChange?: (loading: boolean) => void;
   onSearchingStateChange?: (searching: boolean) => void;
+  onFirstCallDoneChange?: (firstCallDone: boolean) => void;
+  onIsFlyToAnimatingChange?: (animating: boolean) => void;
   onPropertiesLoadError?: (error: unknown) => void;
 
   // Error callback

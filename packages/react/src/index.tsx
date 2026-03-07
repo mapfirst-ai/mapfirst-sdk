@@ -243,6 +243,14 @@ export function useMapFirst(options: BaseMapFirstOptions) {
           updateStateField(setState, "isSearching", searching);
           forwardCallback(optionsRef, "onSearchingStateChange", searching);
         },
+        onFirstCallDoneChange: (firstCallDone) => {
+          updateStateField(setState, "firstCallDone", firstCallDone);
+          forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
+        },
+        onIsFlyToAnimatingChange: (animating) => {
+          updateStateField(setState, "isFlyToAnimating", animating);
+          forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
+        },
       },
     };
 
