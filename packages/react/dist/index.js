@@ -1450,6 +1450,14 @@ function useMapFirst(options) {
         onSearchingStateChange: (searching) => {
           updateStateField(setState, "isSearching", searching);
           forwardCallback(optionsRef, "onSearchingStateChange", searching);
+        },
+        onFirstCallDoneChange: (firstCallDone) => {
+          updateStateField(setState, "firstCallDone", firstCallDone);
+          forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
+        },
+        onIsFlyToAnimatingChange: (animating) => {
+          updateStateField(setState, "isFlyToAnimating", animating);
+          forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
         }
       }
     };
@@ -1480,39 +1488,30 @@ function useMapFirst(options) {
     },
     []
   );
-  const propertiesSearch = import_react9.default.useMemo(
-    () => ({
-      search: async (options2) => {
-        if (!instanceRef.current) {
-          throw new Error("MapFirst instance not available");
-        }
-        return await instanceRef.current.runPropertiesSearch(options2);
+  const propertiesSearch = import_react9.default.useCallback(
+    async (options2) => {
+      if (!instanceRef.current) {
+        throw new Error("MapFirst instance not available");
       }
-    }),
+      return await instanceRef.current.runPropertiesSearch(options2);
+    },
     []
   );
-  const smartFilterSearch = import_react9.default.useMemo(
-    () => ({
-      search: async (options2) => {
-        if (!instanceRef.current) {
-          throw new Error("MapFirst instance not available");
-        }
-        return await instanceRef.current.runSmartFilterSearch(options2);
+  const smartFilterSearch = import_react9.default.useCallback(
+    async (options2) => {
+      if (!instanceRef.current) {
+        throw new Error("MapFirst instance not available");
       }
-    }),
+      return await instanceRef.current.runSmartFilterSearch(options2);
+    },
     []
   );
-  const boundsSearch = import_react9.default.useMemo(
-    () => ({
-      perform: async () => {
-        if (!instanceRef.current) {
-          return null;
-        }
-        return await instanceRef.current.performBoundsSearch();
-      }
-    }),
-    []
-  );
+  const boundsSearch = import_react9.default.useCallback(async () => {
+    if (!instanceRef.current) {
+      return null;
+    }
+    return await instanceRef.current.performBoundsSearch();
+  }, []);
   const mapLibreAttachedRef = import_react9.default.useRef(false);
   const attachMapLibre = import_react9.default.useCallback(
     (map, maplibregl, options2) => {

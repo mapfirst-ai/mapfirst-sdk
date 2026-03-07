@@ -226,15 +226,15 @@ type SmartFilter = {
  * }, [mapLibreInstance]);
  *
  * // Use search methods
- * await propertiesSearch.search({
+ * await propertiesSearch({
  *   body: { city: "Paris", country: "France" }
  * });
  *
- * await smartFilterSearch.search({
+ * await smartFilterSearch({
  *   query: "hotels near beach with pool"
  * });
  *
- * await boundsSearch.perform();
+ * await boundsSearch();
  * ```
  */
 declare function useMapFirst(options: BaseMapFirstOptions): {
@@ -243,54 +243,48 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
     setPrimaryType: (type: PropertyType) => void;
     setSelectedMarker: (id: number | null) => void;
     setUseApi: (useApi: boolean, autoLoad?: boolean) => void;
-    propertiesSearch: {
-        search: (options: {
-            body: InitialRequestBody;
-            beforeApplyProperties?: (data: any) => {
-                price?: any;
-                limit?: number;
-            };
-            smartFiltersClearable?: boolean;
-            onError?: (error: unknown) => void;
-        }) => Promise<{
-            location_id?: number;
-            filters: _mapfirst_ai_core.FilterSchema;
-            properties: Property[];
-            isComplete: boolean | undefined;
-            pollingLink: string | undefined;
-            durationSeconds: number;
-        } | null>;
-    };
-    smartFilterSearch: {
-        search: (options: {
-            query?: string;
-            filters?: SmartFilter[];
-            onProcessFilters?: (filters: any, location_id?: number) => {
-                smartFilters?: SmartFilter[];
-                price?: any;
-                limit?: number;
-                language?: string;
-            };
-            onError?: (error: unknown) => void;
-        }) => Promise<{
-            location_id?: number;
-            filters: _mapfirst_ai_core.FilterSchema;
-            properties: Property[];
-            isComplete: boolean | undefined;
-            pollingLink: string | undefined;
-            durationSeconds: number;
-        } | null>;
-    };
-    boundsSearch: {
-        perform: () => Promise<{
-            location_id?: number;
-            filters: _mapfirst_ai_core.FilterSchema;
-            properties: Property[];
-            isComplete: boolean | undefined;
-            pollingLink: string | undefined;
-            durationSeconds: number;
-        } | null>;
-    };
+    propertiesSearch: (options: {
+        body: InitialRequestBody;
+        beforeApplyProperties?: (data: any) => {
+            price?: any;
+            limit?: number;
+        };
+        smartFiltersClearable?: boolean;
+        onError?: (error: unknown) => void;
+    }) => Promise<{
+        location_id?: number;
+        filters: _mapfirst_ai_core.FilterSchema;
+        properties: Property[];
+        isComplete: boolean | undefined;
+        pollingLink: string | undefined;
+        durationSeconds: number;
+    } | null>;
+    smartFilterSearch: (options: {
+        query?: string;
+        filters?: SmartFilter[];
+        onProcessFilters?: (filters: any, location_id?: number) => {
+            smartFilters?: SmartFilter[];
+            price?: any;
+            limit?: number;
+            language?: string;
+        };
+        onError?: (error: unknown) => void;
+    }) => Promise<{
+        location_id?: number;
+        filters: _mapfirst_ai_core.FilterSchema;
+        properties: Property[];
+        isComplete: boolean | undefined;
+        pollingLink: string | undefined;
+        durationSeconds: number;
+    } | null>;
+    boundsSearch: () => Promise<{
+        location_id?: number;
+        filters: _mapfirst_ai_core.FilterSchema;
+        properties: Property[];
+        isComplete: boolean | undefined;
+        pollingLink: string | undefined;
+        durationSeconds: number;
+    } | null>;
     attachMapLibre: (map: any, maplibregl: MapLibreNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
     }) => void;

@@ -1410,6 +1410,14 @@ function useMapFirst(options) {
         onSearchingStateChange: (searching) => {
           updateStateField(setState, "isSearching", searching);
           forwardCallback(optionsRef, "onSearchingStateChange", searching);
+        },
+        onFirstCallDoneChange: (firstCallDone) => {
+          updateStateField(setState, "firstCallDone", firstCallDone);
+          forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
+        },
+        onIsFlyToAnimatingChange: (animating) => {
+          updateStateField(setState, "isFlyToAnimating", animating);
+          forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
         }
       }
     };
@@ -1440,39 +1448,30 @@ function useMapFirst(options) {
     },
     []
   );
-  const propertiesSearch = React6.useMemo(
-    () => ({
-      search: async (options2) => {
-        if (!instanceRef.current) {
-          throw new Error("MapFirst instance not available");
-        }
-        return await instanceRef.current.runPropertiesSearch(options2);
+  const propertiesSearch = React6.useCallback(
+    async (options2) => {
+      if (!instanceRef.current) {
+        throw new Error("MapFirst instance not available");
       }
-    }),
+      return await instanceRef.current.runPropertiesSearch(options2);
+    },
     []
   );
-  const smartFilterSearch = React6.useMemo(
-    () => ({
-      search: async (options2) => {
-        if (!instanceRef.current) {
-          throw new Error("MapFirst instance not available");
-        }
-        return await instanceRef.current.runSmartFilterSearch(options2);
+  const smartFilterSearch = React6.useCallback(
+    async (options2) => {
+      if (!instanceRef.current) {
+        throw new Error("MapFirst instance not available");
       }
-    }),
+      return await instanceRef.current.runSmartFilterSearch(options2);
+    },
     []
   );
-  const boundsSearch = React6.useMemo(
-    () => ({
-      perform: async () => {
-        if (!instanceRef.current) {
-          return null;
-        }
-        return await instanceRef.current.performBoundsSearch();
-      }
-    }),
-    []
-  );
+  const boundsSearch = React6.useCallback(async () => {
+    if (!instanceRef.current) {
+      return null;
+    }
+    return await instanceRef.current.performBoundsSearch();
+  }, []);
   const mapLibreAttachedRef = React6.useRef(false);
   const attachMapLibre = React6.useCallback(
     (map, maplibregl, options2) => {

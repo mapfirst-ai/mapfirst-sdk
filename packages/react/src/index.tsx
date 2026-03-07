@@ -168,15 +168,15 @@ function attachMapOnce(
  * }, [mapLibreInstance]);
  *
  * // Use search methods
- * await propertiesSearch.search({
+ * await propertiesSearch({
  *   body: { city: "Paris", country: "France" }
  * });
  *
- * await smartFilterSearch.search({
+ * await smartFilterSearch({
  *   query: "hotels near beach with pool"
  * });
  *
- * await boundsSearch.perform();
+ * await boundsSearch();
  * ```
  */
 export function useMapFirst(options: BaseMapFirstOptions) {
@@ -293,67 +293,58 @@ export function useMapFirst(options: BaseMapFirstOptions) {
   );
 
   // Properties search
-  const propertiesSearch = React.useMemo(
-    () => ({
-      search: async (options: {
-        body: InitialRequestBody;
-        beforeApplyProperties?: (data: any) => {
-          price?: any;
-          limit?: number;
-        };
-        smartFiltersClearable?: boolean;
-        onError?: (error: unknown) => void;
-      }) => {
-        if (!instanceRef.current) {
-          throw new Error("MapFirst instance not available");
-        }
+  const propertiesSearch = React.useCallback(
+    async (options: {
+      body: InitialRequestBody;
+      beforeApplyProperties?: (data: any) => {
+        price?: any;
+        limit?: number;
+      };
+      smartFiltersClearable?: boolean;
+      onError?: (error: unknown) => void;
+    }) => {
+      if (!instanceRef.current) {
+        throw new Error("MapFirst instance not available");
+      }
 
-        return await instanceRef.current.runPropertiesSearch(options);
-      },
-    }),
+      return await instanceRef.current.runPropertiesSearch(options);
+    },
     [],
   );
 
   // Smart filter search
-  const smartFilterSearch = React.useMemo(
-    () => ({
-      search: async (options: {
-        query?: string;
-        filters?: SmartFilter[];
-        onProcessFilters?: (
-          filters: any,
-          location_id?: number,
-        ) => {
-          smartFilters?: SmartFilter[];
-          price?: any;
-          limit?: number;
-          language?: string;
-        };
-        onError?: (error: unknown) => void;
-      }) => {
-        if (!instanceRef.current) {
-          throw new Error("MapFirst instance not available");
-        }
+  const smartFilterSearch = React.useCallback(
+    async (options: {
+      query?: string;
+      filters?: SmartFilter[];
+      onProcessFilters?: (
+        filters: any,
+        location_id?: number,
+      ) => {
+        smartFilters?: SmartFilter[];
+        price?: any;
+        limit?: number;
+        language?: string;
+      };
+      onError?: (error: unknown) => void;
+    }) => {
+      if (!instanceRef.current) {
+        throw new Error("MapFirst instance not available");
+      }
 
-        return await instanceRef.current.runSmartFilterSearch(options);
-      },
-    }),
+      return await instanceRef.current.runSmartFilterSearch(options);
+    },
     [],
   );
 
   // Bounds search
-  const boundsSearch = React.useMemo(
-    () => ({
-      perform: async () => {
-        if (!instanceRef.current) {
-          return null;
-        }
+  const boundsSearch = React.useCallback(async () => {
+    if (!instanceRef.current) {
+      return null;
+    }
 
-        return await instanceRef.current.performBoundsSearch();
-      },
-    }),
-    [],
-  );
+    return await instanceRef.current.performBoundsSearch();
+  }, []);
 
   // Map attachment helpers
   const mapLibreAttachedRef = React.useRef(false);
