@@ -68,6 +68,12 @@ jobs:
           cd packages/core && pnpm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }} --no-git-checks
 
       # ── React ─────────────────────────────────────────────────────────────
+      # Core must be built first so its dist/index.d.ts is available for
+      # TypeScript type resolution when compiling the react package.
+      - name: Build @mapfirst.ai/core
+        if: startsWith(github.ref_name, 'react@v')
+        run: cd packages/core && pnpm build
+
       - name: Publish @mapfirst.ai/react
         if: startsWith(github.ref_name, 'react@v')
         run: |
