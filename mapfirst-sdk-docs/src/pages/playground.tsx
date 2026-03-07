@@ -7,13 +7,13 @@ import React, {
 } from "react";
 import Layout from "@theme/Layout";
 import {
+  MapboxNamespace,
   useMapFirst,
   SmartFilter,
   Filter,
   processApiFilters,
   convertToApiFilters,
 } from "@mapfirst.ai/react";
-import type { MapboxNamespace } from "@mapfirst.ai/core";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import mapboxgl from "mapbox-gl";

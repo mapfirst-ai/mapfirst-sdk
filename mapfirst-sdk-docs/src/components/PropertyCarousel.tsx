@@ -5,8 +5,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { Property } from "@mapfirst.ai/core";
-import { fetchImages } from "@mapfirst.ai/core";
+import type { Property } from "@mapfirst.ai/react";
+import { fetchImages } from "@mapfirst.ai/react";
 import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import "swiper/css";

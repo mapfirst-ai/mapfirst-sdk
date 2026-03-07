@@ -65,7 +65,7 @@ jobs:
             echo "Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
             exit 1
           fi
-          cd packages/core && npm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }}
+          cd packages/core && pnpm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }} --no-git-checks
 
       # ── React ─────────────────────────────────────────────────────────────
       - name: Publish @mapfirst.ai/react
@@ -77,7 +77,7 @@ jobs:
             echo "Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
             exit 1
           fi
-          cd packages/react && npm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }}
+          cd packages/react && pnpm publish --provenance --access public --tag ${{ steps.dist_tag.outputs.tag }} --no-git-checks
 
       # ── GitHub Release ────────────────────────────────────────────────────
       - name: Create GitHub Release
