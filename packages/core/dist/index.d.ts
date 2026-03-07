@@ -324,6 +324,8 @@ interface MapStateCallbacks {
     onActiveLocationChange?: (location: ActiveLocation) => void;
     onLoadingStateChange?: (loading: boolean) => void;
     onSearchingStateChange?: (searching: boolean) => void;
+    onFirstCallDoneChange?: (firstCallDone: boolean) => void;
+    onIsFlyToAnimatingChange?: (animating: boolean) => void;
     onPropertiesLoadError?: (error: unknown) => void;
     onError?: (error: Error | string, context?: string) => void;
 }

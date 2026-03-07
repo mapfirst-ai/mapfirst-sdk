@@ -21,7 +21,7 @@ function styleInject(css, { insertAt } = {}) {
 }
 
 // src/markers.css
-styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #d1d5db;\n  cursor: default;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n");
+styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n");
 
 // src/marker-style-utils.ts
 var PRIMARY_Z_INDEX = {
@@ -1862,14 +1862,7 @@ var MapFirstCore = class {
   _setProperties(properties) {
     var _a, _b;
     this.ensureAlive();
-    this.properties = [
-      ...properties.filter(
-        (x) => {
-          var _a2, _b2, _c, _d, _e, _f;
-          return !!x.location && (x.type !== "Accommodation" || ((_b2 = (_a2 = x.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" || ((_d = (_c = x.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.availability) === "pending" || ((_f = (_e = x.pricing) == null ? void 0 : _e.offer) == null ? void 0 : _f.displayPrice));
-        }
-      )
-    ];
+    this.properties = [...properties.filter((x) => !!x.location)];
     this.updateState({
       properties: this.properties
     });
@@ -1933,7 +1926,7 @@ var MapFirstCore = class {
     this.state = { ...this.state, ...update };
   }
   setState(newState) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t;
     const prevState = { ...this.state };
     this.updateState(newState);
     if (newState.center !== void 0 && newState.center !== prevState.center) {
@@ -1959,6 +1952,12 @@ var MapFirstCore = class {
     }
     if (newState.isSearching !== void 0 && newState.isSearching !== prevState.isSearching) {
       (_p = (_o = this.callbacks).onSearchingStateChange) == null ? void 0 : _p.call(_o, newState.isSearching);
+    }
+    if (newState.firstCallDone !== void 0 && newState.firstCallDone !== prevState.firstCallDone) {
+      (_r = (_q = this.callbacks).onFirstCallDoneChange) == null ? void 0 : _r.call(_q, newState.firstCallDone);
+    }
+    if (newState.isFlyToAnimating !== void 0 && newState.isFlyToAnimating !== prevState.isFlyToAnimating) {
+      (_t = (_s = this.callbacks).onIsFlyToAnimatingChange) == null ? void 0 : _t.call(_s, newState.isFlyToAnimating);
     }
   }
   setFilters(filters) {
@@ -2178,14 +2177,13 @@ var MapFirstCore = class {
         );
         if (results.length > 0 || unsupportedIds.size > 0) {
           this.setProperties((prev) => {
-            var _a2;
             const updatedProperties = prev.filter(
               (property) => !unsupportedIds.has(property.tripadvisor_id) && !unsupportedIds2.has(property.tripadvisor_id)
             );
             results.forEach((property) => {
-              var _a3, _b2, _c2, _d2, _e2, _f2;
+              var _a2, _b2, _c2, _d2, _e2, _f2;
               if (!property.location) return;
-              if (((_b2 = (_a3 = property.pricing) == null ? void 0 : _a3.offer) == null ? void 0 : _b2.price) && price && (((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.price) < (price == null ? void 0 : price.min) || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.price) > (price == null ? void 0 : price.max))) {
+              if (((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.price) && price && (((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.price) < (price == null ? void 0 : price.min) || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.price) > (price == null ? void 0 : price.max))) {
                 property.pricing.availability = "unavailable";
               }
               const existingIndex = updatedProperties.findIndex(
@@ -2197,18 +2195,18 @@ var MapFirstCore = class {
                 updatedProperties.push(property);
               }
             });
-            if ((_a2 = pollData == null ? void 0 : pollData.success) == null ? void 0 : _a2.isComplete) {
-              return updatedProperties.filter(
-                (property) => {
-                  var _a3, _b2, _c2, _d2, _e2, _f2;
-                  return property.type !== "Accommodation" || ((_b2 = (_a3 = property.pricing) == null ? void 0 : _a3.offer) == null ? void 0 : _b2.availability) === "available" || ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.availability) === "pending" || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.displayPrice);
-                }
-              );
-            }
             return updatedProperties;
           });
         }
         if ((_i = pollData == null ? void 0 : pollData.success) == null ? void 0 : _i.isComplete) {
+          this.setProperties(
+            (prev) => prev.filter(
+              (property) => {
+                var _a2, _b2, _c2, _d2;
+                return property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" && ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.displayPrice);
+              }
+            )
+          );
           completed = true;
           this.setSearching(false);
           break;
@@ -2264,6 +2262,14 @@ var MapFirstCore = class {
       let price = null;
       let limit = 30;
       let primary_type = data.filters.primary_type;
+      if (data.isComplete) {
+        data.properties = data.properties.filter(
+          (property) => {
+            var _a2, _b2, _c2, _d2;
+            return property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" && ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.displayPrice);
+          }
+        );
+      }
       if (beforeApplyProperties) {
         const result = beforeApplyProperties(data);
         price = (_a = result.price) != null ? _a : null;
@@ -2276,12 +2282,14 @@ var MapFirstCore = class {
       );
       const filteredProperties = price ? data.properties.map(
         (x) => {
-          var _a2;
+          var _a2, _b2;
           return ((_a2 = x.pricing) == null ? void 0 : _a2.offer) ? {
             ...x,
-            pricing: {
-              ...x.pricing,
-              availability: x.pricing.offer.price && (x.pricing.offer.price < price.min || x.pricing.offer.price > price.max) ? "unavailable" : x.pricing.availability
+            ...((_b2 = x.pricing) == null ? void 0 : _b2.offer) && {
+              pricing: {
+                ...x.pricing,
+                availability: x.pricing.offer.price ? x.pricing.offer.price < price.min || x.pricing.offer.price > price.max ? "unavailable" : x.pricing.availability : "unavailable"
+              }
             }
           } : x;
         }
@@ -2292,8 +2300,8 @@ var MapFirstCore = class {
       }
       if (data.filters.primary_type && data.properties.filter(
         (property) => {
-          var _a2, _b2, _c2, _d2, _e2, _f2;
-          return property.type === data.filters.primary_type && (property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" || ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.availability) === "pending" || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.displayPrice));
+          var _a2;
+          return property.type === data.filters.primary_type && (property.type === "Accommodation" ? ((_a2 = property.pricing) == null ? void 0 : _a2.availability) !== "unavailable" : true);
         }
       ).length > 0) {
         primary_type = data.filters.primary_type;
