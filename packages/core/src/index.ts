@@ -1114,21 +1114,21 @@ export class MapFirstCore {
               }
             });
 
-            // When isComplete, remove hotels without a valid offer/availability
-            if (pollData?.success?.isComplete) {
-              return updatedProperties.filter(
-                (property) =>
-                  property.type !== "Accommodation" ||
-                  (property.pricing?.offer?.availability === "available" &&
-                    property.pricing?.offer?.displayPrice),
-              );
-            }
-
             return updatedProperties;
           });
         }
 
+        // When isComplete, always remove hotels without a valid offer/availability,
+        // regardless of whether this final response contained any results.
         if (pollData?.success?.isComplete) {
+          this.setProperties((prev) =>
+            prev.filter(
+              (property) =>
+                property.type !== "Accommodation" ||
+                (property.pricing?.offer?.availability === "available" &&
+                  property.pricing?.offer?.displayPrice),
+            ),
+          );
           completed = true;
           this.setSearching(false);
           break;
