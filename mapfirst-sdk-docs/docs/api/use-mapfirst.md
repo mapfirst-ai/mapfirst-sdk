@@ -22,16 +22,16 @@ import { useMapFirst } from "@mapfirst.ai/react";
 
 ```typescript
 const {
-  instance,          // The underlying MapFirstCore instance
-  state,             // Reactive state (re-renders your component on change)
-  setPrimaryType,    // Switch property type filter
+  instance, // The underlying MapFirstCore instance
+  state, // Reactive state (re-renders your component on change)
+  setPrimaryType, // Switch property type filter
   setSelectedMarker, // Select/deselect a marker
-  propertiesSearch,  // Location-based search
-  smartFilterSearch,  // AI-powered natural language search
-  boundsSearch,      // Search within visible map bounds
-  attachMapLibre,    // Connect a MapLibre GL JS map
-  attachGoogle,      // Connect a Google Maps instance
-  attachMapbox,      // Connect a Mapbox GL JS map
+  propertiesSearch, // Location-based search
+  smartFilterSearch, // AI-powered natural language search
+  boundsSearch, // Search within visible map bounds
+  attachMapLibre, // Connect a MapLibre GL JS map
+  attachGoogle, // Connect a Google Maps instance
+  attachMapbox, // Connect a Mapbox GL JS map
 } = useMapFirst(config);
 ```
 
@@ -92,6 +92,8 @@ interface MapFirstConfig {
     onActiveLocationChange?: (location: ActiveLocation) => void;
     onLoadingStateChange?: (loading: boolean) => void;
     onSearchingStateChange?: (searching: boolean) => void;
+    onFirstCallDoneChange?: (firstCallDone: boolean) => void;
+    onIsFlyToAnimatingChange?: (animating: boolean) => void;
   };
 }
 ```
@@ -167,7 +169,7 @@ setSelectedMarker(null);
 Search for properties by location and filters. This is the primary search method — results are stored in `state.properties` and markers appear on the map automatically.
 
 ```typescript
-propertiesSearch: (params: SearchParams) => Promise<void>;
+propertiesSearch: (params: SearchParams) => Promise<SearchResponse | null>;
 ```
 
 **Parameters:**
@@ -188,6 +190,12 @@ interface SearchParams {
       maxPrice?: number;
     };
   };
+  beforeApplyProperties?: (data: APIResponse) => {
+    price?: Price | null;
+    limit?: number;
+  };
+  smartFiltersClearable?: boolean;
+  onError?: (error: Error) => void;
 }
 ```
 
@@ -205,6 +213,7 @@ await propertiesSearch({
       currency: "EUR",
     },
   },
+  onError: (err) => console.error(err),
 });
 ```
 
@@ -215,7 +224,8 @@ await propertiesSearch({
 AI-powered natural language search. Pass a plain-text query and the SDK extracts structured filters automatically. Pair with the [SmartFilter component](../components/smart-filter) to display interactive filter chips.
 
 ```typescript
-smartFilterSearch: (params: SmartSearchParams) => Promise<void>;
+smartFilterSearch: (params: SmartSearchParams) =>
+  Promise<SmartSearchResponse | null>;
 ```
 
 **Parameters:**
@@ -223,8 +233,14 @@ smartFilterSearch: (params: SmartSearchParams) => Promise<void>;
 ```typescript
 interface SmartSearchParams {
   query: string;
-  city?: string;
-  country?: string;
+  filters?: ApiFilter[];
+  onProcessFilters?: (responseFilters: SmartFilterResponse) => {
+    smartFilters?: ApiFilter[];
+    price?: Price | null;
+    limit?: number;
+    language?: string;
+  };
+  onError?: (error: Error) => void;
 }
 ```
 
@@ -233,8 +249,11 @@ interface SmartSearchParams {
 ```typescript
 await smartFilterSearch({
   query: "hotels near eiffel tower with pool",
-  city: "Paris",
-  country: "France",
+  onProcessFilters: (responseFilters) => ({
+    smartFilters: responseFilters.smartFilters,
+    price: responseFilters.price,
+    limit: 30,
+  }),
 });
 ```
 
@@ -245,7 +264,7 @@ await smartFilterSearch({
 Search properties within the current visible map area. Perfect for implementing a "Search this area" button that appears when the user pans or zooms.
 
 ```typescript
-boundsSearch: () => Promise<void>;
+boundsSearch: () => Promise<BoundsSearchResponse | null>;
 ```
 
 **Example:**
@@ -262,7 +281,7 @@ await boundsSearch();
 Connect a MapLibre GL JS map instance. Call this **after** the map's `load` event fires. The SDK will begin rendering markers and tracking map bounds automatically.
 
 ```typescript
-attachMapLibre: (map: maplibregl.Map, options: AttachOptions) => void
+attachMapLibre: (map: maplibregl.Map, maplibregl: MapLibreNamespace, options?: AttachOptions) => void
 ```
 
 **Parameters:**
@@ -287,7 +306,7 @@ const map = new maplibregl.Map({
 });
 
 map.on("load", () => {
-  attachMapLibre(map, {
+  attachMapLibre(map, maplibregl, {
     onMarkerClick: (property) => {
       console.log("Clicked:", property.name);
     },
@@ -319,6 +338,26 @@ attachGoogle(map, {
     console.log("Clicked:", property.name);
   },
 });
+```
+
+---
+
+### setUseApi
+
+Enable or disable API calls. When `useApi` is `false` the SDK skips network requests (useful for rendering pre-loaded properties). Pass `autoLoad: true` to trigger a new search immediately after enabling.
+
+```typescript
+setUseApi: (useApi: boolean, autoLoad?: boolean) => void
+```
+
+**Example:**
+
+```typescript
+// Turn on API and immediately re-fetch
+setUseApi(true, true);
+
+// Turn on without auto-loading
+setUseApi(true, false);
 ```
 
 ---
@@ -362,21 +401,22 @@ The `Property` interface describes a single property returned from search result
 
 ```typescript
 interface Property {
-  tripadvisor_id: number;     // Unique TripAdvisor ID
-  name: string;               // Property name
-  rating: number;             // TripAdvisor rating (0–5)
-  reviews: number;            // Number of reviews
-  location?: {                // Geographic coordinates
+  tripadvisor_id: number; // Unique TripAdvisor ID
+  name: string; // Property name
+  rating: number; // TripAdvisor rating (0–5)
+  reviews: number; // Number of reviews
+  location?: {
+    // Geographic coordinates
     lat: number;
     lon: number;
   };
-  type: PropertyType;         // "Accommodation" | "Eat & Drink" | "Attraction"
-  awards?: PropertyAward[];   // TripAdvisor awards
+  type: PropertyType; // "Accommodation" | "Eat & Drink" | "Attraction"
+  awards?: PropertyAward[]; // TripAdvisor awards
   pricing?: HotelPricingAPIResults; // Hotel pricing data
-  url?: string;               // Property URL
-  price_level?: PriceLevel;   // Price indicator ($ to $$$$)
-  city?: string;              // City name
-  country?: string;           // Country name
+  url?: string; // Property URL
+  price_level?: PriceLevel; // Price indicator ($ to $$$$)
+  city?: string; // City name
+  country?: string; // Country name
 }
 ```
 

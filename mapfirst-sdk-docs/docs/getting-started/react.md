@@ -105,9 +105,11 @@ export default MapComponent;
 
 :::caution Map not showing?
 The most common cause is a missing CSS import. Make sure you have this line at the top of your component:
+
 ```tsx
 import "maplibre-gl/dist/maplibre-gl.css";
 ```
+
 Also ensure the map container has explicit dimensions (`width` and `height`).
 :::
 
@@ -123,7 +125,7 @@ Search by city and country with optional date and guest filters:
 
 ```tsx
 function SearchExample() {
-  const { instance: mapFirst, state } = useMapFirst({
+  const { propertiesSearch, state } = useMapFirst({
     apiKey: "your-api-key",
     initialLocationData: {
       city: "Paris",
@@ -133,7 +135,7 @@ function SearchExample() {
   });
 
   const handleSearch = async () => {
-    await mapFirst?.runPropertiesSearch({
+    await propertiesSearch({
       body: {
         city: "Paris",
         country: "France",
@@ -172,7 +174,7 @@ function SmartSearchExample() {
   });
 
   const handleSearch = async (query: string) => {
-    await smartFilterSearch.search({
+    await smartFilterSearch({
       query: query,
       onProcessFilters: (responseFilters) => {
         return {
@@ -220,9 +222,7 @@ function TypeSwitcher() {
 
   return (
     <div style={{ display: "flex", gap: "8px" }}>
-      <button onClick={() => setPrimaryType("Accommodation")}>
-        🏨 Hotels
-      </button>
+      <button onClick={() => setPrimaryType("Accommodation")}>🏨 Hotels</button>
       <button onClick={() => setPrimaryType("Eat & Drink")}>
         🍽️ Restaurants
       </button>
@@ -279,17 +279,17 @@ The `useMapFirst` hook returns everything you need in one object:
 
 ```tsx
 const {
-  instance,          // MapFirstCore instance (for advanced use)
-  state,             // Reactive state (properties, search status, etc.)
-  setPrimaryType,    // Switch between Accommodation / Eat & Drink / Attraction
+  instance, // MapFirstCore instance (for advanced use)
+  state, // Reactive state (properties, search status, etc.)
+  setPrimaryType, // Switch between Accommodation / Eat & Drink / Attraction
   setSelectedMarker, // Select or deselect a property marker
-  setUseApi,         // Toggle API usage
-  propertiesSearch,  // Run a location-based search
-  smartFilterSearch,  // Run an AI-powered natural language search
-  boundsSearch,      // Search within current map bounds
-  attachMapLibre,    // Attach a MapLibre GL JS map
-  attachMapbox,      // Attach a Mapbox GL JS map
-  attachGoogle,      // Attach a Google Maps instance
+  setUseApi, // Toggle API usage
+  propertiesSearch, // Run a location-based search
+  smartFilterSearch, // Run an AI-powered natural language search
+  boundsSearch, // Search within current map bounds
+  attachMapLibre, // Attach a MapLibre GL JS map
+  attachMapbox, // Attach a Mapbox GL JS map
+  attachGoogle, // Attach a Google Maps instance
 } = useMapFirst(options);
 ```
 

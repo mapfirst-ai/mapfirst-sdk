@@ -84,7 +84,7 @@ export default function PropertyDetails() {
       });
 
       // Auto-search on load
-      propertiesSearch.search({
+      propertiesSearch({
         body: {
           city: "Paris",
           country: "France",

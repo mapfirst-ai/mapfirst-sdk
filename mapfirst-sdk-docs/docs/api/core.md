@@ -84,6 +84,8 @@ interface MapFirstConfig {
     onActiveLocationChange?: (location: ActiveLocation) => void;
     onLoadingStateChange?: (loading: boolean) => void;
     onSearchingStateChange?: (searching: boolean) => void;
+    onFirstCallDoneChange?: (firstCallDone: boolean) => void;
+    onIsFlyToAnimatingChange?: (animating: boolean) => void;
   };
 }
 ```
@@ -353,6 +355,22 @@ Called when search state changes.
 
 ```typescript
 onSearchingStateChange?: (isSearching: boolean) => void
+```
+
+### onFirstCallDoneChange
+
+Called when the first search completes. Useful for showing/hiding loading states or triggering map animations after initial data loads.
+
+```typescript
+onFirstCallDoneChange?: (firstCallDone: boolean) => void
+```
+
+### onIsFlyToAnimatingChange
+
+Called when a fly-to animation starts or finishes.
+
+```typescript
+onIsFlyToAnimatingChange?: (animating: boolean) => void
 ```
 
 ### onError

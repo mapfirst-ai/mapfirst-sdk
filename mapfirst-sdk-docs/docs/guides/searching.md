@@ -7,10 +7,11 @@ sidebar_position: 1
 MapFirst SDK gives you three powerful ways to search for properties — each designed for different user experiences. This guide covers all three with complete code examples.
 
 :::tip Which search method should I use?
+
 - **Properties Search** — Best for structured forms where users pick a city, dates, and filters.
-- **Smart Filter Search** — Best for search bars where users type natural language queries like *"romantic hotels near the beach."*
+- **Smart Filter Search** — Best for search bars where users type natural language queries like _"romantic hotels near the beach."_
 - **Bounds Search** — Best for "search this area" buttons that re-query based on the visible map.
-:::
+  :::
 
 ---
 
@@ -49,7 +50,7 @@ function SearchComponent() {
   return (
     <div>
       <button onClick={handleSearch}>Search Barcelona</button>
-      <p>Found {state.properties.length} properties</p>
+      <p>Found {state?.properties?.length ?? 0} properties</p>
     </div>
   );
 }
@@ -85,10 +86,10 @@ mapFirst.runPropertiesSearch({
 
 ## Smart Filter Search
 
-Smart Filter Search uses AI to parse natural language queries into structured filters. Type something like *"boutique hotels with rooftop bar near the river"* and the SDK will extract the right filters automatically.
+Smart Filter Search uses AI to parse natural language queries into structured filters. Type something like _"boutique hotels with rooftop bar near the river"_ and the SDK will extract the right filters automatically.
 
 :::info How it works
-When you call `smartFilterSearch.search()`, the SDK sends your query to the MapFirst AI backend. The response includes both matching properties **and** a set of filter objects that you can display as interactive chips using the [SmartFilter component](../components/smart-filter).
+When you call `smartFilterSearch()`, the SDK sends your query to the MapFirst AI backend. The response includes both matching properties **and** a set of filter objects that you can display as interactive chips using the [SmartFilter component](../components/smart-filter).
 :::
 
 ### React Example
@@ -127,7 +128,7 @@ function SmartSearch() {
         ? convertToApiFilters(currentFilters)
         : undefined;
 
-      await smartFilterSearch.search({
+      await smartFilterSearch({
         query: query.trim(),
         filters: apiFilters,
         onProcessFilters: (responseFilters) => {

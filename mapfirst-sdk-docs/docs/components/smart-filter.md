@@ -51,7 +51,7 @@ function MyComponent() {
 
     // Re-run search with updated filters
     if (searchQuery) {
-      await smartFilterSearch.search({
+      await smartFilterSearch({
         query: searchQuery,
         filters: convertToApiFilters(updatedFilters),
       });
@@ -184,7 +184,7 @@ function SearchWithFilters() {
         ? convertToApiFilters(currentFilters)
         : undefined;
 
-      await smartFilterSearch.search({
+      await smartFilterSearch({
         query: query.trim(),
         filters: apiFilters,
         onProcessFilters: (responseFilters) => {

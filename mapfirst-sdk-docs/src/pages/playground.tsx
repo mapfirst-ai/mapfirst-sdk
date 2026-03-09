@@ -446,7 +446,7 @@ function PlaygroundContent() {
         ? convertToApiFilters(currentFilters)
         : undefined;
 
-      await smartFilterSearch.search({
+      await smartFilterSearch({
         query: query.trim(),
         filters: apiFilters,
         onProcessFilters: (responseFilters) => {
@@ -661,7 +661,7 @@ function MapComponent() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
-    await smartFilterSearch.search({
+    await smartFilterSearch({
       query: searchQuery,
       filters: filters.length ? convertToApiFilters(filters) : undefined,
       onProcessFilters: (responseFilters) => {

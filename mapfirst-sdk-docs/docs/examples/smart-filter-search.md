@@ -83,7 +83,7 @@ export default function SmartFilterSearch() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
-    await smartFilterSearch.search({
+    await smartFilterSearch({
       query: searchQuery,
       filters: filters.length ? convertToApiFilters(filters) : undefined,
       onProcessFilters: (responseFilters) => {
@@ -110,7 +110,7 @@ export default function SmartFilterSearch() {
     setFilters(updatedFilters);
 
     if (searchQuery && !state?.isSearching) {
-      smartFilterSearch.search({
+      smartFilterSearch({
         query: searchQuery,
         filters: convertToApiFilters(updatedFilters),
       });
