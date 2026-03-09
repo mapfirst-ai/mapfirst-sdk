@@ -167,7 +167,7 @@ type MapLibreMarkerHandle = MapGLMarkerHandle;
 type MapLibreNamespace = {
     Marker: new (options?: {
         element?: HTMLElement;
-        anchor?: string;
+        [key: string]: any;
     }) => MapLibreMarkerHandle;
 };
 
@@ -177,7 +177,7 @@ type MapboxMarkerHandle = MapGLMarkerHandle;
 type MapboxNamespace = {
     Marker: new (options?: {
         element?: HTMLElement;
-        anchor?: string;
+        [key: string]: any;
     }) => MapboxMarkerHandle;
 };
 

@@ -9,7 +9,7 @@ export type MapLibreMarkerHandle = MapGLMarkerHandle;
 export type MapLibreNamespace = {
   Marker: new (options?: {
     element?: HTMLElement;
-    anchor?: string;
+    [key: string]: any;
   }) => MapLibreMarkerHandle;
 };
 

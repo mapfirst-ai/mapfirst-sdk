@@ -9,7 +9,7 @@ export type MapboxMarkerHandle = MapGLMarkerHandle;
 export type MapboxNamespace = {
   Marker: new (options?: {
     element?: HTMLElement;
-    anchor?: string;
+    [key: string]: any;
   }) => MapboxMarkerHandle;
 };
 
