@@ -627,12 +627,13 @@ function PlaygroundContent() {
 
     const config = mapPlatformConfig[mapPlatform];
 
-    return `import { useMapFirst, SmartFilter, processApiFilters, convertToApiFilters } from "@mapfirst.ai/react";
+    return `import { useState, useEffect } from "react";
+import { useMapFirst, SmartFilter, Filter, processApiFilters, convertToApiFilters } from "@mapfirst.ai/react";
 ${config.import}
 
 function MapComponent() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState<Filter[]>([]);
 
   const { instance: mapFirst, state, smartFilterSearch } = useMapFirst({
     apiKey: "${apiKey || "YOUR_API_KEY_HERE"}",
@@ -676,7 +677,7 @@ function MapComponent() {
     });
   };
 
-  const handleFilterChange = async (updatedFilters) => {
+  const handleFilterChange = async (updatedFilters: Filter[]) => {
     setFilters(updatedFilters);
     if (searchQuery && !state.isSearching) {
       await handleSearch();
