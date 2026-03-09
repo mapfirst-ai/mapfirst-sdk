@@ -238,8 +238,8 @@ type SmartFilter = {
  * ```
  */
 declare function useMapFirst(options: BaseMapFirstOptions): {
-    instance: MapFirstCore | null;
-    state: MapState | null;
+    instance: MapFirstCore;
+    state: MapState;
     setPrimaryType: (type: PropertyType) => void;
     setSelectedMarker: (id: number | null) => void;
     setUseApi: (useApi: boolean, autoLoad?: boolean) => void;

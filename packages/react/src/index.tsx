@@ -8,6 +8,7 @@ import {
   type GoogleMapsNamespace,
   type MapboxNamespace,
   type MapState,
+  type MapStateCallbacks,
   type PropertyType,
 } from "@mapfirst.ai/core";
 
@@ -91,16 +92,6 @@ type SmartFilter = {
   priceLevels?: any[];
 };
 
-type StateSetter = React.Dispatch<React.SetStateAction<MapState | null>>;
-
-function updateStateField<K extends keyof MapState>(
-  setState: StateSetter,
-  key: K,
-  value: MapState[K],
-) {
-  setState((prev) => (prev ? { ...prev, [key]: value } : null));
-}
-
 function forwardCallback(
   optionsRef: React.MutableRefObject<BaseMapFirstOptions>,
   key: keyof NonNullable<BaseMapFirstOptions["callbacks"]>,
@@ -180,90 +171,114 @@ function attachMapOnce(
  * ```
  */
 export function useMapFirst(options: BaseMapFirstOptions) {
-  const instanceRef = React.useRef<MapFirstCore | null>(null);
-  const [state, setState] = React.useState<MapState | null>(null);
-
-  // Memoize the options to prevent recreation on every render
+  // Keep options in a ref so callbacks always read the latest values.
   const optionsRef = React.useRef(options);
   React.useEffect(() => {
     optionsRef.current = options;
   });
 
-  React.useEffect(() => {
-    const opts = optionsRef.current;
+  // Stable mutable callbacks container. MapFirstCore stores this by reference,
+  // so assigning properties after construction is reflected inside the core.
+  const callbacksRef = React.useRef<MapStateCallbacks>({});
 
-    // Create MapFirstCore instance without map using adapter-driven options
-    const coreOptions: MapFirstOptions = {
-      adapter: null as any, // Will be set when attachMap is called
-      ...opts,
-      callbacks: {
-        ...opts.callbacks,
-        // Add internal callbacks to trigger React re-renders
-        onPropertiesChange: (properties) => {
-          updateStateField(setState, "properties", properties);
-          forwardCallback(optionsRef, "onPropertiesChange", properties);
-        },
-        onSelectedPropertyChange: (id) => {
-          updateStateField(setState, "selectedPropertyId", id);
-          forwardCallback(optionsRef, "onSelectedPropertyChange", id);
-        },
-        onPrimaryTypeChange: (type) => {
-          updateStateField(setState, "primary", type);
-          forwardCallback(optionsRef, "onPrimaryTypeChange", type);
-        },
-        onFiltersChange: (filters) => {
-          updateStateField(setState, "filters", filters);
-          forwardCallback(optionsRef, "onFiltersChange", filters);
-        },
-        onBoundsChange: (bounds) => {
-          updateStateField(setState, "bounds", bounds);
-          forwardCallback(optionsRef, "onBoundsChange", bounds);
-        },
-        onPendingBoundsChange: (pendingBounds) => {
-          updateStateField(setState, "pendingBounds", pendingBounds);
-          forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
-        },
-        onCenterChange: (center, zoom) => {
-          setState((prev) => (prev ? { ...prev, center, zoom } : null));
-          forwardCallback(optionsRef, "onCenterChange", center, zoom);
-        },
-        onZoomChange: (zoom) => {
-          updateStateField(setState, "zoom", zoom);
-          forwardCallback(optionsRef, "onZoomChange", zoom);
-        },
-        onActiveLocationChange: (location) => {
-          updateStateField(setState, "activeLocation", location);
-          forwardCallback(optionsRef, "onActiveLocationChange", location);
-        },
-        onLoadingStateChange: (loading) => {
-          updateStateField(setState, "initialLoading", loading);
-          forwardCallback(optionsRef, "onLoadingStateChange", loading);
-        },
-        onSearchingStateChange: (searching) => {
-          updateStateField(setState, "isSearching", searching);
-          forwardCallback(optionsRef, "onSearchingStateChange", searching);
-        },
-        onFirstCallDoneChange: (firstCallDone) => {
-          updateStateField(setState, "firstCallDone", firstCallDone);
-          forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
-        },
-        onIsFlyToAnimatingChange: (animating) => {
-          updateStateField(setState, "isFlyToAnimating", animating);
-          forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
-        },
-      },
+  // Create the instance synchronously on the first render so that the initial
+  // state is always a valid MapState — never null.
+  const instanceRef = React.useRef<MapFirstCore | null>(null);
+  if (instanceRef.current === null) {
+    instanceRef.current = new MapFirstCore({
+      adapter: null as any,
+      ...optionsRef.current,
+      callbacks: callbacksRef.current,
+    });
+  }
+
+  // State initialized directly from the instance — always non-null.
+  const [state, setState] = React.useState<MapState>(() =>
+    instanceRef.current!.getState(),
+  );
+
+  React.useEffect(() => {
+    // React StrictMode mounts, cleans up, then mounts again to detect side
+    // effects. The first cleanup destroys the instance; re-create it here.
+    if (!instanceRef.current) {
+      callbacksRef.current = {};
+      instanceRef.current = new MapFirstCore({
+        adapter: null as any,
+        ...optionsRef.current,
+        callbacks: callbacksRef.current,
+      });
+      setState(instanceRef.current.getState());
+      // Reset attachment flags so the new instance can accept a map.
+      mapLibreAttachedRef.current = false;
+      googleMapsAttachedRef.current = false;
+      mapboxAttachedRef.current = false;
+    }
+
+    // Wire up reactive callbacks. The instance already holds callbacksRef.current
+    // by reference, so these assignments are immediately visible inside the core.
+    const cb = callbacksRef.current;
+    cb.onPropertiesChange = (properties) => {
+      setState((prev) => ({ ...prev, properties }));
+      forwardCallback(optionsRef, "onPropertiesChange", properties);
+    };
+    cb.onSelectedPropertyChange = (id) => {
+      setState((prev) => ({ ...prev, selectedPropertyId: id }));
+      forwardCallback(optionsRef, "onSelectedPropertyChange", id);
+    };
+    cb.onPrimaryTypeChange = (type) => {
+      setState((prev) => ({ ...prev, primary: type }));
+      forwardCallback(optionsRef, "onPrimaryTypeChange", type);
+    };
+    cb.onFiltersChange = (filters) => {
+      setState((prev) => ({ ...prev, filters }));
+      forwardCallback(optionsRef, "onFiltersChange", filters);
+    };
+    cb.onBoundsChange = (bounds) => {
+      setState((prev) => ({ ...prev, bounds }));
+      forwardCallback(optionsRef, "onBoundsChange", bounds);
+    };
+    cb.onPendingBoundsChange = (pendingBounds) => {
+      setState((prev) => ({ ...prev, pendingBounds }));
+      forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
+    };
+    cb.onCenterChange = (center, zoom) => {
+      setState((prev) => ({ ...prev, center, zoom }));
+      forwardCallback(optionsRef, "onCenterChange", center, zoom);
+    };
+    cb.onZoomChange = (zoom) => {
+      setState((prev) => ({ ...prev, zoom }));
+      forwardCallback(optionsRef, "onZoomChange", zoom);
+    };
+    cb.onActiveLocationChange = (location) => {
+      setState((prev) => ({ ...prev, activeLocation: location }));
+      forwardCallback(optionsRef, "onActiveLocationChange", location);
+    };
+    cb.onLoadingStateChange = (loading) => {
+      setState((prev) => ({ ...prev, initialLoading: loading }));
+      forwardCallback(optionsRef, "onLoadingStateChange", loading);
+    };
+    cb.onSearchingStateChange = (searching) => {
+      setState((prev) => ({ ...prev, isSearching: searching }));
+      forwardCallback(optionsRef, "onSearchingStateChange", searching);
+    };
+    cb.onFirstCallDoneChange = (firstCallDone) => {
+      setState((prev) => ({ ...prev, firstCallDone }));
+      forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
+    };
+    cb.onIsFlyToAnimatingChange = (animating) => {
+      setState((prev) => ({ ...prev, isFlyToAnimating: animating }));
+      forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
     };
 
-    const instance = new MapFirstCore(coreOptions);
-    instanceRef.current = instance;
-
-    // Initialize state from SDK
-    setState(instance.getState());
-
     return () => {
-      instance.destroy();
+      // Clear all callbacks so the destroyed instance cannot trigger setState
+      // after the component has unmounted.
+      const existingCb = callbacksRef.current;
+      (Object.keys(existingCb) as Array<keyof MapStateCallbacks>).forEach(
+        (k) => delete existingCb[k],
+      );
+      instanceRef.current?.destroy();
       instanceRef.current = null;
-      setState(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

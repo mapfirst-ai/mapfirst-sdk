@@ -1376,9 +1376,6 @@ var SmartFilter = ({
 };
 
 // src/index.tsx
-function updateStateField(setState, key, value) {
-  setState((prev) => prev ? { ...prev, [key]: value } : null);
-}
 function forwardCallback(optionsRef, key, ...args) {
   var _a;
   const callback = (_a = optionsRef.current.callbacks) == null ? void 0 : _a[key];
@@ -1392,82 +1389,96 @@ function attachMapOnce(instanceRef, attachedRef, map, config) {
   attachedRef.current = true;
 }
 function useMapFirst(options) {
-  const instanceRef = import_react9.default.useRef(null);
-  const [state, setState] = import_react9.default.useState(null);
   const optionsRef = import_react9.default.useRef(options);
   import_react9.default.useEffect(() => {
     optionsRef.current = options;
   });
-  import_react9.default.useEffect(() => {
-    const opts = optionsRef.current;
-    const coreOptions = {
+  const callbacksRef = import_react9.default.useRef({});
+  const instanceRef = import_react9.default.useRef(null);
+  if (instanceRef.current === null) {
+    instanceRef.current = new import_core.MapFirstCore({
       adapter: null,
-      // Will be set when attachMap is called
-      ...opts,
-      callbacks: {
-        ...opts.callbacks,
-        // Add internal callbacks to trigger React re-renders
-        onPropertiesChange: (properties) => {
-          updateStateField(setState, "properties", properties);
-          forwardCallback(optionsRef, "onPropertiesChange", properties);
-        },
-        onSelectedPropertyChange: (id) => {
-          updateStateField(setState, "selectedPropertyId", id);
-          forwardCallback(optionsRef, "onSelectedPropertyChange", id);
-        },
-        onPrimaryTypeChange: (type) => {
-          updateStateField(setState, "primary", type);
-          forwardCallback(optionsRef, "onPrimaryTypeChange", type);
-        },
-        onFiltersChange: (filters) => {
-          updateStateField(setState, "filters", filters);
-          forwardCallback(optionsRef, "onFiltersChange", filters);
-        },
-        onBoundsChange: (bounds) => {
-          updateStateField(setState, "bounds", bounds);
-          forwardCallback(optionsRef, "onBoundsChange", bounds);
-        },
-        onPendingBoundsChange: (pendingBounds) => {
-          updateStateField(setState, "pendingBounds", pendingBounds);
-          forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
-        },
-        onCenterChange: (center, zoom) => {
-          setState((prev) => prev ? { ...prev, center, zoom } : null);
-          forwardCallback(optionsRef, "onCenterChange", center, zoom);
-        },
-        onZoomChange: (zoom) => {
-          updateStateField(setState, "zoom", zoom);
-          forwardCallback(optionsRef, "onZoomChange", zoom);
-        },
-        onActiveLocationChange: (location) => {
-          updateStateField(setState, "activeLocation", location);
-          forwardCallback(optionsRef, "onActiveLocationChange", location);
-        },
-        onLoadingStateChange: (loading) => {
-          updateStateField(setState, "initialLoading", loading);
-          forwardCallback(optionsRef, "onLoadingStateChange", loading);
-        },
-        onSearchingStateChange: (searching) => {
-          updateStateField(setState, "isSearching", searching);
-          forwardCallback(optionsRef, "onSearchingStateChange", searching);
-        },
-        onFirstCallDoneChange: (firstCallDone) => {
-          updateStateField(setState, "firstCallDone", firstCallDone);
-          forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
-        },
-        onIsFlyToAnimatingChange: (animating) => {
-          updateStateField(setState, "isFlyToAnimating", animating);
-          forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
-        }
-      }
+      ...optionsRef.current,
+      callbacks: callbacksRef.current
+    });
+  }
+  const [state, setState] = import_react9.default.useState(
+    () => instanceRef.current.getState()
+  );
+  import_react9.default.useEffect(() => {
+    if (!instanceRef.current) {
+      callbacksRef.current = {};
+      instanceRef.current = new import_core.MapFirstCore({
+        adapter: null,
+        ...optionsRef.current,
+        callbacks: callbacksRef.current
+      });
+      setState(instanceRef.current.getState());
+      mapLibreAttachedRef.current = false;
+      googleMapsAttachedRef.current = false;
+      mapboxAttachedRef.current = false;
+    }
+    const cb = callbacksRef.current;
+    cb.onPropertiesChange = (properties) => {
+      setState((prev) => ({ ...prev, properties }));
+      forwardCallback(optionsRef, "onPropertiesChange", properties);
     };
-    const instance = new import_core.MapFirstCore(coreOptions);
-    instanceRef.current = instance;
-    setState(instance.getState());
+    cb.onSelectedPropertyChange = (id) => {
+      setState((prev) => ({ ...prev, selectedPropertyId: id }));
+      forwardCallback(optionsRef, "onSelectedPropertyChange", id);
+    };
+    cb.onPrimaryTypeChange = (type) => {
+      setState((prev) => ({ ...prev, primary: type }));
+      forwardCallback(optionsRef, "onPrimaryTypeChange", type);
+    };
+    cb.onFiltersChange = (filters) => {
+      setState((prev) => ({ ...prev, filters }));
+      forwardCallback(optionsRef, "onFiltersChange", filters);
+    };
+    cb.onBoundsChange = (bounds) => {
+      setState((prev) => ({ ...prev, bounds }));
+      forwardCallback(optionsRef, "onBoundsChange", bounds);
+    };
+    cb.onPendingBoundsChange = (pendingBounds) => {
+      setState((prev) => ({ ...prev, pendingBounds }));
+      forwardCallback(optionsRef, "onPendingBoundsChange", pendingBounds);
+    };
+    cb.onCenterChange = (center, zoom) => {
+      setState((prev) => ({ ...prev, center, zoom }));
+      forwardCallback(optionsRef, "onCenterChange", center, zoom);
+    };
+    cb.onZoomChange = (zoom) => {
+      setState((prev) => ({ ...prev, zoom }));
+      forwardCallback(optionsRef, "onZoomChange", zoom);
+    };
+    cb.onActiveLocationChange = (location) => {
+      setState((prev) => ({ ...prev, activeLocation: location }));
+      forwardCallback(optionsRef, "onActiveLocationChange", location);
+    };
+    cb.onLoadingStateChange = (loading) => {
+      setState((prev) => ({ ...prev, initialLoading: loading }));
+      forwardCallback(optionsRef, "onLoadingStateChange", loading);
+    };
+    cb.onSearchingStateChange = (searching) => {
+      setState((prev) => ({ ...prev, isSearching: searching }));
+      forwardCallback(optionsRef, "onSearchingStateChange", searching);
+    };
+    cb.onFirstCallDoneChange = (firstCallDone) => {
+      setState((prev) => ({ ...prev, firstCallDone }));
+      forwardCallback(optionsRef, "onFirstCallDoneChange", firstCallDone);
+    };
+    cb.onIsFlyToAnimatingChange = (animating) => {
+      setState((prev) => ({ ...prev, isFlyToAnimating: animating }));
+      forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
+    };
     return () => {
-      instance.destroy();
+      var _a;
+      const existingCb = callbacksRef.current;
+      Object.keys(existingCb).forEach(
+        (k) => delete existingCb[k]
+      );
+      (_a = instanceRef.current) == null ? void 0 : _a.destroy();
       instanceRef.current = null;
-      setState(null);
     };
   }, []);
   const setPrimaryType = import_react9.default.useCallback((type) => {
