@@ -50,7 +50,7 @@ function SearchComponent() {
   return (
     <div>
       <button onClick={handleSearch}>Search Barcelona</button>
-      <p>Found {state?.properties?.length ?? 0} properties</p>
+      <p>Found {state.properties.length} properties</p>
     </div>
   );
 }
@@ -155,7 +155,7 @@ function SmartSearch() {
   const handleFilterChange = async (updatedFilters: Filter[]) => {
     setFilters(updatedFilters);
 
-    if (searchQuery && !state?.isSearching) {
+    if (searchQuery && !state.isSearching) {
       await handleSmartSearch(searchQuery, updatedFilters);
     }
   };
@@ -174,13 +174,13 @@ function SmartSearch() {
       {filters.length > 0 && (
         <SmartFilter
           filters={filters}
-          isSearching={state?.isSearching}
+          isSearching={state.isSearching}
           onFilterChange={handleFilterChange}
           currency="JPY"
         />
       )}
 
-      <p>Found {state?.properties?.length || 0} properties</p>
+      <p>Found {state.properties.length} properties</p>
     </div>
   );
 }
@@ -191,8 +191,6 @@ function SmartSearch() {
 ```javascript
 mapFirst.runSmartFilterSearch({
   query: "boutique hotels near the river",
-  city: "Prague",
-  country: "Czech Republic",
 });
 ```
 
@@ -249,9 +247,9 @@ function TypeFilter() {
   return (
     <div>
       <button onClick={() => setPrimaryType("Accommodation")}>Hotels</button>
-      <button onClick={() => setPrimaryType("Restaurant")}>Restaurants</button>
+      <button onClick={() => setPrimaryType("Eat & Drink")}>Restaurants</button>
       <button onClick={() => setPrimaryType("Attraction")}>Attractions</button>
-      <p>Current: {state.primaryType}</p>
+      <p>Current: {state.primary}</p>
     </div>
   );
 }
@@ -260,7 +258,7 @@ function TypeFilter() {
 ### JavaScript Example
 
 ```javascript
-mapFirst.setPrimaryType("Restaurant");
+mapFirst.setPrimaryType("Eat & Drink");
 ```
 
 ---
@@ -286,9 +284,8 @@ function SearchResults() {
       <h3>Found {state.properties.length} properties</h3>
       <ul>
         {state.properties.map((property) => (
-          <li key={property.id}>
+          <li key={property.tripadvisor_id}>
             {property.name} - {property.rating}/5
-            {property.price && ` - ${property.currency}${property.price}`}
           </li>
         ))}
       </ul>
@@ -310,13 +307,9 @@ function FilteredResults() {
   // Filter by rating
   const highRated = state.properties.filter((p) => p.rating >= 4.5);
 
-  // Filter by price
-  const affordable = state.properties.filter((p) => p.price && p.price < 100);
-
   return (
     <div>
       <h3>High Rated ({highRated.length})</h3>
-      <h3>Affordable ({affordable.length})</h3>
     </div>
   );
 }
@@ -385,7 +378,7 @@ function AutoSearch() {
     });
 
     map.on("load", () => {
-      attachMapLibre(map, {});
+      attachMapLibre(map, maplibregl, {});
 
       // Search when map movement ends
       map.on("moveend", () => {

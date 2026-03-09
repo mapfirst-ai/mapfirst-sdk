@@ -67,7 +67,7 @@ export default function BasicMap() {
 
     map.on("load", () => {
       setMapLoaded(true);
-      attachMapLibre(map, {
+      attachMapLibre(map, maplibregl, {
         onMarkerClick: (property) => {
           alert(`${property.name}\nRating: ${property.rating || "N/A"}`);
         },
@@ -133,7 +133,7 @@ export default function BasicMap() {
         </button>
 
         <p>
-          Type: {state.primaryType} | Properties: {state.properties.length} |
+          Type: {state.primary} | Properties: {state.properties.length} |
           {state.isSearching && " Loading..."}
         </p>
       </div>

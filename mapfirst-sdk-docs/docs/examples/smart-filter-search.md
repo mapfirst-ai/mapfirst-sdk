@@ -27,14 +27,14 @@ import {
   processApiFilters,
   convertToApiFilters,
 } from "@mapfirst.ai/react";
-import type { SmartFilter } from "@mapfirst.ai/react";
+import type { Filter } from "@mapfirst.ai/react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 export default function SmartFilterSearch() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState<SmartFilter[]>([]);
+  const [filters, setFilters] = useState<Filter[]>([]);
 
   const {
     instance: mapFirst,

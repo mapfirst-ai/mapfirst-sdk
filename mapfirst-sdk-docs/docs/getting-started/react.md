@@ -94,8 +94,8 @@ function MapComponent() {
   return (
     <div>
       <div ref={mapContainerRef} style={{ width: "100%", height: "600px" }} />
-      <p>Properties: {state?.properties?.length || 0}</p>
-      <p>Loading: {state?.isSearching ? "Yes" : "No"}</p>
+      <p>Properties: {state.properties.length}</p>
+      <p>Loading: {state.isSearching ? "Yes" : "No"}</p>
     </div>
   );
 }
@@ -151,8 +151,8 @@ function SearchExample() {
   };
 
   return (
-    <button onClick={handleSearch} disabled={state?.isSearching}>
-      {state?.isSearching ? "Searching..." : "Search Paris"}
+    <button onClick={handleSearch} disabled={state.isSearching}>
+      {state.isSearching ? "Searching..." : "Search Paris"}
     </button>
   );
 }
@@ -200,7 +200,7 @@ function SmartSearchExample() {
       <p>
         {state?.isSearching
           ? "Searching..."
-          : `${state?.properties?.length || 0} results`}
+          : `${state.properties.length || 0} results`}
       </p>
     </div>
   );
@@ -229,7 +229,7 @@ function TypeSwitcher() {
       <button onClick={() => setPrimaryType("Attraction")}>
         🎡 Attractions
       </button>
-      <span>Active: {state?.primaryType}</span>
+      <span>Active: {state.primary}</span>
     </div>
   );
 }

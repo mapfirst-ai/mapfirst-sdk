@@ -207,8 +207,6 @@ runSmartFilterSearch(params: SmartSearchParams): Promise<void>
 ```javascript
 await mapFirst.runSmartFilterSearch({
   query: "romantic restaurants with outdoor seating",
-  city: "Rome",
-  country: "Italy",
 });
 ```
 
@@ -235,13 +233,13 @@ await mapFirst.performBoundsSearch();
 Set the active property type filter. This controls which category of markers is displayed on the map.
 
 ```typescript
-setPrimaryType(type: 'Accommodation' | 'Restaurant' | 'Attraction'): void
+setPrimaryType(type: 'Accommodation' | 'Eat & Drink' | 'Attraction'): void
 ```
 
 **Example:**
 
 ```javascript
-mapFirst.setPrimaryType("Attraction");
+mapFirst.setPrimaryType("Eat & Drink");
 ```
 
 ---
@@ -346,7 +344,7 @@ onSelectedPropertyChange?: (id: number | null) => void
 Called when map bounds change.
 
 ```typescript
-onBoundsChange?: (bounds: Bounds) => void
+onBoundsChange?: (bounds: MapBounds | null) => void
 ```
 
 ### onSearchingStateChange
@@ -407,7 +405,7 @@ interface Property {
   pricing?: HotelPricingAPIResults; // Hotel pricing data when available
   url?: string; // Property URL
   secondaries: string[]; // Related property IDs
-  price_level?: PriceLevel; // Price level indicator ($ to $$$$)
+  price_level?: PriceLevel; // "Mid Range" | "Fine Dining" | "Cheap Eats"
   city?: string; // City name
   country?: string; // Country name
 }
@@ -425,12 +423,12 @@ const property = {
   type: "Accommodation",
   awards: [
     {
-      award_type: "Travelers Choice Best of the Best",
-      year: 2024,
-      images: [{ key: "logo", url: "https://..." }],
+      name: "Travelers Choice Best of the Best",
+      image: { key: "logo", url: "https://..." },
+      type: "1",
     },
   ],
-  price_level: "$$$",
+  price_level: "Mid Range",
   city: "Paris",
   country: "France",
 };
@@ -445,40 +443,38 @@ type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
 ### PropertyAward
 
 ```typescript
-interface PropertyAward {
-  award_type: string; // Award name
-  year: number; // Year awarded
-  images: PropertyAwardImage[]; // Award badge images
-}
+type PropertyAward = {
+  name: string; // Award name
+  image: PropertyAwardImage; // Award badge image
+  type: "0" | "1"; // Award category
+};
 
-interface PropertyAwardImage {
+type PropertyAwardImage = {
   key: string; // Image type (e.g., "logo")
   url: string; // Image URL
-}
+};
 ```
 
 ---
 
 ### PriceLevel
 
-Price level indicator shown as dollar signs. Useful for displaying relative cost at a glance.
+Price level indicator shown as a string.
 
 ```typescript
-type PriceLevel = "$" | "$$" | "$$$" | "$$$$";
+type PriceLevel = "Mid Range" | "Fine Dining" | "Cheap Eats";
 ```
 
 ---
 
-### Bounds
+### MapBounds
 
-Represents a rectangular geographic area defined by its edges. Used for bounds-based searches and map viewport tracking.
+Represents a rectangular geographic area defined by its southwest and northeast corners.
 
 ```typescript
-interface Bounds {
-  north: number;
-  south: number;
-  east: number;
-  west: number;
+interface MapBounds {
+  sw: { lat: number; lng: number };
+  ne: { lat: number; lng: number };
 }
 ```
 

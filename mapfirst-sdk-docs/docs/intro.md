@@ -109,7 +109,7 @@ function MyMap() {
     });
 
     map.on("load", () => {
-      attachMapLibre(map, {
+      attachMapLibre(map, maplibregl, {
         onMarkerClick: (property) => console.log(property.name),
       });
     });

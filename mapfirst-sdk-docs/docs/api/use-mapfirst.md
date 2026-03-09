@@ -104,25 +104,42 @@ interface MapFirstConfig {
 
 ### instance
 
-The underlying `MapFirstCore` instance. Use this for advanced operations not covered by the hook's convenience methods. Will be `null` until initialization completes.
+The underlying `MapFirstCore` instance. Use this for advanced operations not covered by the hook's convenience methods.
 
 ```typescript
-instance: MapFirstCore | null;
+instance: MapFirstCore;
 ```
 
 ---
 
 ### state
 
-Reactive state object. Your component re-renders automatically whenever any value in this object changes — no manual subscriptions needed.
+Reactive state object. Your component re-renders automatically whenever any value in this object changes — no manual subscriptions needed. Always non-null from the first render.
 
 ```typescript
-interface MapFirstState {
+interface MapState {
+  // Data
   properties: Property[];
-  selectedProperty: number | null;
+  selectedPropertyId: number | null;
+  primary: PropertyType; // "Accommodation" | "Eat & Drink" | "Attraction"
+
+  // Loading
+  initialLoading: boolean;
   isSearching: boolean;
-  bounds: Bounds | null;
-  primaryType: "Accommodation" | "Restaurant" | "Attraction";
+  firstCallDone: boolean;
+
+  // View
+  center: [number, number]; // [lat, lng]
+  zoom: number;
+  bounds: MapBounds | null;
+  pendingBounds: MapBounds | null;
+
+  // Filters
+  filters: FilterState;
+  activeLocation: ActiveLocation;
+
+  // Animation
+  isFlyToAnimating: boolean;
 }
 ```
 
@@ -133,13 +150,13 @@ interface MapFirstState {
 Switch the active property type filter. This immediately updates which markers are visible on the map.
 
 ```typescript
-setPrimaryType: (type: 'Accommodation' | 'Restaurant' | 'Attraction') => void
+setPrimaryType: (type: 'Accommodation' | 'Eat & Drink' | 'Attraction') => void
 ```
 
 **Example:**
 
 ```typescript
-setPrimaryType("Restaurant");
+setPrimaryType("Eat & Drink");
 ```
 
 ---
@@ -289,7 +306,6 @@ attachMapLibre: (map: maplibregl.Map, maplibregl: MapLibreNamespace, options?: A
 ```typescript
 interface AttachOptions {
   onMarkerClick?: (property: Property) => void;
-  markerStyle?: MarkerStyle;
 }
 ```
 
@@ -321,7 +337,7 @@ map.on("load", () => {
 Connect a Google Maps instance. The map must have a valid `mapId` for Advanced Markers to work.
 
 ```typescript
-attachGoogle: (map: google.maps.Map, options: AttachOptions) => void
+attachGoogle: (map: any, google: GoogleMapsNamespace, options?: AttachOptions) => void
 ```
 
 **Example:**
@@ -333,7 +349,7 @@ const map = new google.maps.Map(document.getElementById("map"), {
   mapId: "YOUR_MAP_ID",
 });
 
-attachGoogle(map, {
+attachGoogle(map, window.google.maps, {
   onMarkerClick: (property) => {
     console.log("Clicked:", property.name);
   },
@@ -367,7 +383,7 @@ setUseApi(true, false);
 Connect a Mapbox GL JS map instance. Call this **after** the map's `load` event fires, just like MapLibre.
 
 ```typescript
-attachMapbox: (map: mapboxgl.Map, options: AttachOptions) => void
+attachMapbox: (map: any, mapboxgl: MapboxNamespace, options?: AttachOptions) => void
 ```
 
 **Example:**
@@ -385,7 +401,7 @@ const map = new mapboxgl.Map({
 });
 
 map.on("load", () => {
-  attachMapbox(map, {
+  attachMapbox(map, mapboxgl, {
     onMarkerClick: (property) => {
       console.log("Clicked:", property.name);
     },
