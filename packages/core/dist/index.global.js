@@ -1796,6 +1796,7 @@ var MapFirstCore = (() => {
       this.clusterItems = [];
       this.isMapAttached = false;
       this.stopLocationPermissionListener = null;
+      this.locationWatchId = null;
       var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u;
       this.properties = [...(_a = options.properties) != null ? _a : []];
       this.primaryType = options.primaryType;
@@ -2164,12 +2165,49 @@ var MapFirstCore = (() => {
         onGranted: async () => {
           if (this.destroyed) return;
           await this.syncUserLocationIfGranted({ maxAttempts: 2, timeoutMs: 1e4 });
+          this.startLocationTracking();
         },
         onDenied: () => {
           if (this.destroyed) return;
           this.setUserLocation(null);
+          this.stopLocationTracking();
         }
       });
+    }
+    /**
+     * Start continuous location tracking using watchPosition.
+     * Updates blue dot marker in real-time as user moves.
+     */
+    startLocationTracking() {
+      if (!navigator.geolocation || this.locationWatchId !== null) {
+        return;
+      }
+      this.locationWatchId = navigator.geolocation.watchPosition(
+        (position) => {
+          if (this.destroyed) return;
+          this.setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.debug("Location watch failed:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 1e4,
+          maximumAge: 0
+        }
+      );
+    }
+    /**
+     * Stop continuous location tracking.
+     */
+    stopLocationTracking() {
+      if (this.locationWatchId !== null) {
+        navigator.geolocation.clearWatch(this.locationWatchId);
+        this.locationWatchId = null;
+      }
     }
     /**
      * Update the user's current location and render the marker.
@@ -2855,6 +2893,7 @@ var MapFirstCore = (() => {
       }
       (_a = this.stopLocationPermissionListener) == null ? void 0 : _a.call(this);
       this.stopLocationPermissionListener = null;
+      this.stopLocationTracking();
       this.clusterItems = [];
       this.properties = [];
       this.destroyed = true;

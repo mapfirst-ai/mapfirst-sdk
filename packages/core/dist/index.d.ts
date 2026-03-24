@@ -470,6 +470,7 @@ declare class MapFirstCore {
     private clusterItems;
     private isMapAttached;
     private stopLocationPermissionListener;
+    private locationWatchId;
     private state;
     private callbacks;
     private useApi;
@@ -514,6 +515,15 @@ declare class MapFirstCore {
      * Observe permission transitions and update location marker automatically.
      */
     private setupCurrentLocationPermissionListener;
+    /**
+     * Start continuous location tracking using watchPosition.
+     * Updates blue dot marker in real-time as user moves.
+     */
+    private startLocationTracking;
+    /**
+     * Stop continuous location tracking.
+     */
+    private stopLocationTracking;
     /**
      * Update the user's current location and render the marker.
      */
