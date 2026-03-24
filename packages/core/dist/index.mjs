@@ -2093,7 +2093,10 @@ var MapFirstCore = class {
    */
   async initializeCurrentLocationMarker() {
     try {
-      await this.syncUserLocationIfGranted({ maxAttempts: 3, timeoutMs: 1e4 });
+      const synced = await this.syncUserLocationIfGranted({ maxAttempts: 3, timeoutMs: 1e4 });
+      if (synced) {
+        this.startLocationTracking();
+      }
     } catch (error) {
       console.debug("Current location marker initialization failed:", error);
     }
@@ -2196,12 +2199,17 @@ var MapFirstCore = class {
     this.ensureAlive();
     if (!granted) {
       this.setUserLocation(null);
+      this.stopLocationTracking();
       return false;
     }
-    return await this.syncUserLocationIfGranted({
+    const synced = await this.syncUserLocationIfGranted({
       maxAttempts: 2,
       timeoutMs: 1e4
     });
+    if (synced) {
+      this.startLocationTracking();
+    }
+    return synced;
   }
   // State management methods
   getState() {

@@ -768,7 +768,11 @@ export class MapFirstCore {
    */
   private async initializeCurrentLocationMarker(): Promise<void> {
     try {
-      await this.syncUserLocationIfGranted({ maxAttempts: 3, timeoutMs: 10000 });
+      const synced = await this.syncUserLocationIfGranted({ maxAttempts: 3, timeoutMs: 10000 });
+      if (synced) {
+        // Permission is already granted at startup; enable continuous tracking immediately.
+        this.startLocationTracking();
+      }
     } catch (error) {
       // Silently fail if geolocation is not available or user denies permission
       console.debug("Current location marker initialization failed:", error);
@@ -890,13 +894,20 @@ export class MapFirstCore {
     this.ensureAlive();
     if (!granted) {
       this.setUserLocation(null);
+      this.stopLocationTracking();
       return false;
     }
 
-    return await this.syncUserLocationIfGranted({
+    const synced = await this.syncUserLocationIfGranted({
       maxAttempts: 2,
       timeoutMs: 10000,
     });
+
+    if (synced) {
+      this.startLocationTracking();
+    }
+
+    return synced;
   }
 
   // State management methods
