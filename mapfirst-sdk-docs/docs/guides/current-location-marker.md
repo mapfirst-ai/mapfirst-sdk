@@ -4,24 +4,31 @@ sidebar_position: 4
 
 # Current Location Marker
 
-Display a blue dot marker showing the user's current geographic location on the map. The marker automatically requests geolocation permission and only displays once the user has granted access.
+Display a blue dot marker showing the user's current geographic location on the map.
 
 ## Overview
 
-The `currentLocationMarker` option enables the SDK to display a blue dot marker on the map representing the user's current geographic location. The marker automatically requests geolocation permission and only displays once the user has granted access.
+The `currentLocationMarker` option enables the SDK to display a blue dot marker on the map representing the user's current geographic location.
+
+Permission flow is **client-driven**:
+
+- Your app requests geolocation permission (for example, from an "Enable Location" button).
+- Your app then notifies SDK by calling `onLocationPermissionResult(true | false)`.
+- SDK reads coordinates (without prompting) and updates the marker state.
 
 ## Features
 
 - **Permission-aware**: Respects browser geolocation permissions
+- **Client-controlled prompting**: SDK does not own the permission prompt UX
 - **Non-blocking**: Won't display an error if permission is denied
-- **Auto-fetching**: Automatically attempts to get user location when enabled
+- **Startup check**: Automatically shows marker on map attach if permission is already granted
 - **Blue dot styling**: Distinctive marker with pulse animation
 - **State management**: Integrates with the MapState for reactive updates
 
-## React Example
+## React Example (Client Prompts, SDK Syncs)
 
 ```typescript
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useMapFirst } from "@mapfirst.ai/react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -29,16 +36,42 @@ import "maplibre-gl/dist/maplibre-gl.css";
 function MapWithUserLocation() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [locationStatus, setLocationStatus] = useState("Location permission not requested");
 
-  const { attachMapLibre, state } = useMapFirst({
+  const { attachMapLibre, instance: mapFirst, state } = useMapFirst({
     apiKey: "your-api-key",
-    currentLocationMarker: true, // Enable user location marker
+    currentLocationMarker: true,
     initialLocationData: {
       city: "New York",
       country: "United States",
       currency: "USD",
     },
   });
+
+  const syncCurrentLocation = useCallback(async (): Promise<boolean> => {
+    if (!navigator.geolocation) {
+      return false;
+    }
+
+    return await new Promise<boolean>((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          mapFirst.setUserLocation({ lat, lng });
+          if (map) {
+            mapFirst.flyMapTo(lng, lat, 13);
+          }
+          resolve(true);
+        },
+        () => {
+          resolve(false);
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 5 * 60 * 1000 },
+      );
+    });
+  }, [mapFirst, map]);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -53,14 +86,45 @@ function MapWithUserLocation() {
     mapInstance.on("load", () => {
       setMap(mapInstance);
       attachMapLibre(mapInstance, maplibregl);
-      // Blue dot will appear once user grants permission
     });
 
     return () => mapInstance.remove();
   }, [attachMapLibre]);
 
+  const requestLocationPermission = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("Geolocation is not supported in this browser");
+      return;
+    }
+
+    setIsRequesting(true);
+    setLocationStatus("Requesting location permission...");
+
+    void (async () => {
+      const synced = await syncCurrentLocation();
+      setLocationStatus(synced ? "Location permission granted" : "Location temporarily unavailable");
+      if (!synced) {
+        mapFirst.setUserLocation(null);
+      }
+      setIsRequesting(false);
+    })();
+  };
+
   return (
     <div>
+      <div style={{ marginBottom: "12px" }}>
+        <button
+          onClick={requestLocationPermission}
+          disabled={isRequesting}
+          style={{ marginRight: "10px", padding: "8px 12px" }}
+        >
+          {isRequesting ? "Requesting..." : "Enable Location"}
+        </button>
+        <span style={{ fontSize: "14px", color: "#555" }}>
+          {locationStatus}
+        </span>
+      </div>
+
       <div
         ref={mapContainerRef}
         style={{ width: "100%", height: "600px", marginBottom: "20px" }}
@@ -85,6 +149,44 @@ function MapWithUserLocation() {
 
 export default MapWithUserLocation;
 ```
+
+## Recommended Approach: Direct Location Sync
+
+The simplest pattern is to use `setUserLocation` directly after obtaining coordinates:
+
+```typescript
+navigator.geolocation.getCurrentPosition(
+  (position) => {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    mapFirst.setUserLocation({ lat, lng });
+    // Optionally center the map on the user location
+    mapFirst.flyMapTo(lng, lat, 13);
+  },
+  () => {
+    // Handle permission denied or error
+    mapFirst.setUserLocation(null);
+  },
+  { enableHighAccuracy: false, timeout: 10000, maximumAge: 5 * 60 * 1000 },
+);
+```
+
+This approach:
+- Directly sets user location when coordinates are obtained
+- No need to check permission state separately
+- Automatically triggers marker render
+- Centers the map so the blue dot is visible
+
+## Advanced: Permission-Only Sync (Legacy)
+
+For cases where you need to sync permission state separately, `onLocationPermissionResult` is available but not recommended for typical use:
+
+```typescript
+await mapFirst.onLocationPermissionResult(true); // permission granted
+await mapFirst.onLocationPermissionResult(false); // permission denied
+```
+
+This method returns `boolean` indicating whether coordinates were successfully resolved.
 
 ## With Location Change Callback
 
@@ -170,19 +272,22 @@ console.log(state.userLocation); // { lat: 40.7128, lng: -74.006 } or null
 
 ### How It Works
 
-The SDK follows the browser's geolocation permission states:
+The SDK behavior follows this contract:
 
-1. **Prompt State**: User hasn't made a decision
-   - SDK waits for user to grant/deny permission
-   - No marker is displayed yet
+1. **Startup Check (no prompt)**
 
-2. **Granted State**: User has granted permission
-   - SDK gets the user's location
-   - Blue dot marker appears on map
+- If `currentLocationMarker: true`, SDK checks whether permission is already granted.
+- If granted, SDK fetches coordinates and renders the blue dot.
 
-3. **Denied State**: User has denied permission
-   - Marker will not appear
-   - No error is thrown to the user
+2. **Client Prompt**
+
+- Your app prompts permission using `navigator.geolocation.getCurrentPosition(...)`.
+- App calls `onLocationPermissionResult(true | false)`.
+
+3. **SDK Sync**
+
+- `true`: SDK reads coordinates and updates marker.
+- `false`: SDK clears marker state.
 
 ### Browser Support
 
@@ -218,10 +323,10 @@ If you need to customize the marker styles:
 
 ## Performance Considerations
 
-- Location fetching happens once when `attachMap` is called
+- Location fetch is only attempted when permission is already granted, or after client confirms permission.
 - The marker updates reactively when `userLocation` state changes
 - Marker removal is automatic when `userLocation` becomes null
-- No continuous polling — location is fetched once on initialization
+- No continuous polling — location is fetched on relevant permission/location sync events
 
 ## Advanced Examples
 
@@ -310,7 +415,7 @@ Check the following:
 
 1. **HTTPS Required**: Geolocation API requires HTTPS in production (localhost is allowed for development)
 2. **Permission Denied**: User may have denied location permission in browser settings
-3. **Timeout**: Location fetch may have exceeded default timeout
+3. **Client Sync Missing**: After prompt, ensure app calls `onLocationPermissionResult(true)`
 4. **Not Enabled**: Ensure `currentLocationMarker: true` is set in options
 
 ### Testing on Localhost
