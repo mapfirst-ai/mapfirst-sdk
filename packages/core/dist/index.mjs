@@ -1480,7 +1480,12 @@ async function getLocationWhenGranted() {
   }
   const status = await navigator.permissions.query({ name: "geolocation" });
   const fetchLocation = () => new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      // Prefer a fast, cached coordinate when available.
+      enableHighAccuracy: false,
+      timeout: 1e4,
+      maximumAge: 5 * 60 * 1e3
+    });
   });
   if (status.state === "granted") {
     return fetchLocation();
@@ -1501,7 +1506,12 @@ async function getLocationIfAlreadyGranted(timeoutMs = 5e3) {
     }
     const position = await Promise.race([
       new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          // Startup flow should return quickly on refresh when cached data exists.
+          enableHighAccuracy: false,
+          timeout: timeoutMs,
+          maximumAge: 5 * 60 * 1e3
+        });
       }),
       new Promise(
         (_, reject) => setTimeout(() => reject(new Error("Geolocation timeout")), timeoutMs)
