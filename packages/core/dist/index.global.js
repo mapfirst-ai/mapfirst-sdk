@@ -2115,13 +2115,33 @@ var MapFirstCore = (() => {
      */
     async initializeCurrentLocationMarker() {
       try {
-        const location = await getLocationIfAlreadyGranted();
-        if (location) {
-          this.setUserLocation(location);
-        }
+        await this.syncUserLocationIfGranted({ maxAttempts: 3, timeoutMs: 1e4 });
       } catch (error) {
         console.debug("Current location marker initialization failed:", error);
       }
+    }
+    /**
+     * Try to resolve and set user location when permission is already granted.
+     * Retries help with transient startup timing issues where coordinates are not
+     * immediately available even though permission is granted.
+     */
+    async syncUserLocationIfGranted({
+      maxAttempts = 1,
+      timeoutMs = 1e4,
+      retryDelayMs = 1200
+    } = {}) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        if (this.destroyed) return false;
+        const location = await getLocationIfAlreadyGranted(timeoutMs);
+        if (location) {
+          this.setUserLocation(location);
+          return true;
+        }
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        }
+      }
+      return false;
     }
     /**
      * Observe permission transitions and update location marker automatically.
@@ -2133,10 +2153,7 @@ var MapFirstCore = (() => {
       this.stopLocationPermissionListener = await subscribeToLocationPermissionChanges({
         onGranted: async () => {
           if (this.destroyed) return;
-          const location = await getLocationIfAlreadyGranted();
-          if (location) {
-            this.setUserLocation(location);
-          }
+          await this.syncUserLocationIfGranted({ maxAttempts: 2, timeoutMs: 1e4 });
         },
         onDenied: () => {
           if (this.destroyed) return;
@@ -2166,12 +2183,10 @@ var MapFirstCore = (() => {
         this.setUserLocation(null);
         return false;
       }
-      const location = await getLocationIfAlreadyGranted();
-      if (!location) {
-        return false;
-      }
-      this.setUserLocation(location);
-      return true;
+      return await this.syncUserLocationIfGranted({
+        maxAttempts: 2,
+        timeoutMs: 1e4
+      });
     }
     // State management methods
     getState() {

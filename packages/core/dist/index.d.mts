@@ -505,6 +505,12 @@ declare class MapFirstCore {
      */
     private initializeCurrentLocationMarker;
     /**
+     * Try to resolve and set user location when permission is already granted.
+     * Retries help with transient startup timing issues where coordinates are not
+     * immediately available even though permission is granted.
+     */
+    private syncUserLocationIfGranted;
+    /**
      * Observe permission transitions and update location marker automatically.
      */
     private setupCurrentLocationPermissionListener;
