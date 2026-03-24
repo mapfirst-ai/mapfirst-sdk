@@ -24,7 +24,10 @@ import {
   extractViewState,
   ViewStateSnapshot,
 } from "./utils/clustering";
-import { getLocationIfAlreadyGranted } from "./utils/geolocation";
+import {
+  getLocationIfAlreadyGranted,
+  subscribeToLocationPermissionChanges,
+} from "./utils/geolocation";
 import type {
   MapBounds,
   ActiveLocation,
@@ -316,6 +319,7 @@ export class MapFirstCore {
   private destroyed = false;
   private clusterItems: ClusterDisplayItem[] = [];
   private isMapAttached = false;
+  private stopLocationPermissionListener: (() => void) | null = null;
 
   // State management
   private state: MapState;
@@ -598,6 +602,8 @@ export class MapFirstCore {
 
     if (this.isMapAttached) {
       console.warn("Map is already attached. Destroying previous adapter.");
+      this.stopLocationPermissionListener?.();
+      this.stopLocationPermissionListener = null;
       if (this.adapter) {
         const markerManager = this.adapter.getMarkerManager();
         markerManager?.destroy();
@@ -623,6 +629,7 @@ export class MapFirstCore {
     // Initialize current location marker if enabled
     if (this.options.currentLocationMarker) {
       this.initializeCurrentLocationMarker();
+      void this.setupCurrentLocationPermissionListener();
     }
 
     // Auto-load properties if we have requestBody and haven't loaded yet
@@ -768,6 +775,29 @@ export class MapFirstCore {
       // Silently fail if geolocation is not available or user denies permission
       console.debug("Current location marker initialization failed:", error);
     }
+  }
+
+  /**
+   * Observe permission transitions and update location marker automatically.
+   */
+  private async setupCurrentLocationPermissionListener(): Promise<void> {
+    this.stopLocationPermissionListener?.();
+    this.stopLocationPermissionListener = null;
+
+    this.stopLocationPermissionListener =
+      await subscribeToLocationPermissionChanges({
+        onGranted: async () => {
+          if (this.destroyed) return;
+          const location = await getLocationIfAlreadyGranted();
+          if (location) {
+            this.setUserLocation(location);
+          }
+        },
+        onDenied: () => {
+          if (this.destroyed) return;
+          this.setUserLocation(null);
+        },
+      });
   }
 
   /**
@@ -1671,6 +1701,9 @@ export class MapFirstCore {
       markerManager.destroy();
       this.adapter.cleanup();
     }
+
+    this.stopLocationPermissionListener?.();
+    this.stopLocationPermissionListener = null;
 
     this.clusterItems = [];
     this.properties = [];

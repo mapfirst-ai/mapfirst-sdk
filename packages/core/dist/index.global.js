@@ -1581,6 +1581,29 @@ var MapFirstCore = (() => {
       return null;
     }
   }
+  async function subscribeToLocationPermissionChanges(handlers) {
+    if (!navigator.permissions) {
+      return () => {
+      };
+    }
+    try {
+      const status = await navigator.permissions.query({ name: "geolocation" });
+      status.onchange = () => {
+        var _a, _b;
+        if (status.state === "granted") {
+          void ((_a = handlers.onGranted) == null ? void 0 : _a.call(handlers));
+        } else if (status.state === "denied") {
+          void ((_b = handlers.onDenied) == null ? void 0 : _b.call(handlers));
+        }
+      };
+      return () => {
+        status.onchange = null;
+      };
+    } catch {
+      return () => {
+      };
+    }
+  }
 
   // src/utils/filters.ts
   function processApiFilters(apiFilters) {
@@ -1779,6 +1802,7 @@ var MapFirstCore = (() => {
       this.destroyed = false;
       this.clusterItems = [];
       this.isMapAttached = false;
+      this.stopLocationPermissionListener = null;
       var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u;
       this.properties = [...(_a = options.properties) != null ? _a : []];
       this.primaryType = options.primaryType;
@@ -1963,9 +1987,12 @@ var MapFirstCore = (() => {
       });
     }
     attachMap(mapInstance, config) {
+      var _a;
       this.assertPlatformSupportForNoApi(config.platform, "throw");
       if (this.isMapAttached) {
         console.warn("Map is already attached. Destroying previous adapter.");
+        (_a = this.stopLocationPermissionListener) == null ? void 0 : _a.call(this);
+        this.stopLocationPermissionListener = null;
         if (this.adapter) {
           const markerManager = this.adapter.getMarkerManager();
           markerManager == null ? void 0 : markerManager.destroy();
@@ -1987,6 +2014,7 @@ var MapFirstCore = (() => {
       this.refresh();
       if (this.options.currentLocationMarker) {
         this.initializeCurrentLocationMarker();
+        void this.setupCurrentLocationPermissionListener();
       }
       if (this.requestBody && !this.state.firstCallDone) {
         this.autoLoadProperties();
@@ -2111,6 +2139,27 @@ var MapFirstCore = (() => {
       } catch (error) {
         console.debug("Current location marker initialization failed:", error);
       }
+    }
+    /**
+     * Observe permission transitions and update location marker automatically.
+     */
+    async setupCurrentLocationPermissionListener() {
+      var _a;
+      (_a = this.stopLocationPermissionListener) == null ? void 0 : _a.call(this);
+      this.stopLocationPermissionListener = null;
+      this.stopLocationPermissionListener = await subscribeToLocationPermissionChanges({
+        onGranted: async () => {
+          if (this.destroyed) return;
+          const location = await getLocationIfAlreadyGranted();
+          if (location) {
+            this.setUserLocation(location);
+          }
+        },
+        onDenied: () => {
+          if (this.destroyed) return;
+          this.setUserLocation(null);
+        }
+      });
     }
     /**
      * Update the user's current location and render the marker.
@@ -2769,6 +2818,7 @@ var MapFirstCore = (() => {
       (_c = (_b = this.options).onClusterUpdate) == null ? void 0 : _c.call(_b, this.clusterItems, viewState);
     }
     destroy() {
+      var _a;
       if (this.destroyed) {
         return;
       }
@@ -2777,6 +2827,8 @@ var MapFirstCore = (() => {
         markerManager.destroy();
         this.adapter.cleanup();
       }
+      (_a = this.stopLocationPermissionListener) == null ? void 0 : _a.call(this);
+      this.stopLocationPermissionListener = null;
       this.clusterItems = [];
       this.properties = [];
       this.destroyed = true;

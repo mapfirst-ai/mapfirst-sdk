@@ -112,3 +112,34 @@ export async function getCurrentLocation(
     return null;
   }
 }
+
+/**
+ * Subscribe to geolocation permission changes without prompting.
+ * Returns an unsubscribe function.
+ */
+export async function subscribeToLocationPermissionChanges(handlers: {
+  onGranted?: () => void | Promise<void>;
+  onDenied?: () => void | Promise<void>;
+}): Promise<() => void> {
+  if (!navigator.permissions) {
+    return () => {};
+  }
+
+  try {
+    const status = await navigator.permissions.query({ name: "geolocation" });
+
+    status.onchange = () => {
+      if (status.state === "granted") {
+        void handlers.onGranted?.();
+      } else if (status.state === "denied") {
+        void handlers.onDenied?.();
+      }
+    };
+
+    return () => {
+      status.onchange = null;
+    };
+  } catch {
+    return () => {};
+  }
+}

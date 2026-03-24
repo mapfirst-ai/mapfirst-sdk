@@ -468,6 +468,7 @@ declare class MapFirstCore {
     private destroyed;
     private clusterItems;
     private isMapAttached;
+    private stopLocationPermissionListener;
     private state;
     private callbacks;
     private useApi;
@@ -502,6 +503,10 @@ declare class MapFirstCore {
      * Retrieves user location and renders blue dot marker on map.
      */
     private initializeCurrentLocationMarker;
+    /**
+     * Observe permission transitions and update location marker automatically.
+     */
+    private setupCurrentLocationPermissionListener;
     /**
      * Update the user's current location and render the marker.
      */
