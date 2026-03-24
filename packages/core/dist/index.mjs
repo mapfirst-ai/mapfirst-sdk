@@ -1488,24 +1488,7 @@ async function getLocationWhenGranted() {
   if (status.state === "denied") {
     throw new Error("Location permission denied");
   }
-  return new Promise((resolve, reject) => {
-    const handleChange = async () => {
-      try {
-        if (status.state === "granted") {
-          status.onchange = null;
-          const pos = await fetchLocation();
-          resolve(pos);
-        } else if (status.state === "denied") {
-          status.onchange = null;
-          reject(new Error("Location permission denied"));
-        }
-      } catch (err) {
-        status.onchange = null;
-        reject(err);
-      }
-    };
-    status.onchange = handleChange;
-  });
+  return fetchLocation();
 }
 async function getLocationIfAlreadyGranted(timeoutMs = 5e3) {
   try {
@@ -2138,6 +2121,24 @@ var MapFirstCore = class {
     this.updateState({ userLocation: location });
     (_b = (_a = this.callbacks).onUserLocationChange) == null ? void 0 : _b.call(_a, location);
     this.refresh();
+  }
+  /**
+   * Sync user location after the app has handled permission UI.
+   * This method never prompts for permission; it only reads coordinates if
+   * permission is already granted.
+   */
+  async onLocationPermissionResult(granted) {
+    this.ensureAlive();
+    if (!granted) {
+      this.setUserLocation(null);
+      return false;
+    }
+    const location = await getLocationIfAlreadyGranted();
+    if (!location) {
+      return false;
+    }
+    this.setUserLocation(location);
+    return true;
   }
   // State management methods
   getState() {

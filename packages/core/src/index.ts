@@ -812,6 +812,27 @@ export class MapFirstCore {
     this.refresh();
   }
 
+  /**
+   * Sync user location after the app has handled permission UI.
+   * This method never prompts for permission; it only reads coordinates if
+   * permission is already granted.
+   */
+  async onLocationPermissionResult(granted: boolean): Promise<boolean> {
+    this.ensureAlive();
+    if (!granted) {
+      this.setUserLocation(null);
+      return false;
+    }
+
+    const location = await getLocationIfAlreadyGranted();
+    if (!location) {
+      return false;
+    }
+
+    this.setUserLocation(location);
+    return true;
+  }
+
   // State management methods
   getState(): Readonly<MapState> {
     return { ...this.state };

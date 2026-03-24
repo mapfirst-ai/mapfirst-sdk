@@ -380,7 +380,8 @@ declare function convertToApiFilters(filters: any[]): SmartFilter[];
 
 /**
  * Helper to get user's geolocation only if permission has been granted.
- * Waits for permission grant if in "prompt" state, throws if denied.
+ * If permission is in "prompt" state, this will trigger the browser prompt.
+ * Throws if denied.
  */
 declare function getLocationWhenGranted(): Promise<GeolocationPosition>;
 /**
@@ -514,6 +515,12 @@ declare class MapFirstCore {
         lat: number;
         lng: number;
     } | null): void;
+    /**
+     * Sync user location after the app has handled permission UI.
+     * This method never prompts for permission; it only reads coordinates if
+     * permission is already granted.
+     */
+    onLocationPermissionResult(granted: boolean): Promise<boolean>;
     getState(): Readonly<MapState>;
     private handleError;
     updateState(update: MapStateUpdate): void;
