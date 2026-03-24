@@ -24,7 +24,7 @@ import {
   extractViewState,
   ViewStateSnapshot,
 } from "./utils/clustering";
-import { getCurrentLocation } from "./utils/geolocation";
+import { getLocationIfAlreadyGranted } from "./utils/geolocation";
 import type {
   MapBounds,
   ActiveLocation,
@@ -760,7 +760,7 @@ export class MapFirstCore {
    */
   private async initializeCurrentLocationMarker(): Promise<void> {
     try {
-      const location = await getCurrentLocation();
+      const location = await getLocationIfAlreadyGranted();
       if (location) {
         this.setUserLocation(location);
       }

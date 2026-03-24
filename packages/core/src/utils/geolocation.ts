@@ -50,6 +50,46 @@ export async function getLocationWhenGranted(): Promise<GeolocationPosition> {
 }
 
 /**
+ * Get current location IF geolocation permission is already granted.
+ * Returns null if permission is not yet granted (without requesting it).
+ * Use this for auto-initialization without prompting the user.
+ */
+export async function getLocationIfAlreadyGranted(
+  timeoutMs: number = 5000,
+): Promise<{ lat: number; lng: number } | null> {
+  try {
+    if (!navigator.permissions || !navigator.geolocation) {
+      return null;
+    }
+
+    // Check permission status WITHOUT requesting
+    const status = await navigator.permissions.query({ name: "geolocation" });
+
+    // Only proceed if permission is already granted
+    if (status.state !== "granted") {
+      return null;
+    }
+
+    // Permission is granted, get location
+    const position = await Promise.race([
+      new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Geolocation timeout")), timeoutMs),
+      ),
+    ]);
+
+    return {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+/**
  * Get current location with optional timeout and error handling.
  * Returns null if geolocation fails or is not supported.
  */

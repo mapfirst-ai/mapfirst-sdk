@@ -496,7 +496,9 @@ function createDotMarkerElement(item, primaryType, selectedMarkerId, onMarkerCli
 // src/user-location-marker.ts
 function createUserLocationMarkerElement() {
   if (typeof document === "undefined") {
-    throw new Error("createUserLocationMarkerElement requires a DOM environment");
+    throw new Error(
+      "createUserLocationMarkerElement requires a DOM environment"
+    );
   }
   const container = document.createElement("div");
   container.className = "mapfirst-user-location-marker-container";
@@ -1538,6 +1540,31 @@ async function getLocationWhenGranted() {
     status.onchange = handleChange;
   });
 }
+async function getLocationIfAlreadyGranted(timeoutMs = 5e3) {
+  try {
+    if (!navigator.permissions || !navigator.geolocation) {
+      return null;
+    }
+    const status = await navigator.permissions.query({ name: "geolocation" });
+    if (status.state !== "granted") {
+      return null;
+    }
+    const position = await Promise.race([
+      new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      }),
+      new Promise(
+        (_, reject) => setTimeout(() => reject(new Error("Geolocation timeout")), timeoutMs)
+      )
+    ]);
+    return {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+  } catch (error) {
+    return null;
+  }
+}
 async function getCurrentLocation(timeoutMs = 5e3) {
   try {
     const position = await Promise.race([
@@ -2077,7 +2104,7 @@ var MapFirstCore = class {
    */
   async initializeCurrentLocationMarker() {
     try {
-      const location = await getCurrentLocation();
+      const location = await getLocationIfAlreadyGranted();
       if (location) {
         this.setUserLocation(location);
       }
