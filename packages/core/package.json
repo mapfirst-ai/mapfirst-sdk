@@ -1,6 +1,6 @@
 {
   "name": "@mapfirst.ai/core",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "description": "Core SDK for MapFirst - Multi-platform map markers and property visualization",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
