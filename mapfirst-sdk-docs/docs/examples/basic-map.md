@@ -8,11 +8,12 @@ A complete, copy-paste example that gives you a working map with property search
 
 :::tip What you'll build
 By the end of this example, you'll have a map that:
+
 - Displays property markers for a city (Paris)
 - Lets users switch between Hotels, Restaurants, and Attractions
 - Shows a property count and loading state
 - Responds to marker clicks with property details
-:::
+  :::
 
 ---
 
@@ -350,14 +351,14 @@ The same functionality works without React — just include the SDK via CDN and 
 
 ## What This Example Demonstrates
 
-| Feature | How it's used |
-|---|---|
-| **Map Initialization** | Creates a MapLibre GL JS map with the MapFirst tile style |
-| **SDK Attachment** | Connects the map to MapFirst for automatic marker rendering |
-| **Property Type Switching** | Toggles between Hotels, Restaurants, and Attractions |
-| **Search** | Runs a location-based search with date and guest filters |
-| **Marker Interaction** | Handles clicks on property markers |
-| **State Tracking** | Displays property count and loading state in real time |
+| Feature                     | How it's used                                               |
+| --------------------------- | ----------------------------------------------------------- |
+| **Map Initialization**      | Creates a MapLibre GL JS map with the MapFirst tile style   |
+| **SDK Attachment**          | Connects the map to MapFirst for automatic marker rendering |
+| **Property Type Switching** | Toggles between Hotels, Restaurants, and Attractions        |
+| **Search**                  | Runs a location-based search with date and guest filters    |
+| **Marker Interaction**      | Handles clicks on property markers                          |
+| **State Tracking**          | Displays property count and loading state in real time      |
 
 :::tip Try it live
 Open the [Playground](/playground) to experiment with these features in your browser — no setup required.

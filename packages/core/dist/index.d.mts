@@ -310,6 +310,10 @@ interface MapState {
     firstCallDone: boolean;
     filters: FilterState;
     activeLocation: ActiveLocation;
+    userLocation: {
+        lat: number;
+        lng: number;
+    } | null;
     isFlyToAnimating: boolean;
 }
 interface MapStateCallbacks {
@@ -322,6 +326,10 @@ interface MapStateCallbacks {
     onPrimaryTypeChange?: (type: PropertyType) => void;
     onFiltersChange?: (filters: FilterState) => void;
     onActiveLocationChange?: (location: ActiveLocation) => void;
+    onUserLocationChange?: (location: {
+        lat: number;
+        lng: number;
+    } | null) => void;
     onLoadingStateChange?: (loading: boolean) => void;
     onSearchingStateChange?: (searching: boolean) => void;
     onFirstCallDoneChange?: (firstCallDone: boolean) => void;
@@ -370,6 +378,20 @@ declare function processApiFilters(apiFilters: ApiFiltersResponse): SmartFilter[
  */
 declare function convertToApiFilters(filters: any[]): SmartFilter[];
 
+/**
+ * Helper to get user's geolocation only if permission has been granted.
+ * Waits for permission grant if in "prompt" state, throws if denied.
+ */
+declare function getLocationWhenGranted(): Promise<GeolocationPosition>;
+/**
+ * Get current location with optional timeout and error handling.
+ * Returns null if geolocation fails or is not supported.
+ */
+declare function getCurrentLocation(timeoutMs?: number): Promise<{
+    lat: number;
+    lng: number;
+} | null>;
+
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {
     status: number;
@@ -412,6 +434,7 @@ type BaseMapFirstOptions = {
         right?: number;
     };
     apiUrl?: string;
+    currentLocationMarker?: boolean;
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
     adapter: MapAdapter;
@@ -474,6 +497,18 @@ declare class MapFirstCore {
     clearProperties(): void;
     setPrimaryType(primary: PropertyType): void;
     setSelectedMarker(markerId: number | null): void;
+    /**
+     * Initialize current location marker fetching.
+     * Retrieves user location and renders blue dot marker on map.
+     */
+    private initializeCurrentLocationMarker;
+    /**
+     * Update the user's current location and render the marker.
+     */
+    setUserLocation(location: {
+        lat: number;
+        lng: number;
+    } | null): void;
     getState(): Readonly<MapState>;
     private handleError;
     updateState(update: MapStateUpdate): void;
@@ -533,4 +568,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, processApiFilters };
+export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, getCurrentLocation, getLocationWhenGranted, processApiFilters };

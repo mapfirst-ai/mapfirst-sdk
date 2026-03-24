@@ -54,11 +54,11 @@ The React package depends on Core, so you only need to install `@mapfirst.ai/rea
 
 MapFirst SDK works with all three major web mapping libraries. Choose whichever fits your project:
 
-| Platform | Type | Best For |
-|---|---|---|
-| **MapLibre GL JS** | Open-source, free | Projects that want zero licensing costs |
-| **Mapbox GL JS** | Commercial, token required | Premium cartography and design tools |
-| **Google Maps** | Commercial, key required | Teams already invested in the Google ecosystem |
+| Platform           | Type                       | Best For                                       |
+| ------------------ | -------------------------- | ---------------------------------------------- |
+| **MapLibre GL JS** | Open-source, free          | Projects that want zero licensing costs        |
+| **Mapbox GL JS**   | Commercial, token required | Premium cartography and design tools           |
+| **Google Maps**    | Commercial, key required   | Teams already invested in the Google ecosystem |
 
 You can switch between platforms with minimal code changes — the SDK abstracts away the differences.
 
@@ -66,7 +66,7 @@ You can switch between platforms with minimal code changes — the SDK abstracts
 
 ## Key Features
 
-- **🤖 AI-Powered Search** — Search with natural language queries like *"romantic hotels near the beach with a pool"* and get smart, filterable results.
+- **🤖 AI-Powered Search** — Search with natural language queries like _"romantic hotels near the beach with a pool"_ and get smart, filterable results.
 - **🗺️ Multi-Platform** — One API surface for MapLibre, Mapbox, and Google Maps. Write once, deploy anywhere.
 - **⚛️ React Hooks** — The `useMapFirst` hook manages state, markers, and API calls. No boilerplate needed.
 - **🏷️ Smart Filters** — Interactive filter chips generated from AI search results. Users can toggle and refine in real time.

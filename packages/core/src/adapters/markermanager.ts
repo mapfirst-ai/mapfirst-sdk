@@ -1,6 +1,7 @@
 import type { Property } from "../types";
 import { createDotMarkerElement } from "../dotmarker";
 import { createPrimaryMarkerElement } from "../marker";
+import { createUserLocationMarkerElement } from "../user-location-marker";
 import {
   updatePrimaryMarkerElement,
   updateDotMarkerElement,
@@ -36,7 +37,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
   render(
     items: ClusterDisplayItem[],
     primaryType?: string,
-    selectedMarkerId?: number | null
+    selectedMarkerId?: number | null,
   ) {
     if (primaryType && primaryType !== this.primaryType) {
       this.primaryType = primaryType;
@@ -92,7 +93,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
             existingEntry.marker,
             item,
             displayState.isPrimaryType,
-            displayState.isSelected
+            displayState.isSelected,
           );
 
           // Update cache with new key
@@ -126,7 +127,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
 
   protected createAndAddMarker(
     item: ClusterDisplayItem,
-    coords: { lon: number; lat: number }
+    coords: { lon: number; lat: number },
   ) {
     const element =
       item.kind === "primary"
@@ -134,13 +135,13 @@ export abstract class BaseMarkerManager<TMarker = any> {
             item,
             this.primaryType,
             this.selectedMarkerId,
-            this.onMarkerClick
+            this.onMarkerClick,
           )
         : createDotMarkerElement(
             item,
             this.primaryType,
             this.selectedMarkerId,
-            this.onMarkerClick
+            this.onMarkerClick,
           );
 
     if (!element) return;
@@ -153,7 +154,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
         coords,
         item,
         displayState.isPrimaryType,
-        displayState.isSelected
+        displayState.isSelected,
       );
       if (marker) {
         this.markerCache.set(item.key, {
@@ -174,14 +175,14 @@ export abstract class BaseMarkerManager<TMarker = any> {
     coords: { lon: number; lat: number },
     item: ClusterDisplayItem,
     isPrimaryType: boolean,
-    isSelected: boolean
+    isSelected: boolean,
   ): TMarker | null;
 
   protected abstract removeMarkerFromMap(marker: TMarker): void;
 
   protected abstract updateMarkerPosition(
     marker: TMarker,
-    coords: { lon: number; lat: number }
+    coords: { lon: number; lat: number },
   ): void;
 
   protected abstract getMarkerElement(marker: TMarker): HTMLElement | null;
@@ -190,7 +191,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
     marker: TMarker,
     item: ClusterDisplayItem,
     isPrimaryType: boolean,
-    isSelected: boolean
+    isSelected: boolean,
   ): void {
     // Default implementation does nothing (override in subclasses that support zIndex)
   }
@@ -210,7 +211,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
   private updateMarkerElement(
     marker: TMarker,
     item: ClusterDisplayItem,
-    displayState: MarkerDisplayState
+    displayState: MarkerDisplayState,
   ) {
     const element = this.getMarkerElement(marker);
     if (!element) {
@@ -223,7 +224,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
         displayState.isPrimaryType,
         displayState.isSelected,
         displayState.isPending,
-        item.marker
+        item.marker,
       );
       return;
     }
@@ -232,7 +233,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
       element,
       displayState.isPrimaryType,
       displayState.isSelected,
-      displayState.isPending
+      displayState.isPending,
     );
   }
 
@@ -247,6 +248,58 @@ export abstract class BaseMarkerManager<TMarker = any> {
       }
     }
     return null;
+  }
+
+  /**
+   * Update user location marker rendering
+   */
+  renderUserLocation(userLocation: { lat: number; lng: number } | null): void {
+    // Remove existing user location marker if present
+    const existingKey = "__user-location__";
+    const existing = this.markerCache.get(existingKey);
+    if (existing) {
+      this.removeMarkerFromMap(existing.marker);
+      this.markerCache.delete(existingKey);
+    }
+
+    // If no user location provided, we're done
+    if (!userLocation) {
+      return;
+    }
+
+    // Create and add new user location marker
+    const element = createUserLocationMarkerElement();
+
+    if (element) {
+      try {
+        const marker = this.createMarker(
+          element,
+          { lon: userLocation.lng, lat: userLocation.lat },
+          {
+            kind: "dot",
+            key: existingKey,
+            marker: {
+              tripadvisor_id: -1, // Special ID for user location
+              type: "Attraction",
+              name: "Your Location",
+              location: { lat: userLocation.lat, lon: userLocation.lng },
+            },
+          } as any,
+          false,
+          false,
+        );
+
+        if (marker) {
+          this.markerCache.set(existingKey, {
+            key: existingKey,
+            marker,
+            kind: "dot",
+          });
+        }
+      } catch (error) {
+        console.error("Error creating user location marker", error);
+      }
+    }
   }
 }
 

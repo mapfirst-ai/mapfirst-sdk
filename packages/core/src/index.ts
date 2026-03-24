@@ -24,6 +24,7 @@ import {
   extractViewState,
   ViewStateSnapshot,
 } from "./utils/clustering";
+import { getCurrentLocation } from "./utils/geolocation";
 import type {
   MapBounds,
   ActiveLocation,
@@ -45,6 +46,10 @@ export type {
 
 export type { ApiFiltersResponse } from "./utils/filters";
 export { processApiFilters, convertToApiFilters } from "./utils/filters";
+export {
+  getLocationWhenGranted,
+  getCurrentLocation,
+} from "./utils/geolocation";
 
 export type {
   MapBounds,
@@ -253,6 +258,8 @@ export type BaseMapFirstOptions = {
     right?: number;
   };
   apiUrl?: string;
+  // Current location marker option
+  currentLocationMarker?: boolean;
 };
 
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -393,6 +400,7 @@ export class MapFirstCore {
         locationName: "",
         coordinates: [0, 0],
       },
+      userLocation: null,
       isFlyToAnimating: false,
       ...options.state,
     };
@@ -612,6 +620,11 @@ export class MapFirstCore {
     this.isMapAttached = true;
     this.refresh();
 
+    // Initialize current location marker if enabled
+    if (this.options.currentLocationMarker) {
+      this.initializeCurrentLocationMarker();
+    }
+
     // Auto-load properties if we have requestBody and haven't loaded yet
     if (this.requestBody && !this.state.firstCallDone) {
       this.autoLoadProperties();
@@ -738,6 +751,34 @@ export class MapFirstCore {
     this.selectedMarkerId = markerId;
     this.updateState({ selectedPropertyId: markerId });
     this.callbacks.onSelectedPropertyChange?.(markerId);
+    this.refresh();
+  }
+
+  /**
+   * Initialize current location marker fetching.
+   * Retrieves user location and renders blue dot marker on map.
+   */
+  private async initializeCurrentLocationMarker(): Promise<void> {
+    try {
+      const location = await getCurrentLocation();
+      if (location) {
+        this.setUserLocation(location);
+      }
+    } catch (error) {
+      // Silently fail if geolocation is not available or user denies permission
+      console.debug("Current location marker initialization failed:", error);
+    }
+  }
+
+  /**
+   * Update the user's current location and render the marker.
+   */
+  setUserLocation(location: { lat: number; lng: number } | null): void {
+    this.ensureAlive();
+    if (this.state.userLocation === location) return;
+
+    this.updateState({ userLocation: location });
+    this.callbacks.onUserLocationChange?.(location);
     this.refresh();
   }
 
@@ -1614,6 +1655,9 @@ export class MapFirstCore {
 
     const markerManager = this.adapter.getMarkerManager();
     markerManager.render(this.clusterItems, primaryType, this.selectedMarkerId);
+
+    // Render user location marker if available
+    markerManager.renderUserLocation(this.state.userLocation);
 
     this.options.onClusterUpdate?.(this.clusterItems, viewState);
   }

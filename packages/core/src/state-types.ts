@@ -50,6 +50,9 @@ export interface MapState {
   filters: FilterState;
   activeLocation: ActiveLocation;
 
+  // User location state (for currentLocationMarker feature)
+  userLocation: { lat: number; lng: number } | null;
+
   // Animation state
   isFlyToAnimating: boolean;
 }
@@ -69,6 +72,11 @@ export interface MapStateCallbacks {
   // Filter callbacks
   onFiltersChange?: (filters: FilterState) => void;
   onActiveLocationChange?: (location: ActiveLocation) => void;
+
+  // User location callback
+  onUserLocationChange?: (
+    location: { lat: number; lng: number } | null,
+  ) => void;
 
   // Loading callbacks
   onLoadingStateChange?: (loading: boolean) => void;

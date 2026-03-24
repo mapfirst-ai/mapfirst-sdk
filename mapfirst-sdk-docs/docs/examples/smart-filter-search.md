@@ -8,11 +8,12 @@ A complete example showing how to build an AI-powered search experience with nat
 
 :::tip What you'll build
 By the end of this example, you'll have a map with:
-- A search bar that accepts natural language queries (e.g., *"hotels near Eiffel Tower with pool"*)
+
+- A search bar that accepts natural language queries (e.g., _"hotels near Eiffel Tower with pool"_)
 - Dynamic filter chips that appear after each search
 - The ability to remove individual filters and re-search
 - A live property count that updates in real time
-:::
+  :::
 
 ---
 
@@ -232,7 +233,10 @@ The same functionality works without React — use the global `MapFirstCore` bun
       }
 
       body {
-        font-family: system-ui, -apple-system, sans-serif;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
         height: 100vh;
         display: flex;
         flex-direction: column;

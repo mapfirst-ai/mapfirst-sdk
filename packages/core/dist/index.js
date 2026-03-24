@@ -25,6 +25,8 @@ __export(index_exports, {
   convertToApiFilters: () => convertToApiFilters,
   fetchImages: () => fetchImages,
   fetchProperties: () => fetchProperties,
+  getCurrentLocation: () => getCurrentLocation,
+  getLocationWhenGranted: () => getLocationWhenGranted,
   processApiFilters: () => processApiFilters
 });
 module.exports = __toCommonJS(index_exports);
@@ -52,7 +54,7 @@ function styleInject(css, { insertAt } = {}) {
 }
 
 // src/markers.css
-styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n");
+styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n.mapfirst-user-location-marker-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n  z-index: 1000;\n}\n.mapfirst-user-location-dot {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));\n}\n.mapfirst-user-location-dot svg {\n  animation: mapfirst-location-pulse 2s infinite;\n}\n@keyframes mapfirst-location-pulse {\n  0% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4));\n  }\n  70% {\n    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));\n  }\n  100% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));\n  }\n}\n");
 
 // src/marker-style-utils.ts
 var PRIMARY_Z_INDEX = {
@@ -491,6 +493,35 @@ function createDotMarkerElement(item, primaryType, selectedMarkerId, onMarkerCli
   return container;
 }
 
+// src/user-location-marker.ts
+function createUserLocationMarkerElement() {
+  if (typeof document === "undefined") {
+    return document.createElement("div");
+  }
+  const container = document.createElement("div");
+  container.className = "mapfirst-user-location-marker-container";
+  container.style.zIndex = String(1e3);
+  const dot = document.createElement("div");
+  dot.className = "mapfirst-user-location-dot";
+  dot.innerHTML = `
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer pulse ring -->
+      <circle cx="12" cy="12" r="12" fill="#3B82F6" opacity="0.2"/>
+      <!-- Middle ring -->
+      <circle cx="12" cy="12" r="9" fill="#3B82F6" opacity="0.3"/>
+      <!-- Inner blue dot -->
+      <circle cx="12" cy="12" r="5" fill="#3B82F6"/>
+      <!-- Center white dot -->
+      <circle cx="12" cy="12" r="2" fill="white"/>
+    </svg>
+  `;
+  container.appendChild(dot);
+  container.style.position = "absolute";
+  container.style.transform = "translate(-50%, -50%)";
+  container.style.cursor = "default";
+  return container;
+}
+
 // src/marker-updater.ts
 function updatePrimaryMarkerElement(element, isPrimaryType, isSelected, isPending, marker) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
@@ -749,6 +780,51 @@ var BaseMarkerManager = class {
       }
     }
     return null;
+  }
+  /**
+   * Update user location marker rendering
+   */
+  renderUserLocation(userLocation) {
+    const existingKey = "__user-location__";
+    const existing = this.markerCache.get(existingKey);
+    if (existing) {
+      this.removeMarkerFromMap(existing.marker);
+      this.markerCache.delete(existingKey);
+    }
+    if (!userLocation) {
+      return;
+    }
+    const element = createUserLocationMarkerElement();
+    if (element) {
+      try {
+        const marker = this.createMarker(
+          element,
+          { lon: userLocation.lng, lat: userLocation.lat },
+          {
+            kind: "dot",
+            key: existingKey,
+            marker: {
+              tripadvisor_id: -1,
+              // Special ID for user location
+              type: "Attraction",
+              name: "Your Location",
+              location: { lat: userLocation.lat, lon: userLocation.lng }
+            }
+          },
+          false,
+          false
+        );
+        if (marker) {
+          this.markerCache.set(existingKey, {
+            key: existingKey,
+            marker,
+            kind: "dot"
+          });
+        }
+      } catch (error) {
+        console.error("Error creating user location marker", error);
+      }
+    }
   }
 };
 function safeLatLon(location) {
@@ -1428,6 +1504,57 @@ function resolvePrice(marker) {
   return Number.isNaN(numeric) ? -Infinity : numeric;
 }
 
+// src/utils/geolocation.ts
+async function getLocationWhenGranted() {
+  if (!navigator.permissions || !navigator.geolocation) {
+    throw new Error("Geolocation or Permissions API not supported");
+  }
+  const status = await navigator.permissions.query({ name: "geolocation" });
+  const fetchLocation = () => new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+  if (status.state === "granted") {
+    return fetchLocation();
+  }
+  if (status.state === "denied") {
+    throw new Error("Location permission denied");
+  }
+  return new Promise((resolve, reject) => {
+    const handleChange = async () => {
+      try {
+        if (status.state === "granted") {
+          status.onchange = null;
+          const pos = await fetchLocation();
+          resolve(pos);
+        } else if (status.state === "denied") {
+          status.onchange = null;
+          reject(new Error("Location permission denied"));
+        }
+      } catch (err) {
+        status.onchange = null;
+        reject(err);
+      }
+    };
+    status.onchange = handleChange;
+  });
+}
+async function getCurrentLocation(timeoutMs = 5e3) {
+  try {
+    const position = await Promise.race([
+      getLocationWhenGranted(),
+      new Promise(
+        (_, reject) => setTimeout(() => reject(new Error("Geolocation timeout")), timeoutMs)
+      )
+    ]);
+    return {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
 // src/utils/filters.ts
 function processApiFilters(apiFilters) {
   const filters = [];
@@ -1674,6 +1801,7 @@ var MapFirstCore = class {
         locationName: "",
         coordinates: [0, 0]
       },
+      userLocation: null,
       isFlyToAnimating: false,
       ...options.state
     };
@@ -1830,6 +1958,9 @@ var MapFirstCore = class {
     this.adapter = this.createAdapter(adapterConfig);
     this.isMapAttached = true;
     this.refresh();
+    if (this.options.currentLocationMarker) {
+      this.initializeCurrentLocationMarker();
+    }
     if (this.requestBody && !this.state.firstCallDone) {
       this.autoLoadProperties();
     }
@@ -1938,6 +2069,31 @@ var MapFirstCore = class {
     this.selectedMarkerId = markerId;
     this.updateState({ selectedPropertyId: markerId });
     (_b = (_a = this.callbacks).onSelectedPropertyChange) == null ? void 0 : _b.call(_a, markerId);
+    this.refresh();
+  }
+  /**
+   * Initialize current location marker fetching.
+   * Retrieves user location and renders blue dot marker on map.
+   */
+  async initializeCurrentLocationMarker() {
+    try {
+      const location = await getCurrentLocation();
+      if (location) {
+        this.setUserLocation(location);
+      }
+    } catch (error) {
+      console.debug("Current location marker initialization failed:", error);
+    }
+  }
+  /**
+   * Update the user's current location and render the marker.
+   */
+  setUserLocation(location) {
+    var _a, _b;
+    this.ensureAlive();
+    if (this.state.userLocation === location) return;
+    this.updateState({ userLocation: location });
+    (_b = (_a = this.callbacks).onUserLocationChange) == null ? void 0 : _b.call(_a, location);
     this.refresh();
   }
   // State management methods
@@ -2582,6 +2738,7 @@ var MapFirstCore = class {
     });
     const markerManager = this.adapter.getMarkerManager();
     markerManager.render(this.clusterItems, primaryType, this.selectedMarkerId);
+    markerManager.renderUserLocation(this.state.userLocation);
     (_c = (_b = this.options).onClusterUpdate) == null ? void 0 : _c.call(_b, this.clusterItems, viewState);
   }
   destroy() {
@@ -2632,5 +2789,7 @@ function isMapboxOptions(options) {
   convertToApiFilters,
   fetchImages,
   fetchProperties,
+  getCurrentLocation,
+  getLocationWhenGranted,
   processApiFilters
 });
