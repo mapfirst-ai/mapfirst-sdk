@@ -496,7 +496,7 @@ var MapFirstCore = (() => {
   // src/user-location-marker.ts
   function createUserLocationMarkerElement() {
     if (typeof document === "undefined") {
-      return document.createElement("div");
+      throw new Error("createUserLocationMarkerElement requires a DOM environment");
     }
     const container = document.createElement("div");
     container.className = "mapfirst-user-location-marker-container";

@@ -5,7 +5,7 @@ import "./markers.css";
  */
 export function createUserLocationMarkerElement(): HTMLElement {
   if (typeof document === "undefined") {
-    return document.createElement("div");
+    throw new Error("createUserLocationMarkerElement requires a DOM environment");
   }
 
   const container = document.createElement("div");
