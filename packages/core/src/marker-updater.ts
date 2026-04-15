@@ -20,7 +20,7 @@ export function updatePrimaryMarkerElement(
   isPrimaryType: boolean,
   isSelected: boolean,
   isPending: boolean,
-  marker?: Property
+  marker?: Property,
 ) {
   const wasPending =
     element
@@ -81,7 +81,7 @@ export function updatePrimaryMarkerElement(
   // Update hover card content if it exists
   if (marker) {
     const hoverCard = document.querySelector(
-      `.mapfirst-property-hover-card[data-marker-id="${marker.tripadvisor_id}"]`
+      `.mapfirst-property-hover-card[data-marker-id="${marker.tripadvisor_id}"]`,
     );
     if (hoverCard) {
       const rating = marker.rating || 0;
@@ -112,10 +112,10 @@ export function updatePrimaryMarkerElement(
           priceEl = document.createElement("div");
           priceEl.className = "mapfirst-property-hover-price";
           const detailsEl = hoverCard.querySelector(
-            ".mapfirst-property-hover-details"
+            ".mapfirst-property-hover-details",
           );
           const learnMoreEl = hoverCard.querySelector(
-            ".mapfirst-property-hover-learn-more"
+            ".mapfirst-property-hover-learn-more",
           );
           if (detailsEl) {
             if (learnMoreEl) {
@@ -153,11 +153,13 @@ export function updateDotMarkerElement(
   element: HTMLElement,
   isPrimaryType: boolean,
   isSelected: boolean,
-  isPending: boolean
+  isPending: boolean,
 ) {
   // Update container z-index
   const container = element;
-  container.style.zIndex = String(getDotMarkerZIndex(isPrimaryType, isSelected));
+  container.style.zIndex = String(
+    getDotMarkerZIndex(isPrimaryType, isSelected),
+  );
 
   // Update button classes
   const button = container.querySelector(".mapfirst-dot-marker-button");

@@ -30,6 +30,8 @@ export type ClusterParams = {
   zoom: number;
   collisionThresholdPx?: number;
   dotCollisionThresholdPx?: number;
+  /** Extra horizontal pixels to add to the collision check (e.g. label width) */
+  labelExtentPx?: number;
 };
 
 export type ProjectedMarker = {
@@ -81,6 +83,7 @@ export function clusterMarkers({
   zoom,
   collisionThresholdPx,
   dotCollisionThresholdPx,
+  labelExtentPx,
 }: ClusterParams): ClusterDisplayItem[] {
   if (!markers.length) return [];
   if (!map) {
@@ -127,7 +130,11 @@ export function clusterMarkers({
     for (let j = i + 1; j < projected.length; j += 1) {
       const dx = projected[i].x - projected[j].x;
       const dy = projected[i].y - projected[j].y;
-      if (Math.hypot(dx, dy) <= threshold) {
+      const collides =
+        labelExtentPx !== undefined
+          ? Math.abs(dx) <= threshold + labelExtentPx && Math.abs(dy) <= threshold
+          : Math.hypot(dx, dy) <= threshold;
+      if (collides) {
         union(i, j);
       }
     }
@@ -194,6 +201,7 @@ export function clusterMarkers({
         primaryType,
         collisionThresholdPx,
         dotCollisionThresholdPx,
+        labelExtentPx,
       });
       clustered.push(...followUp);
     }

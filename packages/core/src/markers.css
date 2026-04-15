@@ -69,7 +69,8 @@
   content: "";
   position: absolute;
   bottom: -10px;
-  left: 14px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
   height: 0;
   border-left: 8px solid transparent;

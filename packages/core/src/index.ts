@@ -1801,6 +1801,7 @@ export class MapFirstCore {
       map: this.adapter,
       selectedMarkerId: this.selectedMarkerId,
       zoom: viewState?.zoom ?? 0,
+      labelExtentPx: this.options.markerOptions?.showLabel ? 120 : undefined,
     });
 
     const markerManager = this.adapter.getMarkerManager();
