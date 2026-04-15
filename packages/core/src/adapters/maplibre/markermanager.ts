@@ -17,6 +17,7 @@ type MapLibreMarkerManagerOptions = {
   mapInstance: any;
   maplibregl: MapLibreNamespace;
   onMarkerClick?: (marker: Property) => void;
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
 };
 
 export class MapLibreMarkerManager extends BaseMapGLMarkerManager<
@@ -28,6 +29,7 @@ export class MapLibreMarkerManager extends BaseMapGLMarkerManager<
       mapInstance: options.mapInstance,
       namespace: options.maplibregl,
       onMarkerClick: options.onMarkerClick,
+      markerOptions: options.markerOptions,
     });
   }
 }

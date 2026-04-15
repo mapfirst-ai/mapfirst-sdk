@@ -17,11 +17,12 @@ export class MapboxAdapter extends BaseMapGLAdapter<
   MapboxAdapterOptions
 > {
   constructor(map: any) {
-    super(map, ({ mapInstance, namespace, onMarkerClick }) => {
+    super(map, ({ mapInstance, namespace, onMarkerClick, markerOptions }) => {
       return new MapboxMarkerManager({
         mapInstance,
         mapboxgl: namespace,
         onMarkerClick,
+        markerOptions,
       });
     });
   }

@@ -263,6 +263,11 @@ export type BaseMapFirstOptions = {
   apiUrl?: string;
   // Current location marker option
   currentLocationMarker?: boolean;
+  // Marker display options
+  markerOptions?: {
+    showLabel?: boolean;
+    hideBadge?: boolean;
+  };
 };
 
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -596,6 +601,7 @@ export class MapFirstCore {
       google?: GoogleMapsNamespace;
       mapboxgl?: MapboxNamespace;
       onMarkerClick?: (marker: Property) => void;
+      markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
     },
   ): void {
     // Validate platform restrictions when useApi is false
@@ -620,6 +626,9 @@ export class MapFirstCore {
       google: config.google,
       mapboxgl: config.mapboxgl,
       onMarkerClick: config.onMarkerClick,
+      ...(config.markerOptions !== undefined && {
+        markerOptions: config.markerOptions,
+      }),
     };
 
     this.currentPlatform = config.platform;
@@ -644,18 +653,24 @@ export class MapFirstCore {
       return this.initializeAdapter(new MapLibreAdapter(options.mapInstance), {
         maplibregl: options.maplibregl,
         onMarkerClick: options.onMarkerClick,
+        markerOptions: options.markerOptions,
       });
     }
     if (isGoogleMapsOptions(options) && options.mapInstance) {
       return this.initializeAdapter(
         new GoogleMapsAdapter(options.mapInstance),
-        { google: options.google, onMarkerClick: options.onMarkerClick },
+        {
+          google: options.google,
+          onMarkerClick: options.onMarkerClick,
+          markerOptions: options.markerOptions,
+        },
       );
     }
     if (isMapboxOptions(options) && options.mapInstance) {
       return this.initializeAdapter(new MapboxAdapter(options.mapInstance), {
         mapboxgl: options.mapboxgl,
         onMarkerClick: options.onMarkerClick,
+        markerOptions: options.markerOptions,
       });
     }
     if ("adapter" in options && options.adapter) {
@@ -768,7 +783,10 @@ export class MapFirstCore {
    */
   private async initializeCurrentLocationMarker(): Promise<void> {
     try {
-      const synced = await this.syncUserLocationIfGranted({ maxAttempts: 3, timeoutMs: 10000 });
+      const synced = await this.syncUserLocationIfGranted({
+        maxAttempts: 3,
+        timeoutMs: 10000,
+      });
       if (synced) {
         // Permission is already granted at startup; enable continuous tracking immediately.
         this.startLocationTracking();
@@ -821,7 +839,10 @@ export class MapFirstCore {
       await subscribeToLocationPermissionChanges({
         onGranted: async () => {
           if (this.destroyed) return;
-          await this.syncUserLocationIfGranted({ maxAttempts: 2, timeoutMs: 10000 });
+          await this.syncUserLocationIfGranted({
+            maxAttempts: 2,
+            timeoutMs: 10000,
+          });
           // Start continuous tracking when permission is granted
           this.startLocationTracking();
         },

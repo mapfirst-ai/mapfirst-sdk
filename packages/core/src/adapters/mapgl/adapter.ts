@@ -7,12 +7,14 @@ type MarkerManagerFactory<TMarkerManager, TNamespace> = (options: {
   mapInstance: any;
   namespace: TNamespace;
   onMarkerClick?: (marker: Property) => void;
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
 }) => TMarkerManager;
 
 type BaseMapGLAdapterSharedOptions = {
   onMarkerClick?: (marker: Property) => void;
   onRefresh?: () => void;
   onMapMoveEnd?: (bounds: MapBounds) => void;
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
 };
 
 export type BaseMapGLAdapterOptions<TNamespace> =
@@ -23,7 +25,8 @@ export type BaseMapGLAdapterOptions<TNamespace> =
 export abstract class BaseMapGLAdapter<
   TMarkerManager,
   TNamespace,
-  TOptions extends BaseMapGLAdapterSharedOptions = BaseMapGLAdapterOptions<TNamespace>,
+  TOptions extends BaseMapGLAdapterSharedOptions =
+    BaseMapGLAdapterOptions<TNamespace>,
 > extends MapAdapter {
   private markerManager?: TMarkerManager;
   private cleanupFns: Array<() => void> = [];
@@ -43,6 +46,7 @@ export abstract class BaseMapGLAdapter<
       mapInstance: this.map,
       namespace: this.getNamespace(options),
       onMarkerClick: options.onMarkerClick,
+      markerOptions: options.markerOptions,
     });
 
     if (options.onRefresh) {

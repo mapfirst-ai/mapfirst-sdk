@@ -2,10 +2,7 @@ import {
   BaseMapGLAdapter,
   type BaseMapGLAdapterOptions,
 } from "../mapgl/adapter";
-import {
-  MapLibreMarkerManager,
-  type MapLibreNamespace,
-} from "./markermanager";
+import { MapLibreMarkerManager, type MapLibreNamespace } from "./markermanager";
 
 type MapLibreAdapterOptions = Omit<
   BaseMapGLAdapterOptions<MapLibreNamespace>,
@@ -20,11 +17,12 @@ export class MapLibreAdapter extends BaseMapGLAdapter<
   MapLibreAdapterOptions
 > {
   constructor(map: any) {
-    super(map, ({ mapInstance, namespace, onMarkerClick }) => {
+    super(map, ({ mapInstance, namespace, onMarkerClick, markerOptions }) => {
       return new MapLibreMarkerManager({
         mapInstance,
         maplibregl: namespace,
         onMarkerClick,
+        markerOptions,
       });
     });
   }

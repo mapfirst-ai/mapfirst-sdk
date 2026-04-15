@@ -1529,7 +1529,8 @@ function useMapFirst(options) {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
         platform: "maplibre",
         maplibregl,
-        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick,
+        markerOptions: options2 == null ? void 0 : options2.markerOptions
       });
     },
     []
@@ -1540,7 +1541,8 @@ function useMapFirst(options) {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
         platform: "google",
         google,
-        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick,
+        markerOptions: options2 == null ? void 0 : options2.markerOptions
       });
     },
     []
@@ -1551,7 +1553,8 @@ function useMapFirst(options) {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {
         platform: "mapbox",
         mapboxgl,
-        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick
+        onMarkerClick: options2 == null ? void 0 : options2.onMarkerClick,
+        markerOptions: options2 == null ? void 0 : options2.markerOptions
       });
     },
     []

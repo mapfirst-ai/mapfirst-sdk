@@ -14,20 +14,21 @@ type GoogleMapsMarkerManagerOptions = {
   mapInstance: any; // google.maps.Map
   google: GoogleMapsNamespace;
   onMarkerClick?: (marker: Property) => void;
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
 };
 
 export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerHandle> {
   private readonly google: GoogleMapsNamespace;
 
   constructor(options: GoogleMapsMarkerManagerOptions) {
-    super(options.mapInstance, options.onMarkerClick);
+    super(options.mapInstance, options.onMarkerClick, options.markerOptions);
     this.google = options.google;
   }
 
   render(
     items: ClusterDisplayItem[],
     primaryType?: string,
-    selectedMarkerId?: number | null
+    selectedMarkerId?: number | null,
   ) {
     if (!this.google?.marker?.AdvancedMarkerElement) {
       console.warn("AdvancedMarkerElement not available");
@@ -41,7 +42,7 @@ export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerH
     coords: { lon: number; lat: number },
     item: ClusterDisplayItem,
     isPrimaryType: boolean,
-    isSelected: boolean
+    isSelected: boolean,
   ): GoogleMapsMarkerHandle | null {
     if (!this.google?.marker?.AdvancedMarkerElement) return null;
 
@@ -68,13 +69,13 @@ export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerH
 
   protected updateMarkerPosition(
     marker: GoogleMapsMarkerHandle,
-    coords: { lon: number; lat: number }
+    coords: { lon: number; lat: number },
   ): void {
     marker.position = { lat: coords.lat, lng: coords.lon };
   }
 
   protected getMarkerElement(
-    marker: GoogleMapsMarkerHandle
+    marker: GoogleMapsMarkerHandle,
   ): HTMLElement | null {
     const element = marker.content;
     return element instanceof HTMLElement ? element : null;
@@ -84,7 +85,7 @@ export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerH
     marker: GoogleMapsMarkerHandle,
     item: ClusterDisplayItem,
     isPrimaryType: boolean,
-    isSelected: boolean
+    isSelected: boolean,
   ): void {
     marker.zIndex =
       item.kind === "primary"

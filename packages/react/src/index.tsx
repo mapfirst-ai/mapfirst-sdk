@@ -367,12 +367,16 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       maplibregl: MapLibreNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void },
+      options?: {
+        onMarkerClick?: (marker: Property) => void;
+        markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
+      },
     ) => {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
         platform: "maplibre",
         maplibregl,
         onMarkerClick: options?.onMarkerClick,
+        markerOptions: options?.markerOptions,
       });
     },
     [],
@@ -383,12 +387,16 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       google: GoogleMapsNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void },
+      options?: {
+        onMarkerClick?: (marker: Property) => void;
+        markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
+      },
     ) => {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
         platform: "google",
         google,
         onMarkerClick: options?.onMarkerClick,
+        markerOptions: options?.markerOptions,
       });
     },
     [],
@@ -399,12 +407,16 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     (
       map: any,
       mapboxgl: MapboxNamespace,
-      options?: { onMarkerClick?: (marker: Property) => void },
+      options?: {
+        onMarkerClick?: (marker: Property) => void;
+        markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
+      },
     ) => {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {
         platform: "mapbox",
         mapboxgl,
         onMarkerClick: options?.onMarkerClick,
+        markerOptions: options?.markerOptions,
       });
     },
     [],

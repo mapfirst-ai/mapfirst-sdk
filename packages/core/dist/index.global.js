@@ -54,7 +54,7 @@ var MapFirstCore = (() => {
   }
 
   // src/markers.css
-  styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n.mapfirst-user-location-marker-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n  z-index: 1000;\n}\n.mapfirst-user-location-dot {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));\n}\n.mapfirst-user-location-dot svg {\n  animation: mapfirst-location-pulse 2s infinite;\n}\n@keyframes mapfirst-location-pulse {\n  0% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4));\n  }\n  70% {\n    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));\n  }\n  100% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));\n  }\n}\n");
+  styleInject(".mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-video {\n  width: 20px;\n  height: 20px;\n  display: block;\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n.mapfirst-marker-label {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  pointer-events: none;\n}\n.mapfirst-marker-label-name {\n  font-size: 13px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  color: #ffffff;\n  max-width: 140px;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);\n  line-height: 1.3;\n}\n.mapfirst-marker-label-rating {\n  font-size: 11px;\n  color: rgba(255, 255, 255, 0.8);\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);\n  margin-top: 2px;\n  line-height: 1.2;\n}\n.mapfirst-user-location-marker-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n  z-index: 1000;\n}\n.mapfirst-user-location-dot {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));\n}\n.mapfirst-user-location-dot svg {\n  animation: mapfirst-location-pulse 2s infinite;\n}\n@keyframes mapfirst-location-pulse {\n  0% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4));\n  }\n  70% {\n    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));\n  }\n  100% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));\n  }\n}\n");
 
   // src/marker-style-utils.ts
   var PRIMARY_Z_INDEX = {
@@ -370,8 +370,8 @@ var MapFirstCore = (() => {
     card.style.left = `${left}px`;
     card.style.top = `${top}px`;
   }
-  function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+  function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick, markerOptions) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     if (typeof document === "undefined") {
       return null;
     }
@@ -402,7 +402,7 @@ var MapFirstCore = (() => {
       isPrimaryType,
       isSelected
     );
-    if (!isPending && (((_f = marker.awards) == null ? void 0 : _f.length) || ratingLabel)) {
+    if (!isPending && !(markerOptions == null ? void 0 : markerOptions.hideBadge) && (((_f = marker.awards) == null ? void 0 : _f.length) || ratingLabel)) {
       const badge = document.createElement("div");
       badge.className = "mapfirst-marker-badge";
       if (!isPrimaryType) {
@@ -456,6 +456,25 @@ var MapFirstCore = (() => {
       setupHoverCard(root, pill, marker, isSelected);
     }
     root.appendChild(pill);
+    if ((markerOptions == null ? void 0 : markerOptions.showLabel) && !isPending) {
+      root.style.flexDirection = "row";
+      root.style.alignItems = "flex-start";
+      root.style.gap = "8px";
+      const label = document.createElement("div");
+      label.className = "mapfirst-marker-label";
+      const nameLine = document.createElement("div");
+      nameLine.className = "mapfirst-marker-label-name";
+      nameLine.textContent = (_j = marker.name) != null ? _j : "";
+      label.appendChild(nameLine);
+      if (ratingLabel) {
+        const ratingLine = document.createElement("div");
+        ratingLine.className = "mapfirst-marker-label-rating";
+        const reviewCount = typeof marker.reviews === "number" ? marker.reviews.toLocaleString() : "";
+        ratingLine.textContent = reviewCount ? `${ratingLabel} \u2022 (${reviewCount})` : ratingLabel;
+        label.appendChild(ratingLine);
+      }
+      root.appendChild(label);
+    }
     return root;
   }
 
@@ -638,12 +657,13 @@ var MapFirstCore = (() => {
 
   // src/adapters/markermanager.ts
   var BaseMarkerManager = class {
-    constructor(mapInstance, onMarkerClick) {
+    constructor(mapInstance, onMarkerClick, markerOptions) {
       this.markerCache = /* @__PURE__ */ new Map();
       this.primaryType = "Accommodation";
       this.selectedMarkerId = null;
       this.mapInstance = mapInstance;
       this.onMarkerClick = onMarkerClick;
+      this.markerOptions = markerOptions;
     }
     render(items, primaryType, selectedMarkerId) {
       if (primaryType && primaryType !== this.primaryType) {
@@ -713,7 +733,8 @@ var MapFirstCore = (() => {
         item,
         this.primaryType,
         this.selectedMarkerId,
-        this.onMarkerClick
+        this.onMarkerClick,
+        this.markerOptions
       ) : createDotMarkerElement(
         item,
         this.primaryType,
@@ -843,7 +864,7 @@ var MapFirstCore = (() => {
   var BaseMapGLMarkerManager = class extends BaseMarkerManager {
     constructor(options) {
       var _a;
-      super(options.mapInstance, options.onMarkerClick);
+      super(options.mapInstance, options.onMarkerClick, options.markerOptions);
       this.MarkerCtor = (_a = options.namespace) == null ? void 0 : _a.Marker;
     }
     render(items, primaryType, selectedMarkerId) {
@@ -879,7 +900,8 @@ var MapFirstCore = (() => {
       super({
         mapInstance: options.mapInstance,
         namespace: options.maplibregl,
-        onMarkerClick: options.onMarkerClick
+        onMarkerClick: options.onMarkerClick,
+        markerOptions: options.markerOptions
       });
     }
   };
@@ -887,7 +909,7 @@ var MapFirstCore = (() => {
   // src/adapters/google/markermanager.ts
   var GoogleMapsMarkerManager = class extends BaseMarkerManager {
     constructor(options) {
-      super(options.mapInstance, options.onMarkerClick);
+      super(options.mapInstance, options.onMarkerClick, options.markerOptions);
       this.google = options.google;
     }
     render(items, primaryType, selectedMarkerId) {
@@ -934,7 +956,8 @@ var MapFirstCore = (() => {
       super({
         mapInstance: options.mapInstance,
         namespace: options.mapboxgl,
-        onMarkerClick: options.onMarkerClick
+        onMarkerClick: options.onMarkerClick,
+        markerOptions: options.markerOptions
       });
     }
   };
@@ -996,7 +1019,8 @@ var MapFirstCore = (() => {
       this.markerManager = this.markerManagerFactory({
         mapInstance: this.map,
         namespace: this.getNamespace(options),
-        onMarkerClick: options.onMarkerClick
+        onMarkerClick: options.onMarkerClick,
+        markerOptions: options.markerOptions
       });
       if (options.onRefresh) {
         this.attachEventListeners(options.onRefresh);
@@ -1110,11 +1134,12 @@ var MapFirstCore = (() => {
   // src/adapters/maplibre/index.ts
   var MapLibreAdapter = class extends BaseMapGLAdapter {
     constructor(map) {
-      super(map, ({ mapInstance, namespace, onMarkerClick }) => {
+      super(map, ({ mapInstance, namespace, onMarkerClick, markerOptions }) => {
         return new MapLibreMarkerManager({
           mapInstance,
           maplibregl: namespace,
-          onMarkerClick
+          onMarkerClick,
+          markerOptions
         });
       });
     }
@@ -1134,7 +1159,8 @@ var MapFirstCore = (() => {
       this.markerManager = new GoogleMapsMarkerManager({
         mapInstance: this.map,
         google: options.google,
-        onMarkerClick: options.onMarkerClick
+        onMarkerClick: options.onMarkerClick,
+        markerOptions: options.markerOptions
       });
       if (options.onRefresh) {
         this.attachEventListeners(options.onRefresh);
@@ -1296,11 +1322,12 @@ var MapFirstCore = (() => {
   // src/adapters/mapbox/index.ts
   var MapboxAdapter = class extends BaseMapGLAdapter {
     constructor(map) {
-      super(map, ({ mapInstance, namespace, onMarkerClick }) => {
+      super(map, ({ mapInstance, namespace, onMarkerClick, markerOptions }) => {
         return new MapboxMarkerManager({
           mapInstance,
           mapboxgl: namespace,
-          onMarkerClick
+          onMarkerClick,
+          markerOptions
         });
       });
     }
@@ -2000,7 +2027,8 @@ var MapFirstCore = (() => {
         maplibregl: config.maplibregl,
         google: config.google,
         mapboxgl: config.mapboxgl,
-        onMarkerClick: config.onMarkerClick
+        onMarkerClick: config.onMarkerClick,
+        ...config.markerOptions !== void 0 && { markerOptions: config.markerOptions }
       };
       this.currentPlatform = config.platform;
       this.adapter = this.createAdapter(adapterConfig);
@@ -2018,19 +2046,21 @@ var MapFirstCore = (() => {
       if (isMapLibreOptions(options) && options.mapInstance) {
         return this.initializeAdapter(new MapLibreAdapter(options.mapInstance), {
           maplibregl: options.maplibregl,
-          onMarkerClick: options.onMarkerClick
+          onMarkerClick: options.onMarkerClick,
+          markerOptions: options.markerOptions
         });
       }
       if (isGoogleMapsOptions(options) && options.mapInstance) {
         return this.initializeAdapter(
           new GoogleMapsAdapter(options.mapInstance),
-          { google: options.google, onMarkerClick: options.onMarkerClick }
+          { google: options.google, onMarkerClick: options.onMarkerClick, markerOptions: options.markerOptions }
         );
       }
       if (isMapboxOptions(options) && options.mapInstance) {
         return this.initializeAdapter(new MapboxAdapter(options.mapInstance), {
           mapboxgl: options.mapboxgl,
-          onMarkerClick: options.onMarkerClick
+          onMarkerClick: options.onMarkerClick,
+          markerOptions: options.markerOptions
         });
       }
       if ("adapter" in options && options.adapter) {

@@ -20,11 +20,13 @@ export class GoogleMapsAdapter extends MapAdapter {
     onMarkerClick?: (marker: Property) => void;
     onRefresh?: () => void;
     onMapMoveEnd?: (bounds: MapBounds) => void;
+    markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
   }) {
     this.markerManager = new GoogleMapsMarkerManager({
       mapInstance: this.map,
       google: options.google,
       onMarkerClick: options.onMarkerClick,
+      markerOptions: options.markerOptions,
     });
 
     if (options.onRefresh) {
@@ -40,7 +42,7 @@ export class GoogleMapsAdapter extends MapAdapter {
 
   private attachBoundsTracking(
     onMapMoveEnd: (bounds: MapBounds) => void,
-    google: GoogleMapsNamespace
+    google: GoogleMapsNamespace,
   ) {
     if (!this.map) {
       return;

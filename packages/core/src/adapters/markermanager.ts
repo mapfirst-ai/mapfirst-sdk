@@ -28,10 +28,19 @@ export abstract class BaseMarkerManager<TMarker = any> {
   protected markerCache = new Map<string, MarkerEntry<TMarker>>();
   protected primaryType: string = "Accommodation";
   protected selectedMarkerId: number | null = null;
+  protected readonly markerOptions?: {
+    showLabel?: boolean;
+    hideBadge?: boolean;
+  };
 
-  constructor(mapInstance: any, onMarkerClick?: (marker: Property) => void) {
+  constructor(
+    mapInstance: any,
+    onMarkerClick?: (marker: Property) => void,
+    markerOptions?: { showLabel?: boolean; hideBadge?: boolean },
+  ) {
     this.mapInstance = mapInstance;
     this.onMarkerClick = onMarkerClick;
+    this.markerOptions = markerOptions;
   }
 
   render(
@@ -136,6 +145,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
             this.primaryType,
             this.selectedMarkerId,
             this.onMarkerClick,
+            this.markerOptions,
           )
         : createDotMarkerElement(
             item,

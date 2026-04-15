@@ -436,6 +436,10 @@ type BaseMapFirstOptions = {
     };
     apiUrl?: string;
     currentLocationMarker?: boolean;
+    markerOptions?: {
+        showLabel?: boolean;
+        hideBadge?: boolean;
+    };
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
     adapter: MapAdapter;
@@ -492,6 +496,10 @@ declare class MapFirstCore {
         google?: GoogleMapsNamespace;
         mapboxgl?: MapboxNamespace;
         onMarkerClick?: (marker: Property) => void;
+        markerOptions?: {
+            showLabel?: boolean;
+            hideBadge?: boolean;
+        };
     }): void;
     private createAdapter;
     private initializeAdapter;

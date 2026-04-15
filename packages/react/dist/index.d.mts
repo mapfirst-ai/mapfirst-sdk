@@ -287,12 +287,24 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
     } | null>;
     attachMapLibre: (map: any, maplibregl: MapLibreNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
+        markerOptions?: {
+            showLabel?: boolean;
+            hideBadge?: boolean;
+        };
     }) => void;
     attachGoogle: (map: any, google: GoogleMapsNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
+        markerOptions?: {
+            showLabel?: boolean;
+            hideBadge?: boolean;
+        };
     }) => void;
     attachMapbox: (map: any, mapboxgl: MapboxNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
+        markerOptions?: {
+            showLabel?: boolean;
+            hideBadge?: boolean;
+        };
     }) => void;
 };
 

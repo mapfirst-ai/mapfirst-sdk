@@ -18,8 +18,7 @@ const ATTRACTION_SVG = `<svg viewBox="0 0 24 24" width="20" height="20" fill="cu
 
 const STAR_BASE_STYLE =
   "display:inline-block;width:8px;height:8px;border:1px solid #03852e;border-radius:9999px;";
-const STAR_HALF_STYLE =
-  "linear-gradient(90deg, #03852e 50%, transparent 50%)";
+const STAR_HALF_STYLE = "linear-gradient(90deg, #03852e 50%, transparent 50%)";
 type CardStarKind = "full" | "half" | "empty";
 const STAR_KIND_CACHE = new Map<string, CardStarKind[]>();
 
@@ -189,7 +188,8 @@ function createPropertyCard(marker: Property): HTMLElement {
   const url = marker.pricing?.offer?.clickUrl ?? marker.url;
   const rating = marker.rating || 0;
   const reviews = marker.reviews || 0;
-  const displayPrice = marker.pricing?.offer?.displayPrice ?? marker.price_level;
+  const displayPrice =
+    marker.pricing?.offer?.displayPrice ?? marker.price_level;
   const defaultImageUrl = getDefaultImageForType(marker.type);
 
   const card = document.createElement(url ? "a" : "div");
@@ -400,6 +400,7 @@ export function createPrimaryMarkerElement(
   primaryType: string,
   selectedMarkerId: number | null,
   onMarkerClick?: (marker: Property) => void,
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean },
 ) {
   if (typeof document === "undefined") {
     return null;
@@ -442,7 +443,11 @@ export function createPrimaryMarkerElement(
   // pill.title = marker.name ?? String(marker.tripadvisor_id);
 
   // Awards or Rating badge
-  if (!isPending && (marker.awards?.length || ratingLabel)) {
+  if (
+    !isPending &&
+    !markerOptions?.hideBadge &&
+    (marker.awards?.length || ratingLabel)
+  ) {
     const badge = document.createElement("div");
     badge.className = "mapfirst-marker-badge";
     if (!isPrimaryType) {
@@ -508,5 +513,37 @@ export function createPrimaryMarkerElement(
   }
 
   root.appendChild(pill);
+
+  // Optional label: hotel name + rating to the right of the pill
+  if (markerOptions?.showLabel && !isPending) {
+    root.style.flexDirection = "row";
+    root.style.alignItems = "flex-start";
+    root.style.gap = "8px";
+
+    const label = document.createElement("div");
+    label.className = "mapfirst-marker-label";
+
+    const nameLine = document.createElement("div");
+    nameLine.className = "mapfirst-marker-label-name";
+    nameLine.textContent = marker.name ?? "";
+
+    label.appendChild(nameLine);
+
+    if (ratingLabel) {
+      const ratingLine = document.createElement("div");
+      ratingLine.className = "mapfirst-marker-label-rating";
+      const reviewCount =
+        typeof marker.reviews === "number"
+          ? marker.reviews.toLocaleString()
+          : "";
+      ratingLine.textContent = reviewCount
+        ? `${ratingLabel} • (${reviewCount})`
+        : ratingLabel;
+      label.appendChild(ratingLine);
+    }
+
+    root.appendChild(label);
+  }
+
   return root;
 }

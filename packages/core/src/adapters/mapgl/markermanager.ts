@@ -25,6 +25,7 @@ type BaseMapGLMarkerManagerOptions<
   mapInstance: any;
   namespace: TNamespace;
   onMarkerClick?: (marker: Property) => void;
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
 };
 
 export class BaseMapGLMarkerManager<
@@ -34,7 +35,7 @@ export class BaseMapGLMarkerManager<
   private readonly MarkerCtor?: TNamespace["Marker"];
 
   constructor(options: BaseMapGLMarkerManagerOptions<TMarker, TNamespace>) {
-    super(options.mapInstance, options.onMarkerClick);
+    super(options.mapInstance, options.onMarkerClick, options.markerOptions);
     this.MarkerCtor = options.namespace?.Marker;
   }
 
