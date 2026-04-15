@@ -132,7 +132,8 @@ export function clusterMarkers({
       const dy = projected[i].y - projected[j].y;
       const collides =
         labelExtentPx !== undefined
-          ? Math.abs(dx) <= threshold + labelExtentPx && Math.abs(dy) <= threshold
+          ? Math.abs(dx) <= threshold + labelExtentPx &&
+            Math.abs(dy) <= threshold
           : Math.hypot(dx, dy) <= threshold;
       if (collides) {
         union(i, j);
@@ -163,7 +164,7 @@ export function clusterMarkers({
     }
 
     const sorted = [...groupItems].sort((a, b) =>
-      compareMarkers(b.marker, a.marker, primaryType)
+      compareMarkers(b.marker, a.marker, primaryType),
     );
     const [primary, ...rest] = sorted;
     clustered.push(
@@ -177,7 +178,9 @@ export function clusterMarkers({
 
     rest.forEach((item) => {
       if (selectedMarkerId && item.marker.tripadvisor_id === selectedMarkerId) {
-        clustered.push(createPrimaryClusterItem(item.marker, primaryType, true));
+        clustered.push(
+          createPrimaryClusterItem(item.marker, primaryType, true),
+        );
         return;
       }
 
@@ -299,7 +302,7 @@ function resolvePrice(marker: Property) {
   const numeric = Number(
     (marker.pricing.offer.displayPrice ?? "0")
       .replace(/[^0-9.,-]+/g, "")
-      .replace(/,/g, "")
+      .replace(/,/g, ""),
   );
   return Number.isNaN(numeric) ? -Infinity : numeric;
 }

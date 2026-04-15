@@ -1454,7 +1454,9 @@ var MapFirstCore = (() => {
       const remainder = [];
       rest.forEach((item) => {
         if (selectedMarkerId && item.marker.tripadvisor_id === selectedMarkerId) {
-          clustered.push(createPrimaryClusterItem(item.marker, primaryType, true));
+          clustered.push(
+            createPrimaryClusterItem(item.marker, primaryType, true)
+          );
           return;
         }
         if (distancePx(primary, item) <= dotThreshold) {
@@ -2939,7 +2941,7 @@ var MapFirstCore = (() => {
         map: this.adapter,
         selectedMarkerId: this.selectedMarkerId,
         zoom: (_a = viewState == null ? void 0 : viewState.zoom) != null ? _a : 0,
-        labelExtentPx: ((_b = this.options.markerOptions) == null ? void 0 : _b.showLabel) ? 120 : void 0
+        labelExtentPx: ((_b = this.options.markerOptions) == null ? void 0 : _b.showLabel) ? 160 : void 0
       });
       const markerManager = this.adapter.getMarkerManager();
       markerManager.render(this.clusterItems, primaryType, this.selectedMarkerId);
