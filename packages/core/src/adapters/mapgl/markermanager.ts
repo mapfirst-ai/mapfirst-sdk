@@ -25,7 +25,7 @@ type BaseMapGLMarkerManagerOptions<
   mapInstance: any;
   namespace: TNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
 };
 
 export class BaseMapGLMarkerManager<

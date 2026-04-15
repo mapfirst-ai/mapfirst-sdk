@@ -32,12 +32,13 @@ export abstract class BaseMarkerManager<TMarker = any> {
     showLabel?: boolean;
     hideBadge?: boolean;
     showTail?: boolean;
+    hideNonPrimary?: boolean;
   };
 
   constructor(
     mapInstance: any,
     onMarkerClick?: (marker: Property) => void,
-    markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean },
+    markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean },
   ) {
     this.mapInstance = mapInstance;
     this.onMarkerClick = onMarkerClick;
@@ -61,8 +62,13 @@ export abstract class BaseMarkerManager<TMarker = any> {
       this.selectedMarkerId = selectedMarkerId;
     }
 
+    // Filter out non-primary markers if hideNonPrimary is set
+    const effectiveItems = this.markerOptions?.hideNonPrimary
+      ? items.filter((item) => item.marker.type === this.primaryType)
+      : items;
+
     // Create a set of keys for the new items
-    const newKeys = new Set(items.map((item) => item.key));
+    const newKeys = new Set(effectiveItems.map((item) => item.key));
 
     // Remove markers that are no longer needed
     for (const [key, entry] of this.markerCache.entries()) {
@@ -73,7 +79,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
     }
 
     // Add or update markers
-    for (const item of items) {
+    for (const item of effectiveItems) {
       const coords = safeLatLon(item.marker.location);
       if (!coords) continue;
 

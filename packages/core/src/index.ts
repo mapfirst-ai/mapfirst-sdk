@@ -268,6 +268,7 @@ export type BaseMapFirstOptions = {
     showLabel?: boolean;
     hideBadge?: boolean;
     showTail?: boolean;
+    hideNonPrimary?: boolean;
   };
 };
 

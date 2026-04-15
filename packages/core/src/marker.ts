@@ -400,7 +400,7 @@ export function createPrimaryMarkerElement(
   primaryType: string,
   selectedMarkerId: number | null,
   onMarkerClick?: (marker: Property) => void,
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean },
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean },
 ) {
   if (typeof document === "undefined") {
     return null;
@@ -521,7 +521,7 @@ export function createPrimaryMarkerElement(
   root.appendChild(pill);
 
   // Optional label: hotel name + rating to the right of the pill
-  if (markerOptions?.showLabel && !isPending) {
+  if (markerOptions?.showLabel && isPrimaryType && !isPending) {
     const label = document.createElement("div");
     label.className = "mapfirst-marker-label";
 

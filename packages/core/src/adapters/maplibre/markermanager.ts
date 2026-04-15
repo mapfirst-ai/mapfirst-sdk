@@ -22,6 +22,7 @@ type MapLibreMarkerManagerOptions = {
     showLabel?: boolean;
     hideBadge?: boolean;
     showTail?: boolean;
+    hideNonPrimary?: boolean;
   };
 };
 
@@ -47,7 +48,11 @@ export class MapLibreMarkerManager extends BaseMapGLMarkerManager<
   ) {
     super.render(items, primaryType, selectedMarkerId);
     if (this.markerOptions?.showLabel) {
-      this.hideOverlappingLabels(items);
+      // Only primary-type markers participate in label collision
+      const primaryItems = items.filter(
+        (item) => item.marker.type === this.primaryType,
+      );
+      this.hideOverlappingLabels(primaryItems);
     }
   }
 

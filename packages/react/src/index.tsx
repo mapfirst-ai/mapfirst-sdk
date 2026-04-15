@@ -369,7 +369,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       maplibregl: MapLibreNamespace,
       options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
       },
     ) => {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
@@ -389,7 +389,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       google: GoogleMapsNamespace,
       options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
       },
     ) => {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
@@ -409,7 +409,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       mapboxgl: MapboxNamespace,
       options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
       },
     ) => {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {

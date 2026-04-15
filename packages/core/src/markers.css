@@ -5,6 +5,7 @@
   flex-direction: column;
   align-items: center;
   pointer-events: auto;
+  position: relative;
 }
 
 /* Extra bottom padding so the speech-bubble tail sits inside the element
@@ -316,6 +317,7 @@
   left: 100%;
   top: 0;
   margin-left: 8px;
+  width: 150px;
   display: flex;
   flex-direction: column;
   justify-content: center;
