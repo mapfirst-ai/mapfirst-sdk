@@ -312,10 +312,15 @@
 
 /* Marker label (shown to the right of pill when showLabel is enabled) */
 .mapfirst-marker-label {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   pointer-events: none;
+  text-align: left;
 }
 
 .mapfirst-marker-label-name {

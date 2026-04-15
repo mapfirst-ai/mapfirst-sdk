@@ -522,10 +522,6 @@ export function createPrimaryMarkerElement(
 
   // Optional label: hotel name + rating to the right of the pill
   if (markerOptions?.showLabel && !isPending) {
-    root.style.flexDirection = "row";
-    root.style.alignItems = "flex-start";
-    root.style.gap = "8px";
-
     const label = document.createElement("div");
     label.className = "mapfirst-marker-label";
 
