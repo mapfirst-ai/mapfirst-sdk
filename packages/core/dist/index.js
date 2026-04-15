@@ -562,6 +562,9 @@ function updatePrimaryMarkerElement(element, isPrimaryType, isSelected, isPendin
       isPrimaryType,
       isSelected
     );
+    if (!isPending && root.classList.contains("mapfirst-marker-has-tail")) {
+      pill.classList.add("mapfirst-marker-tail");
+    }
   }
   const badge = root.querySelector(".mapfirst-marker-badge");
   if (badge instanceof HTMLElement) {

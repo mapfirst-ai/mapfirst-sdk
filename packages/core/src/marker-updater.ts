@@ -38,6 +38,10 @@ export function updatePrimaryMarkerElement(
       isPrimaryType,
       isSelected,
     );
+    // Re-apply tail class if the root has it enabled and marker is no longer pending
+    if (!isPending && root.classList.contains("mapfirst-marker-has-tail")) {
+      pill.classList.add("mapfirst-marker-tail");
+    }
   }
 
   // Update badge opacity for non-primary markers
