@@ -267,6 +267,7 @@ export type BaseMapFirstOptions = {
   markerOptions?: {
     showLabel?: boolean;
     hideBadge?: boolean;
+    showTail?: boolean;
   };
 };
 
@@ -601,7 +602,7 @@ export class MapFirstCore {
       google?: GoogleMapsNamespace;
       mapboxgl?: MapboxNamespace;
       onMarkerClick?: (marker: Property) => void;
-      markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
+      markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
     },
   ): void {
     // Validate platform restrictions when useApi is false

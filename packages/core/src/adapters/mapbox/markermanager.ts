@@ -17,7 +17,7 @@ type MapboxMarkerManagerOptions = {
   mapInstance: any;
   mapboxgl: MapboxNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
 };
 
 export class MapboxMarkerManager extends BaseMapGLMarkerManager<

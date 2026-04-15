@@ -439,6 +439,7 @@ type BaseMapFirstOptions = {
     markerOptions?: {
         showLabel?: boolean;
         hideBadge?: boolean;
+        showTail?: boolean;
     };
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -499,6 +500,7 @@ declare class MapFirstCore {
         markerOptions?: {
             showLabel?: boolean;
             hideBadge?: boolean;
+            showTail?: boolean;
         };
     }): void;
     private createAdapter;

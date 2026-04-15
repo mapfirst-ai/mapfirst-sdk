@@ -31,12 +31,13 @@ export abstract class BaseMarkerManager<TMarker = any> {
   protected readonly markerOptions?: {
     showLabel?: boolean;
     hideBadge?: boolean;
+    showTail?: boolean;
   };
 
   constructor(
     mapInstance: any,
     onMarkerClick?: (marker: Property) => void,
-    markerOptions?: { showLabel?: boolean; hideBadge?: boolean },
+    markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean },
   ) {
     this.mapInstance = mapInstance;
     this.onMarkerClick = onMarkerClick;

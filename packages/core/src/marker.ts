@@ -400,7 +400,7 @@ export function createPrimaryMarkerElement(
   primaryType: string,
   selectedMarkerId: number | null,
   onMarkerClick?: (marker: Property) => void,
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean },
+  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean },
 ) {
   if (typeof document === "undefined") {
     return null;
@@ -424,6 +424,9 @@ export function createPrimaryMarkerElement(
 
   const root = document.createElement("div");
   root.className = "mapfirst-marker-root";
+  if (markerOptions?.showTail && isPrimaryType) {
+    root.classList.add("mapfirst-marker-has-tail");
+  }
   root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
 
   // Get URL for the marker
@@ -440,6 +443,9 @@ export function createPrimaryMarkerElement(
     isPrimaryType,
     isSelected,
   );
+  if (markerOptions?.showTail && isPrimaryType && !isPending) {
+    pill.classList.add("mapfirst-marker-tail");
+  }
   // pill.title = marker.name ?? String(marker.tripadvisor_id);
 
   // Awards or Rating badge

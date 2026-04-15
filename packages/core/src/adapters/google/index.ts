@@ -20,7 +20,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     onMarkerClick?: (marker: Property) => void;
     onRefresh?: () => void;
     onMapMoveEnd?: (bounds: MapBounds) => void;
-    markerOptions?: { showLabel?: boolean; hideBadge?: boolean };
+    markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
   }) {
     this.markerManager = new GoogleMapsMarkerManager({
       mapInstance: this.map,

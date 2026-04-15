@@ -290,6 +290,7 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
         markerOptions?: {
             showLabel?: boolean;
             hideBadge?: boolean;
+            showTail?: boolean;
         };
     }) => void;
     attachGoogle: (map: any, google: GoogleMapsNamespace, options?: {
@@ -297,6 +298,7 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
         markerOptions?: {
             showLabel?: boolean;
             hideBadge?: boolean;
+            showTail?: boolean;
         };
     }) => void;
     attachMapbox: (map: any, mapboxgl: MapboxNamespace, options?: {
@@ -304,6 +306,7 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
         markerOptions?: {
             showLabel?: boolean;
             hideBadge?: boolean;
+            showTail?: boolean;
         };
     }) => void;
 };
