@@ -1,5 +1,6 @@
 import { MapAdapter, type LngLat, type MapBounds } from "../index";
 import type { Property } from "../../types";
+import type { MarkerOptions } from "../../marker";
 
 const MAP_GL_REFRESH_EVENTS = ["move", "zoom", "dragend", "pitch", "rotate"];
 
@@ -7,14 +8,14 @@ type MarkerManagerFactory<TMarkerManager, TNamespace> = (options: {
   mapInstance: any;
   namespace: TNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+  markerOptions?: MarkerOptions;
 }) => TMarkerManager;
 
 type BaseMapGLAdapterSharedOptions = {
   onMarkerClick?: (marker: Property) => void;
   onRefresh?: () => void;
   onMapMoveEnd?: (bounds: MapBounds) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+  markerOptions?: MarkerOptions;
 };
 
 export type BaseMapGLAdapterOptions<TNamespace> =

@@ -18,6 +18,7 @@ import type {
 import type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 import type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 import type { MapboxNamespace } from "./adapters/mapbox/markermanager";
+import type { MarkerOptions } from "./marker";
 import {
   ClusterDisplayItem,
   clusterMarkers,
@@ -69,6 +70,7 @@ export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 export type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 
 export type { MapboxNamespace } from "./adapters/mapbox/markermanager";
+export type { MarkerOptions } from "./marker";
 
 // Environment configuration
 export type Environment = "prod" | "test";
@@ -269,6 +271,7 @@ export type BaseMapFirstOptions = {
     hideBadge?: boolean;
     showTail?: boolean;
     hideNonPrimary?: boolean;
+    disableHoverCard?: boolean;
   };
 };
 
@@ -603,7 +606,7 @@ export class MapFirstCore {
       google?: GoogleMapsNamespace;
       mapboxgl?: MapboxNamespace;
       onMarkerClick?: (marker: Property) => void;
-      markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+      markerOptions?: MarkerOptions;
     },
   ): void {
     // Validate platform restrictions when useApi is false

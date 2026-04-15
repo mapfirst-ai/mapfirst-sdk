@@ -10,6 +10,7 @@ import {
   type MapState,
   type MapStateCallbacks,
   type PropertyType,
+  type MarkerOptions,
 } from "@mapfirst.ai/core";
 
 // Re-export all of @mapfirst.ai/core so users only need @mapfirst.ai/react.
@@ -369,7 +370,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       maplibregl: MapLibreNamespace,
       options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
+        markerOptions?: MarkerOptions;
       },
     ) => {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
@@ -389,7 +390,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       google: GoogleMapsNamespace,
       options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
+        markerOptions?: MarkerOptions;
       },
     ) => {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
@@ -409,7 +410,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       mapboxgl: MapboxNamespace,
       options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean };
+        markerOptions?: MarkerOptions;
       },
     ) => {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {

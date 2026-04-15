@@ -1,5 +1,5 @@
 import * as _mapfirst_ai_core from '@mapfirst.ai/core';
-import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, GoogleMapsNamespace, MapboxNamespace } from '@mapfirst.ai/core';
+import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, MarkerOptions, GoogleMapsNamespace, MapboxNamespace } from '@mapfirst.ai/core';
 export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
 import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'react';
@@ -287,30 +287,15 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
     } | null>;
     attachMapLibre: (map: any, maplibregl: MapLibreNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: {
-            showLabel?: boolean;
-            hideBadge?: boolean;
-            showTail?: boolean;
-            hideNonPrimary?: boolean;
-        };
+        markerOptions?: MarkerOptions;
     }) => void;
     attachGoogle: (map: any, google: GoogleMapsNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: {
-            showLabel?: boolean;
-            hideBadge?: boolean;
-            showTail?: boolean;
-            hideNonPrimary?: boolean;
-        };
+        markerOptions?: MarkerOptions;
     }) => void;
     attachMapbox: (map: any, mapboxgl: MapboxNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: {
-            showLabel?: boolean;
-            hideBadge?: boolean;
-            showTail?: boolean;
-            hideNonPrimary?: boolean;
-        };
+        markerOptions?: MarkerOptions;
     }) => void;
 };
 

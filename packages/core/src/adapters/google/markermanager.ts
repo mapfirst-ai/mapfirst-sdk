@@ -1,4 +1,5 @@
 import type { Property } from "../../types";
+import type { MarkerOptions } from "../../marker";
 import { BaseMarkerManager } from "../markermanager";
 import { ClusterDisplayItem } from "../../utils/clustering";
 import {
@@ -14,7 +15,7 @@ type GoogleMapsMarkerManagerOptions = {
   mapInstance: any; // google.maps.Map
   google: GoogleMapsNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+  markerOptions?: MarkerOptions;
 };
 
 export class GoogleMapsMarkerManager extends BaseMarkerManager<GoogleMapsMarkerHandle> {

@@ -395,12 +395,20 @@ function positionCard(
   card.style.top = `${top}px`;
 }
 
+export type MarkerOptions = {
+  showLabel?: boolean;
+  hideBadge?: boolean;
+  showTail?: boolean;
+  hideNonPrimary?: boolean;
+  disableHoverCard?: boolean;
+};
+
 export function createPrimaryMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "primary" }>,
   primaryType: string,
   selectedMarkerId: number | null,
   onMarkerClick?: (marker: Property) => void,
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean },
+  markerOptions?: MarkerOptions,
 ) {
   if (typeof document === "undefined") {
     return null;
@@ -514,7 +522,7 @@ export function createPrimaryMarkerElement(
   });
 
   // Add hover card
-  if (!isPending) {
+  if (!isPending && !markerOptions?.disableHoverCard) {
     setupHoverCard(root, pill, marker, isSelected);
   }
 

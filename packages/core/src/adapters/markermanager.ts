@@ -1,6 +1,6 @@
 import type { Property } from "../types";
 import { createDotMarkerElement } from "../dotmarker";
-import { createPrimaryMarkerElement } from "../marker";
+import { createPrimaryMarkerElement, type MarkerOptions } from "../marker";
 import { createUserLocationMarkerElement } from "../user-location-marker";
 import {
   updatePrimaryMarkerElement,
@@ -28,17 +28,12 @@ export abstract class BaseMarkerManager<TMarker = any> {
   protected markerCache = new Map<string, MarkerEntry<TMarker>>();
   protected primaryType: string = "Accommodation";
   protected selectedMarkerId: number | null = null;
-  protected readonly markerOptions?: {
-    showLabel?: boolean;
-    hideBadge?: boolean;
-    showTail?: boolean;
-    hideNonPrimary?: boolean;
-  };
+  protected readonly markerOptions?: MarkerOptions;
 
   constructor(
     mapInstance: any,
     onMarkerClick?: (marker: Property) => void,
-    markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean; hideNonPrimary?: boolean },
+    markerOptions?: MarkerOptions,
   ) {
     this.mapInstance = mapInstance;
     this.onMarkerClick = onMarkerClick;

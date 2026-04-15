@@ -3,6 +3,7 @@ import {
   BaseMapGLMarkerManager,
   type MapGLMarkerHandle,
 } from "../mapgl/markermanager";
+import type { MarkerOptions } from "../../marker";
 import type { ClusterDisplayItem } from "../../utils/clustering";
 
 export type MapLibreMarkerHandle = MapGLMarkerHandle;
@@ -18,12 +19,7 @@ type MapLibreMarkerManagerOptions = {
   mapInstance: any;
   maplibregl: MapLibreNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: {
-    showLabel?: boolean;
-    hideBadge?: boolean;
-    showTail?: boolean;
-    hideNonPrimary?: boolean;
-  };
+  markerOptions?: MarkerOptions;
 };
 
 type Box = { x: number; y: number; w: number; h: number };

@@ -1,4 +1,5 @@
 import type { Property } from "../../types";
+import type { MarkerOptions } from "../../marker";
 import {
   BaseMapGLMarkerManager,
   type MapGLMarkerHandle,
@@ -17,7 +18,7 @@ type MapboxMarkerManagerOptions = {
   mapInstance: any;
   mapboxgl: MapboxNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+  markerOptions?: MarkerOptions;
 };
 
 export class MapboxMarkerManager extends BaseMapGLMarkerManager<

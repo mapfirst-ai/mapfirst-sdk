@@ -156,6 +156,14 @@ type ViewStateSnapshot = {
     pitch: number;
 };
 
+type MarkerOptions = {
+    showLabel?: boolean;
+    hideBadge?: boolean;
+    showTail?: boolean;
+    hideNonPrimary?: boolean;
+    disableHoverCard?: boolean;
+};
+
 type MapGLMarkerHandle = {
     setLngLat(lngLat: [number, number]): MapGLMarkerHandle;
     addTo(map: any): MapGLMarkerHandle;
@@ -441,6 +449,7 @@ type BaseMapFirstOptions = {
         hideBadge?: boolean;
         showTail?: boolean;
         hideNonPrimary?: boolean;
+        disableHoverCard?: boolean;
     };
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
@@ -498,11 +507,7 @@ declare class MapFirstCore {
         google?: GoogleMapsNamespace;
         mapboxgl?: MapboxNamespace;
         onMarkerClick?: (marker: Property) => void;
-        markerOptions?: {
-            showLabel?: boolean;
-            hideBadge?: boolean;
-            showTail?: boolean;
-        };
+        markerOptions?: MarkerOptions;
     }): void;
     private createAdapter;
     private initializeAdapter;
@@ -607,4 +612,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, getCurrentLocation, getLocationWhenGranted, processApiFilters };
+export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type MarkerOptions, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, getCurrentLocation, getLocationWhenGranted, processApiFilters };

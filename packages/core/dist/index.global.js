@@ -458,7 +458,7 @@ var MapFirstCore = (() => {
         onMarkerClick == null ? void 0 : onMarkerClick(marker);
       }
     });
-    if (!isPending) {
+    if (!isPending && !(markerOptions == null ? void 0 : markerOptions.disableHoverCard)) {
       setupHoverCard(root, pill, marker, isSelected);
     }
     root.appendChild(pill);

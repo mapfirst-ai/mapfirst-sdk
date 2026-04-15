@@ -4,6 +4,7 @@ import {
   type GoogleMapsNamespace,
 } from "./markermanager";
 import type { Property } from "../../types";
+import type { MarkerOptions } from "../../marker";
 
 export class GoogleMapsAdapter extends MapAdapter {
   private overlayView: any;
@@ -20,7 +21,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     onMarkerClick?: (marker: Property) => void;
     onRefresh?: () => void;
     onMapMoveEnd?: (bounds: MapBounds) => void;
-    markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+    markerOptions?: MarkerOptions;
   }) {
     this.markerManager = new GoogleMapsMarkerManager({
       mapInstance: this.map,
