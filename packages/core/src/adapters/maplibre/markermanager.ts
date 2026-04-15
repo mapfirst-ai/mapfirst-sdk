@@ -18,19 +18,19 @@ type MapLibreMarkerManagerOptions = {
   mapInstance: any;
   maplibregl: MapLibreNamespace;
   onMarkerClick?: (marker: Property) => void;
-  markerOptions?: { showLabel?: boolean; hideBadge?: boolean; showTail?: boolean };
+  markerOptions?: {
+    showLabel?: boolean;
+    hideBadge?: boolean;
+    showTail?: boolean;
+  };
 };
 
-const LABEL_SOURCE_ID = "mapfirst-labels-source";
-const LABEL_LAYER_ID = "mapfirst-labels-layer";
+type Box = { x: number; y: number; w: number; h: number };
 
 export class MapLibreMarkerManager extends BaseMapGLMarkerManager<
   MapLibreMarkerHandle,
   MapLibreNamespace
 > {
-  private labelLayerReady = false;
-  private pendingLabelData: any = null;
-
   constructor(options: MapLibreMarkerManagerOptions) {
     super({
       mapInstance: options.mapInstance,
@@ -38,14 +38,6 @@ export class MapLibreMarkerManager extends BaseMapGLMarkerManager<
       onMarkerClick: options.onMarkerClick,
       markerOptions: options.markerOptions,
     });
-
-    if (options.markerOptions?.showLabel) {
-      if (options.mapInstance.isStyleLoaded()) {
-        this.initLabelLayer();
-      } else {
-        options.mapInstance.once("style.load", () => this.initLabelLayer());
-      }
-    }
   }
 
   override render(
@@ -55,123 +47,111 @@ export class MapLibreMarkerManager extends BaseMapGLMarkerManager<
   ) {
     super.render(items, primaryType, selectedMarkerId);
     if (this.markerOptions?.showLabel) {
-      this.syncLabelLayer(items);
+      this.hideOverlappingLabels(items);
     }
   }
 
-  override destroy() {
-    super.destroy();
-    this.removeLabelLayer();
-  }
-
-  /** Suppress DOM labels — symbol layer renders them instead */
-  protected override getEffectiveMarkerOptions() {
-    if (this.markerOptions?.showLabel) {
-      return { ...this.markerOptions, showLabel: false };
-    }
-    return this.markerOptions;
-  }
-
-  private initLabelLayer() {
+  /**
+   * Hide labels that overlap with pills, dots, or other labels.
+   * Uses projected map coordinates + approximate bounding boxes.
+   */
+  private hideOverlappingLabels(items: ClusterDisplayItem[]) {
     const map = this.mapInstance;
-    try {
-      if (map.getSource(LABEL_SOURCE_ID)) return;
+    const markerBoxes: { key: string; box: Box }[] = [];
+    const labelInfo: { key: string; el: HTMLElement; box: Box }[] = [];
 
-      const empty = {
-        type: "FeatureCollection" as const,
-        features: [] as any[],
-      };
+    for (const item of items) {
+      const loc = item.marker.location as { lon?: number; lat?: number };
+      if (typeof loc?.lon !== "number" || typeof loc?.lat !== "number") continue;
 
-      map.addSource(LABEL_SOURCE_ID, { type: "geojson", data: empty });
-      map.addLayer({
-        id: LABEL_LAYER_ID,
-        type: "symbol",
-        source: LABEL_SOURCE_ID,
-        layout: {
-          // Show "Name\nRating (reviews)" or just "Name"
-          "text-field": [
-            "case",
-            ["!=", ["get", "rating"], ""],
-            ["concat", ["get", "name"], "\n", ["get", "rating"]],
-            ["get", "name"],
-          ],
-          "text-anchor": "left",
-          // Offset right of pill: ~3.5em horizontal, ~2.3em up from tail tip
-          "text-offset": [3.5, -2.3],
-          "text-size": 13,
-          "text-max-width": 8,
-          // Native collision detection — overlapping labels auto-hide
-          "text-allow-overlap": false,
-          "text-ignore-placement": false,
-          "symbol-placement": "point",
-        },
-        paint: {
-          "text-color": "#ffffff",
-          "text-halo-color": "rgba(0,0,0,0.85)",
-          "text-halo-width": 1.5,
-        },
-      });
-
-      this.labelLayerReady = true;
-      if (this.pendingLabelData) {
-        (map.getSource(LABEL_SOURCE_ID) as any).setData(this.pendingLabelData);
-        this.pendingLabelData = null;
-      }
-    } catch {
-      // Style doesn't support this layer (e.g. no glyphs) — fail silently
-    }
-  }
-
-  private syncLabelLayer(items: ClusterDisplayItem[]) {
-    const features = items
-      .filter(
-        (item) =>
-          item.kind === "primary" && item.marker.type === this.primaryType,
-      )
-      .map((item) => {
-        const loc = item.marker.location as { lon: number; lat: number };
-        const rating =
-          item.marker.rating != null && item.marker.reviews
-            ? `${item.marker.rating} (${item.marker.reviews})`
-            : item.marker.rating != null
-              ? String(item.marker.rating)
-              : "";
-        return {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [loc.lon, loc.lat],
-          },
-          properties: {
-            name: item.marker.name ?? "",
-            rating,
-          },
-        };
-      });
-
-    const geojson = {
-      type: "FeatureCollection",
-      features,
-    };
-
-    if (this.labelLayerReady) {
+      let pt: { x: number; y: number };
       try {
-        (this.mapInstance.getSource(LABEL_SOURCE_ID) as any).setData(geojson);
+        pt = map.project([loc.lon, loc.lat]);
       } catch {
-        // swallow
+        continue;
       }
-    } else {
-      this.pendingLabelData = geojson;
-    }
-  }
 
-  private removeLabelLayer() {
-    const map = this.mapInstance;
-    try {
-      if (map.getLayer(LABEL_LAYER_ID)) map.removeLayer(LABEL_LAYER_ID);
-      if (map.getSource(LABEL_SOURCE_ID)) map.removeSource(LABEL_SOURCE_ID);
-    } catch {
-      // swallow
+      if (item.kind === "primary") {
+        // Pill: anchor "bottom", tail adds 10px below pill.
+        // Pill height ~40px, center ~30px above coordinate.
+        const pillW = 80;
+        const pillH = 40;
+        const pillCY = pt.y - 30;
+
+        markerBoxes.push({
+          key: item.key,
+          box: {
+            x: pt.x - pillW / 2,
+            y: pillCY - pillH / 2,
+            w: pillW,
+            h: pillH,
+          },
+        });
+
+        // Collect label elements for primary-type markers
+        if (item.marker.type === this.primaryType) {
+          const entry = this.markerCache.get(item.key);
+          const root = entry ? this.getMarkerElement(entry.marker) : null;
+          const label = root?.querySelector(
+            ".mapfirst-marker-label",
+          ) as HTMLElement | null;
+          if (label) {
+            const labelX = pt.x + pillW / 2 + 8;
+            const labelW = 150;
+            const labelH = 44;
+            labelInfo.push({
+              key: item.key,
+              el: label,
+              box: {
+                x: labelX,
+                y: pillCY - labelH / 2,
+                w: labelW,
+                h: labelH,
+              },
+            });
+          }
+        }
+      } else {
+        // Dot: center anchor, ~20x20
+        markerBoxes.push({
+          key: item.key,
+          box: { x: pt.x - 10, y: pt.y - 10, w: 20, h: 20 },
+        });
+      }
+    }
+
+    // Collision detection: hide labels that overlap other markers or shown labels.
+    const shownLabelBoxes: Box[] = [];
+    for (const { key, el, box } of labelInfo) {
+      let overlaps = false;
+
+      // Check vs pills/dots (skip own pill)
+      for (const mb of markerBoxes) {
+        if (mb.key === key) continue;
+        if (boxesOverlap(box, mb.box)) {
+          overlaps = true;
+          break;
+        }
+      }
+
+      // Check vs already-shown labels
+      if (!overlaps) {
+        for (const sb of shownLabelBoxes) {
+          if (boxesOverlap(box, sb)) {
+            overlaps = true;
+            break;
+          }
+        }
+      }
+
+      el.style.visibility = overlaps ? "hidden" : "visible";
+      if (!overlaps) shownLabelBoxes.push(box);
     }
   }
+}
+
+function boxesOverlap(a: Box, b: Box): boolean {
+  return (
+    a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
+  );
 }

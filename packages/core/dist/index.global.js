@@ -910,132 +910,107 @@ var MapFirstCore = (() => {
   };
 
   // src/adapters/maplibre/markermanager.ts
-  var LABEL_SOURCE_ID = "mapfirst-labels-source";
-  var LABEL_LAYER_ID = "mapfirst-labels-layer";
   var MapLibreMarkerManager = class extends BaseMapGLMarkerManager {
     constructor(options) {
-      var _a;
       super({
         mapInstance: options.mapInstance,
         namespace: options.maplibregl,
         onMarkerClick: options.onMarkerClick,
         markerOptions: options.markerOptions
       });
-      this.labelLayerReady = false;
-      this.pendingLabelData = null;
-      if ((_a = options.markerOptions) == null ? void 0 : _a.showLabel) {
-        if (options.mapInstance.isStyleLoaded()) {
-          this.initLabelLayer();
-        } else {
-          options.mapInstance.once("style.load", () => this.initLabelLayer());
-        }
-      }
     }
     render(items, primaryType, selectedMarkerId) {
       var _a;
       super.render(items, primaryType, selectedMarkerId);
       if ((_a = this.markerOptions) == null ? void 0 : _a.showLabel) {
-        this.syncLabelLayer(items);
+        this.hideOverlappingLabels(items);
       }
     }
-    destroy() {
-      super.destroy();
-      this.removeLabelLayer();
-    }
-    /** Suppress DOM labels — symbol layer renders them instead */
-    getEffectiveMarkerOptions() {
-      var _a;
-      if ((_a = this.markerOptions) == null ? void 0 : _a.showLabel) {
-        return { ...this.markerOptions, showLabel: false };
-      }
-      return this.markerOptions;
-    }
-    initLabelLayer() {
+    /**
+     * Hide labels that overlap with pills, dots, or other labels.
+     * Uses projected map coordinates + approximate bounding boxes.
+     */
+    hideOverlappingLabels(items) {
       const map = this.mapInstance;
-      try {
-        if (map.getSource(LABEL_SOURCE_ID)) return;
-        const empty = {
-          type: "FeatureCollection",
-          features: []
-        };
-        map.addSource(LABEL_SOURCE_ID, { type: "geojson", data: empty });
-        map.addLayer({
-          id: LABEL_LAYER_ID,
-          type: "symbol",
-          source: LABEL_SOURCE_ID,
-          layout: {
-            // Show "Name\nRating (reviews)" or just "Name"
-            "text-field": [
-              "case",
-              ["!=", ["get", "rating"], ""],
-              ["concat", ["get", "name"], "\n", ["get", "rating"]],
-              ["get", "name"]
-            ],
-            "text-anchor": "left",
-            // Offset right of pill: ~3.5em horizontal, ~2.3em up from tail tip
-            "text-offset": [3.5, -2.3],
-            "text-size": 13,
-            "text-max-width": 8,
-            // Native collision detection — overlapping labels auto-hide
-            "text-allow-overlap": false,
-            "text-ignore-placement": false,
-            "symbol-placement": "point"
-          },
-          paint: {
-            "text-color": "#ffffff",
-            "text-halo-color": "rgba(0,0,0,0.85)",
-            "text-halo-width": 1.5
-          }
-        });
-        this.labelLayerReady = true;
-        if (this.pendingLabelData) {
-          map.getSource(LABEL_SOURCE_ID).setData(this.pendingLabelData);
-          this.pendingLabelData = null;
-        }
-      } catch {
-      }
-    }
-    syncLabelLayer(items) {
-      const features = items.filter(
-        (item) => item.kind === "primary" && item.marker.type === this.primaryType
-      ).map((item) => {
-        var _a;
+      const markerBoxes = [];
+      const labelInfo = [];
+      for (const item of items) {
         const loc = item.marker.location;
-        const rating = item.marker.rating != null && item.marker.reviews ? `${item.marker.rating} (${item.marker.reviews})` : item.marker.rating != null ? String(item.marker.rating) : "";
-        return {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [loc.lon, loc.lat]
-          },
-          properties: {
-            name: (_a = item.marker.name) != null ? _a : "",
-            rating
-          }
-        };
-      });
-      const geojson = {
-        type: "FeatureCollection",
-        features
-      };
-      if (this.labelLayerReady) {
+        if (typeof (loc == null ? void 0 : loc.lon) !== "number" || typeof (loc == null ? void 0 : loc.lat) !== "number") continue;
+        let pt;
         try {
-          this.mapInstance.getSource(LABEL_SOURCE_ID).setData(geojson);
+          pt = map.project([loc.lon, loc.lat]);
         } catch {
+          continue;
         }
-      } else {
-        this.pendingLabelData = geojson;
+        if (item.kind === "primary") {
+          const pillW = 80;
+          const pillH = 40;
+          const pillCY = pt.y - 30;
+          markerBoxes.push({
+            key: item.key,
+            box: {
+              x: pt.x - pillW / 2,
+              y: pillCY - pillH / 2,
+              w: pillW,
+              h: pillH
+            }
+          });
+          if (item.marker.type === this.primaryType) {
+            const entry = this.markerCache.get(item.key);
+            const root = entry ? this.getMarkerElement(entry.marker) : null;
+            const label = root == null ? void 0 : root.querySelector(
+              ".mapfirst-marker-label"
+            );
+            if (label) {
+              const labelX = pt.x + pillW / 2 + 8;
+              const labelW = 150;
+              const labelH = 44;
+              labelInfo.push({
+                key: item.key,
+                el: label,
+                box: {
+                  x: labelX,
+                  y: pillCY - labelH / 2,
+                  w: labelW,
+                  h: labelH
+                }
+              });
+            }
+          }
+        } else {
+          markerBoxes.push({
+            key: item.key,
+            box: { x: pt.x - 10, y: pt.y - 10, w: 20, h: 20 }
+          });
+        }
       }
-    }
-    removeLabelLayer() {
-      const map = this.mapInstance;
-      try {
-        if (map.getLayer(LABEL_LAYER_ID)) map.removeLayer(LABEL_LAYER_ID);
-        if (map.getSource(LABEL_SOURCE_ID)) map.removeSource(LABEL_SOURCE_ID);
-      } catch {
+      const shownLabelBoxes = [];
+      for (const { key, el, box } of labelInfo) {
+        let overlaps = false;
+        for (const mb of markerBoxes) {
+          if (mb.key === key) continue;
+          if (boxesOverlap(box, mb.box)) {
+            overlaps = true;
+            break;
+          }
+        }
+        if (!overlaps) {
+          for (const sb of shownLabelBoxes) {
+            if (boxesOverlap(box, sb)) {
+              overlaps = true;
+              break;
+            }
+          }
+        }
+        el.style.visibility = overlaps ? "hidden" : "visible";
+        if (!overlaps) shownLabelBoxes.push(box);
       }
     }
   };
+  function boxesOverlap(a, b) {
+    return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+  }
 
   // src/adapters/google/markermanager.ts
   var GoogleMapsMarkerManager = class extends BaseMarkerManager {
