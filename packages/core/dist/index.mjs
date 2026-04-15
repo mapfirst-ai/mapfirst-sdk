@@ -360,7 +360,7 @@ function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarke
     root.classList.add("mapfirst-marker-has-tail");
   }
   root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
-  const markerUrl = (_e = (_d = (_c = marker.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.clickUrl) != null ? _e : marker.url;
+  const markerUrl = (markerOptions == null ? void 0 : markerOptions.disableHoverCard) ? void 0 : (_e = (_d = (_c = marker.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.clickUrl) != null ? _e : marker.url;
   const pill = document.createElement(markerUrl ? "a" : "div");
   if (markerUrl) {
     pill.href = markerUrl;

@@ -438,7 +438,9 @@ export function createPrimaryMarkerElement(
   root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
 
   // Get URL for the marker
-  const markerUrl = marker.pricing?.offer?.clickUrl ?? marker.url;
+  const markerUrl = markerOptions?.disableHoverCard
+    ? undefined
+    : (marker.pricing?.offer?.clickUrl ?? marker.url);
 
   const pill = document.createElement(markerUrl ? "a" : "div");
   if (markerUrl) {
