@@ -676,6 +676,10 @@ var MapFirstCore = (() => {
       this.onMarkerClick = onMarkerClick;
       this.markerOptions = markerOptions;
     }
+    /** Override in subclasses to change effective options passed to marker elements */
+    getEffectiveMarkerOptions() {
+      return this.markerOptions;
+    }
     render(items, primaryType, selectedMarkerId) {
       if (primaryType && primaryType !== this.primaryType) {
         this.primaryType = primaryType;
@@ -745,7 +749,7 @@ var MapFirstCore = (() => {
         this.primaryType,
         this.selectedMarkerId,
         this.onMarkerClick,
-        this.markerOptions
+        this.getEffectiveMarkerOptions()
       ) : createDotMarkerElement(
         item,
         this.primaryType,
@@ -906,14 +910,130 @@ var MapFirstCore = (() => {
   };
 
   // src/adapters/maplibre/markermanager.ts
+  var LABEL_SOURCE_ID = "mapfirst-labels-source";
+  var LABEL_LAYER_ID = "mapfirst-labels-layer";
   var MapLibreMarkerManager = class extends BaseMapGLMarkerManager {
     constructor(options) {
+      var _a;
       super({
         mapInstance: options.mapInstance,
         namespace: options.maplibregl,
         onMarkerClick: options.onMarkerClick,
         markerOptions: options.markerOptions
       });
+      this.labelLayerReady = false;
+      this.pendingLabelData = null;
+      if ((_a = options.markerOptions) == null ? void 0 : _a.showLabel) {
+        if (options.mapInstance.isStyleLoaded()) {
+          this.initLabelLayer();
+        } else {
+          options.mapInstance.once("style.load", () => this.initLabelLayer());
+        }
+      }
+    }
+    render(items, primaryType, selectedMarkerId) {
+      var _a;
+      super.render(items, primaryType, selectedMarkerId);
+      if ((_a = this.markerOptions) == null ? void 0 : _a.showLabel) {
+        this.syncLabelLayer(items);
+      }
+    }
+    destroy() {
+      super.destroy();
+      this.removeLabelLayer();
+    }
+    /** Suppress DOM labels — symbol layer renders them instead */
+    getEffectiveMarkerOptions() {
+      var _a;
+      if ((_a = this.markerOptions) == null ? void 0 : _a.showLabel) {
+        return { ...this.markerOptions, showLabel: false };
+      }
+      return this.markerOptions;
+    }
+    initLabelLayer() {
+      const map = this.mapInstance;
+      try {
+        if (map.getSource(LABEL_SOURCE_ID)) return;
+        const empty = {
+          type: "FeatureCollection",
+          features: []
+        };
+        map.addSource(LABEL_SOURCE_ID, { type: "geojson", data: empty });
+        map.addLayer({
+          id: LABEL_LAYER_ID,
+          type: "symbol",
+          source: LABEL_SOURCE_ID,
+          layout: {
+            // Show "Name\nRating (reviews)" or just "Name"
+            "text-field": [
+              "case",
+              ["!=", ["get", "rating"], ""],
+              ["concat", ["get", "name"], "\n", ["get", "rating"]],
+              ["get", "name"]
+            ],
+            "text-anchor": "left",
+            // Offset right of pill: ~3.5em horizontal, ~2.3em up from tail tip
+            "text-offset": [3.5, -2.3],
+            "text-size": 13,
+            "text-max-width": 8,
+            // Native collision detection — overlapping labels auto-hide
+            "text-allow-overlap": false,
+            "text-ignore-placement": false,
+            "symbol-placement": "point"
+          },
+          paint: {
+            "text-color": "#ffffff",
+            "text-halo-color": "rgba(0,0,0,0.85)",
+            "text-halo-width": 1.5
+          }
+        });
+        this.labelLayerReady = true;
+        if (this.pendingLabelData) {
+          map.getSource(LABEL_SOURCE_ID).setData(this.pendingLabelData);
+          this.pendingLabelData = null;
+        }
+      } catch {
+      }
+    }
+    syncLabelLayer(items) {
+      const features = items.filter(
+        (item) => item.kind === "primary" && item.marker.type === this.primaryType
+      ).map((item) => {
+        var _a;
+        const loc = item.marker.location;
+        const rating = item.marker.rating != null && item.marker.reviews ? `${item.marker.rating} (${item.marker.reviews})` : item.marker.rating != null ? String(item.marker.rating) : "";
+        return {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [loc.lon, loc.lat]
+          },
+          properties: {
+            name: (_a = item.marker.name) != null ? _a : "",
+            rating
+          }
+        };
+      });
+      const geojson = {
+        type: "FeatureCollection",
+        features
+      };
+      if (this.labelLayerReady) {
+        try {
+          this.mapInstance.getSource(LABEL_SOURCE_ID).setData(geojson);
+        } catch {
+        }
+      } else {
+        this.pendingLabelData = geojson;
+      }
+    }
+    removeLabelLayer() {
+      const map = this.mapInstance;
+      try {
+        if (map.getLayer(LABEL_LAYER_ID)) map.removeLayer(LABEL_LAYER_ID);
+        if (map.getSource(LABEL_SOURCE_ID)) map.removeSource(LABEL_SOURCE_ID);
+      } catch {
+      }
     }
   };
 

@@ -44,6 +44,11 @@ export abstract class BaseMarkerManager<TMarker = any> {
     this.markerOptions = markerOptions;
   }
 
+  /** Override in subclasses to change effective options passed to marker elements */
+  protected getEffectiveMarkerOptions() {
+    return this.markerOptions;
+  }
+
   render(
     items: ClusterDisplayItem[],
     primaryType?: string,
@@ -146,7 +151,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
             this.primaryType,
             this.selectedMarkerId,
             this.onMarkerClick,
-            this.markerOptions,
+            this.getEffectiveMarkerOptions(),
           )
         : createDotMarkerElement(
             item,
