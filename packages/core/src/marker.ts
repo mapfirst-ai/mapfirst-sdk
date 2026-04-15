@@ -544,7 +544,7 @@ export function createPrimaryMarkerElement(
       label.appendChild(ratingLine);
     }
 
-    root.appendChild(label);
+    pill.appendChild(label);
   }
 
   return root;
