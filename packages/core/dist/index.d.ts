@@ -32,6 +32,7 @@ type FilterSchema = {
     include_urls?: boolean;
     include_rankings?: boolean;
     include_phone_numbers?: boolean;
+    restrict_location_id?: number;
 };
 type Offer = {
     availability: "available" | "unavailable" | "pending";
@@ -335,6 +336,7 @@ interface FilterState {
     include_urls?: boolean;
     include_rankings?: boolean;
     include_phone_numbers?: boolean;
+    restrict_location_id?: number;
 }
 interface MapState {
     center: [number, number];

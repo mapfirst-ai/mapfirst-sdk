@@ -29,6 +29,7 @@ export interface FilterState {
   include_urls?: boolean;
   include_rankings?: boolean;
   include_phone_numbers?: boolean;
+  restrict_location_id?: number;
 }
 
 export interface MapState {
