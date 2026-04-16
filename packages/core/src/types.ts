@@ -35,6 +35,9 @@ export type FilterSchema = {
   primary_type?: PropertyType;
   transformed_query?: string;
   selected_restaurant_price_levels?: PriceLevel[];
+  include_urls?: boolean;
+  include_rankings?: boolean;
+  include_phone_numbers?: boolean;
 };
 
 export type DatedFilterSchema = Omit<FilterSchema, "checkIn" | "checkOut"> & {
@@ -101,6 +104,11 @@ export type Ranking = {
   total: number;
 };
 
+export type PhoneNumber = {
+  type: string;
+  value: string;
+};
+
 export type Property = {
   tripadvisor_id: number;
   name: string;
@@ -113,6 +121,7 @@ export type Property = {
   url?: string;
   urls?: PropertyUrls;
   rankings?: Ranking[];
+  phone_numbers?: PhoneNumber[];
   secondaries: string[];
   price_level?: PriceLevel;
   city?: string;

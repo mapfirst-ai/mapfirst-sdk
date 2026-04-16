@@ -29,6 +29,9 @@ type FilterSchema = {
     primary_type?: PropertyType;
     transformed_query?: string;
     selected_restaurant_price_levels?: PriceLevel[];
+    include_urls?: boolean;
+    include_rankings?: boolean;
+    include_phone_numbers?: boolean;
 };
 type Offer = {
     availability: "available" | "unavailable" | "pending";
@@ -65,6 +68,29 @@ type PropertyAward = {
     type: "0" | "1";
 };
 type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
+type PropertyUrls = {
+    official?: string;
+    menu?: string;
+    tripadvisor?: {
+        main?: string;
+        photos?: string;
+        write_review?: string;
+        questions_answers?: string;
+    };
+};
+type Ranking = {
+    category: string;
+    category_id: string;
+    display_text: string;
+    geo: string;
+    geo_id: number;
+    rank: number;
+    total: number;
+};
+type PhoneNumber = {
+    type: string;
+    value: string;
+};
 type Property = {
     tripadvisor_id: number;
     name: string;
@@ -78,6 +104,9 @@ type Property = {
     awards?: PropertyAward[];
     pricing?: HotelPricingAPIResults;
     url?: string;
+    urls?: PropertyUrls;
+    rankings?: Ranking[];
+    phone_numbers?: PhoneNumber[];
     secondaries: string[];
     price_level?: PriceLevel;
     city?: string;
@@ -303,6 +332,9 @@ interface FilterState {
     numAdults?: number;
     numRooms?: number;
     currency?: string;
+    include_urls?: boolean;
+    include_rankings?: boolean;
+    include_phone_numbers?: boolean;
 }
 interface MapState {
     center: [number, number];

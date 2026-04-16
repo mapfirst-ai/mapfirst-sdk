@@ -26,6 +26,9 @@ export interface FilterState {
   numAdults?: number;
   numRooms?: number;
   currency?: string;
+  include_urls?: boolean;
+  include_rankings?: boolean;
+  include_phone_numbers?: boolean;
 }
 
 export interface MapState {
