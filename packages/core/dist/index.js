@@ -2902,16 +2902,19 @@ var MapFirstCore = class {
     const newCity = (_c = (_b = data.filters.location) == null ? void 0 : _b.city) != null ? _c : void 0;
     const newCountry = ((_d = data.filters.location) == null ? void 0 : _d.country) || "";
     const newCoordinates = data.filters.location ? [data.filters.location.latitude, data.filters.location.longitude] : void 0;
-    if (!newCoordinates) return;
     const currentLocation = this.state.activeLocation;
-    if (newLocationId !== (currentLocation == null ? void 0 : currentLocation.location_id) || newCity !== (currentLocation == null ? void 0 : currentLocation.city) || newCountry !== (currentLocation == null ? void 0 : currentLocation.country)) {
-      this.setActiveLocation({
-        city: newCity,
-        country: newCountry,
-        location_id: newLocationId,
-        locationName: newCity && newCountry ? `${newCity}, ${newCountry}` : newCountry || "",
-        coordinates: newCoordinates
-      });
+    if (newCoordinates || newLocationId && newLocationId !== (currentLocation == null ? void 0 : currentLocation.location_id)) {
+      if (newLocationId !== (currentLocation == null ? void 0 : currentLocation.location_id) || newCity !== (currentLocation == null ? void 0 : currentLocation.city) || newCountry !== (currentLocation == null ? void 0 : currentLocation.country)) {
+        this.setActiveLocation({
+          city: newCity,
+          country: newCountry,
+          location_id: newLocationId,
+          locationName: newCity && newCountry ? `${newCity}, ${newCountry}` : newCountry || "",
+          ...newCoordinates && {
+            coordinates: newCoordinates
+          }
+        });
+      }
     }
   }
   async runSmartFilterSearch({
@@ -2988,7 +2991,7 @@ var MapFirstCore = class {
     const body = {
       filters: filterPayload,
       ...query && { query },
-      ...state.bounds ? { bounds: state.bounds } : state.activeLocation.location_id ? { location_id: state.activeLocation.location_id } : state.activeLocation.coordinates ? {
+      ...state.bounds ? { bounds: state.bounds } : state.activeLocation.location_id ? { location_id: state.activeLocation.location_id } : state.activeLocation.coordinates && (state.activeLocation.coordinates[0] !== 0 || state.activeLocation.coordinates[1] !== 0) ? {
         latitude: state.activeLocation.coordinates[0],
         longitude: state.activeLocation.coordinates[1]
       } : {},

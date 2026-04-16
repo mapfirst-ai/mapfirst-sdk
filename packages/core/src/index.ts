@@ -1625,26 +1625,31 @@ export class MapFirstCore {
       ? [data.filters.location.latitude, data.filters.location.longitude]
       : undefined;
 
-    if (!newCoordinates) return;
-
     const currentLocation = this.state.activeLocation;
 
-    // Check if location has changed
+    // Update if we have new coordinates or a new location_id
     if (
-      newLocationId !== currentLocation?.location_id ||
-      newCity !== currentLocation?.city ||
-      newCountry !== currentLocation?.country
+      newCoordinates ||
+      (newLocationId && newLocationId !== currentLocation?.location_id)
     ) {
-      this.setActiveLocation({
-        city: newCity,
-        country: newCountry,
-        location_id: newLocationId,
-        locationName:
-          newCity && newCountry
-            ? `${newCity}, ${newCountry}`
-            : newCountry || "",
-        coordinates: newCoordinates as [number, number],
-      });
+      if (
+        newLocationId !== currentLocation?.location_id ||
+        newCity !== currentLocation?.city ||
+        newCountry !== currentLocation?.country
+      ) {
+        this.setActiveLocation({
+          city: newCity,
+          country: newCountry,
+          location_id: newLocationId,
+          locationName:
+            newCity && newCountry
+              ? `${newCity}, ${newCountry}`
+              : newCountry || "",
+          ...(newCoordinates && {
+            coordinates: newCoordinates as [number, number],
+          }),
+        });
+      }
     }
   }
 
@@ -1746,7 +1751,9 @@ export class MapFirstCore {
         ? { bounds: state.bounds }
         : state.activeLocation.location_id
           ? { location_id: state.activeLocation.location_id }
-          : state.activeLocation.coordinates
+          : state.activeLocation.coordinates &&
+              (state.activeLocation.coordinates[0] !== 0 ||
+                state.activeLocation.coordinates[1] !== 0)
             ? {
                 latitude: state.activeLocation.coordinates[0],
                 longitude: state.activeLocation.coordinates[1],
