@@ -29,10 +29,6 @@ type FilterSchema = {
     primary_type?: PropertyType;
     transformed_query?: string;
     selected_restaurant_price_levels?: PriceLevel[];
-    include_urls?: boolean;
-    include_rankings?: boolean;
-    include_phone_numbers?: boolean;
-    restrict_location_id?: number;
 };
 type Offer = {
     availability: "available" | "unavailable" | "pending";
@@ -133,6 +129,10 @@ type InitialRequestBody = {
     longitude?: number;
     latitude?: number;
     radius?: number;
+    include_urls?: boolean;
+    include_rankings?: boolean;
+    include_phone_numbers?: boolean;
+    restrict_location_id?: number;
 };
 type SmartFilter = {
     id: string;
@@ -333,10 +333,6 @@ interface FilterState {
     numAdults?: number;
     numRooms?: number;
     currency?: string;
-    include_urls?: boolean;
-    include_rankings?: boolean;
-    include_phone_numbers?: boolean;
-    restrict_location_id?: number;
 }
 interface MapState {
     center: [number, number];
@@ -478,6 +474,10 @@ type BaseMapFirstOptions = {
     };
     apiUrl?: string;
     currentLocationMarker?: boolean;
+    include_urls?: boolean;
+    include_rankings?: boolean;
+    include_phone_numbers?: boolean;
+    restrict_location_id?: number;
     markerOptions?: {
         showLabel?: boolean;
         hideBadge?: boolean;
@@ -529,6 +529,10 @@ declare class MapFirstCore {
     private currentPlatform;
     private requestBody?;
     private readonly fitBoundsPadding;
+    private readonly includeUrls;
+    private readonly includeRankings;
+    private readonly includePhoneNumbers;
+    private readonly restrictLocationId?;
     constructor(options: MapFirstOptions);
     private hasMapInstance;
     private assertPlatformSupportForNoApi;
@@ -607,6 +611,7 @@ declare class MapFirstCore {
         lng: number;
     }[], type?: PropertyType, animate?: boolean): void;
     getFilters(): FilterSchema;
+    private getRequestLevelOptions;
     pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, }: PollOptions): Promise<{
         completed: boolean;
         pollData?: HotelPricingAPIResponse;

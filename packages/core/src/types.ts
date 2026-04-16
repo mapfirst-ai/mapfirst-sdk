@@ -35,10 +35,6 @@ export type FilterSchema = {
   primary_type?: PropertyType;
   transformed_query?: string;
   selected_restaurant_price_levels?: PriceLevel[];
-  include_urls?: boolean;
-  include_rankings?: boolean;
-  include_phone_numbers?: boolean;
-  restrict_location_id?: number;
 };
 
 export type DatedFilterSchema = Omit<FilterSchema, "checkIn" | "checkOut"> & {
@@ -174,6 +170,11 @@ export type InitialRequestBody = {
   longitude?: number;
   latitude?: number;
   radius?: number;
+
+  include_urls?: boolean;
+  include_rankings?: boolean;
+  include_phone_numbers?: boolean;
+  restrict_location_id?: number;
 };
 
 export type SmartFilter = {

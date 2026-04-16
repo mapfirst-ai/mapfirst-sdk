@@ -265,6 +265,11 @@ export type BaseMapFirstOptions = {
   apiUrl?: string;
   // Current location marker option
   currentLocationMarker?: boolean;
+  // Request-level options (not filters, sent at body level)
+  include_urls?: boolean;
+  include_rankings?: boolean;
+  include_phone_numbers?: boolean;
+  restrict_location_id?: number;
   // Marker display options
   markerOptions?: {
     showLabel?: boolean;
@@ -349,6 +354,11 @@ export class MapFirstCore {
     left: number;
     right: number;
   };
+  // Request-level options
+  private readonly includeUrls: boolean;
+  private readonly includeRankings: boolean;
+  private readonly includePhoneNumbers: boolean;
+  private readonly restrictLocationId?: number;
 
   constructor(private readonly options: MapFirstOptions) {
     this.properties = [...(options.properties ?? [])];
@@ -362,6 +372,12 @@ export class MapFirstCore {
     this.apiKey = options.apiKey;
     this.requestBody = options.requestBody;
     this.currentPlatform = options.platform;
+
+    // Request-level options
+    this.includeUrls = options.include_urls ?? false;
+    this.includeRankings = options.include_rankings ?? false;
+    this.includePhoneNumbers = options.include_phone_numbers ?? false;
+    this.restrictLocationId = options.restrict_location_id;
 
     // Validate platform restrictions when useApi is false
     this.assertPlatformSupportForNoApi(options.platform, "throw");
@@ -492,6 +508,7 @@ export class MapFirstCore {
         longitude,
         radius,
         bounds,
+        ...this.getRequestLevelOptions(),
       };
 
       const location = [city, state].filter(Boolean).join(", ");
@@ -587,6 +604,7 @@ export class MapFirstCore {
       filters: this.getFilters(),
       initial: true,
       ...this.requestBody,
+      ...this.getRequestLevelOptions(),
     };
 
     await this.runPropertiesSearch({
@@ -1222,6 +1240,17 @@ export class MapFirstCore {
     return filters as FilterSchema;
   }
 
+  private getRequestLevelOptions(): Partial<InitialRequestBody> {
+    return {
+      ...(this.includeUrls && { include_urls: true }),
+      ...(this.includeRankings && { include_rankings: true }),
+      ...(this.includePhoneNumbers && { include_phone_numbers: true }),
+      ...(this.restrictLocationId !== undefined && {
+        restrict_location_id: this.restrictLocationId,
+      }),
+    };
+  }
+
   async pollForPricing({
     pollingLink,
     maxAttempts = 15,
@@ -1254,6 +1283,7 @@ export class MapFirstCore {
     const body: any = {
       filters,
       pollingLink,
+      ...this.getRequestLevelOptions(),
     };
 
     const referrer = getDocumentReferrer();
@@ -1400,9 +1430,10 @@ export class MapFirstCore {
     this.clearProperties();
 
     try {
+      const enrichedBody = { ...body, ...this.getRequestLevelOptions() };
       const data = await fetchProperties<InitialRequestBody, APIResponse>(
         `${this.apiUrl}/properties`,
-        body,
+        enrichedBody,
         this.apiKey,
       );
 
@@ -1565,6 +1596,7 @@ export class MapFirstCore {
     const body: InitialRequestBody = {
       bounds: this.state.pendingBounds,
       filters,
+      ...this.getRequestLevelOptions(),
     };
 
     const priceFilter = filters?.price ?? undefined;
@@ -1720,6 +1752,7 @@ export class MapFirstCore {
                 longitude: state.activeLocation.coordinates[1],
               }
             : {}),
+      ...this.getRequestLevelOptions(),
     };
 
     return this.runPropertiesSearch({

@@ -1938,7 +1938,7 @@ var MapFirstCore = (() => {
       this.isMapAttached = false;
       this.stopLocationPermissionListener = null;
       this.locationWatchId = null;
-      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x;
       this.properties = [...(_a = options.properties) != null ? _a : []];
       this.primaryType = options.primaryType;
       this.selectedMarkerId = (_b = options.selectedMarkerId) != null ? _b : null;
@@ -1948,26 +1948,30 @@ var MapFirstCore = (() => {
       this.apiKey = options.apiKey;
       this.requestBody = options.requestBody;
       this.currentPlatform = options.platform;
+      this.includeUrls = (_f = options.include_urls) != null ? _f : false;
+      this.includeRankings = (_g = options.include_rankings) != null ? _g : false;
+      this.includePhoneNumbers = (_h = options.include_phone_numbers) != null ? _h : false;
+      this.restrictLocationId = options.restrict_location_id;
       this.assertPlatformSupportForNoApi(options.platform, "throw");
       const isGoogleMaps = isGoogleMapsOptions(options);
       this.fitBoundsPadding = {
-        top: (_g = (_f = options.fitBoundsPadding) == null ? void 0 : _f.top) != null ? _g : isGoogleMaps ? 0 : 50,
-        bottom: (_i = (_h = options.fitBoundsPadding) == null ? void 0 : _h.bottom) != null ? _i : isGoogleMaps ? 0 : 160,
-        left: (_k = (_j = options.fitBoundsPadding) == null ? void 0 : _j.left) != null ? _k : isGoogleMaps ? 0 : 50,
-        right: (_m = (_l = options.fitBoundsPadding) == null ? void 0 : _l.right) != null ? _m : isGoogleMaps ? 0 : 50
+        top: (_j = (_i = options.fitBoundsPadding) == null ? void 0 : _i.top) != null ? _j : isGoogleMaps ? 0 : 50,
+        bottom: (_l = (_k = options.fitBoundsPadding) == null ? void 0 : _k.bottom) != null ? _l : isGoogleMaps ? 0 : 160,
+        left: (_n = (_m = options.fitBoundsPadding) == null ? void 0 : _m.left) != null ? _n : isGoogleMaps ? 0 : 50,
+        right: (_p = (_o = options.fitBoundsPadding) == null ? void 0 : _o.right) != null ? _p : isGoogleMaps ? 0 : 50
       };
       const defaultDates = getDefaultDates();
       this.state = {
-        center: ((_n = options.initialLocationData) == null ? void 0 : _n.latitude) && options.initialLocationData.longitude ? [
+        center: ((_q = options.initialLocationData) == null ? void 0 : _q.latitude) && options.initialLocationData.longitude ? [
           options.initialLocationData.latitude,
           options.initialLocationData.longitude
         ] : [0, 0],
-        zoom: (_p = (_o = options.initialLocationData) == null ? void 0 : _o.zoom) != null ? _p : 0,
-        bounds: (_r = (_q = options.initialLocationData) == null ? void 0 : _q.bounds) != null ? _r : null,
+        zoom: (_s = (_r = options.initialLocationData) == null ? void 0 : _r.zoom) != null ? _s : 0,
+        bounds: (_u = (_t = options.initialLocationData) == null ? void 0 : _t.bounds) != null ? _u : null,
         pendingBounds: null,
         tempBounds: null,
         properties: this.properties,
-        primary: (_s = this.primaryType) != null ? _s : DEFAULT_PRIMARY_TYPE,
+        primary: (_v = this.primaryType) != null ? _v : DEFAULT_PRIMARY_TYPE,
         selectedPropertyId: this.selectedMarkerId,
         initialLoading: true,
         isSearching: false,
@@ -1977,7 +1981,7 @@ var MapFirstCore = (() => {
           checkOut: defaultDates.checkOut,
           numAdults: 2,
           numRooms: 1,
-          ...((_t = options.initialLocationData) == null ? void 0 : _t.currency) && {
+          ...((_w = options.initialLocationData) == null ? void 0 : _w.currency) && {
             currency: options.initialLocationData.currency
           }
         },
@@ -1991,7 +1995,7 @@ var MapFirstCore = (() => {
         isFlyToAnimating: false,
         ...options.state
       };
-      this.callbacks = (_u = options.callbacks) != null ? _u : {};
+      this.callbacks = (_x = options.callbacks) != null ? _x : {};
       if (this.hasMapInstance(options)) {
         this.adapter = this.createAdapter(options);
         this.isMapAttached = true;
@@ -2046,7 +2050,8 @@ var MapFirstCore = (() => {
           latitude,
           longitude,
           radius,
-          bounds
+          bounds,
+          ...this.getRequestLevelOptions()
         };
         const location = [city, state].filter(Boolean).join(", ");
         if (country || location) {
@@ -2110,7 +2115,8 @@ var MapFirstCore = (() => {
       const defaultRequestBody = {
         filters: this.getFilters(),
         initial: true,
-        ...this.requestBody
+        ...this.requestBody,
+        ...this.getRequestLevelOptions()
       };
       await this.runPropertiesSearch({
         body: defaultRequestBody,
@@ -2609,6 +2615,16 @@ var MapFirstCore = (() => {
       }
       return filters;
     }
+    getRequestLevelOptions() {
+      return {
+        ...this.includeUrls && { include_urls: true },
+        ...this.includeRankings && { include_rankings: true },
+        ...this.includePhoneNumbers && { include_phone_numbers: true },
+        ...this.restrictLocationId !== void 0 && {
+          restrict_location_id: this.restrictLocationId
+        }
+      };
+    }
     async pollForPricing({
       pollingLink,
       maxAttempts = 15,
@@ -2633,7 +2649,8 @@ var MapFirstCore = (() => {
       }
       const body = {
         filters,
-        pollingLink
+        pollingLink,
+        ...this.getRequestLevelOptions()
       };
       const referrer = getDocumentReferrer();
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -2744,9 +2761,10 @@ var MapFirstCore = (() => {
       this.setSearching(true);
       this.clearProperties();
       try {
+        const enrichedBody = { ...body, ...this.getRequestLevelOptions() };
         const data = await fetchProperties(
           `${this.apiUrl}/properties`,
-          body,
+          enrichedBody,
           this.apiKey
         );
         this.updateActiveLocationFromResponse(data);
@@ -2861,7 +2879,8 @@ var MapFirstCore = (() => {
       const filters = this.getFilters();
       const body = {
         bounds: this.state.pendingBounds,
-        filters
+        filters,
+        ...this.getRequestLevelOptions()
       };
       const priceFilter = (_a = filters == null ? void 0 : filters.price) != null ? _a : void 0;
       const result = await this.runPropertiesSearch({
@@ -2972,7 +2991,8 @@ var MapFirstCore = (() => {
         ...state.bounds ? { bounds: state.bounds } : state.activeLocation.location_id ? { location_id: state.activeLocation.location_id } : state.activeLocation.coordinates ? {
           latitude: state.activeLocation.coordinates[0],
           longitude: state.activeLocation.coordinates[1]
-        } : {}
+        } : {},
+        ...this.getRequestLevelOptions()
       };
       return this.runPropertiesSearch({
         body,
