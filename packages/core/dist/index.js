@@ -371,7 +371,7 @@ function positionCard(card, markerElement, mapContainer) {
   card.style.top = `${top}px`;
 }
 function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick, markerOptions) {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
   if (typeof document === "undefined") {
     return null;
   }
@@ -405,17 +405,18 @@ function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarke
     isPrimaryType,
     isSelected
   );
+  pill.dataset.type = (_f = marker.type) != null ? _f : "";
   if ((markerOptions == null ? void 0 : markerOptions.showTail) && isPrimaryType && !isPending) {
     pill.classList.add("mapfirst-marker-tail");
   }
-  if (!isPending && !(markerOptions == null ? void 0 : markerOptions.hideBadge) && (((_f = marker.awards) == null ? void 0 : _f.length) || ratingLabel)) {
+  if (!isPending && !(markerOptions == null ? void 0 : markerOptions.hideBadge) && (((_g = marker.awards) == null ? void 0 : _g.length) || ratingLabel)) {
     const badge = document.createElement("div");
     badge.className = "mapfirst-marker-badge";
     if (!isPrimaryType) {
       badge.style.opacity = "0.2";
     }
     badge.className = "mapfirst-marker-badge";
-    if (((_g = marker.awards) == null ? void 0 : _g.length) && marker.awards[0].type) {
+    if (((_h = marker.awards) == null ? void 0 : _h.length) && marker.awards[0].type) {
       const awardContainer = document.createElement("div");
       awardContainer.className = "mapfirst-marker-award-container";
       const backLayer = document.createElement("div");
@@ -439,7 +440,7 @@ function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarke
   const content = document.createElement("span");
   content.className = "mapfirst-marker-content";
   if (isAccommodation) {
-    if ((_i = (_h = marker.pricing) == null ? void 0 : _h.offer) == null ? void 0 : _i.displayPrice) {
+    if ((_j = (_i = marker.pricing) == null ? void 0 : _i.offer) == null ? void 0 : _j.displayPrice) {
       content.innerHTML = marker.pricing.offer.displayPrice;
       content.dataset.price = marker.pricing.offer.displayPrice;
     } else {
@@ -467,7 +468,7 @@ function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarke
     label.className = "mapfirst-marker-label";
     const nameLine = document.createElement("div");
     nameLine.className = "mapfirst-marker-label-name";
-    nameLine.textContent = (_j = marker.name) != null ? _j : "";
+    nameLine.textContent = (_k = marker.name) != null ? _k : "";
     label.appendChild(nameLine);
     if (ratingLabel) {
       const ratingLine = document.createElement("div");

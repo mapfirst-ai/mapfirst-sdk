@@ -453,6 +453,7 @@ export function createPrimaryMarkerElement(
     isPrimaryType,
     isSelected,
   );
+  pill.dataset.type = marker.type ?? "";
   if (markerOptions?.showTail && isPrimaryType && !isPending) {
     pill.classList.add("mapfirst-marker-tail");
   }
