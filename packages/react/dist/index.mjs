@@ -1431,6 +1431,9 @@ function useMapFirst(options) {
       setState((prev) => ({ ...prev, isFlyToAnimating: animating }));
       forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
     };
+    cb.onError = (error, context) => {
+      forwardCallback(optionsRef, "onError", error, context);
+    };
     return () => {
       var _a;
       const existingCb = callbacksRef.current;

@@ -270,6 +270,9 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       setState((prev) => ({ ...prev, isFlyToAnimating: animating }));
       forwardCallback(optionsRef, "onIsFlyToAnimatingChange", animating);
     };
+    cb.onError = (error, context) => {
+      forwardCallback(optionsRef, "onError", error, context);
+    };
 
     return () => {
       // Clear all callbacks so the destroyed instance cannot trigger setState
