@@ -81,9 +81,24 @@ export type PropertyAward = {
 export type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
 
 export type PropertyUrls = {
-  tripadvisor: {
-    main: string;
+  official?: string;
+  menu?: string;
+  tripadvisor?: {
+    main?: string;
+    photos?: string;
+    write_review?: string;
+    questions_answers?: string;
   };
+};
+
+export type Ranking = {
+  category: string;
+  category_id: string;
+  display_text: string;
+  geo: string;
+  geo_id: number;
+  rank: number;
+  total: number;
 };
 
 export type Property = {
@@ -96,6 +111,8 @@ export type Property = {
   awards?: PropertyAward[];
   pricing?: HotelPricingAPIResults;
   url?: string;
+  urls?: PropertyUrls;
+  rankings?: Ranking[];
   secondaries: string[];
   price_level?: PriceLevel;
   city?: string;
