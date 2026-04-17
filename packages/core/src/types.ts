@@ -119,6 +119,7 @@ export type Property = {
   urls?: PropertyUrls;
   rankings?: Ranking[];
   phone_numbers?: PhoneNumber[];
+  address?: string;
   secondaries: string[];
   price_level?: PriceLevel;
   city?: string;
@@ -174,6 +175,7 @@ export type InitialRequestBody = {
   include_urls?: boolean;
   include_rankings?: boolean;
   include_phone_numbers?: boolean;
+  include_address?: boolean;
   restrict_location_id?: number;
 };
 

@@ -269,6 +269,7 @@ export type BaseMapFirstOptions = {
   include_urls?: boolean;
   include_rankings?: boolean;
   include_phone_numbers?: boolean;
+  include_address?: boolean;
   restrict_location_id?: number;
   // Marker display options
   markerOptions?: {
@@ -358,6 +359,7 @@ export class MapFirstCore {
   private readonly includeUrls: boolean;
   private readonly includeRankings: boolean;
   private readonly includePhoneNumbers: boolean;
+  private readonly includeAddress: boolean;
   private readonly restrictLocationId?: number;
 
   constructor(private readonly options: MapFirstOptions) {
@@ -377,6 +379,7 @@ export class MapFirstCore {
     this.includeUrls = options.include_urls ?? false;
     this.includeRankings = options.include_rankings ?? false;
     this.includePhoneNumbers = options.include_phone_numbers ?? false;
+    this.includeAddress = options.include_address ?? false;
     this.restrictLocationId = options.restrict_location_id;
 
     // Validate platform restrictions when useApi is false
@@ -1245,6 +1248,7 @@ export class MapFirstCore {
       ...(this.includeUrls && { include_urls: true }),
       ...(this.includeRankings && { include_rankings: true }),
       ...(this.includePhoneNumbers && { include_phone_numbers: true }),
+      ...(this.includeAddress && { include_address: true }),
       ...(this.restrictLocationId !== undefined && {
         restrict_location_id: this.restrictLocationId,
       }),
