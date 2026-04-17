@@ -1938,7 +1938,7 @@ var MapFirstCore = class {
     this.isMapAttached = false;
     this.stopLocationPermissionListener = null;
     this.locationWatchId = null;
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
     this.properties = [...(_a = options.properties) != null ? _a : []];
     this.primaryType = options.primaryType;
     this.selectedMarkerId = (_b = options.selectedMarkerId) != null ? _b : null;
@@ -1952,27 +1952,28 @@ var MapFirstCore = class {
     this.includeRankings = (_g = options.include_rankings) != null ? _g : false;
     this.includePhoneNumbers = (_h = options.include_phone_numbers) != null ? _h : false;
     this.includeAddress = (_i = options.include_address) != null ? _i : false;
+    this.includeOpeningHours = (_j = options.include_opening_hours) != null ? _j : false;
     this.restrictLocationId = options.restrict_location_id;
     this.assertPlatformSupportForNoApi(options.platform, "throw");
     const isGoogleMaps = isGoogleMapsOptions(options);
     this.fitBoundsPadding = {
-      top: (_k = (_j = options.fitBoundsPadding) == null ? void 0 : _j.top) != null ? _k : isGoogleMaps ? 0 : 50,
-      bottom: (_m = (_l = options.fitBoundsPadding) == null ? void 0 : _l.bottom) != null ? _m : isGoogleMaps ? 0 : 160,
-      left: (_o = (_n = options.fitBoundsPadding) == null ? void 0 : _n.left) != null ? _o : isGoogleMaps ? 0 : 50,
-      right: (_q = (_p = options.fitBoundsPadding) == null ? void 0 : _p.right) != null ? _q : isGoogleMaps ? 0 : 50
+      top: (_l = (_k = options.fitBoundsPadding) == null ? void 0 : _k.top) != null ? _l : isGoogleMaps ? 0 : 50,
+      bottom: (_n = (_m = options.fitBoundsPadding) == null ? void 0 : _m.bottom) != null ? _n : isGoogleMaps ? 0 : 160,
+      left: (_p = (_o = options.fitBoundsPadding) == null ? void 0 : _o.left) != null ? _p : isGoogleMaps ? 0 : 50,
+      right: (_r = (_q = options.fitBoundsPadding) == null ? void 0 : _q.right) != null ? _r : isGoogleMaps ? 0 : 50
     };
     const defaultDates = getDefaultDates();
     this.state = {
-      center: ((_r = options.initialLocationData) == null ? void 0 : _r.latitude) && options.initialLocationData.longitude ? [
+      center: ((_s = options.initialLocationData) == null ? void 0 : _s.latitude) && options.initialLocationData.longitude ? [
         options.initialLocationData.latitude,
         options.initialLocationData.longitude
       ] : [0, 0],
-      zoom: (_t = (_s = options.initialLocationData) == null ? void 0 : _s.zoom) != null ? _t : 0,
-      bounds: (_v = (_u = options.initialLocationData) == null ? void 0 : _u.bounds) != null ? _v : null,
+      zoom: (_u = (_t = options.initialLocationData) == null ? void 0 : _t.zoom) != null ? _u : 0,
+      bounds: (_w = (_v = options.initialLocationData) == null ? void 0 : _v.bounds) != null ? _w : null,
       pendingBounds: null,
       tempBounds: null,
       properties: this.properties,
-      primary: (_w = this.primaryType) != null ? _w : DEFAULT_PRIMARY_TYPE,
+      primary: (_x = this.primaryType) != null ? _x : DEFAULT_PRIMARY_TYPE,
       selectedPropertyId: this.selectedMarkerId,
       initialLoading: true,
       isSearching: false,
@@ -1982,7 +1983,7 @@ var MapFirstCore = class {
         checkOut: defaultDates.checkOut,
         numAdults: 2,
         numRooms: 1,
-        ...((_x = options.initialLocationData) == null ? void 0 : _x.currency) && {
+        ...((_y = options.initialLocationData) == null ? void 0 : _y.currency) && {
           currency: options.initialLocationData.currency
         }
       },
@@ -1996,7 +1997,7 @@ var MapFirstCore = class {
       isFlyToAnimating: false,
       ...options.state
     };
-    this.callbacks = (_y = options.callbacks) != null ? _y : {};
+    this.callbacks = (_z = options.callbacks) != null ? _z : {};
     if (this.hasMapInstance(options)) {
       this.adapter = this.createAdapter(options);
       this.isMapAttached = true;
@@ -2622,6 +2623,7 @@ var MapFirstCore = class {
       ...this.includeRankings && { include_rankings: true },
       ...this.includePhoneNumbers && { include_phone_numbers: true },
       ...this.includeAddress && { include_address: true },
+      ...this.includeOpeningHours && { include_opening_hours: true },
       ...this.restrictLocationId !== void 0 && {
         restrict_location_id: this.restrictLocationId
       }

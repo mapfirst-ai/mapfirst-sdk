@@ -88,6 +88,16 @@ type PhoneNumber = {
     type: string;
     value: string;
 };
+type OpeningHoursPeriod = {
+    day_of_week: string;
+    opens: string;
+    closes: string;
+};
+type OpeningHours = {
+    formatted?: string[];
+    timezone?: string;
+    periods?: OpeningHoursPeriod[];
+};
 type Property = {
     tripadvisor_id: number;
     name: string;
@@ -105,6 +115,7 @@ type Property = {
     rankings?: Ranking[];
     phone_numbers?: PhoneNumber[];
     address?: string;
+    opening_hours?: OpeningHours;
     secondaries: string[];
     price_level?: PriceLevel;
     city?: string;
@@ -134,6 +145,7 @@ type InitialRequestBody = {
     include_rankings?: boolean;
     include_phone_numbers?: boolean;
     include_address?: boolean;
+    include_opening_hours?: boolean;
     restrict_location_id?: number;
 };
 type SmartFilter = {
@@ -480,6 +492,7 @@ type BaseMapFirstOptions = {
     include_rankings?: boolean;
     include_phone_numbers?: boolean;
     include_address?: boolean;
+    include_opening_hours?: boolean;
     restrict_location_id?: number;
     markerOptions?: {
         showLabel?: boolean;
@@ -536,6 +549,7 @@ declare class MapFirstCore {
     private readonly includeRankings;
     private readonly includePhoneNumbers;
     private readonly includeAddress;
+    private readonly includeOpeningHours;
     private readonly restrictLocationId?;
     constructor(options: MapFirstOptions);
     private hasMapInstance;

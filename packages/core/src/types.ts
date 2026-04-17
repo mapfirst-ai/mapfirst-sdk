@@ -106,6 +106,18 @@ export type PhoneNumber = {
   value: string;
 };
 
+export type OpeningHoursPeriod = {
+  day_of_week: string;
+  opens: string;
+  closes: string;
+};
+
+export type OpeningHours = {
+  formatted?: string[];
+  timezone?: string;
+  periods?: OpeningHoursPeriod[];
+};
+
 export type Property = {
   tripadvisor_id: number;
   name: string;
@@ -120,6 +132,7 @@ export type Property = {
   rankings?: Ranking[];
   phone_numbers?: PhoneNumber[];
   address?: string;
+  opening_hours?: OpeningHours;
   secondaries: string[];
   price_level?: PriceLevel;
   city?: string;
@@ -176,6 +189,7 @@ export type InitialRequestBody = {
   include_rankings?: boolean;
   include_phone_numbers?: boolean;
   include_address?: boolean;
+  include_opening_hours?: boolean;
   restrict_location_id?: number;
 };
 
