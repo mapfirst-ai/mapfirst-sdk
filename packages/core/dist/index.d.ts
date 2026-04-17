@@ -116,6 +116,7 @@ type Property = {
     phone_numbers?: PhoneNumber[];
     address?: string;
     opening_hours?: OpeningHours;
+    star_rating?: number;
     secondaries: string[];
     price_level?: PriceLevel;
     city?: string;
@@ -146,6 +147,7 @@ type InitialRequestBody = {
     include_phone_numbers?: boolean;
     include_address?: boolean;
     include_opening_hours?: boolean;
+    include_star_rating?: boolean;
     restrict_location_id?: number;
 };
 type SmartFilter = {
@@ -493,6 +495,7 @@ type BaseMapFirstOptions = {
     include_phone_numbers?: boolean;
     include_address?: boolean;
     include_opening_hours?: boolean;
+    include_star_rating?: boolean;
     restrict_location_id?: number;
     markerOptions?: {
         showLabel?: boolean;
@@ -550,6 +553,7 @@ declare class MapFirstCore {
     private readonly includePhoneNumbers;
     private readonly includeAddress;
     private readonly includeOpeningHours;
+    private readonly includeStarRating;
     private readonly restrictLocationId?;
     constructor(options: MapFirstOptions);
     private hasMapInstance;
