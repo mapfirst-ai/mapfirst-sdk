@@ -2616,6 +2616,9 @@ var MapFirstCore = (() => {
       if (filters.checkOut instanceof Date) {
         filters.checkOut = toISO(filters.checkOut);
       }
+      if (this.primaryType) {
+        filters.primary_type = this.primaryType;
+      }
       return filters;
     }
     getRequestLevelOptions() {

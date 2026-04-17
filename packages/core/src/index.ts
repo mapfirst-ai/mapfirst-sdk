@@ -1246,6 +1246,10 @@ export class MapFirstCore {
     if (filters.checkOut instanceof Date) {
       filters.checkOut = toISO(filters.checkOut);
     }
+    // Always reflect the current primary type
+    if (this.primaryType) {
+      filters.primary_type = this.primaryType;
+    }
     return filters as FilterSchema;
   }
 

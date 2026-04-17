@@ -26,6 +26,7 @@ export interface FilterState {
   numAdults?: number;
   numRooms?: number;
   currency?: string;
+  primary_type?: PropertyType;
 }
 
 export interface MapState {
