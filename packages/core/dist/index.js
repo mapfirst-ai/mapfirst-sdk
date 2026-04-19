@@ -1608,8 +1608,8 @@ function createDotClusterItem(marker, primaryType, parent) {
   };
 }
 function buildClusterKey(kind, marker, isPrimary, isSelected) {
-  var _a;
-  return `${kind}-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${isSelected ? 1 : 0}-${(_a = marker.pricing) == null ? void 0 : _a.availability}`;
+  var _a, _b, _c, _d;
+  return `${kind}-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${isSelected ? 1 : 0}-${(_a = marker.pricing) == null ? void 0 : _a.availability}-${(_d = (_c = (_b = marker.pricing) == null ? void 0 : _b.offer) == null ? void 0 : _c.displayPrice) != null ? _d : ""}`;
 }
 function distancePx(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);

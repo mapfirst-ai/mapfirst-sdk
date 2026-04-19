@@ -260,7 +260,7 @@ function buildClusterKey(
 ): string {
   return `${kind}-${marker.tripadvisor_id}-p${isPrimary ? 1 : 0}-s${
     isSelected ? 1 : 0
-  }-${marker.pricing?.availability}`;
+  }-${marker.pricing?.availability}-${marker.pricing?.offer?.displayPrice ?? ""}`;
 }
 
 function distancePx(a: ProjectedMarker, b: ProjectedMarker) {
