@@ -1,7 +1,7 @@
 import type { Property } from "./types";
 import { setupHoverCard } from "./marker";
 import {
-  LOADING_VIDEO_HTML,
+  LOADING_SPINNER_HTML,
   getDotMarkerButtonClass,
   getDotMarkerZIndex,
   getPrimaryMarkerPillClass,
@@ -71,7 +71,7 @@ export function updatePrimaryMarkerElement(
           content.innerHTML = displayPrice;
           content.dataset.price = displayPrice;
         } else {
-          content.innerHTML = LOADING_VIDEO_HTML;
+          content.innerHTML = LOADING_SPINNER_HTML;
           content.dataset.price = "";
         }
       }

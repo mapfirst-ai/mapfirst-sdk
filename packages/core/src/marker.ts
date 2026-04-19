@@ -3,7 +3,7 @@ import { fetchImages } from ".";
 import "./markers.css";
 import { ClusterDisplayItem } from "./utils/clustering";
 import {
-  LOADING_VIDEO_HTML,
+  LOADING_SPINNER_HTML,
   getPrimaryMarkerPillClass,
   getPrimaryMarkerZIndex,
 } from "./marker-style-utils";
@@ -507,7 +507,7 @@ export function createPrimaryMarkerElement(
       content.innerHTML = marker.pricing.offer.displayPrice;
       content.dataset.price = marker.pricing.offer.displayPrice;
     } else {
-      content.innerHTML = LOADING_VIDEO_HTML;
+      content.innerHTML = LOADING_SPINNER_HTML;
       content.dataset.price = "";
     }
   } else if (marker.type === "Eat & Drink") {

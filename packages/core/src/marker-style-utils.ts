@@ -10,7 +10,7 @@ export const DOT_Z_INDEX = {
   secondary: 1,
 } as const;
 
-export const LOADING_VIDEO_HTML = `<video class="mapfirst-marker-loading-video" src="https://api.mapfirst.ai/static/images/loading.webm" autoplay loop muted></video>`;
+export const LOADING_SPINNER_HTML = `<span class="mapfirst-marker-loading-spinner"></span>`;
 
 export function getPrimaryMarkerZIndex(
   isPrimaryType: boolean,
