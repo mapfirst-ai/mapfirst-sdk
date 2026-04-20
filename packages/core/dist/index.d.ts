@@ -170,6 +170,7 @@ type PollOptions = {
     isCancelled?: () => boolean;
     price?: Price;
     limit?: number;
+    requestBody?: Record<string, unknown>;
 };
 type InitialLocationData = {
     city?: string;
@@ -635,7 +636,7 @@ declare class MapFirstCore {
     }[], type?: PropertyType, animate?: boolean): void;
     getFilters(): FilterSchema;
     private getRequestLevelOptions;
-    pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, }: PollOptions): Promise<{
+    pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, requestBody, }: PollOptions): Promise<{
         completed: boolean;
         pollData?: HotelPricingAPIResponse;
     }>;

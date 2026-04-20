@@ -1274,6 +1274,7 @@ export class MapFirstCore {
     isCancelled,
     price,
     limit,
+    requestBody,
   }: PollOptions): Promise<{
     completed: boolean;
     pollData?: HotelPricingAPIResponse;
@@ -1297,6 +1298,7 @@ export class MapFirstCore {
     }
 
     const body: any = {
+      ...requestBody,
       filters,
       pollingLink,
       ...this.getRequestLevelOptions(),
@@ -1540,6 +1542,7 @@ export class MapFirstCore {
           pollingLink: data.pollingLink,
           ...(price && { price }),
           ...(limit && { limit }),
+          requestBody: enrichedBody,
         });
 
         if (

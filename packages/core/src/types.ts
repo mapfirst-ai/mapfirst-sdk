@@ -224,6 +224,7 @@ export type PollOptions = {
   isCancelled?: () => boolean;
   price?: Price;
   limit?: number;
+  requestBody?: Record<string, unknown>;
 };
 
 export type InitialLocationData = {

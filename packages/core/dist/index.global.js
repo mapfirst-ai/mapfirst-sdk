@@ -2640,7 +2640,8 @@ var MapFirstCore = (() => {
       delayMs = 2e3,
       isCancelled,
       price,
-      limit
+      limit,
+      requestBody
     }) {
       var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
       this.ensureAlive();
@@ -2657,6 +2658,7 @@ var MapFirstCore = (() => {
         filters.limit = limit;
       }
       const body = {
+        ...requestBody,
         filters,
         pollingLink,
         ...this.getRequestLevelOptions()
@@ -2836,7 +2838,8 @@ var MapFirstCore = (() => {
           const { completed, pollData } = await this.pollForPricing({
             pollingLink: data.pollingLink,
             ...price && { price },
-            ...limit && { limit }
+            ...limit && { limit },
+            requestBody: enrichedBody
           });
           if (completed && ((_c = pollData == null ? void 0 : pollData.success) == null ? void 0 : _c.results) && pollData.success.results.filter(
             (property) => {
