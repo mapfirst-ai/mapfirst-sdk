@@ -196,6 +196,7 @@ export type InitialRequestBody = {
   restrict_bounds?: {
     sw: { lat: number; lng: number };
     ne: { lat: number; lng: number };
+    polygon?: [number, number][];
   };
 };
 

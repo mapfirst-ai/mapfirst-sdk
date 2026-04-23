@@ -158,6 +158,7 @@ type InitialRequestBody = {
             lat: number;
             lng: number;
         };
+        polygon?: [number, number][];
     };
 };
 type SmartFilter = {
@@ -518,6 +519,7 @@ type BaseMapFirstOptions = {
             lat: number;
             lng: number;
         };
+        polygon?: [number, number][];
     };
     markerOptions?: {
         showLabel?: boolean;

@@ -276,6 +276,7 @@ export type BaseMapFirstOptions = {
   restrict_bounds?: {
     sw: { lat: number; lng: number };
     ne: { lat: number; lng: number };
+    polygon?: [number, number][];
   };
   // Marker display options
   markerOptions?: {
@@ -372,6 +373,7 @@ export class MapFirstCore {
   private readonly restrictBounds?: {
     sw: { lat: number; lng: number };
     ne: { lat: number; lng: number };
+    polygon?: [number, number][];
   };
 
   constructor(private readonly options: MapFirstOptions) {
