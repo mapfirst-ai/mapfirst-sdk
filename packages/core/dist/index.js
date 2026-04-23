@@ -1955,6 +1955,7 @@ var MapFirstCore = class {
     this.includeOpeningHours = (_j = options.include_opening_hours) != null ? _j : false;
     this.includeStarRating = (_k = options.include_star_rating) != null ? _k : false;
     this.restrictLocationId = options.restrict_location_id;
+    this.restrictBounds = options.restrict_bounds;
     this.assertPlatformSupportForNoApi(options.platform, "throw");
     const isGoogleMaps = isGoogleMapsOptions(options);
     this.fitBoundsPadding = {
@@ -2631,6 +2632,9 @@ var MapFirstCore = class {
       ...this.includeStarRating && { include_star_rating: true },
       ...this.restrictLocationId !== void 0 && {
         restrict_location_id: this.restrictLocationId
+      },
+      ...this.restrictBounds !== void 0 && {
+        restrict_bounds: this.restrictBounds
       }
     };
   }

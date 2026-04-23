@@ -193,6 +193,10 @@ export type InitialRequestBody = {
   include_opening_hours?: boolean;
   include_star_rating?: boolean;
   restrict_location_id?: number;
+  restrict_bounds?: {
+    sw: { lat: number; lng: number };
+    ne: { lat: number; lng: number };
+  };
 };
 
 export type SmartFilter = {

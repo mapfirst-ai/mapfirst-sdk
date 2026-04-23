@@ -149,6 +149,16 @@ type InitialRequestBody = {
     include_opening_hours?: boolean;
     include_star_rating?: boolean;
     restrict_location_id?: number;
+    restrict_bounds?: {
+        sw: {
+            lat: number;
+            lng: number;
+        };
+        ne: {
+            lat: number;
+            lng: number;
+        };
+    };
 };
 type SmartFilter = {
     id: string;
@@ -499,6 +509,16 @@ type BaseMapFirstOptions = {
     include_opening_hours?: boolean;
     include_star_rating?: boolean;
     restrict_location_id?: number;
+    restrict_bounds?: {
+        sw: {
+            lat: number;
+            lng: number;
+        };
+        ne: {
+            lat: number;
+            lng: number;
+        };
+    };
     markerOptions?: {
         showLabel?: boolean;
         hideBadge?: boolean;
@@ -557,6 +577,7 @@ declare class MapFirstCore {
     private readonly includeOpeningHours;
     private readonly includeStarRating;
     private readonly restrictLocationId?;
+    private readonly restrictBounds?;
     constructor(options: MapFirstOptions);
     private hasMapInstance;
     private assertPlatformSupportForNoApi;

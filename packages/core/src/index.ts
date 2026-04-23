@@ -273,6 +273,10 @@ export type BaseMapFirstOptions = {
   include_opening_hours?: boolean;
   include_star_rating?: boolean;
   restrict_location_id?: number;
+  restrict_bounds?: {
+    sw: { lat: number; lng: number };
+    ne: { lat: number; lng: number };
+  };
   // Marker display options
   markerOptions?: {
     showLabel?: boolean;
@@ -365,6 +369,10 @@ export class MapFirstCore {
   private readonly includeOpeningHours: boolean;
   private readonly includeStarRating: boolean;
   private readonly restrictLocationId?: number;
+  private readonly restrictBounds?: {
+    sw: { lat: number; lng: number };
+    ne: { lat: number; lng: number };
+  };
 
   constructor(private readonly options: MapFirstOptions) {
     this.properties = [...(options.properties ?? [])];
@@ -387,6 +395,7 @@ export class MapFirstCore {
     this.includeOpeningHours = options.include_opening_hours ?? false;
     this.includeStarRating = options.include_star_rating ?? false;
     this.restrictLocationId = options.restrict_location_id;
+    this.restrictBounds = options.restrict_bounds;
 
     // Validate platform restrictions when useApi is false
     this.assertPlatformSupportForNoApi(options.platform, "throw");
@@ -1263,6 +1272,9 @@ export class MapFirstCore {
       ...(this.includeStarRating && { include_star_rating: true }),
       ...(this.restrictLocationId !== undefined && {
         restrict_location_id: this.restrictLocationId,
+      }),
+      ...(this.restrictBounds !== undefined && {
+        restrict_bounds: this.restrictBounds,
       }),
     };
   }
