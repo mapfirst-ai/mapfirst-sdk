@@ -7,6 +7,10 @@ export type ApiFiltersResponse = Pick<
   FilterSchema,
   | "amenities"
   | "hotelStyle"
+  | "features"
+  | "goodFor"
+  | "meals"
+  | "specialDiets"
   | "price"
   | "minRating"
   | "starRating"
@@ -30,13 +34,19 @@ export type ApiFiltersResponse = Pick<
  * ```
  */
 export function processApiFilters(
-  apiFilters: ApiFiltersResponse
+  apiFilters: ApiFiltersResponse,
 ): SmartFilter[] {
   const filters: SmartFilter[] = [];
   const addBasicFilters = (
     values: string[] | undefined,
-    type: "amenity" | "hotelStyle",
-    prefix: string
+    type:
+      | "amenity"
+      | "hotelStyle"
+      | "features"
+      | "goodFor"
+      | "meals"
+      | "specialDiets",
+    prefix: string,
   ) => {
     if (!values || !Array.isArray(values)) return;
     values.forEach((value) => {
@@ -54,6 +64,18 @@ export function processApiFilters(
 
   // Process hotel styles
   addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
+
+  // Process features
+  addBasicFilters(apiFilters.features, "features", "features");
+
+  // Process goodFor
+  addBasicFilters(apiFilters.goodFor, "goodFor", "goodFor");
+
+  // Process meals
+  addBasicFilters(apiFilters.meals, "meals", "meals");
+
+  // Process special diets
+  addBasicFilters(apiFilters.specialDiets, "specialDiets", "specialDiets");
 
   // Process price range
   if (apiFilters.price) {
@@ -106,9 +128,8 @@ export function processApiFilters(
 
   // Process restaurant price levels
   if (apiFilters.selected_restaurant_price_levels) {
-    const joinedPriceLevels = apiFilters.selected_restaurant_price_levels.join(
-      ", "
-    );
+    const joinedPriceLevels =
+      apiFilters.selected_restaurant_price_levels.join(", ");
     filters.push({
       id: "selected_restaurant_price_levels",
       label: joinedPriceLevels,

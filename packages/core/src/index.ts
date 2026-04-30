@@ -560,18 +560,25 @@ export class MapFirstCore {
             type: string;
           };
 
-          requestBody.city = !["country", "island", "state"].includes(
-            place.type,
-          )
+          requestBody.city = ![
+            "country",
+            "island",
+            "island group",
+            "state",
+          ].includes(place.type)
             ? place.name
             : undefined;
           requestBody.state =
             place.type === "state"
               ? place.name
-              : !["country", "island", "county"].includes(place.type)
+              : !["country", "island", "island group", "county"].includes(
+                    place.type,
+                  )
                 ? place.state
                 : undefined;
-          requestBody.country = ["country", "island"].includes(place.type)
+          requestBody.country = ["country", "island", "island group"].includes(
+            place.type,
+          )
             ? place.name
             : place.country;
           requestBody.location_id = place.id;
@@ -1718,6 +1725,10 @@ export class MapFirstCore {
     if (filters && filters.length > 0) {
       const amenities = new Set<string>();
       const hotelStyle = new Set<string>();
+      const features = new Set<string>();
+      const goodFor = new Set<string>();
+      const meals = new Set<string>();
+      const specialDiets = new Set<string>();
       let price: { min: number; max: number } | undefined;
       let minRating: number | undefined;
       let starRating: number | undefined;
@@ -1732,6 +1743,18 @@ export class MapFirstCore {
             break;
           case "hotelStyle":
             hotelStyle.add(filter.value);
+            break;
+          case "features":
+            features.add(filter.value);
+            break;
+          case "goodFor":
+            goodFor.add(filter.value);
+            break;
+          case "meals":
+            meals.add(filter.value);
+            break;
+          case "specialDiets":
+            specialDiets.add(filter.value);
             break;
           case "priceRange":
             if (filter.priceRange) {
@@ -1763,6 +1786,12 @@ export class MapFirstCore {
         ...filterPayload,
         ...(amenities.size > 0 && { amenities: Array.from(amenities) }),
         ...(hotelStyle.size > 0 && { hotelStyle: Array.from(hotelStyle) }),
+        ...(features.size > 0 && { features: Array.from(features) }),
+        ...(goodFor.size > 0 && { goodFor: Array.from(goodFor) }),
+        ...(meals.size > 0 && { meals: Array.from(meals) }),
+        ...(specialDiets.size > 0 && {
+          specialDiets: Array.from(specialDiets),
+        }),
         ...(price && { price }),
         ...(minRating !== undefined && { minRating }),
         ...(starRating !== undefined && { starRating }),

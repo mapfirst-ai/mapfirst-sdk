@@ -7,7 +7,7 @@ import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'rea
 type Filter = {
     id: string;
     label: string | React.ReactNode;
-    type: "amenity" | "hotelStyle" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
+    type: "amenity" | "hotelStyle" | "features" | "goodFor" | "meals" | "specialDiets" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
     value: string;
     numericValue?: number;
     icon?: React.ReactNode;

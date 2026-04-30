@@ -6,6 +6,10 @@ export type Filter = {
   type:
     | "amenity"
     | "hotelStyle"
+    | "features"
+    | "goodFor"
+    | "meals"
+    | "specialDiets"
     | "priceRange"
     | "minRating"
     | "starRating"

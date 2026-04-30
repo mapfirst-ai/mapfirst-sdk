@@ -1755,6 +1755,10 @@ function processApiFilters(apiFilters) {
   };
   addBasicFilters(apiFilters.amenities, "amenity", "amenity");
   addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
+  addBasicFilters(apiFilters.features, "features", "features");
+  addBasicFilters(apiFilters.goodFor, "goodFor", "goodFor");
+  addBasicFilters(apiFilters.meals, "meals", "meals");
+  addBasicFilters(apiFilters.specialDiets, "specialDiets", "specialDiets");
   if (apiFilters.price) {
     filters.push({
       id: "priceRange",
@@ -2074,11 +2078,18 @@ var MapFirstCore = class {
         );
         if (geoResponse.ok) {
           const place = await geoResponse.json();
-          requestBody.city = !["country", "island", "state"].includes(
+          requestBody.city = ![
+            "country",
+            "island",
+            "island group",
+            "state"
+          ].includes(place.type) ? place.name : void 0;
+          requestBody.state = place.type === "state" ? place.name : !["country", "island", "island group", "county"].includes(
             place.type
-          ) ? place.name : void 0;
-          requestBody.state = place.type === "state" ? place.name : !["country", "island", "county"].includes(place.type) ? place.state : void 0;
-          requestBody.country = ["country", "island"].includes(place.type) ? place.name : place.country;
+          ) ? place.state : void 0;
+          requestBody.country = ["country", "island", "island group"].includes(
+            place.type
+          ) ? place.name : place.country;
           requestBody.location_id = place.id;
           requestBody.latitude = place.lat;
           requestBody.longitude = place.lon;
@@ -2948,6 +2959,10 @@ var MapFirstCore = class {
     if (filters && filters.length > 0) {
       const amenities = /* @__PURE__ */ new Set();
       const hotelStyle = /* @__PURE__ */ new Set();
+      const features = /* @__PURE__ */ new Set();
+      const goodFor = /* @__PURE__ */ new Set();
+      const meals = /* @__PURE__ */ new Set();
+      const specialDiets = /* @__PURE__ */ new Set();
       let price;
       let minRating;
       let starRating;
@@ -2962,6 +2977,18 @@ var MapFirstCore = class {
             break;
           case "hotelStyle":
             hotelStyle.add(filter.value);
+            break;
+          case "features":
+            features.add(filter.value);
+            break;
+          case "goodFor":
+            goodFor.add(filter.value);
+            break;
+          case "meals":
+            meals.add(filter.value);
+            break;
+          case "specialDiets":
+            specialDiets.add(filter.value);
             break;
           case "priceRange":
             if (filter.priceRange) {
@@ -2992,6 +3019,10 @@ var MapFirstCore = class {
         ...filterPayload,
         ...amenities.size > 0 && { amenities: Array.from(amenities) },
         ...hotelStyle.size > 0 && { hotelStyle: Array.from(hotelStyle) },
+        ...features.size > 0 && { features: Array.from(features) },
+        ...goodFor.size > 0 && { goodFor: Array.from(goodFor) },
+        ...meals.size > 0 && { meals: Array.from(meals) },
+        ...specialDiets.size > 0 && { specialDiets: Array.from(specialDiets) },
         ...price && { price },
         ...minRating !== void 0 && { minRating },
         ...starRating !== void 0 && { starRating },

@@ -14,6 +14,10 @@ export type PriceLevel = "Mid Range" | "Fine Dining" | "Cheap Eats";
 export type FilterSchema = {
   amenities?: string[];
   hotelStyle?: string[];
+  features?: string[];
+  goodFor?: string[];
+  meals?: string[];
+  specialDiets?: string[];
   price?: Price | null;
   minRating?: number;
   starRating?: number;
@@ -206,6 +210,10 @@ export type SmartFilter = {
   type:
     | "amenity"
     | "hotelStyle"
+    | "features"
+    | "goodFor"
+    | "meals"
+    | "specialDiets"
     | "priceRange"
     | "minRating"
     | "starRating"

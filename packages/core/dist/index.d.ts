@@ -8,6 +8,10 @@ type PriceLevel = "Mid Range" | "Fine Dining" | "Cheap Eats";
 type FilterSchema = {
     amenities?: string[];
     hotelStyle?: string[];
+    features?: string[];
+    goodFor?: string[];
+    meals?: string[];
+    specialDiets?: string[];
     price?: Price | null;
     minRating?: number;
     starRating?: number;
@@ -164,7 +168,7 @@ type InitialRequestBody = {
 type SmartFilter = {
     id: string;
     label: string;
-    type: "amenity" | "hotelStyle" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
+    type: "amenity" | "hotelStyle" | "features" | "goodFor" | "meals" | "specialDiets" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
     value: string;
     numericValue?: number;
     priceRange?: {
@@ -409,7 +413,7 @@ type MapStateUpdate = Partial<MapState>;
 /**
  * Response type from the API containing filter information
  */
-type ApiFiltersResponse = Pick<FilterSchema, "amenities" | "hotelStyle" | "price" | "minRating" | "starRating" | "transformed_query" | "selected_restaurant_price_levels">;
+type ApiFiltersResponse = Pick<FilterSchema, "amenities" | "hotelStyle" | "features" | "goodFor" | "meals" | "specialDiets" | "price" | "minRating" | "starRating" | "transformed_query" | "selected_restaurant_price_levels">;
 /**
  * Converts API filter response into SmartFilter objects that can be used with the SmartFilter component.
  * This utility processes the various filter types returned from the API and transforms them into
