@@ -1207,6 +1207,10 @@ export class MapFirstCore {
       .filter(
         (property) =>
           property.location !== undefined &&
+          typeof property.location.lat === "number" &&
+          Number.isFinite(property.location.lat) &&
+          typeof property.location.lon === "number" &&
+          Number.isFinite(property.location.lon) &&
           (type !== undefined ? property.type === type : true),
       )
       .map((property) => ({
@@ -1230,6 +1234,12 @@ export class MapFirstCore {
       points = this.extractPoiPoints(this.properties, type);
     }
     if (!points || points.length === 0) return;
+
+    // Filter out any points with non-finite coordinates to prevent map errors
+    points = points.filter(
+      (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng),
+    );
+    if (points.length === 0) return;
 
     // Check if this is Google Maps
 
@@ -1275,7 +1285,10 @@ export class MapFirstCore {
         if (animate) {
           this.setFlyToAnimating(true);
         }
-        mapInstance.fitBounds([sw, ne], { padding: 40, animate });
+        mapInstance.fitBounds([sw, ne], {
+          padding: [40, 40] as [number, number],
+          animate,
+        });
       } else if (mapInstance.fitBounds) {
         // MapLibre/Mapbox
         const bounds: [[number, number], [number, number]] = [

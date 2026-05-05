@@ -2692,7 +2692,7 @@ var MapFirstCore = class {
   }
   extractPoiPoints(properties, type) {
     return properties.filter(
-      (property) => property.location !== void 0 && (type !== void 0 ? property.type === type : true)
+      (property) => property.location !== void 0 && typeof property.location.lat === "number" && Number.isFinite(property.location.lat) && typeof property.location.lon === "number" && Number.isFinite(property.location.lon) && (type !== void 0 ? property.type === type : true)
     ).map((property) => ({
       lat: property.location.lat,
       lng: property.location.lon
@@ -2709,6 +2709,10 @@ var MapFirstCore = class {
       points = this.extractPoiPoints(this.properties, type);
     }
     if (!points || points.length === 0) return;
+    points = points.filter(
+      (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng)
+    );
+    if (points.length === 0) return;
     if (points.length === 1) {
       const poi = points[0];
       if (this.currentPlatform === "google") {
@@ -2749,7 +2753,7 @@ var MapFirstCore = class {
         if (animate) {
           this.setFlyToAnimating(true);
         }
-        mapInstance.fitBounds([sw, ne], { padding: 40, animate });
+        mapInstance.fitBounds([sw, ne], { padding: [40, 40], animate });
       } else if (mapInstance.fitBounds) {
         const bounds = [
           [points[0].lng, points[0].lat],
