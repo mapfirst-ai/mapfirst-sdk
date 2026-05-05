@@ -471,6 +471,7 @@ export function useMapFirst(options: BaseMapFirstOptions) {
       // private "adapter" option path (createAdapter handles it).
       (instanceRef.current as any).adapter = adapter;
       (instanceRef.current as any).isMapAttached = true;
+      (instanceRef.current as any).currentPlatform = "leaflet";
       instanceRef.current.refresh();
       leafletAttachedRef.current = true;
     },

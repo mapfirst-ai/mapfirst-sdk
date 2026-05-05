@@ -1561,6 +1561,7 @@ function useMapFirst(options) {
       });
       instanceRef.current.adapter = adapter;
       instanceRef.current.isMapAttached = true;
+      instanceRef.current.currentPlatform = "leaflet";
       instanceRef.current.refresh();
       leafletAttachedRef.current = true;
     },

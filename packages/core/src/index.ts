@@ -361,7 +361,12 @@ export class MapFirstCore {
   private readonly environment: Environment;
   private readonly apiUrl: string;
   private apiKey?: string;
-  private currentPlatform: "google" | "maplibre" | "mapbox" | undefined;
+  private currentPlatform:
+    | "google"
+    | "maplibre"
+    | "mapbox"
+    | "leaflet"
+    | undefined;
   private requestBody?: InitialRequestBody;
   private readonly fitBoundsPadding: {
     top: number;
@@ -489,10 +494,15 @@ export class MapFirstCore {
   }
 
   private assertPlatformSupportForNoApi(
-    platform: "google" | "maplibre" | "mapbox" | undefined,
+    platform: "google" | "maplibre" | "mapbox" | "leaflet" | undefined,
     mode: "throw" | "warn",
   ): void {
-    if (this.useApi || !platform || platform === "maplibre") {
+    if (
+      this.useApi ||
+      !platform ||
+      platform === "maplibre" ||
+      platform === "leaflet"
+    ) {
       return;
     }
     if (mode === "throw") {
@@ -1171,6 +1181,15 @@ export class MapFirstCore {
       return;
     }
 
+    if (this.currentPlatform === "leaflet") {
+      this.setFlyToAnimating(true);
+      if (mapInstance.flyTo) {
+        mapInstance.flyTo([latitude, longitude], zoom ?? 13);
+        mapInstance.once?.("moveend", () => this.setFlyToAnimating(false));
+      }
+      return;
+    }
+
     this.setFlyToAnimating(true);
     if (mapInstance.flyTo) {
       mapInstance.flyTo({
@@ -1219,6 +1238,10 @@ export class MapFirstCore {
       if (this.currentPlatform === "google") {
         mapInstance.setCenter({ lat: poi.lat, lng: poi.lng });
         mapInstance.setZoom(13);
+      } else if (this.currentPlatform === "leaflet") {
+        if (mapInstance.flyTo) {
+          mapInstance.flyTo([poi.lat, poi.lng], 13);
+        }
       } else if (mapInstance.flyTo) {
         mapInstance.flyTo({
           center: [poi.lng, poi.lat],
@@ -1239,6 +1262,20 @@ export class MapFirstCore {
           }
           mapInstance.fitBounds(bounds, this.fitBoundsPadding);
         }
+      } else if (this.currentPlatform === "leaflet" && mapInstance.fitBounds) {
+        // Leaflet: fitBounds uses [[lat, lng], [lat, lng]]
+        const sw: [number, number] = [points[0].lat, points[0].lng];
+        const ne: [number, number] = [points[0].lat, points[0].lng];
+        points.forEach((poi) => {
+          sw[0] = Math.min(sw[0], poi.lat);
+          sw[1] = Math.min(sw[1], poi.lng);
+          ne[0] = Math.max(ne[0], poi.lat);
+          ne[1] = Math.max(ne[1], poi.lng);
+        });
+        if (animate) {
+          this.setFlyToAnimating(true);
+        }
+        mapInstance.fitBounds([sw, ne], { padding: 40, animate });
       } else if (mapInstance.fitBounds) {
         // MapLibre/Mapbox
         const bounds: [[number, number], [number, number]] = [
