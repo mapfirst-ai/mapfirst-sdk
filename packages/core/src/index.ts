@@ -54,6 +54,7 @@ export {
   getLocationWhenGranted,
   getCurrentLocation,
 } from "./utils/geolocation";
+export { isWebGLSupported } from "./utils/webgl";
 
 export type {
   MapBounds,
@@ -70,6 +71,12 @@ export type { MapLibreNamespace } from "./adapters/maplibre/markermanager";
 export type { GoogleMapsNamespace } from "./adapters/google/markermanager";
 
 export type { MapboxNamespace } from "./adapters/mapbox/markermanager";
+export type {
+  LeafletNamespace,
+  LeafletMarkerHandle,
+} from "./adapters/leaflet/markermanager";
+export { LeafletMarkerManager } from "./adapters/leaflet/markermanager";
+export { LeafletAdapter } from "./adapters/leaflet/index";
 export type { MarkerOptions } from "./marker";
 
 // Environment configuration

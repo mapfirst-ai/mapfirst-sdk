@@ -16,6 +16,12 @@ export {
   type MapboxNamespace,
 } from "./mapbox/markermanager";
 
+export {
+  LeafletMarkerManager,
+  type LeafletMarkerHandle,
+  type LeafletNamespace,
+} from "./leaflet/markermanager";
+
 /**
  * Abstract base class for map adapters supporting different map libraries
  */
@@ -81,7 +87,7 @@ export abstract class MapAdapter {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(container);

@@ -227,6 +227,51 @@ type MarkerOptions = {
     disableHoverCard?: boolean;
 };
 
+type MarkerEntry<T = any> = {
+    key: string;
+    marker: T;
+    kind: "primary" | "dot";
+    parentId?: number;
+};
+declare abstract class BaseMarkerManager<TMarker = any> {
+    protected readonly mapInstance: any;
+    protected readonly onMarkerClick?: (marker: Property) => void;
+    protected markerCache: Map<string, MarkerEntry<TMarker>>;
+    protected primaryType: string;
+    protected selectedMarkerId: number | null;
+    protected readonly markerOptions?: MarkerOptions;
+    constructor(mapInstance: any, onMarkerClick?: (marker: Property) => void, markerOptions?: MarkerOptions);
+    /** Override in subclasses to change effective options passed to marker elements */
+    protected getEffectiveMarkerOptions(): MarkerOptions | undefined;
+    render(items: ClusterDisplayItem[], primaryType?: string, selectedMarkerId?: number | null): void;
+    destroy(): void;
+    protected createAndAddMarker(item: ClusterDisplayItem, coords: {
+        lon: number;
+        lat: number;
+    }): void;
+    protected abstract createMarker(element: HTMLElement, coords: {
+        lon: number;
+        lat: number;
+    }, item: ClusterDisplayItem, isPrimaryType: boolean, isSelected: boolean): TMarker | null;
+    protected abstract removeMarkerFromMap(marker: TMarker): void;
+    protected abstract updateMarkerPosition(marker: TMarker, coords: {
+        lon: number;
+        lat: number;
+    }): void;
+    protected abstract getMarkerElement(marker: TMarker): HTMLElement | null;
+    protected updateMarkerZIndex(marker: TMarker, item: ClusterDisplayItem, isPrimaryType: boolean, isSelected: boolean): void;
+    private getDisplayState;
+    private updateMarkerElement;
+    private findMatchingMarkerEntry;
+    /**
+     * Update user location marker rendering
+     */
+    renderUserLocation(userLocation: {
+        lat: number;
+        lng: number;
+    } | null): void;
+}
+
 type MapGLMarkerHandle = {
     setLngLat(lngLat: [number, number]): MapGLMarkerHandle;
     addTo(map: any): MapGLMarkerHandle;
@@ -251,6 +296,37 @@ type MapboxNamespace = {
         [key: string]: any;
     }) => MapboxMarkerHandle;
 };
+
+type LeafletNamespace = any;
+type LeafletMarkerHandle = {
+    setLatLng(latlng: [number, number]): LeafletMarkerHandle;
+    addTo(map: any): LeafletMarkerHandle;
+    remove(): void;
+    setZIndexOffset(offset: number): LeafletMarkerHandle;
+    getElement(): HTMLElement | undefined;
+};
+type LeafletMarkerManagerOptions = {
+    mapInstance: any;
+    leaflet: LeafletNamespace;
+    onMarkerClick?: (marker: Property) => void;
+    markerOptions?: MarkerOptions;
+};
+declare class LeafletMarkerManager extends BaseMarkerManager<LeafletMarkerHandle> {
+    private readonly L;
+    constructor(options: LeafletMarkerManagerOptions);
+    render(items: ClusterDisplayItem[], primaryType?: string, selectedMarkerId?: number | null): void;
+    protected createMarker(element: HTMLElement, coords: {
+        lon: number;
+        lat: number;
+    }, item: ClusterDisplayItem, isPrimaryType: boolean, isSelected: boolean): LeafletMarkerHandle | null;
+    protected removeMarkerFromMap(marker: LeafletMarkerHandle): void;
+    protected updateMarkerPosition(marker: LeafletMarkerHandle, coords: {
+        lon: number;
+        lat: number;
+    }): void;
+    protected getMarkerElement(marker: LeafletMarkerHandle): HTMLElement | null;
+    protected updateMarkerZIndex(marker: LeafletMarkerHandle, item: ClusterDisplayItem, isPrimaryType: boolean, isSelected: boolean): void;
+}
 
 /**
  * Abstract base class for map adapters supporting different map libraries
@@ -464,6 +540,47 @@ declare function getCurrentLocation(timeoutMs?: number): Promise<{
     lat: number;
     lng: number;
 } | null>;
+
+/**
+ * Returns true when a WebGL rendering context is available in the current
+ * browser.  Returns false in non-browser environments (e.g. SSR) and on
+ * devices/browsers where WebGL is unavailable or blocked.
+ */
+declare function isWebGLSupported(): boolean;
+
+type LeafletAdapterOptions = {
+    leaflet: LeafletNamespace;
+    onMarkerClick?: (marker: Property) => void;
+    onRefresh?: () => void;
+    onMapMoveEnd?: (bounds: MapBounds$1) => void;
+    markerOptions?: MarkerOptions;
+};
+declare class LeafletAdapter extends MapAdapter {
+    private markerManager?;
+    private cleanupFns;
+    constructor(map: any);
+    initialize(options: LeafletAdapterOptions): LeafletMarkerManager;
+    private attachBoundsTracking;
+    private attachEventListeners;
+    getMarkerManager(): LeafletMarkerManager | undefined;
+    getContainer(): HTMLElement | null;
+    cleanup(): void;
+    getCenter(): {
+        lng: number;
+        lat: number;
+    };
+    getZoom(): number;
+    getBearing(): number;
+    getPitch(): number;
+    getMapBounds(): MapBounds$1;
+    project(lngLat: [number, number]): {
+        x: number;
+        y: number;
+    };
+    on(event: string, handler: (...args: any[]) => void): void;
+    off(event: string, handler: (...args: any[]) => void): void;
+    remove(): void;
+}
 
 type Environment = "prod" | "test";
 declare class PropertiesFetchError extends Error {
@@ -705,4 +822,4 @@ declare class MapFirstCore {
     private ensureAlive;
 }
 
-export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type MarkerOptions, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, getCurrentLocation, getLocationWhenGranted, processApiFilters };
+export { type ActiveLocation, type ApiFiltersResponse, type BaseMapFirstOptions, type Environment, type FilterSchema, type FilterState, type GoogleMapsNamespace, LeafletAdapter, type LeafletMarkerHandle, LeafletMarkerManager, type LeafletNamespace, type Locale, type MapBounds, MapFirstCore, type MapFirstOptions, type MapLibreNamespace, type MapState, type MapStateCallbacks, type MapStateUpdate, type MapboxNamespace, type MarkerOptions, type Price, type PriceLevel, PropertiesFetchError, type Property, type PropertyType, type SmartFilter, type TripAdvisorImage, type TripAdvisorImageResponse, type ViewState, convertToApiFilters, fetchImages, fetchProperties, getCurrentLocation, getLocationWhenGranted, isWebGLSupported, processApiFilters };

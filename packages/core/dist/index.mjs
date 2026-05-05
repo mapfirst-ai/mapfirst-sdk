@@ -1038,6 +1038,63 @@ var MapboxMarkerManager = class extends BaseMapGLMarkerManager {
   }
 };
 
+// src/adapters/leaflet/markermanager.ts
+var LeafletMarkerManager = class extends BaseMarkerManager {
+  constructor(options) {
+    super(options.mapInstance, options.onMarkerClick, options.markerOptions);
+    this.L = options.leaflet;
+  }
+  render(items, primaryType, selectedMarkerId) {
+    var _a;
+    if (!((_a = this.L) == null ? void 0 : _a.DivIcon)) {
+      console.warn("Leaflet DivIcon not available");
+      return;
+    }
+    super.render(items, primaryType, selectedMarkerId);
+  }
+  createMarker(element, coords, item, isPrimaryType, isSelected) {
+    var _a, _b;
+    if (!((_a = this.L) == null ? void 0 : _a.marker) || !((_b = this.L) == null ? void 0 : _b.DivIcon)) return null;
+    const anchor = item.kind === "primary" ? [element.offsetWidth / 2 || 20, element.offsetHeight || 40] : [element.offsetWidth / 2 || 10, element.offsetHeight / 2 || 10];
+    const icon = new this.L.DivIcon({
+      html: element.outerHTML,
+      className: "",
+      iconAnchor: anchor
+    });
+    const zOffset = item.kind === "primary" ? getPrimaryMarkerZIndex(isPrimaryType, isSelected) * 100 : getDotMarkerZIndex(isPrimaryType, isSelected) * 100;
+    const m = this.L.marker([coords.lat, coords.lon], {
+      icon
+    }).setZIndexOffset(zOffset).addTo(this.mapInstance);
+    const el = m.getElement();
+    if (el && this.onMarkerClick) {
+      const prop = item.marker;
+      el.style.cursor = "pointer";
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.onMarkerClick(prop);
+      });
+    }
+    return m;
+  }
+  removeMarkerFromMap(marker) {
+    try {
+      marker.remove();
+    } catch {
+    }
+  }
+  updateMarkerPosition(marker, coords) {
+    marker.setLatLng([coords.lat, coords.lon]);
+  }
+  getMarkerElement(marker) {
+    var _a;
+    return (_a = marker.getElement()) != null ? _a : null;
+  }
+  updateMarkerZIndex(marker, item, isPrimaryType, isSelected) {
+    const zOffset = item.kind === "primary" ? getPrimaryMarkerZIndex(isPrimaryType, isSelected) * 100 : getDotMarkerZIndex(isPrimaryType, isSelected) * 100;
+    marker.setZIndexOffset(zOffset);
+  }
+};
+
 // src/adapters/index.ts
 var MapAdapter = class {
   constructor(map) {
@@ -1800,6 +1857,108 @@ function convertToApiFilters(filters) {
     return apiFilter;
   });
 }
+
+// src/utils/webgl.ts
+function isWebGLSupported() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return false;
+  }
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
+  } catch {
+    return false;
+  }
+}
+
+// src/adapters/leaflet/index.ts
+var LEAFLET_REFRESH_EVENTS = ["zoom", "move", "drag", "rotate"];
+var LeafletAdapter = class extends MapAdapter {
+  constructor(map) {
+    super(map);
+    this.cleanupFns = [];
+  }
+  initialize(options) {
+    this.markerManager = new LeafletMarkerManager({
+      mapInstance: this.map,
+      leaflet: options.leaflet,
+      onMarkerClick: options.onMarkerClick,
+      markerOptions: options.markerOptions
+    });
+    if (options.onRefresh) {
+      this.attachEventListeners(options.onRefresh);
+    }
+    if (options.onMapMoveEnd) {
+      this.attachBoundsTracking(options.onMapMoveEnd);
+    }
+    return this.markerManager;
+  }
+  attachBoundsTracking(onMapMoveEnd) {
+    const handleMoveEnd = () => {
+      const bounds = this.getMapBounds();
+      onMapMoveEnd(bounds);
+    };
+    handleMoveEnd();
+    this.map.on("moveend", handleMoveEnd);
+    this.cleanupFns.push(() => this.map.off("moveend", handleMoveEnd));
+  }
+  attachEventListeners(onRefresh) {
+    LEAFLET_REFRESH_EVENTS.forEach((eventName) => {
+      this.map.on(eventName, onRefresh);
+      this.cleanupFns.push(() => this.map.off(eventName, onRefresh));
+    });
+  }
+  getMarkerManager() {
+    return this.markerManager;
+  }
+  getContainer() {
+    var _a, _b, _c;
+    return (_c = (_b = (_a = this.map) == null ? void 0 : _a.getContainer) == null ? void 0 : _b.call(_a)) != null ? _c : null;
+  }
+  cleanup() {
+    var _a;
+    for (const fn of this.cleanupFns) fn();
+    this.cleanupFns = [];
+    (_a = this.markerManager) == null ? void 0 : _a.destroy();
+  }
+  getCenter() {
+    const c = this.map.getCenter();
+    return { lng: c.lng, lat: c.lat };
+  }
+  getZoom() {
+    return this.map.getZoom();
+  }
+  // Leaflet does not support bearing/pitch — return 0
+  getBearing() {
+    return 0;
+  }
+  getPitch() {
+    return 0;
+  }
+  getMapBounds() {
+    const b = this.map.getBounds();
+    const sw = b.getSouthWest();
+    const ne = b.getNorthEast();
+    return {
+      sw: { lat: sw.lat, lng: sw.lng },
+      ne: { lat: ne.lat, lng: ne.lng }
+    };
+  }
+  project(lngLat) {
+    const point = this.map.latLngToContainerPoint([lngLat[1], lngLat[0]]);
+    return { x: point.x, y: point.y };
+  }
+  on(event, handler) {
+    this.map.on(event, handler);
+  }
+  off(event, handler) {
+    this.map.off(event, handler);
+  }
+  remove() {
+    this.cleanup();
+    this.map.remove();
+  }
+};
 
 // src/index.ts
 var API_URLS = {
@@ -3133,6 +3292,8 @@ function isMapboxOptions(options) {
   return options.platform === "mapbox";
 }
 export {
+  LeafletAdapter,
+  LeafletMarkerManager,
   MapFirstCore,
   PropertiesFetchError,
   convertToApiFilters,
@@ -3140,5 +3301,6 @@ export {
   fetchProperties,
   getCurrentLocation,
   getLocationWhenGranted,
+  isWebGLSupported,
   processApiFilters
 };
