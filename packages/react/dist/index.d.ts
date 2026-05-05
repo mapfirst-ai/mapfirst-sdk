@@ -1,6 +1,6 @@
 import * as _mapfirst_ai_core from '@mapfirst.ai/core';
-import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, MarkerOptions, GoogleMapsNamespace, MapboxNamespace } from '@mapfirst.ai/core';
-export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, processApiFilters } from '@mapfirst.ai/core';
+import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, MarkerOptions, GoogleMapsNamespace, MapboxNamespace, LeafletNamespace } from '@mapfirst.ai/core';
+export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, LeafletAdapter, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, isWebGLSupported, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
 import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'react';
 
@@ -294,6 +294,10 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
         markerOptions?: MarkerOptions;
     }) => void;
     attachMapbox: (map: any, mapboxgl: MapboxNamespace, options?: {
+        onMarkerClick?: (marker: Property) => void;
+        markerOptions?: MarkerOptions;
+    }) => void;
+    attachLeaflet: (map: any, leaflet: LeafletNamespace, options?: {
         onMarkerClick?: (marker: Property) => void;
         markerOptions?: MarkerOptions;
     }) => void;

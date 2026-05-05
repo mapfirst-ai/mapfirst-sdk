@@ -34,6 +34,7 @@ __export(index_exports, {
   CloseIcon: () => CloseIcon,
   EditIcon: () => EditIcon,
   FilterChips: () => FilterChips,
+  LeafletAdapter: () => import_core2.LeafletAdapter,
   MapFirstCore: () => import_core2.MapFirstCore,
   MinRatingFilterChip: () => MinRatingFilterChip,
   NextIcon: () => NextIcon,
@@ -50,6 +51,7 @@ __export(index_exports, {
   fetchImages: () => import_core2.fetchImages,
   fetchProperties: () => import_core2.fetchProperties,
   formatRatingValue: () => formatRatingValue,
+  isWebGLSupported: () => import_core2.isWebGLSupported,
   processApiFilters: () => import_core2.processApiFilters,
   renderStars: () => renderStars,
   useFilterScroll: () => useFilterScroll,
@@ -1562,6 +1564,47 @@ function useMapFirst(options) {
     },
     []
   );
+  const leafletAttachedRef = import_react9.default.useRef(false);
+  const attachLeaflet = import_react9.default.useCallback(
+    (map, leaflet, options2) => {
+      if (!instanceRef.current || !map || leafletAttachedRef.current) return;
+      const adapter = new import_core.LeafletAdapter(map);
+      adapter.initialize({
+        leaflet,
+        onMarkerClick: (marker) => {
+          var _a, _b, _c, _d, _e, _f;
+          if (marker.location) {
+            (_a = instanceRef.current) == null ? void 0 : _a.flyMapTo(
+              marker.location.lon,
+              marker.location.lat,
+              14
+            );
+          }
+          if (marker.type !== ((_b = instanceRef.current) == null ? void 0 : _b.primaryType)) {
+            (_c = instanceRef.current) == null ? void 0 : _c.setPrimaryType(marker.type);
+          }
+          (_e = instanceRef.current) == null ? void 0 : _e.setSelectedMarker(
+            marker.tripadvisor_id === ((_d = instanceRef.current) == null ? void 0 : _d.selectedMarkerId) ? null : marker.tripadvisor_id
+          );
+          (_f = options2 == null ? void 0 : options2.onMarkerClick) == null ? void 0 : _f.call(options2, marker);
+        },
+        markerOptions: options2 == null ? void 0 : options2.markerOptions,
+        onRefresh: () => {
+          var _a;
+          return (_a = instanceRef.current) == null ? void 0 : _a.refresh();
+        },
+        onMapMoveEnd: (bounds) => {
+          var _a;
+          return (_a = instanceRef.current) == null ? void 0 : _a.setBounds(bounds);
+        }
+      });
+      instanceRef.current.adapter = adapter;
+      instanceRef.current.isMapAttached = true;
+      instanceRef.current.refresh();
+      leafletAttachedRef.current = true;
+    },
+    []
+  );
   return {
     instance: instanceRef.current,
     state,
@@ -1573,7 +1616,8 @@ function useMapFirst(options) {
     boundsSearch,
     attachMapLibre,
     attachGoogle,
-    attachMapbox
+    attachMapbox,
+    attachLeaflet
   };
 }
 // Annotate the CommonJS export names for ESM import in node:
@@ -1582,6 +1626,7 @@ function useMapFirst(options) {
   CloseIcon,
   EditIcon,
   FilterChips,
+  LeafletAdapter,
   MapFirstCore,
   MinRatingFilterChip,
   NextIcon,
@@ -1598,6 +1643,7 @@ function useMapFirst(options) {
   fetchImages,
   fetchProperties,
   formatRatingValue,
+  isWebGLSupported,
   processApiFilters,
   renderStars,
   useFilterScroll,

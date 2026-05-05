@@ -1,12 +1,14 @@
 import React from "react";
 import {
   MapFirstCore,
+  LeafletAdapter,
   type MapFirstOptions,
   type BaseMapFirstOptions,
   type Property,
   type MapLibreNamespace,
   type GoogleMapsNamespace,
   type MapboxNamespace,
+  type LeafletNamespace,
   type MapState,
   type MapStateCallbacks,
   type PropertyType,
@@ -46,6 +48,8 @@ export {
   fetchImages,
   fetchProperties,
   MapFirstCore,
+  LeafletAdapter,
+  isWebGLSupported,
 } from "@mapfirst.ai/core";
 
 // Export all components
@@ -426,6 +430,52 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     [],
   );
 
+  const leafletAttachedRef = React.useRef(false);
+  const attachLeaflet = React.useCallback(
+    (
+      map: any,
+      leaflet: LeafletNamespace,
+      options?: {
+        onMarkerClick?: (marker: Property) => void;
+        markerOptions?: MarkerOptions;
+      },
+    ) => {
+      if (!instanceRef.current || !map || leafletAttachedRef.current) return;
+      const adapter = new LeafletAdapter(map);
+      adapter.initialize({
+        leaflet,
+        onMarkerClick: (marker) => {
+          if (marker.location) {
+            instanceRef.current?.flyMapTo(
+              marker.location.lon,
+              marker.location.lat,
+              14,
+            );
+          }
+          if (marker.type !== (instanceRef.current as any)?.primaryType) {
+            instanceRef.current?.setPrimaryType(marker.type);
+          }
+          instanceRef.current?.setSelectedMarker(
+            marker.tripadvisor_id === (instanceRef.current as any)?.selectedMarkerId
+              ? null
+              : marker.tripadvisor_id,
+          );
+          options?.onMarkerClick?.(marker);
+        },
+        markerOptions: options?.markerOptions,
+        onRefresh: () => instanceRef.current?.refresh(),
+        onMapMoveEnd: (bounds) => instanceRef.current?.setBounds(bounds),
+      });
+      // Manually wire the adapter into the instance internals via the
+      // private "adapter" option path (createAdapter handles it).
+      (instanceRef.current as any).adapter = adapter;
+      (instanceRef.current as any).isMapAttached = true;
+      instanceRef.current.refresh();
+      leafletAttachedRef.current = true;
+    },
+    [],
+  );
+
   return {
     instance: instanceRef.current,
     state,
@@ -438,5 +488,6 @@ export function useMapFirst(options: BaseMapFirstOptions) {
     attachMapLibre,
     attachGoogle,
     attachMapbox,
+    attachLeaflet,
   };
 }

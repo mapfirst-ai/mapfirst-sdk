@@ -1,7 +1,8 @@
 // src/index.tsx
 import React6 from "react";
 import {
-  MapFirstCore
+  MapFirstCore,
+  LeafletAdapter
 } from "@mapfirst.ai/core";
 import {
   processApiFilters,
@@ -9,7 +10,9 @@ import {
   PropertiesFetchError,
   fetchImages,
   fetchProperties,
-  MapFirstCore as MapFirstCore2
+  MapFirstCore as MapFirstCore2,
+  LeafletAdapter as LeafletAdapter2,
+  isWebGLSupported
 } from "@mapfirst.ai/core";
 
 // src/components/SmartFilter.tsx
@@ -1522,6 +1525,47 @@ function useMapFirst(options) {
     },
     []
   );
+  const leafletAttachedRef = React6.useRef(false);
+  const attachLeaflet = React6.useCallback(
+    (map, leaflet, options2) => {
+      if (!instanceRef.current || !map || leafletAttachedRef.current) return;
+      const adapter = new LeafletAdapter(map);
+      adapter.initialize({
+        leaflet,
+        onMarkerClick: (marker) => {
+          var _a, _b, _c, _d, _e, _f;
+          if (marker.location) {
+            (_a = instanceRef.current) == null ? void 0 : _a.flyMapTo(
+              marker.location.lon,
+              marker.location.lat,
+              14
+            );
+          }
+          if (marker.type !== ((_b = instanceRef.current) == null ? void 0 : _b.primaryType)) {
+            (_c = instanceRef.current) == null ? void 0 : _c.setPrimaryType(marker.type);
+          }
+          (_e = instanceRef.current) == null ? void 0 : _e.setSelectedMarker(
+            marker.tripadvisor_id === ((_d = instanceRef.current) == null ? void 0 : _d.selectedMarkerId) ? null : marker.tripadvisor_id
+          );
+          (_f = options2 == null ? void 0 : options2.onMarkerClick) == null ? void 0 : _f.call(options2, marker);
+        },
+        markerOptions: options2 == null ? void 0 : options2.markerOptions,
+        onRefresh: () => {
+          var _a;
+          return (_a = instanceRef.current) == null ? void 0 : _a.refresh();
+        },
+        onMapMoveEnd: (bounds) => {
+          var _a;
+          return (_a = instanceRef.current) == null ? void 0 : _a.setBounds(bounds);
+        }
+      });
+      instanceRef.current.adapter = adapter;
+      instanceRef.current.isMapAttached = true;
+      instanceRef.current.refresh();
+      leafletAttachedRef.current = true;
+    },
+    []
+  );
   return {
     instance: instanceRef.current,
     state,
@@ -1533,7 +1577,8 @@ function useMapFirst(options) {
     boundsSearch,
     attachMapLibre,
     attachGoogle,
-    attachMapbox
+    attachMapbox,
+    attachLeaflet
   };
 }
 export {
@@ -1541,6 +1586,7 @@ export {
   CloseIcon,
   EditIcon,
   FilterChips,
+  LeafletAdapter2 as LeafletAdapter,
   MapFirstCore2 as MapFirstCore,
   MinRatingFilterChip,
   NextIcon,
@@ -1557,6 +1603,7 @@ export {
   fetchImages,
   fetchProperties,
   formatRatingValue,
+  isWebGLSupported,
   processApiFilters,
   renderStars,
   useFilterScroll,
