@@ -146,6 +146,7 @@ type InitialRequestBody = {
     longitude?: number;
     latitude?: number;
     radius?: number;
+    chain?: string;
     include_urls?: boolean;
     include_rankings?: boolean;
     include_phone_numbers?: boolean;
@@ -525,6 +526,7 @@ type BaseMapFirstOptions = {
         };
         polygon?: [number, number][];
     };
+    chain?: string;
     markerOptions?: {
         showLabel?: boolean;
         hideBadge?: boolean;
@@ -584,6 +586,7 @@ declare class MapFirstCore {
     private readonly includeStarRating;
     private readonly restrictLocationId?;
     private readonly restrictBounds?;
+    private readonly chain?;
     constructor(options: MapFirstOptions);
     private hasMapInstance;
     private assertPlatformSupportForNoApi;

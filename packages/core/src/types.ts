@@ -190,6 +190,8 @@ export type InitialRequestBody = {
   latitude?: number;
   radius?: number;
 
+  chain?: string;
+
   include_urls?: boolean;
   include_rankings?: boolean;
   include_phone_numbers?: boolean;

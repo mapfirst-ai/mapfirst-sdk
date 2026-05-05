@@ -1762,9 +1762,7 @@ function processApiFilters(apiFilters) {
     });
   }
   if (apiFilters.selected_restaurant_price_levels) {
-    const joinedPriceLevels = apiFilters.selected_restaurant_price_levels.join(
-      ", "
-    );
+    const joinedPriceLevels = apiFilters.selected_restaurant_price_levels.join(", ");
     filters.push({
       id: "selected_restaurant_price_levels",
       label: joinedPriceLevels,
@@ -1927,6 +1925,7 @@ var MapFirstCore = class {
     this.includeStarRating = (_k = options.include_star_rating) != null ? _k : false;
     this.restrictLocationId = options.restrict_location_id;
     this.restrictBounds = options.restrict_bounds;
+    this.chain = options.chain;
     this.assertPlatformSupportForNoApi(options.platform, "throw");
     const isGoogleMaps = isGoogleMapsOptions(options);
     this.fitBoundsPadding = {
@@ -2613,6 +2612,9 @@ var MapFirstCore = class {
       },
       ...this.restrictBounds !== void 0 && {
         restrict_bounds: this.restrictBounds
+      },
+      ...this.chain !== void 0 && {
+        chain: this.chain
       }
     };
   }
@@ -2989,7 +2991,9 @@ var MapFirstCore = class {
         ...features.size > 0 && { features: Array.from(features) },
         ...goodFor.size > 0 && { goodFor: Array.from(goodFor) },
         ...meals.size > 0 && { meals: Array.from(meals) },
-        ...specialDiets.size > 0 && { specialDiets: Array.from(specialDiets) },
+        ...specialDiets.size > 0 && {
+          specialDiets: Array.from(specialDiets)
+        },
         ...price && { price },
         ...minRating !== void 0 && { minRating },
         ...starRating !== void 0 && { starRating },

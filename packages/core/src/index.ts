@@ -278,7 +278,7 @@ export type BaseMapFirstOptions = {
     ne: { lat: number; lng: number };
     polygon?: [number, number][];
   };
-  // Marker display options
+  chain?: string;
   markerOptions?: {
     showLabel?: boolean;
     hideBadge?: boolean;
@@ -375,6 +375,7 @@ export class MapFirstCore {
     ne: { lat: number; lng: number };
     polygon?: [number, number][];
   };
+  private readonly chain?: string;
 
   constructor(private readonly options: MapFirstOptions) {
     this.properties = [...(options.properties ?? [])];
@@ -398,6 +399,7 @@ export class MapFirstCore {
     this.includeStarRating = options.include_star_rating ?? false;
     this.restrictLocationId = options.restrict_location_id;
     this.restrictBounds = options.restrict_bounds;
+    this.chain = options.chain;
 
     // Validate platform restrictions when useApi is false
     this.assertPlatformSupportForNoApi(options.platform, "throw");
@@ -1284,6 +1286,9 @@ export class MapFirstCore {
       }),
       ...(this.restrictBounds !== undefined && {
         restrict_bounds: this.restrictBounds,
+      }),
+      ...(this.chain !== undefined && {
+        chain: this.chain,
       }),
     };
   }
