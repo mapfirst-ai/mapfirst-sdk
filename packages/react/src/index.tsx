@@ -456,7 +456,8 @@ export function useMapFirst(options: BaseMapFirstOptions) {
             instanceRef.current?.setPrimaryType(marker.type);
           }
           instanceRef.current?.setSelectedMarker(
-            marker.tripadvisor_id === (instanceRef.current as any)?.selectedMarkerId
+            marker.tripadvisor_id ===
+              (instanceRef.current as any)?.selectedMarkerId
               ? null
               : marker.tripadvisor_id,
           );
