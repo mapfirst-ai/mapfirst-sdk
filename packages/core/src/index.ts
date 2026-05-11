@@ -151,7 +151,7 @@ export type TripAdvisorImageResponse = {
   photos: TripAdvisorImage[];
 };
 
-// Fetch images for a property from TripAdvisor
+// Fetch images for a property from Tripadvisor
 export async function fetchImages(
   tripadvisorId: number,
   limit: number = 1,

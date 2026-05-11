@@ -138,7 +138,7 @@ function PropertyCard({ property, isSelected, onClick }: PropertyCardProps) {
   const [imageSrc, setImageSrc] = useState<string>("");
   const [imageError, setImageError] = useState(false);
 
-  // Fetch image from TripAdvisor API
+  // Fetch image from Tripadvisor API
   useEffect(() => {
     let cancelled = false;
 

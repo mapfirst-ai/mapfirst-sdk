@@ -417,9 +417,9 @@ The `Property` interface describes a single property returned from search result
 
 ```typescript
 interface Property {
-  tripadvisor_id: number; // Unique TripAdvisor ID
+  tripadvisor_id: number; // Unique Tripadvisor ID
   name: string; // Property name
-  rating: number; // TripAdvisor rating (0–5)
+  rating: number; // Tripadvisor rating (0–5)
   reviews: number; // Number of reviews
   location?: {
     // Geographic coordinates
@@ -427,7 +427,7 @@ interface Property {
     lon: number;
   };
   type: PropertyType; // "Accommodation" | "Eat & Drink" | "Attraction"
-  awards?: PropertyAward[]; // TripAdvisor awards
+  awards?: PropertyAward[]; // Tripadvisor awards
   pricing?: HotelPricingAPIResults; // Hotel pricing data
   url?: string; // Property URL
   price_level?: PriceLevel; // Price indicator ($ to $$$$)
@@ -437,7 +437,7 @@ interface Property {
 ```
 
 :::tip Fetching property images
-Use the [`fetchImages`](../guides/fetching-images) function from `@mapfirst.ai/core` to load TripAdvisor photos for any property using its `tripadvisor_id`.
+Use the [`fetchImages`](../guides/fetching-images) function from `@mapfirst.ai/core` to load Tripadvisor photos for any property using its `tripadvisor_id`.
 :::
 
 ---

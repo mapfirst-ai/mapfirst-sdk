@@ -14,7 +14,7 @@ If you want to start coding right away, head to the [React Setup](./getting-star
 
 ## What is MapFirst SDK?
 
-MapFirst SDK lets you embed interactive maps with intelligent property search into any website. It connects to the MapFirst API to fetch hotels, restaurants, and attractions — complete with ratings, reviews, pricing, and images from TripAdvisor — and renders them as markers on a map you control.
+MapFirst SDK lets you embed interactive maps with intelligent property search into any website. It connects to the MapFirst API to fetch hotels, restaurants, and attractions — complete with ratings, reviews, pricing, and images from Tripadvisor — and renders them as markers on a map you control.
 
 You can search by **city and country**, by **coordinates and radius**, by **map bounds**, or even by **natural language** using the built-in AI search engine. The SDK handles marker rendering, state management, and API communication so you can focus on building your product.
 
@@ -70,7 +70,7 @@ You can switch between platforms with minimal code changes — the SDK abstracts
 - **🗺️ Multi-Platform** — One API surface for MapLibre, Mapbox, and Google Maps. Write once, deploy anywhere.
 - **⚛️ React Hooks** — The `useMapFirst` hook manages state, markers, and API calls. No boilerplate needed.
 - **🏷️ Smart Filters** — Interactive filter chips generated from AI search results. Users can toggle and refine in real time.
-- **📍 Rich Property Data** — Ratings, reviews, pricing, awards, and images from TripAdvisor for every property.
+- **📍 Rich Property Data** — Ratings, reviews, pricing, awards, and images from Tripadvisor for every property.
 - **🔍 Flexible Search** — Search by city, coordinates, bounds, or natural language. Combine with price, rating, and type filters.
 - **📱 Responsive & Accessible** — Mobile-first components with keyboard navigation and ARIA support out of the box.
 - **🔒 Type-Safe** — Full TypeScript definitions for every function, hook, component, and data type.

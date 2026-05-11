@@ -8,12 +8,13 @@ A complete example showing how to build a property details sidebar with images, 
 
 :::tip What you'll build
 By the end of this example, you'll have a map with:
+
 - A clickable marker for each property
 - A slide-out sidebar that appears when a marker is clicked
-- TripAdvisor images with loading states and fallbacks
+- Tripadvisor images with loading states and fallbacks
 - Star ratings, review counts, and award badges
-- Pricing information and a "View on TripAdvisor" link
-:::
+- Pricing information and a "View on Tripadvisor" link
+  :::
 
 ---
 
@@ -29,7 +30,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 export default function PropertyDetails() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
-    null
+    null,
   );
 
   const {
@@ -56,7 +57,7 @@ export default function PropertyDetails() {
       onSelectedPropertyChange: (id) => {
         if (id) {
           const property = state?.properties.find(
-            (p) => p.tripadvisor_id === id
+            (p) => p.tripadvisor_id === id,
           );
           setSelectedProperty(property || null);
         } else {
@@ -333,7 +334,7 @@ function PropertyDetailsSidebar({
               >
                 Free cancellation until{" "}
                 {new Date(
-                  property.pricing.offer.freeCancellationDate
+                  property.pricing.offer.freeCancellationDate,
                 ).toLocaleDateString()}
               </div>
             )}
@@ -372,7 +373,7 @@ function PropertyDetailsSidebar({
           </div>
         )}
 
-        {/* View on TripAdvisor */}
+        {/* View on Tripadvisor */}
         {property.url && (
           <a
             href={property.url}
@@ -389,7 +390,7 @@ function PropertyDetailsSidebar({
               textDecoration: "none",
             }}
           >
-            View on TripAdvisor
+            View on Tripadvisor
           </a>
         )}
       </div>
@@ -423,7 +424,10 @@ function PropertyDetailsSidebar({
       }
 
       body {
-        font-family: system-ui, -apple-system, sans-serif;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
         height: 100vh;
         display: flex;
       }
@@ -564,7 +568,7 @@ function PropertyDetailsSidebar({
             onSelectedPropertyChange: function (id) {
               if (id) {
                 const property = currentProperties.find(
-                  (p) => p.tripadvisor_id === id
+                  (p) => p.tripadvisor_id === id,
                 );
                 if (property) {
                   showPropertyDetails(property);
@@ -624,7 +628,7 @@ function PropertyDetailsSidebar({
               <div class="stars" style="color: #fbbf24;">${stars}</div>
               <span style="color: #64748b; font-size: 14px;">
                 ${property.rating.toFixed(
-                  1
+                  1,
                 )} (${property.reviews.toLocaleString()} reviews)
               </span>
             </div>
@@ -641,8 +645,8 @@ function PropertyDetailsSidebar({
           html += `
             <div style="margin: 12px 0; color: #64748b;">
               <strong>Location:</strong> ${property.city || ""}${
-            property.city && property.country ? ", " : ""
-          }${property.country || ""}
+                property.city && property.country ? ", " : ""
+              }${property.country || ""}
             </div>
           `;
         }
@@ -671,7 +675,7 @@ function PropertyDetailsSidebar({
         if (property.url) {
           html += `
             <a href="${property.url}" target="_blank" class="cta-button">
-              View on TripAdvisor
+              View on Tripadvisor
             </a>
           `;
         }
@@ -692,13 +696,13 @@ function PropertyDetailsSidebar({
 
 ## What This Example Demonstrates
 
-| Feature | How it's used |
-|---|---|
-| **Property Selection** | Clicking a marker selects it and opens the sidebar |
-| **Image Loading** | Fetches TripAdvisor images via `fetchImages` with loading skeleton and fallbacks |
-| **Detailed Information** | Displays star ratings, review counts, pricing, and award badges |
-| **Responsive Sidebar** | Clean, scrollable layout with a close button and smooth transitions |
-| **External Links** | Direct "View on TripAdvisor" link for each property |
+| Feature                  | How it's used                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| **Property Selection**   | Clicking a marker selects it and opens the sidebar                               |
+| **Image Loading**        | Fetches Tripadvisor images via `fetchImages` with loading skeleton and fallbacks |
+| **Detailed Information** | Displays star ratings, review counts, pricing, and award badges                  |
+| **Responsive Sidebar**   | Clean, scrollable layout with a close button and smooth transitions              |
+| **External Links**       | Direct "View on Tripadvisor" link for each property                              |
 
 :::tip Fetching images
 This example uses the `fetchImages` function from `@mapfirst.ai/core`. For a deep dive into image loading patterns — including caching, lazy loading, and error handling — see the [Fetching Images guide](../guides/fetching-images).

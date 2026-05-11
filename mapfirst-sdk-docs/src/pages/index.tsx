@@ -70,7 +70,7 @@ const features = [
     icon: "📍",
     title: "Rich Property Data",
     description:
-      "Access ratings, reviews, pricing, images, and awards from TripAdvisor. Everything you need to build compelling property cards.",
+      "Access ratings, reviews, pricing, images, and awards from Tripadvisor. Everything you need to build compelling property cards.",
   },
   {
     icon: "📱",

@@ -545,6 +545,7 @@ Make sure the `<script>` tag for `@mapfirst.ai/core` is loaded **before** your c
   }
 </script>
 ```
+
 :::
 
 ### Map not displaying?
@@ -576,5 +577,5 @@ Now that you have a working map, explore these guides to build richer experience
 - **[API Reference](../api/core)** — Complete `MapFirstCore` class documentation.
 - **[Searching Guide](../guides/searching)** — Learn location search, smart search, and bounds search.
 - **[Customizing Markers](../guides/customizing-markers)** — Style markers with CSS to match your brand.
-- **[Fetching Images](../guides/fetching-images)** — Display property photos from TripAdvisor.
+- **[Fetching Images](../guides/fetching-images)** — Display property photos from Tripadvisor.
 - **[Examples](../examples/basic-map)** — More complete examples to copy and adapt.

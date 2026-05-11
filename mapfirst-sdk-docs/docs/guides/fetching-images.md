@@ -14,7 +14,7 @@ Use `fetchImages` whenever you need to display property photos — in cards, lis
 
 ## Overview
 
-The SDK provides a `fetchImages` function that retrieves images from TripAdvisor for any property. Common use cases include:
+The SDK provides a `fetchImages` function that retrieves images from Tripadvisor for any property. Common use cases include:
 
 - Displaying property previews in cards or lists
 - Creating image galleries or carousels
@@ -285,7 +285,7 @@ function PropertyGallery({ property }: { property: Property }) {
 
 ### fetchImages
 
-Fetches property images from TripAdvisor.
+Fetches property images from Tripadvisor.
 
 ```typescript
 fetchImages(
@@ -296,7 +296,7 @@ fetchImages(
 
 **Parameters:**
 
-- `tripadvisorId` - The TripAdvisor ID of the property (from `property.tripadvisor_id`)
+- `tripadvisorId` - The Tripadvisor ID of the property (from `property.tripadvisor_id`)
 - `limit` - Maximum number of images to fetch (default: 1)
 
 **Returns:**
@@ -345,7 +345,7 @@ Always show a loading indicator while fetching images:
 
 ### 2. Provide Fallback Images
 
-Always have fallback images for when TripAdvisor images aren't available:
+Always have fallback images for when Tripadvisor images aren't available:
 
 ```tsx
 const fallbackImage = imageError
