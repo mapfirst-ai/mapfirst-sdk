@@ -12,6 +12,13 @@
     "publish:react": "cd packages/react && npm publish",
     "publish:all": "pnpm publish:core && pnpm publish:react"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "core-js",
+      "core-js-pure",
+      "esbuild"
+    ]
+  },
   "devDependencies": {
     "@types/react": "^19.2.4",
     "@types/react-dom": "^19.2.3",
