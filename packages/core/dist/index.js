@@ -2789,7 +2789,10 @@ var MapFirstCore = class {
         if (animate) {
           this.setFlyToAnimating(true);
         }
-        mapInstance.fitBounds([sw, ne], { padding: [40, 40], animate });
+        mapInstance.fitBounds([sw, ne], {
+          padding: [40, 40],
+          animate
+        });
       } else if (mapInstance.fitBounds) {
         const bounds = [
           [points[0].lng, points[0].lat],

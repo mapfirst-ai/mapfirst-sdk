@@ -1,4 +1,4 @@
-import type { Property, PropertyType } from "./types";
+import type { Locale, Property, PropertyType } from "./types";
 
 export interface MapBounds {
   sw: { lat: number; lng: number };
@@ -26,6 +26,8 @@ export interface FilterState {
   numAdults?: number;
   numRooms?: number;
   currency?: string;
+  limit?: number;
+  language?: Locale;
   primary_type?: PropertyType;
 }
 

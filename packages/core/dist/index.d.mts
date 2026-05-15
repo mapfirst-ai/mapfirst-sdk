@@ -442,6 +442,8 @@ interface FilterState {
     numAdults?: number;
     numRooms?: number;
     currency?: string;
+    limit?: number;
+    language?: Locale;
     primary_type?: PropertyType;
 }
 interface MapState {
