@@ -1,6 +1,6 @@
 import { MapBounds } from "./adapters";
 
-export const locales = ["en", "es", "de", "fr", "it", "pt"] as const;
+export const locales = ["en", "es", "de", "fr", "it", "pt", "au"] as const;
 
 export type Locale = (typeof locales)[number];
 

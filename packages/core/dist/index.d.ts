@@ -1,4 +1,4 @@
-declare const locales: readonly ["en", "es", "de", "fr", "it", "pt"];
+declare const locales: readonly ["en", "es", "de", "fr", "it", "pt", "au"];
 type Locale = (typeof locales)[number];
 type Price = {
     min: number;
