@@ -11,7 +11,7 @@ const chipStyles: CSSProperties = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "16px",
@@ -50,7 +50,7 @@ export const RestaurantPriceLevelChip: FunctionComponent<
       selection.delete(valueAsPriceLevel);
     }
     const orderedSelection = PRICE_LEVEL_OPTIONS.filter((option) =>
-      selection.has(option.value)
+      selection.has(option.value),
     ).map((option) => option.value);
     onChange(orderedSelection);
   };
@@ -78,7 +78,7 @@ export const RestaurantPriceLevelChip: FunctionComponent<
         <div style={{ display: "flex", gap: "12px" }}>
           {PRICE_LEVEL_OPTIONS.map((option) => {
             const optionLabel = t(
-              `smartFilter.restaurantPriceLevel.options.${option.key}`
+              `smartFilter.restaurantPriceLevel.options.${option.key}`,
             );
             const checkboxId = `price-level-${option.key}`;
             return (

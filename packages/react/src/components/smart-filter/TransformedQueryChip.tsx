@@ -19,7 +19,7 @@ const chipStyles: CSSProperties = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "8px",

@@ -18,7 +18,7 @@ export interface FilterChipsProps {
   formatCurrency: (value: number, currency?: string) => string;
   onFilterChange: (
     filters: Filter[],
-    clearAll?: boolean
+    clearAll?: boolean,
   ) => void | Promise<void>;
   onResetFilters: () => void;
   onClearAll: () => void;
@@ -52,8 +52,8 @@ const navButtonStyles: CSSProperties = {
   top: "50%",
   transform: "translateY(-50%)",
   backgroundColor: "white",
-  color: "#003c30",
-  border: "1px solid #003c30",
+  color: "#012b11",
+  border: "1px solid #012b11",
   padding: "4px",
   borderRadius: "50%",
   display: "flex",
@@ -72,11 +72,11 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   nextFiltersLabel,
   formatCurrency: _formatCurrency,
   onFilterChange,
-  onResetFilters: _onResetFilters,
+  onResetFilters,
   onClearAll,
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
-    filters.length
+    filters.length,
   );
   const [navHover, setNavHover] = React.useState<"prev" | "next" | null>(null);
   const [clearHover, setClearHover] = React.useState(false);
@@ -84,16 +84,16 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
     (filterId: string) => {
       void onFilterChange(filters.filter((f) => f.id !== filterId));
     },
-    [filters, onFilterChange]
+    [filters, onFilterChange],
   );
   const patchFilter = React.useCallback(
     (filterId: string, patch: Partial<Filter>) => {
       const nextFilters = filters.map((f) =>
-        f.id === filterId ? { ...f, ...patch } : f
+        f.id === filterId ? { ...f, ...patch } : f,
       );
       void onFilterChange(nextFilters);
     },
-    [filters, onFilterChange]
+    [filters, onFilterChange],
   );
 
   return (
@@ -103,7 +103,6 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
         style={{
           ...scrollContainerBase,
           padding: "8px",
-          // Hide scrollbar for webkit browsers
           WebkitOverflowScrolling: "touch",
         }}
       >
@@ -114,6 +113,24 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             }
           `}
         </style>
+        <button
+          style={{
+            flexShrink: 0,
+            backgroundColor: "#01ea5b",
+            borderRadius: "50%",
+            padding: "8px",
+            cursor: "pointer",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onClick={onResetFilters}
+        >
+          <SearchIcon
+            style={{ width: "20px", height: "20px", color: "#012b11" }}
+          />
+        </button>
         {filters.map((filter) => {
           const renderStandardChip = () => (
             <Chip
@@ -196,9 +213,9 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             cursor: "pointer",
             fontSize: "14px",
             userSelect: "none",
-            backgroundColor: clearHover ? "#eee" : "white",
+            backgroundColor: clearHover ? "#e5e5e5" : "transparent",
             color: "black",
-            border: "1px solid #03852e",
+            border: "none",
           }}
           onClick={onClearAll}
           onMouseEnter={() => setClearHover(true)}

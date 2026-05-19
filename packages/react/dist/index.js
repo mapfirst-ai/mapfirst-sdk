@@ -172,7 +172,7 @@ var closeButtonStyles = {
   padding: "2px",
   borderRadius: "50%",
   backgroundColor: "white",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
@@ -212,7 +212,7 @@ var chipStyles = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "8px",
@@ -365,7 +365,7 @@ var chipContainerStyles = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   gap: "8px",
   alignItems: "center",
@@ -447,15 +447,39 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                     height: "16px"
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-                      StarIcon,
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+                      "svg",
                       {
-                        fill: displayRating >= starNumber ? "#03852e" : "none",
-                        style: {
-                          width: "16px",
-                          height: "16px",
-                          pointerEvents: "none"
-                        }
+                        viewBox: "0 0 24 24",
+                        style: { width: "16px", height: "16px", pointerEvents: "none" },
+                        xmlns: "http://www.w3.org/2000/svg",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("defs", { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("linearGradient", { id: `star-gradient-${index}`, children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                              "stop",
+                              {
+                                offset: fillState === "half" ? "50%" : "0%",
+                                stopColor: "#03852e"
+                              }
+                            ),
+                            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                              "stop",
+                              {
+                                offset: fillState === "half" ? "50%" : "0%",
+                                stopColor: "transparent"
+                              }
+                            )
+                          ] }) }),
+                          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                            "path",
+                            {
+                              d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+                              fill: fillState === "full" ? "#03852e" : fillState === "half" ? `url(#star-gradient-${index})` : "transparent",
+                              stroke: "#03852e",
+                              strokeWidth: "1"
+                            }
+                          )
+                        ]
                       }
                     ),
                     /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
@@ -578,7 +602,7 @@ var chipStyles2 = {
   fontSize: "14px",
   borderRadius: "9999px",
   padding: "0 16px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "8px",
@@ -707,10 +731,7 @@ var PriceBoundaryChip = ({
         style: inputStyles,
         autoFocus: true
       }
-    ) : hasValue ? /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("span", { style: { fontSize: "16px" }, children: [
-      currency,
-      value
-    ] }) : showAddWhenEmpty ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    ) : hasValue ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontSize: "16px", fontWeight: 600, textAlign: "center" }, children: value }) : showAddWhenEmpty ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       "button",
       {
         type: "button",
@@ -727,7 +748,7 @@ var PriceBoundaryChip = ({
         children: "+"
       }
     ) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
-    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { color: "#737373", fontSize: "12px" }, children: currency }),
+    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em" }, children: currency }),
     !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
       "button",
       {
@@ -812,7 +833,7 @@ var chipStyles3 = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "16px",
@@ -921,7 +942,7 @@ var chipStyles4 = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "8px",
@@ -1104,8 +1125,8 @@ var navButtonStyles = {
   top: "50%",
   transform: "translateY(-50%)",
   backgroundColor: "white",
-  color: "#003c30",
-  border: "1px solid #003c30",
+  color: "#012b11",
+  border: "1px solid #012b11",
   padding: "4px",
   borderRadius: "50%",
   display: "flex",
@@ -1123,7 +1144,7 @@ var FilterChips = ({
   nextFiltersLabel,
   formatCurrency: _formatCurrency,
   onFilterChange,
-  onResetFilters: _onResetFilters,
+  onResetFilters,
   onClearAll
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
@@ -1154,7 +1175,6 @@ var FilterChips = ({
         style: {
           ...scrollContainerBase,
           padding: "8px",
-          // Hide scrollbar for webkit browsers
           WebkitOverflowScrolling: "touch"
         },
         children: [
@@ -1163,6 +1183,24 @@ var FilterChips = ({
               display: none;
             }
           ` }),
+          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+            "button",
+            {
+              style: {
+                flexShrink: 0,
+                backgroundColor: "#01ea5b",
+                borderRadius: "50%",
+                padding: "8px",
+                cursor: "pointer",
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              },
+              onClick: onResetFilters,
+              children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(SearchIcon, { style: { width: "20px", height: "20px", color: "#012b11" } })
+            }
+          ),
           filters.map((filter) => {
             var _a, _b;
             const renderStandardChip = () => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
@@ -1247,9 +1285,9 @@ var FilterChips = ({
                 cursor: "pointer",
                 fontSize: "14px",
                 userSelect: "none",
-                backgroundColor: clearHover ? "#eee" : "white",
+                backgroundColor: clearHover ? "#e5e5e5" : "transparent",
                 color: "black",
-                border: "1px solid #03852e"
+                border: "none"
               },
               onClick: onClearAll,
               onMouseEnter: () => setClearHover(true),

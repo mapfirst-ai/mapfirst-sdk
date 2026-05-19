@@ -13,7 +13,7 @@ const closeButtonStyles: CSSProperties = {
   padding: "2px",
   borderRadius: "50%",
   backgroundColor: "white",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",

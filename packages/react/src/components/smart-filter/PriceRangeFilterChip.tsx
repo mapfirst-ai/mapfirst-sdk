@@ -18,7 +18,7 @@ const chipStyles: CSSProperties = {
   fontSize: "14px",
   borderRadius: "9999px",
   padding: "0 16px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   alignItems: "center",
   gap: "8px",
@@ -76,7 +76,7 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
   onRemove,
 }) => {
   const [draft, setDraft] = useState<string>(
-    value !== undefined ? String(value) : ""
+    value !== undefined ? String(value) : "",
   );
   const [isEditing, setIsEditing] = useState(false);
   const [editHover, setEditHover] = useState(false);
@@ -181,8 +181,9 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
           autoFocus
         />
       ) : hasValue ? (
-        <span style={{ fontSize: "16px" }}>
-          {currency}
+        <span
+          style={{ fontSize: "16px", fontWeight: 600, textAlign: "center" }}
+        >
           {value}
         </span>
       ) : showAddWhenEmpty ? (
@@ -205,7 +206,16 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
         <span style={{ fontSize: "16px", color: "#737373" }}>-</span>
       )}
       {(!showAddWhenEmpty || (showAddWhenEmpty && isEditing)) && (
-        <span style={{ color: "#737373", fontSize: "12px" }}>{currency}</span>
+        <span
+          style={{
+            fontWeight: 600,
+            fontSize: "10px",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
+          {currency}
+        </span>
       )}
       {!isEditing && (!showAddWhenEmpty || hasValue) && (
         <button
@@ -240,7 +250,10 @@ export const PriceRangeFilterChip: FunctionComponent<{
   const maxChipLabel = "Max";
   const editLabel = t("smartFilter.priceRange.edit");
 
-  const handleBoundaryCommit = (boundary: "min" | "max", nextValue?: number) => {
+  const handleBoundaryCommit = (
+    boundary: "min" | "max",
+    nextValue?: number,
+  ) => {
     const nextRange: PriceRangeValue = {
       min: priceRange.min,
       max: priceRange.max,

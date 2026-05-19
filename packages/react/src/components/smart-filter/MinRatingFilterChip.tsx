@@ -4,7 +4,6 @@ import React, {
   FocusEvent,
   CSSProperties,
 } from "react";
-import { StarIcon } from "../Icons";
 import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
 import { formatRatingValue } from "./utils";
@@ -17,7 +16,7 @@ const chipContainerStyles: CSSProperties = {
   borderRadius: "9999px",
   padding: "0 16px",
   paddingRight: "20px",
-  border: "1px solid #03852e",
+  border: "1px solid #012b11",
   display: "flex",
   gap: "8px",
   alignItems: "center",
@@ -122,14 +121,40 @@ export const MinRatingFilterChip: FunctionComponent<{
                     height: "16px",
                   }}
                 >
-                  <StarIcon
-                    fill={displayRating >= starNumber ? "#03852e" : "none"}
+                  <svg
+                    viewBox="0 0 24 24"
                     style={{
                       width: "16px",
                       height: "16px",
                       pointerEvents: "none",
                     }}
-                  />
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <defs>
+                      <linearGradient id={`star-gradient-${index}`}>
+                        <stop
+                          offset={fillState === "half" ? "50%" : "0%"}
+                          stopColor="#03852e"
+                        />
+                        <stop
+                          offset={fillState === "half" ? "50%" : "0%"}
+                          stopColor="transparent"
+                        />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                      fill={
+                        fillState === "full"
+                          ? "#03852e"
+                          : fillState === "half"
+                            ? `url(#star-gradient-${index})`
+                            : "transparent"
+                      }
+                      stroke="#03852e"
+                      strokeWidth="1"
+                    />
+                  </svg>
                   <button
                     type="button"
                     style={{
