@@ -292,6 +292,7 @@ export type BaseMapFirstOptions = {
     showTail?: boolean;
     hideNonPrimary?: boolean;
     disableHoverCard?: boolean;
+    badgeImageUrl?: string;
   };
 };
 

@@ -89,6 +89,15 @@
   right: -20px;
 }
 
+.mapfirst-marker-badge-img {
+  display: block;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 0 10px -5px black;
+}
+
 .mapfirst-marker-award-container {
   position: relative;
   width: 32px;

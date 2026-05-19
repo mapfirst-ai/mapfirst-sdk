@@ -401,6 +401,8 @@ export type MarkerOptions = {
   showTail?: boolean;
   hideNonPrimary?: boolean;
   disableHoverCard?: boolean;
+  /** URL of a custom badge image to show on Accommodation markers (takes priority over awards/rating). */
+  badgeImageUrl?: string;
 };
 
 export function createPrimaryMarkerElement(
@@ -459,44 +461,53 @@ export function createPrimaryMarkerElement(
   }
   // pill.title = marker.name ?? String(marker.tripadvisor_id);
 
-  // Awards or Rating badge
-  if (
-    !isPending &&
-    !markerOptions?.hideBadge &&
-    (marker.awards?.length || ratingLabel)
-  ) {
-    const badge = document.createElement("div");
-    badge.className = "mapfirst-marker-badge";
-    if (!isPrimaryType) {
-      badge.style.opacity = "0.2";
+  // Badge: custom image > awards > rating
+  if (!isPending && !markerOptions?.hideBadge) {
+    if (markerOptions?.badgeImageUrl && isAccommodation) {
+      const badge = document.createElement("div");
+      badge.className = "mapfirst-marker-badge";
+      if (!isPrimaryType) {
+        badge.style.opacity = "0.2";
+      }
+      const img = document.createElement("img");
+      img.src = markerOptions.badgeImageUrl;
+      img.alt = "Award";
+      img.className = "mapfirst-marker-badge-img";
+      badge.appendChild(img);
+      pill.appendChild(badge);
+    } else if (marker.awards?.length || ratingLabel) {
+      const badge = document.createElement("div");
+      badge.className = "mapfirst-marker-badge";
+      if (!isPrimaryType) {
+        badge.style.opacity = "0.2";
+      }
+
+      if (marker.awards?.length && marker.awards[0].type) {
+        const awardContainer = document.createElement("div");
+        awardContainer.className = "mapfirst-marker-award-container";
+
+        const backLayer = document.createElement("div");
+        backLayer.className = "mapfirst-marker-award-back";
+        backLayer.innerHTML = AWARD_BACK_SVG;
+
+        const colorDot = document.createElement("div");
+        colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${marker.awards[0].type}`;
+
+        const frontLayer = document.createElement("div");
+        frontLayer.className = "mapfirst-marker-award-front";
+        frontLayer.innerHTML = AWARD_SVG;
+
+        awardContainer.appendChild(backLayer);
+        awardContainer.appendChild(colorDot);
+        awardContainer.appendChild(frontLayer);
+        badge.appendChild(awardContainer);
+      } else if (ratingLabel) {
+        badge.className = "mapfirst-marker-badge mapfirst-marker-rating-badge";
+        badge.textContent = ratingLabel;
+      }
+
+      pill.appendChild(badge);
     }
-    badge.className = "mapfirst-marker-badge";
-
-    if (marker.awards?.length && marker.awards[0].type) {
-      const awardContainer = document.createElement("div");
-      awardContainer.className = "mapfirst-marker-award-container";
-
-      const backLayer = document.createElement("div");
-      backLayer.className = "mapfirst-marker-award-back";
-      backLayer.innerHTML = AWARD_BACK_SVG;
-
-      const colorDot = document.createElement("div");
-      colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${marker.awards[0].type}`;
-
-      const frontLayer = document.createElement("div");
-      frontLayer.className = "mapfirst-marker-award-front";
-      frontLayer.innerHTML = AWARD_SVG;
-
-      awardContainer.appendChild(backLayer);
-      awardContainer.appendChild(colorDot);
-      awardContainer.appendChild(frontLayer);
-      badge.appendChild(awardContainer);
-    } else if (ratingLabel) {
-      badge.className = "mapfirst-marker-badge mapfirst-marker-rating-badge";
-      badge.textContent = ratingLabel;
-    }
-
-    pill.appendChild(badge);
   }
 
   // Content

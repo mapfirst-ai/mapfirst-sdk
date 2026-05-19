@@ -225,6 +225,8 @@ type MarkerOptions = {
     showTail?: boolean;
     hideNonPrimary?: boolean;
     disableHoverCard?: boolean;
+    /** URL of a custom badge image to show on Accommodation markers (takes priority over awards/rating). */
+    badgeImageUrl?: string;
 };
 
 type MarkerEntry<T = any> = {
@@ -652,6 +654,7 @@ type BaseMapFirstOptions = {
         showTail?: boolean;
         hideNonPrimary?: boolean;
         disableHoverCard?: boolean;
+        badgeImageUrl?: string;
     };
 };
 type AdapterDrivenOptions = BaseMapFirstOptions & {
