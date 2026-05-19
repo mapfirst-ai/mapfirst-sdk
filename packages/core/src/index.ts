@@ -1864,9 +1864,11 @@ export class MapFirstCore {
           selected_restaurant_price_levels,
         }),
       };
-    } else if (!query) {
-      // Add default minRating if no filters and no query
-      filterPayload.minRating = 4;
+    } else {
+      // No explicit filters provided — keep default minRating = 4 if not already set
+      if (!filterPayload.minRating) {
+        filterPayload.minRating = 4;
+      }
     }
 
     const body: InitialRequestBody = {

@@ -3208,8 +3208,10 @@ var MapFirstCore = class {
           selected_restaurant_price_levels
         }
       };
-    } else if (!query) {
-      filterPayload.minRating = 4;
+    } else {
+      if (!filterPayload.minRating) {
+        filterPayload.minRating = 4;
+      }
     }
     const body = {
       filters: filterPayload,
