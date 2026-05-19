@@ -4,7 +4,7 @@ import { MinRatingFilterChip } from "./MinRatingFilterChip";
 import { PriceRangeFilterChip } from "./PriceRangeFilterChip";
 import { RestaurantPriceLevelChip } from "./RestaurantPriceLevelChip";
 import { TransformedQueryChip } from "./TransformedQueryChip";
-import { SearchIcon, NextIcon } from "../Icons";
+import { NextIcon } from "../Icons";
 import { useFilterScroll } from "../../hooks/useFilterScroll";
 import type { Filter } from "./types";
 
@@ -72,7 +72,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   nextFiltersLabel,
   formatCurrency: _formatCurrency,
   onFilterChange,
-  onResetFilters,
+  onResetFilters: _onResetFilters,
   onClearAll,
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
@@ -113,24 +113,6 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             }
           `}
         </style>
-        <button
-          style={{
-            flexShrink: 0,
-            backgroundColor: "#01ea5b",
-            borderRadius: "50%",
-            padding: "8px",
-            cursor: "pointer",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          onClick={onResetFilters}
-        >
-          <SearchIcon
-            style={{ width: "20px", height: "20px", color: "#012b11" }}
-          />
-        </button>
         {filters.map((filter) => {
           const renderStandardChip = () => (
             <Chip

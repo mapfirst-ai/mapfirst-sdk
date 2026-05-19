@@ -1790,19 +1790,12 @@ function processApiFilters(apiFilters) {
       });
     });
   };
-  addBasicFilters(apiFilters.amenities, "amenity", "amenity");
-  addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
-  addBasicFilters(apiFilters.features, "features", "features");
-  addBasicFilters(apiFilters.goodFor, "goodFor", "goodFor");
-  addBasicFilters(apiFilters.meals, "meals", "meals");
-  addBasicFilters(apiFilters.specialDiets, "specialDiets", "specialDiets");
-  if (apiFilters.price) {
+  if (apiFilters.transformed_query) {
     filters.push({
-      id: "priceRange",
-      label: "Price Range",
-      type: "priceRange",
-      value: `${apiFilters.price.min}-${apiFilters.price.max}`,
-      priceRange: apiFilters.price
+      id: "transformed_query",
+      label: apiFilters.transformed_query,
+      type: "transformed_query",
+      value: apiFilters.transformed_query
     });
   }
   if (typeof apiFilters.minRating === "number" && Number.isFinite(apiFilters.minRating)) {
@@ -1823,12 +1816,13 @@ function processApiFilters(apiFilters) {
       numericValue: apiFilters.starRating
     });
   }
-  if (apiFilters.transformed_query) {
+  if (apiFilters.price) {
     filters.push({
-      id: "transformed_query",
-      label: apiFilters.transformed_query,
-      type: "transformed_query",
-      value: apiFilters.transformed_query
+      id: "priceRange",
+      label: "Price Range",
+      type: "priceRange",
+      value: `${apiFilters.price.min}-${apiFilters.price.max}`,
+      priceRange: apiFilters.price
     });
   }
   if (apiFilters.selected_restaurant_price_levels) {
@@ -1841,6 +1835,12 @@ function processApiFilters(apiFilters) {
       priceLevels: apiFilters.selected_restaurant_price_levels
     });
   }
+  addBasicFilters(apiFilters.amenities, "amenity", "amenity");
+  addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
+  addBasicFilters(apiFilters.features, "features", "features");
+  addBasicFilters(apiFilters.goodFor, "goodFor", "goodFor");
+  addBasicFilters(apiFilters.meals, "meals", "meals");
+  addBasicFilters(apiFilters.specialDiets, "specialDiets", "specialDiets");
   return filters;
 }
 function convertToApiFilters(filters) {

@@ -405,7 +405,11 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                       "svg",
                       {
                         viewBox: "0 0 24 24",
-                        style: { width: "16px", height: "16px", pointerEvents: "none" },
+                        style: {
+                          width: "16px",
+                          height: "16px",
+                          pointerEvents: "none"
+                        },
                         xmlns: "http://www.w3.org/2000/svg",
                         children: [
                           /* @__PURE__ */ jsx5("defs", { children: /* @__PURE__ */ jsxs4("linearGradient", { id: `star-gradient-${index}`, children: [
@@ -688,7 +692,13 @@ var PriceBoundaryChip = ({
         style: inputStyles,
         autoFocus: true
       }
-    ) : hasValue ? /* @__PURE__ */ jsx6("span", { style: { fontSize: "16px", fontWeight: 600, textAlign: "center" }, children: value }) : showAddWhenEmpty ? /* @__PURE__ */ jsx6(
+    ) : hasValue ? /* @__PURE__ */ jsx6(
+      "span",
+      {
+        style: { fontSize: "16px", fontWeight: 600, textAlign: "center" },
+        children: value
+      }
+    ) : showAddWhenEmpty ? /* @__PURE__ */ jsx6(
       "button",
       {
         type: "button",
@@ -705,7 +715,18 @@ var PriceBoundaryChip = ({
         children: "+"
       }
     ) : /* @__PURE__ */ jsx6("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
-    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ jsx6("span", { style: { fontWeight: 600, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.05em" }, children: currency }),
+    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ jsx6(
+      "span",
+      {
+        style: {
+          fontWeight: 600,
+          fontSize: "10px",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em"
+        },
+        children: currency
+      }
+    ),
     !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ jsx6(
       "button",
       {
@@ -1105,7 +1126,7 @@ var FilterChips = ({
   nextFiltersLabel,
   formatCurrency: _formatCurrency,
   onFilterChange,
-  onResetFilters,
+  onResetFilters: _onResetFilters,
   onClearAll
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
@@ -1144,24 +1165,6 @@ var FilterChips = ({
               display: none;
             }
           ` }),
-          /* @__PURE__ */ jsx9(
-            "button",
-            {
-              style: {
-                flexShrink: 0,
-                backgroundColor: "#01ea5b",
-                borderRadius: "50%",
-                padding: "8px",
-                cursor: "pointer",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              },
-              onClick: onResetFilters,
-              children: /* @__PURE__ */ jsx9(SearchIcon, { style: { width: "20px", height: "20px", color: "#012b11" } })
-            }
-          ),
           filters.map((filter) => {
             var _a, _b;
             const renderStandardChip = () => /* @__PURE__ */ jsx9(

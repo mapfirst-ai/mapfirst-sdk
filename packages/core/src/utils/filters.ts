@@ -59,32 +59,13 @@ export function processApiFilters(
     });
   };
 
-  // Process amenities
-  addBasicFilters(apiFilters.amenities, "amenity", "amenity");
-
-  // Process hotel styles
-  addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
-
-  // Process features
-  addBasicFilters(apiFilters.features, "features", "features");
-
-  // Process goodFor
-  addBasicFilters(apiFilters.goodFor, "goodFor", "goodFor");
-
-  // Process meals
-  addBasicFilters(apiFilters.meals, "meals", "meals");
-
-  // Process special diets
-  addBasicFilters(apiFilters.specialDiets, "specialDiets", "specialDiets");
-
-  // Process price range
-  if (apiFilters.price) {
+  // Process transformed query first (highest priority)
+  if (apiFilters.transformed_query) {
     filters.push({
-      id: "priceRange",
-      label: "Price Range",
-      type: "priceRange",
-      value: `${apiFilters.price.min}-${apiFilters.price.max}`,
-      priceRange: apiFilters.price,
+      id: "transformed_query",
+      label: apiFilters.transformed_query,
+      type: "transformed_query",
+      value: apiFilters.transformed_query,
     });
   }
 
@@ -116,13 +97,14 @@ export function processApiFilters(
     });
   }
 
-  // Process transformed query
-  if (apiFilters.transformed_query) {
+  // Process price range
+  if (apiFilters.price) {
     filters.push({
-      id: "transformed_query",
-      label: apiFilters.transformed_query,
-      type: "transformed_query",
-      value: apiFilters.transformed_query,
+      id: "priceRange",
+      label: "Price Range",
+      type: "priceRange",
+      value: `${apiFilters.price.min}-${apiFilters.price.max}`,
+      priceRange: apiFilters.price,
     });
   }
 
@@ -138,6 +120,24 @@ export function processApiFilters(
       priceLevels: apiFilters.selected_restaurant_price_levels,
     });
   }
+
+  // Process amenities
+  addBasicFilters(apiFilters.amenities, "amenity", "amenity");
+
+  // Process hotel styles
+  addBasicFilters(apiFilters.hotelStyle, "hotelStyle", "hotelStyle");
+
+  // Process features
+  addBasicFilters(apiFilters.features, "features", "features");
+
+  // Process goodFor
+  addBasicFilters(apiFilters.goodFor, "goodFor", "goodFor");
+
+  // Process meals
+  addBasicFilters(apiFilters.meals, "meals", "meals");
+
+  // Process special diets
+  addBasicFilters(apiFilters.specialDiets, "specialDiets", "specialDiets");
 
   return filters;
 }
