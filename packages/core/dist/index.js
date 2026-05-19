@@ -2418,7 +2418,14 @@ var MapFirstCore = class {
   _setProperties(properties) {
     var _a, _b;
     this.ensureAlive();
-    this.properties = [...properties.filter((x) => !!x.location)];
+    this.properties = [
+      ...properties.filter(
+        (x) => {
+          var _a2;
+          return !!x.location && ((_a2 = x.pricing) == null ? void 0 : _a2.availability) !== "unavailable";
+        }
+      )
+    ];
     this.updateState({
       properties: this.properties
     });

@@ -796,7 +796,11 @@ export class MapFirstCore {
 
   _setProperties(properties: Property[]) {
     this.ensureAlive();
-    this.properties = [...properties.filter((x) => !!x.location)];
+    this.properties = [
+      ...properties.filter(
+        (x) => !!x.location && x.pricing?.availability !== "unavailable",
+      ),
+    ];
     this.updateState({
       properties: this.properties,
     });
