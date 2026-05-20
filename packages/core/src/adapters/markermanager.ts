@@ -159,6 +159,7 @@ export abstract class BaseMarkerManager<TMarker = any> {
             this.primaryType,
             this.selectedMarkerId,
             this.onMarkerClick,
+            this.getEffectiveMarkerOptions(),
           );
 
     if (!element) return;

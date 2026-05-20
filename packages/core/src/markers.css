@@ -185,7 +185,7 @@
   border-radius: 999px;
   border: 2px solid #ffffff;
   box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);
-  transition: transform 0.2s;
+  transition: scale 0.2s;
   outline: none;
   transform-origin: center center;
 }
@@ -206,7 +206,7 @@
 }
 
 .mapfirst-dot-marker-button-active:hover {
-  transform: scale(1.2);
+  scale: 1.2;
 }
 
 .mapfirst-dot-marker-button-active:focus {
