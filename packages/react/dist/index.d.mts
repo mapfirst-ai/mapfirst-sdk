@@ -2,7 +2,7 @@ import * as _mapfirst_ai_core from '@mapfirst.ai/core';
 import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, MarkerOptions, GoogleMapsNamespace, MapboxNamespace, LeafletNamespace } from '@mapfirst.ai/core';
 export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, LeafletAdapter, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, isWebGLSupported, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
-import React__default, { FunctionComponent, CSSProperties, ReactNode } from 'react';
+import React__default, { FunctionComponent, ReactNode, CSSProperties } from 'react';
 
 type Filter = {
     id: string;
@@ -20,47 +20,46 @@ type PriceRangeValue = {
     max?: number;
 };
 
+/** Per-element style overrides for the SmartFilter component tree. */
+interface SmartFilterStyles {
+    /** Outer wrapper div */
+    container?: CSSProperties;
+    /** Horizontally-scrollable chips row */
+    scrollContainer?: CSSProperties;
+    /** Generic text chips (amenities, hotel style, etc.) */
+    chip?: CSSProperties;
+    /** minRating / starRating interactive chip container */
+    minRatingChip?: CSSProperties;
+    /** Price range chip container */
+    priceRangeChip?: CSSProperties;
+    /** Transformed-query chip container */
+    transformedQueryChip?: CSSProperties;
+    /** Restaurant price-level chip container */
+    restaurantPriceLevelChip?: CSSProperties;
+    /** Prev / next scroll nav buttons */
+    navButton?: CSSProperties;
+    /** "Clear all" button */
+    clearAllButton?: CSSProperties;
+}
 interface SmartFilterProps {
     filters: Filter[];
     isSearching?: boolean;
     onFilterChange: (filters: Filter[]) => Promise<void> | void;
     customTranslations?: Record<string, string>;
     currency?: string;
+    /**
+     * Content rendered as the first item inside the scroll row, before any
+     * chips. Use this to place a sticky-looking action button (e.g. a search /
+     * reset icon) that scrolls together with the chips.
+     */
+    beforeContent?: ReactNode;
+    /** Fine-grained style overrides for every visual part of the component. */
+    styles?: SmartFilterStyles;
+    /** @deprecated Use `styles.container` instead. */
     style?: CSSProperties;
+    /** @deprecated Use `styles.container` instead. */
     containerStyle?: CSSProperties;
 }
-/**
- * SmartFilter component for AI-powered search with filter chips.
- * Provides a search input with smart filtering capabilities.
- *
- * @example
- * ```tsx
- * const { mapFirst, state } = useMapFirstCore({ ... });
- * const [filters, setFilters] = useState<Filter[]>([]);
- * const [searchValue, setSearchValue] = useState("");
- *
- * const handleSearch = async (query: string, currentFilters?: Filter[]) => {
- *   // Perform search using mapFirst.runSmartFilterSearch
- *   const result = await mapFirst.runSmartFilterSearch({
- *     query,
- *     filters: currentFilters
- *   });
- *   // Update filters based on response
- * };
- *
- * return (
- *   <SmartFilter
- *     mapFirst={mapFirst}
- *     filters={filters}
- *     value={searchValue}
- *     isSearching={state?.isSearching}
- *     onSearch={handleSearch}
- *     onFilterChange={setFilters}
- *     onValueChange={setSearchValue}
- *   />
- * );
- * ```
- */
 declare const SmartFilter$1: FunctionComponent<SmartFilterProps>;
 
 interface IconProps {
@@ -94,6 +93,10 @@ interface FilterChipsProps {
     onFilterChange: (filters: Filter[], clearAll?: boolean) => void | Promise<void>;
     onResetFilters: () => void;
     onClearAll: () => void;
+    /** Rendered as the first item in the scroll row, before any chips. */
+    beforeContent?: ReactNode;
+    /** Style overrides forwarded from SmartFilter. */
+    styles?: SmartFilterStyles;
 }
 declare const FilterChips: FunctionComponent<FilterChipsProps>;
 
@@ -102,6 +105,7 @@ declare const MinRatingFilterChip: FunctionComponent<{
     rating: number;
     onChange: (rating: number) => void;
     onRemove: () => void;
+    style?: CSSProperties;
 }>;
 
 declare const PriceRangeFilterChip: FunctionComponent<{
@@ -109,12 +113,14 @@ declare const PriceRangeFilterChip: FunctionComponent<{
     currency: string;
     onChange: (range: PriceRangeValue) => void;
     onRemove: () => void;
+    style?: CSSProperties;
 }>;
 
 interface RestaurantPriceLevelChipProps {
     values: PriceLevel[];
     onChange: (values: PriceLevel[]) => void;
     onRemove: () => void;
+    style?: CSSProperties;
 }
 declare const RestaurantPriceLevelChip: FunctionComponent<RestaurantPriceLevelChipProps>;
 
@@ -122,6 +128,7 @@ interface TransformedQueryChipProps {
     value: string;
     onChange: (nextValue: string) => void;
     onRemove: () => void;
+    style?: CSSProperties;
 }
 declare const TransformedQueryChip: FunctionComponent<TransformedQueryChipProps>;
 
@@ -303,4 +310,4 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
     }) => void;
 };
 
-export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useMapFirst, useTranslation };
+export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, type SmartFilterStyles, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useMapFirst, useTranslation };

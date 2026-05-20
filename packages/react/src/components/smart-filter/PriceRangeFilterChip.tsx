@@ -61,6 +61,7 @@ interface PriceBoundaryChipProps {
   showAddWhenEmpty?: boolean;
   onCommit: (value?: number) => void;
   onRemove: () => void;
+  style?: CSSProperties;
 }
 
 const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
@@ -74,6 +75,7 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
   showAddWhenEmpty = false,
   onCommit,
   onRemove,
+  style,
 }) => {
   const [draft, setDraft] = useState<string>(
     value !== undefined ? String(value) : "",
@@ -153,7 +155,7 @@ const PriceBoundaryChip: FunctionComponent<PriceBoundaryChipProps> = ({
   };
 
   return (
-    <div style={chipStyles}>
+    <div style={{ ...chipStyles, ...style }}>
       <span
         style={{
           fontSize: "10px",
@@ -243,7 +245,8 @@ export const PriceRangeFilterChip: FunctionComponent<{
   currency: string;
   onChange: (range: PriceRangeValue) => void;
   onRemove: () => void;
-}> = ({ priceRange, currency, onChange, onRemove }) => {
+  style?: CSSProperties;
+}> = ({ priceRange, currency, onChange, onRemove, style }) => {
   const { t } = useTranslation();
 
   const minLabel = "Min";
@@ -294,6 +297,7 @@ export const PriceRangeFilterChip: FunctionComponent<{
         showRemoveButton={priceRange.min !== undefined && priceRange.min !== 0}
         onCommit={(value) => handleBoundaryCommit("min", value)}
         onRemove={onRemove}
+        style={style}
       />
       <PriceBoundaryChip
         label={maxChipLabel}
@@ -305,6 +309,7 @@ export const PriceRangeFilterChip: FunctionComponent<{
         showAddWhenEmpty
         onCommit={(value) => handleBoundaryCommit("max", value)}
         onRemove={onRemove}
+        style={style}
       />
     </>
   );

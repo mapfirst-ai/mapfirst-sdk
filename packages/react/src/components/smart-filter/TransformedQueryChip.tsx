@@ -55,11 +55,12 @@ export interface TransformedQueryChipProps {
   value: string;
   onChange: (nextValue: string) => void;
   onRemove: () => void;
+  style?: CSSProperties;
 }
 
 export const TransformedQueryChip: FunctionComponent<
   TransformedQueryChipProps
-> = ({ value, onChange, onRemove }) => {
+> = ({ value, onChange, onRemove, style }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [draft, setDraft] = useState(value);
   const [isEditing, setIsEditing] = useState(false);
@@ -106,7 +107,7 @@ export const TransformedQueryChip: FunctionComponent<
   };
 
   return (
-    <div style={chipStyles}>
+    <div style={{ ...chipStyles, ...style }}>
       <SearchIcon style={{ width: "16px", height: "16px", color: "#03852e" }} />
       {isEditing ? (
         <input

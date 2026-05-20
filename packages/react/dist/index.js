@@ -59,15 +59,15 @@ __export(index_exports, {
   useTranslation: () => useTranslation
 });
 module.exports = __toCommonJS(index_exports);
-var import_react9 = __toESM(require("react"));
+var import_react10 = __toESM(require("react"));
 var import_core = require("@mapfirst.ai/core");
 var import_core2 = require("@mapfirst.ai/core");
 
 // src/components/SmartFilter.tsx
-var import_react8 = require("react");
+var import_react9 = require("react");
 
 // src/components/smart-filter/FilterChips.tsx
-var import_react7 = __toESM(require("react"));
+var import_react8 = __toESM(require("react"));
 
 // src/components/smart-filter/CloseButton.tsx
 var import_react = __toESM(require("react"));
@@ -228,18 +228,27 @@ var Chip = ({ label, icon, remove, style }) => {
 };
 
 // src/components/smart-filter/MinRatingFilterChip.tsx
-var import_react3 = require("react");
+var import_react4 = require("react");
 
 // src/hooks/useTranslation.ts
-var import_react2 = require("react");
+var import_react3 = require("react");
+
+// src/context/TranslationContext.tsx
+var import_react2 = __toESM(require("react"));
+var import_jsx_runtime4 = require("react/jsx-runtime");
+var TranslationContext = import_react2.default.createContext(void 0);
+var TranslationProvider = ({ value, children }) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(TranslationContext.Provider, { value, children });
+var useCustomTranslationsContext = () => import_react2.default.useContext(TranslationContext);
+
+// src/hooks/useTranslation.ts
 var defaultTranslations = {
   "smartFilter.typingPrompt": "Search for hotels, restaurants, or attractions...",
   "smartFilter.nav.previous": "Previous filters",
   "smartFilter.nav.next": "Next filters",
   "smartFilter.toast.locationRequired": "Please select a location first",
   "smartFilter.clearAll": "Clear all",
-  "smartFilter.minRating.suffix": "+",
-  "smartFilter.minRating.label": "{{value}}+",
+  "smartFilter.minRating.suffix": "& up",
+  "smartFilter.minRating.label": "{{value}} & up",
   "smartFilter.minRating.remove": "Remove rating filter",
   "smartFilter.minRating.setTo": "Set rating to {{rating}}",
   "smartFilter.priceRange.label": "Price Range",
@@ -263,12 +272,14 @@ var formatCurrencyDefault = (value, currency = "USD") => {
   }).format(value);
 };
 var useTranslation = (customTranslations, customFormatCurrency) => {
-  const [locale, setLocale] = (0, import_react2.useState)("en");
-  const translations = (0, import_react2.useMemo)(
-    () => ({ ...defaultTranslations, ...customTranslations }),
-    [customTranslations]
+  const contextTranslations = useCustomTranslationsContext();
+  const merged = customTranslations != null ? customTranslations : contextTranslations;
+  const [locale, setLocale] = (0, import_react3.useState)("en");
+  const translations = (0, import_react3.useMemo)(
+    () => ({ ...defaultTranslations, ...merged }),
+    [merged]
   );
-  const t = (0, import_react2.useCallback)(
+  const t = (0, import_react3.useCallback)(
     (key, params) => {
       let translation = translations[key] || key;
       if (params) {
@@ -283,7 +294,7 @@ var useTranslation = (customTranslations, customFormatCurrency) => {
     },
     [translations]
   );
-  const formatCurrency = (0, import_react2.useCallback)(
+  const formatCurrency = (0, import_react3.useCallback)(
     (value, currency) => {
       if (customFormatCurrency) {
         return customFormatCurrency(value, currency);
@@ -301,7 +312,7 @@ var useTranslation = (customTranslations, customFormatCurrency) => {
 };
 
 // src/components/smart-filter/utils.tsx
-var import_jsx_runtime4 = require("react/jsx-runtime");
+var import_jsx_runtime5 = require("react/jsx-runtime");
 var STAR_BASE_STYLES = {
   display: "block",
   width: "12px",
@@ -333,19 +344,19 @@ var renderStars = (rating) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   for (let i = 0; i < fullStars; i += 1) {
-    stars.push(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: STAR_FULL_STYLES }, `full-${i}`));
+    stars.push(/* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: STAR_FULL_STYLES }, `full-${i}`));
   }
   if (hasHalfStar) {
-    stars.push(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: STAR_HALF_STYLES }, "half"));
+    stars.push(/* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: STAR_HALF_STYLES }, "half"));
   }
   const remainingStars = Math.max(0, 5 - Math.ceil(rating));
   for (let i = 0; i < remainingStars; i += 1) {
-    stars.push(/* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: STAR_BASE_STYLES }, `empty-${i}`));
+    stars.push(/* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: STAR_BASE_STYLES }, `empty-${i}`));
   }
   return stars;
 };
-var createMinRatingFilterLabel = (rating, suffix) => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { style: MIN_RATING_LABEL_STYLES, children: [
-  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { style: MIN_RATING_STARS_WRAPPER_STYLES, children: renderStars(rating) }),
+var createMinRatingFilterLabel = (rating, suffix) => /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { style: MIN_RATING_LABEL_STYLES, children: [
+  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: MIN_RATING_STARS_WRAPPER_STYLES, children: renderStars(rating) }),
   " ",
   suffix
 ] });
@@ -356,7 +367,7 @@ var createPriceRangeFilterLabel = (min, max, currency, formatCurrencyFn) => `${f
 )}`;
 
 // src/components/smart-filter/MinRatingFilterChip.tsx
-var import_jsx_runtime5 = require("react/jsx-runtime");
+var import_jsx_runtime6 = require("react/jsx-runtime");
 var chipContainerStyles = {
   position: "relative",
   backgroundColor: "white",
@@ -395,8 +406,8 @@ var buttonBaseStyles = {
   border: "none",
   padding: 0
 };
-var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
-  const [hoverRating, setHoverRating] = (0, import_react3.useState)(null);
+var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) => {
+  const [hoverRating, setHoverRating] = (0, import_react4.useState)(null);
   const { t } = useTranslation();
   const displayRating = hoverRating != null ? hoverRating : rating;
   const formatLabel = (value) => star && value ? value.toString() : t("smartFilter.minRating.label", { value: formatRatingValue(value) });
@@ -426,19 +437,19 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
       setHoverRating(null);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { style: chipContainerStyles, "data-min-rating-chip": true, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: { ...chipContainerStyles, ...style }, "data-min-rating-chip": true, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
       "div",
       {
         style: { display: "flex", alignItems: "center", gap: "4px" },
         onMouseLeave: () => setHoverRating(null),
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { style: starContainerStyles, children: Array.from({ length: 5 }).map((_, index) => {
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("div", { style: starContainerStyles, children: Array.from({ length: 5 }).map((_, index) => {
             const fillState = getFillForStar(index);
             const starNumber = index + 1;
             const halfValue = starNumber - 0.5;
             if (star) {
-              return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+              return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
                 "div",
                 {
                   style: {
@@ -447,7 +458,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                     height: "16px"
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
                       "svg",
                       {
                         viewBox: "0 0 24 24",
@@ -458,15 +469,15 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                         },
                         xmlns: "http://www.w3.org/2000/svg",
                         children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("defs", { children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("linearGradient", { id: `star-gradient-${index}`, children: [
-                            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("defs", { children: /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("linearGradient", { id: `star-gradient-${index}`, children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                               "stop",
                               {
                                 offset: fillState === "half" ? "50%" : "0%",
                                 stopColor: "#03852e"
                               }
                             ),
-                            /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                            /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                               "stop",
                               {
                                 offset: fillState === "half" ? "50%" : "0%",
@@ -474,7 +485,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                               }
                             )
                           ] }) }),
-                          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                             "path",
                             {
                               d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
@@ -486,7 +497,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                         ]
                       }
                     ),
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                       "button",
                       {
                         type: "button",
@@ -504,7 +515,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                         title: formatLabel(halfValue)
                       }
                     ),
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                       "button",
                       {
                         type: "button",
@@ -532,18 +543,18 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
               ...circleBaseStyles,
               background: "linear-gradient(90deg, #03852e 50%, transparent 50%)"
             };
-            return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+            return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(
               "div",
               {
                 style: { position: "relative", width: "12px", height: "12px" },
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                     "span",
                     {
                       style: fillState === "half" ? halfCircleStyles : circleStyles
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                     "button",
                     {
                       type: "button",
@@ -563,7 +574,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
                       title: formatLabel(halfValue)
                     }
                   ),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
                     "button",
                     {
                       type: "button",
@@ -588,17 +599,17 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false }) => {
               index
             );
           }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { whiteSpace: "nowrap" }, children: formatLabel(displayRating) })
+          /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { whiteSpace: "nowrap" }, children: formatLabel(displayRating) })
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(CloseButton, { onClick: onRemove })
+    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(CloseButton, { onClick: onRemove })
   ] });
 };
 
 // src/components/smart-filter/PriceRangeFilterChip.tsx
-var import_react4 = require("react");
-var import_jsx_runtime6 = require("react/jsx-runtime");
+var import_react5 = require("react");
+var import_jsx_runtime7 = require("react/jsx-runtime");
 var chipStyles2 = {
   position: "relative",
   backgroundColor: "white",
@@ -645,15 +656,16 @@ var PriceBoundaryChip = ({
   editLabel,
   showAddWhenEmpty = false,
   onCommit,
-  onRemove
+  onRemove,
+  style
 }) => {
-  const [draft, setDraft] = (0, import_react4.useState)(
+  const [draft, setDraft] = (0, import_react5.useState)(
     value !== void 0 ? String(value) : ""
   );
-  const [isEditing, setIsEditing] = (0, import_react4.useState)(false);
-  const [editHover, setEditHover] = (0, import_react4.useState)(false);
+  const [isEditing, setIsEditing] = (0, import_react5.useState)(false);
+  const [editHover, setEditHover] = (0, import_react5.useState)(false);
   const hasValue = value !== void 0;
-  (0, import_react4.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     setDraft(value !== void 0 ? String(value) : "");
     setIsEditing(false);
   }, [value]);
@@ -705,8 +717,8 @@ var PriceBoundaryChip = ({
       event.preventDefault();
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)("div", { style: chipStyles2, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { ...chipStyles2, ...style }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "span",
       {
         style: {
@@ -718,7 +730,7 @@ var PriceBoundaryChip = ({
         children: label
       }
     ),
-    isEditing ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    isEditing ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "input",
       {
         value: draft,
@@ -735,13 +747,13 @@ var PriceBoundaryChip = ({
         style: inputStyles,
         autoFocus: true
       }
-    ) : hasValue ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    ) : hasValue ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "span",
       {
         style: { fontSize: "16px", fontWeight: 600, textAlign: "center" },
         children: value
       }
-    ) : showAddWhenEmpty ? /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    ) : showAddWhenEmpty ? /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "button",
       {
         type: "button",
@@ -757,8 +769,8 @@ var PriceBoundaryChip = ({
         "aria-label": editLabel,
         children: "+"
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime6.jsx)("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
-    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    ) : /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
+    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "span",
       {
         style: {
@@ -770,7 +782,7 @@ var PriceBoundaryChip = ({
         children: currency
       }
     ),
-    !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       "button",
       {
         type: "button",
@@ -783,13 +795,13 @@ var PriceBoundaryChip = ({
         onClick: () => setIsEditing(true),
         onMouseEnter: () => setEditHover(true),
         onMouseLeave: () => setEditHover(false),
-        children: /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(EditIcon, {})
+        children: /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(EditIcon, {})
       }
     ),
-    showRemoveButton && /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(CloseButton, { onClick: onRemove })
+    showRemoveButton && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(CloseButton, { onClick: onRemove })
   ] });
 };
-var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove }) => {
+var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove, style }) => {
   const { t } = useTranslation();
   const minLabel = "Min";
   const maxChipLabel = "Max";
@@ -814,8 +826,8 @@ var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove }) => {
       onChange(nextRange);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsxs)(import_jsx_runtime6.Fragment, { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(import_jsx_runtime7.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       PriceBoundaryChip,
       {
         label: minLabel,
@@ -824,10 +836,11 @@ var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove }) => {
         editLabel,
         showRemoveButton: priceRange.min !== void 0 && priceRange.min !== 0,
         onCommit: (value) => handleBoundaryCommit("min", value),
-        onRemove
+        onRemove,
+        style
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
       PriceBoundaryChip,
       {
         label: maxChipLabel,
@@ -838,14 +851,15 @@ var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove }) => {
         editLabel,
         showAddWhenEmpty: true,
         onCommit: (value) => handleBoundaryCommit("max", value),
-        onRemove
+        onRemove,
+        style
       }
     )
   ] });
 };
 
 // src/components/smart-filter/RestaurantPriceLevelChip.tsx
-var import_jsx_runtime7 = require("react/jsx-runtime");
+var import_jsx_runtime8 = require("react/jsx-runtime");
 var chipStyles3 = {
   position: "relative",
   backgroundColor: "white",
@@ -866,7 +880,7 @@ var PRICE_LEVEL_OPTIONS = [
   { value: "Mid Range", key: "midRange" },
   { value: "Fine Dining", key: "fineDining" }
 ];
-var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
+var RestaurantPriceLevelChip = ({ values, onChange, onRemove, style }) => {
   const { t } = useTranslation();
   const label = t("smartFilter.restaurantPriceLevel.label");
   const removeLabel = t("smartFilter.restaurantPriceLevel.remove");
@@ -885,8 +899,8 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
     ).map((option) => option.value);
     onChange(orderedSelection);
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: chipStyles3, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { ...chipStyles3, ...style }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
       "div",
       {
         style: {
@@ -896,7 +910,7 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
           flexWrap: "wrap"
         },
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
             "span",
             {
               style: {
@@ -908,13 +922,13 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
               children: label
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { style: { display: "flex", gap: "12px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: { display: "flex", gap: "12px" }, children: [
             PRICE_LEVEL_OPTIONS.map((option) => {
               const optionLabel = t(
                 `smartFilter.restaurantPriceLevel.options.${option.key}`
               );
               const checkboxId = `price-level-${option.key}`;
-              return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)(
+              return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)(
                 "label",
                 {
                   htmlFor: checkboxId,
@@ -926,7 +940,7 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
                     cursor: "pointer"
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
                       "input",
                       {
                         id: checkboxId,
@@ -937,24 +951,24 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove }) => {
                         style: { accentColor: "#03852e", cursor: "pointer" }
                       }
                     ),
-                    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { children: optionLabel })
+                    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { children: optionLabel })
                   ]
                 },
                 option.value
               );
             }),
-            values.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime7.jsx)("span", { style: { fontSize: "12px", color: "#737373" }, children: noneSelectedLabel })
+            values.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "12px", color: "#737373" }, children: noneSelectedLabel })
           ] })
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(CloseButton, { onClick: onRemove })
+    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(CloseButton, { onClick: onRemove })
   ] });
 };
 
 // src/components/smart-filter/TransformedQueryChip.tsx
-var import_react5 = require("react");
-var import_jsx_runtime8 = require("react/jsx-runtime");
+var import_react6 = require("react");
+var import_jsx_runtime9 = require("react/jsx-runtime");
 var chipStyles4 = {
   position: "relative",
   backgroundColor: "white",
@@ -992,15 +1006,15 @@ var editButtonStyles2 = {
   alignItems: "center",
   justifyContent: "center"
 };
-var TransformedQueryChip = ({ value, onChange, onRemove }) => {
-  const inputRef = (0, import_react5.useRef)(null);
-  const [draft, setDraft] = (0, import_react5.useState)(value);
-  const [isEditing, setIsEditing] = (0, import_react5.useState)(false);
-  const [editHover, setEditHover] = (0, import_react5.useState)(false);
+var TransformedQueryChip = ({ value, onChange, onRemove, style }) => {
+  const inputRef = (0, import_react6.useRef)(null);
+  const [draft, setDraft] = (0, import_react6.useState)(value);
+  const [isEditing, setIsEditing] = (0, import_react6.useState)(false);
+  const [editHover, setEditHover] = (0, import_react6.useState)(false);
   const { t } = useTranslation();
   const removeLabel = t("smartFilter.transformedQuery.remove");
   const editLabel = t("smartFilter.transformedQuery.edit");
-  (0, import_react5.useEffect)(() => {
+  (0, import_react6.useEffect)(() => {
     setDraft(value);
     setIsEditing(false);
   }, [value]);
@@ -1031,9 +1045,9 @@ var TransformedQueryChip = ({ value, onChange, onRemove }) => {
       return;
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime8.jsxs)("div", { style: chipStyles4, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SearchIcon, { style: { width: "16px", height: "16px", color: "#03852e" } }),
-    isEditing ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { style: { ...chipStyles4, ...style }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(SearchIcon, { style: { width: "16px", height: "16px", color: "#03852e" } }),
+    isEditing ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "input",
       {
         ref: inputRef,
@@ -1048,8 +1062,8 @@ var TransformedQueryChip = ({ value, onChange, onRemove }) => {
         style: inputStyles2,
         autoFocus: true
       }
-    ) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)("span", { style: { fontSize: "16px" }, children: value }),
-    !isEditing && /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(
+    ) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("span", { style: { fontSize: "16px" }, children: value }),
+    !isEditing && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
       "button",
       {
         type: "button",
@@ -1062,20 +1076,20 @@ var TransformedQueryChip = ({ value, onChange, onRemove }) => {
         onClick: () => setIsEditing(true),
         onMouseEnter: () => setEditHover(true),
         onMouseLeave: () => setEditHover(false),
-        children: /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(EditIcon, {})
+        children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(EditIcon, {})
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(CloseButton, { onClick: onRemove })
+    /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(CloseButton, { onClick: onRemove })
   ] });
 };
 
 // src/hooks/useFilterScroll.ts
-var import_react6 = require("react");
+var import_react7 = require("react");
 var useFilterScroll = (dependency) => {
-  const scrollerRef = (0, import_react6.useRef)(null);
-  const [atStart, setAtStart] = (0, import_react6.useState)(true);
-  const [atEnd, setAtEnd] = (0, import_react6.useState)(true);
-  const updateScrollButtons = (0, import_react6.useCallback)(() => {
+  const scrollerRef = (0, import_react7.useRef)(null);
+  const [atStart, setAtStart] = (0, import_react7.useState)(true);
+  const [atEnd, setAtEnd] = (0, import_react7.useState)(true);
+  const updateScrollButtons = (0, import_react7.useCallback)(() => {
     const el = scrollerRef.current;
     if (!el) {
       setAtStart(true);
@@ -1086,7 +1100,7 @@ var useFilterScroll = (dependency) => {
     setAtStart(scrollLeft <= 0);
     setAtEnd(scrollLeft + clientWidth >= scrollWidth - 1);
   }, []);
-  (0, import_react6.useEffect)(() => {
+  (0, import_react7.useEffect)(() => {
     const el = scrollerRef.current;
     updateScrollButtons();
     if (!el) {
@@ -1100,7 +1114,7 @@ var useFilterScroll = (dependency) => {
       window.removeEventListener("resize", updateScrollButtons);
     };
   }, [dependency, updateScrollButtons]);
-  const scrollByDir = (0, import_react6.useCallback)((dir) => {
+  const scrollByDir = (0, import_react7.useCallback)((dir) => {
     const el = scrollerRef.current;
     if (!el) {
       return;
@@ -1120,7 +1134,7 @@ var useFilterScroll = (dependency) => {
 };
 
 // src/components/smart-filter/FilterChips.tsx
-var import_jsx_runtime9 = require("react/jsx-runtime");
+var import_jsx_runtime10 = require("react/jsx-runtime");
 var containerStyles = {
   position: "relative",
   width: "100%"
@@ -1166,20 +1180,22 @@ var FilterChips = ({
   formatCurrency: _formatCurrency,
   onFilterChange,
   onResetFilters: _onResetFilters,
-  onClearAll
+  onClearAll,
+  beforeContent,
+  styles
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
     filters.length
   );
-  const [navHover, setNavHover] = import_react7.default.useState(null);
-  const [clearHover, setClearHover] = import_react7.default.useState(false);
-  const removeFilter = import_react7.default.useCallback(
+  const [navHover, setNavHover] = import_react8.default.useState(null);
+  const [clearHover, setClearHover] = import_react8.default.useState(false);
+  const removeFilter = import_react8.default.useCallback(
     (filterId) => {
       void onFilterChange(filters.filter((f) => f.id !== filterId));
     },
     [filters, onFilterChange]
   );
-  const patchFilter = import_react7.default.useCallback(
+  const patchFilter = import_react8.default.useCallback(
     (filterId, patch) => {
       const nextFilters = filters.map(
         (f) => f.id === filterId ? { ...f, ...patch } : f
@@ -1188,30 +1204,33 @@ var FilterChips = ({
     },
     [filters, onFilterChange]
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("div", { style: containerStyles, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { style: containerStyles, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(
       "div",
       {
         ref: scrollerRef,
         style: {
           ...scrollContainerBase,
           padding: "8px",
-          WebkitOverflowScrolling: "touch"
+          WebkitOverflowScrolling: "touch",
+          ...styles == null ? void 0 : styles.scrollContainer
         },
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("style", { children: `
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("style", { children: `
             div::-webkit-scrollbar {
               display: none;
             }
           ` }),
+          beforeContent,
           filters.map((filter) => {
             var _a, _b;
-            const renderStandardChip = () => /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+            const renderStandardChip = () => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
               Chip,
               {
                 label: filter.label,
                 icon: filter.icon,
-                remove: () => removeFilter(filter.id)
+                remove: () => removeFilter(filter.id),
+                style: styles == null ? void 0 : styles.chip
               },
               filter.id
             );
@@ -1220,7 +1239,7 @@ var FilterChips = ({
               if (!Number.isFinite(currentRating)) {
                 return renderStandardChip();
               }
-              return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                 MinRatingFilterChip,
                 {
                   star: filter.type === "starRating",
@@ -1231,13 +1250,14 @@ var FilterChips = ({
                       value: String(nextRating)
                     });
                   },
-                  onRemove: () => removeFilter(filter.id)
+                  onRemove: () => removeFilter(filter.id),
+                  style: styles == null ? void 0 : styles.minRatingChip
                 },
                 filter.id
               );
             }
             if (filter.type === "priceRange" && filter.priceRange) {
-              return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                 PriceRangeFilterChip,
                 {
                   priceRange: filter.priceRange,
@@ -1245,40 +1265,43 @@ var FilterChips = ({
                   onChange: (nextRange) => {
                     patchFilter(filter.id, { priceRange: nextRange });
                   },
-                  onRemove: () => removeFilter(filter.id)
+                  onRemove: () => removeFilter(filter.id),
+                  style: styles == null ? void 0 : styles.priceRangeChip
                 },
                 filter.id
               );
             }
             if (filter.type === "transformed_query") {
-              return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                 TransformedQueryChip,
                 {
                   value: filter.value,
                   onChange: (nextValue) => {
                     patchFilter(filter.id, { value: nextValue });
                   },
-                  onRemove: () => removeFilter(filter.id)
+                  onRemove: () => removeFilter(filter.id),
+                  style: styles == null ? void 0 : styles.transformedQueryChip
                 },
                 filter.id
               );
             }
             if (filter.type === "selected_restaurant_price_levels") {
-              return /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+              return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
                 RestaurantPriceLevelChip,
                 {
                   values: (_b = filter.priceLevels) != null ? _b : [],
                   onChange: (nextLevels) => {
                     patchFilter(filter.id, { priceLevels: nextLevels });
                   },
-                  onRemove: () => removeFilter(filter.id)
+                  onRemove: () => removeFilter(filter.id),
+                  style: styles == null ? void 0 : styles.restaurantPriceLevelChip
                 },
                 filter.id
               );
             }
             return renderStandardChip();
           }),
-          /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
             "button",
             {
               style: {
@@ -1290,7 +1313,8 @@ var FilterChips = ({
                 userSelect: "none",
                 backgroundColor: clearHover ? "#e5e5e5" : "transparent",
                 color: "black",
-                border: "none"
+                border: "none",
+                ...styles == null ? void 0 : styles.clearAllButton
               },
               onClick: onClearAll,
               onMouseEnter: () => setClearHover(true),
@@ -1301,7 +1325,7 @@ var FilterChips = ({
         ]
       }
     ),
-    !atStart && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    !atStart && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "div",
       {
         "aria-hidden": "true",
@@ -1312,7 +1336,7 @@ var FilterChips = ({
         }
       }
     ),
-    !atEnd && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    !atEnd && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "div",
       {
         "aria-hidden": "true",
@@ -1323,7 +1347,7 @@ var FilterChips = ({
         }
       }
     ),
-    !atStart && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    !atStart && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
         type: "button",
@@ -1332,15 +1356,16 @@ var FilterChips = ({
           ...navButtonStyles,
           left: "4px",
           transform: "translateY(-50%) rotate(180deg)",
-          backgroundColor: navHover === "prev" ? "#e5e5e5" : "white"
+          backgroundColor: navHover === "prev" ? "#e5e5e5" : "white",
+          ...styles == null ? void 0 : styles.navButton
         },
         onClick: () => scrollByDir("prev"),
         onMouseEnter: () => setNavHover("prev"),
         onMouseLeave: () => setNavHover(null),
-        children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(NextIcon, { style: { width: "20px", height: "20px" } })
+        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(NextIcon, { style: { width: "20px", height: "20px" } })
       }
     ),
-    !atEnd && /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
+    !atEnd && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       "button",
       {
         type: "button",
@@ -1348,19 +1373,20 @@ var FilterChips = ({
         style: {
           ...navButtonStyles,
           right: "4px",
-          backgroundColor: navHover === "next" ? "#e5e5e5" : "white"
+          backgroundColor: navHover === "next" ? "#e5e5e5" : "white",
+          ...styles == null ? void 0 : styles.navButton
         },
         onClick: () => scrollByDir("next"),
         onMouseEnter: () => setNavHover("next"),
         onMouseLeave: () => setNavHover(null),
-        children: /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(NextIcon, { style: { width: "20px", height: "20px" } })
+        children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(NextIcon, { style: { width: "20px", height: "20px" } })
       }
     )
   ] });
 };
 
 // src/components/SmartFilter.tsx
-var import_jsx_runtime10 = require("react/jsx-runtime");
+var import_jsx_runtime11 = require("react/jsx-runtime");
 var containerStyles2 = {
   position: "relative",
   display: "flex",
@@ -1374,6 +1400,8 @@ var SmartFilter = ({
   onFilterChange,
   customTranslations,
   currency = "USD",
+  beforeContent,
+  styles,
   containerStyle,
   style
 }) => {
@@ -1382,7 +1410,7 @@ var SmartFilter = ({
   const previousFiltersLabel = t("smartFilter.nav.previous");
   const nextFiltersLabel = t("smartFilter.nav.next");
   const clearAllLabel = t("smartFilter.clearAll");
-  const handleFilterChange = (0, import_react8.useCallback)(
+  const handleFilterChange = (0, import_react9.useCallback)(
     async (nextFilters, clearAll) => {
       if (isSearching) {
         return;
@@ -1395,25 +1423,38 @@ var SmartFilter = ({
     },
     [isSearching, onFilterChange]
   );
-  const resetFilters = (0, import_react8.useCallback)(() => {
+  const resetFilters = (0, import_react9.useCallback)(() => {
     void handleFilterChange([]);
   }, [handleFilterChange]);
-  const clearAllFilters = (0, import_react8.useCallback)(() => {
+  const clearAllFilters = (0, import_react9.useCallback)(() => {
     void handleFilterChange([], true);
   }, [handleFilterChange]);
-  return /* @__PURE__ */ (0, import_jsx_runtime10.jsx)("div", { style: { ...containerStyles2, ...containerStyle, ...style }, children: filters.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
-    FilterChips,
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(TranslationProvider, { value: customTranslations, children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+    "div",
     {
-      filters,
-      currency,
-      minRatingSuffix,
-      clearAllLabel,
-      previousFiltersLabel,
-      nextFiltersLabel,
-      formatCurrency,
-      onFilterChange: handleFilterChange,
-      onResetFilters: resetFilters,
-      onClearAll: clearAllFilters
+      style: {
+        ...containerStyles2,
+        ...styles == null ? void 0 : styles.container,
+        ...containerStyle,
+        ...style
+      },
+      children: filters.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+        FilterChips,
+        {
+          filters,
+          currency,
+          minRatingSuffix,
+          clearAllLabel,
+          previousFiltersLabel,
+          nextFiltersLabel,
+          formatCurrency,
+          onFilterChange: handleFilterChange,
+          onResetFilters: resetFilters,
+          onClearAll: clearAllFilters,
+          beforeContent,
+          styles
+        }
+      )
     }
   ) });
 };
@@ -1432,12 +1473,12 @@ function attachMapOnce(instanceRef, attachedRef, map, config) {
   attachedRef.current = true;
 }
 function useMapFirst(options) {
-  const optionsRef = import_react9.default.useRef(options);
-  import_react9.default.useEffect(() => {
+  const optionsRef = import_react10.default.useRef(options);
+  import_react10.default.useEffect(() => {
     optionsRef.current = options;
   });
-  const callbacksRef = import_react9.default.useRef({});
-  const instanceRef = import_react9.default.useRef(null);
+  const callbacksRef = import_react10.default.useRef({});
+  const instanceRef = import_react10.default.useRef(null);
   if (instanceRef.current === null) {
     instanceRef.current = new import_core.MapFirstCore({
       adapter: null,
@@ -1445,10 +1486,10 @@ function useMapFirst(options) {
       callbacks: callbacksRef.current
     });
   }
-  const [state, setState] = import_react9.default.useState(
+  const [state, setState] = import_react10.default.useState(
     () => instanceRef.current.getState()
   );
-  import_react9.default.useEffect(() => {
+  import_react10.default.useEffect(() => {
     if (!instanceRef.current) {
       callbacksRef.current = {};
       instanceRef.current = new import_core.MapFirstCore({
@@ -1527,17 +1568,17 @@ function useMapFirst(options) {
       instanceRef.current = null;
     };
   }, []);
-  const setPrimaryType = import_react9.default.useCallback((type) => {
+  const setPrimaryType = import_react10.default.useCallback((type) => {
     if (instanceRef.current) {
       instanceRef.current.setPrimaryType(type);
     }
   }, []);
-  const setSelectedMarker = import_react9.default.useCallback((id) => {
+  const setSelectedMarker = import_react10.default.useCallback((id) => {
     if (instanceRef.current) {
       instanceRef.current.setSelectedMarker(id);
     }
   }, []);
-  const setUseApi = import_react9.default.useCallback(
+  const setUseApi = import_react10.default.useCallback(
     (useApi, autoLoad = true) => {
       if (instanceRef.current) {
         instanceRef.current.setUseApi(useApi, autoLoad);
@@ -1545,7 +1586,7 @@ function useMapFirst(options) {
     },
     []
   );
-  const propertiesSearch = import_react9.default.useCallback(
+  const propertiesSearch = import_react10.default.useCallback(
     async (options2) => {
       if (!instanceRef.current) {
         throw new Error("MapFirst instance not available");
@@ -1554,7 +1595,7 @@ function useMapFirst(options) {
     },
     []
   );
-  const smartFilterSearch = import_react9.default.useCallback(
+  const smartFilterSearch = import_react10.default.useCallback(
     async (options2) => {
       if (!instanceRef.current) {
         throw new Error("MapFirst instance not available");
@@ -1563,14 +1604,14 @@ function useMapFirst(options) {
     },
     []
   );
-  const boundsSearch = import_react9.default.useCallback(async () => {
+  const boundsSearch = import_react10.default.useCallback(async () => {
     if (!instanceRef.current) {
       return null;
     }
     return await instanceRef.current.performBoundsSearch();
   }, []);
-  const mapLibreAttachedRef = import_react9.default.useRef(false);
-  const attachMapLibre = import_react9.default.useCallback(
+  const mapLibreAttachedRef = import_react10.default.useRef(false);
+  const attachMapLibre = import_react10.default.useCallback(
     (map, maplibregl, options2) => {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
         platform: "maplibre",
@@ -1581,8 +1622,8 @@ function useMapFirst(options) {
     },
     []
   );
-  const googleMapsAttachedRef = import_react9.default.useRef(false);
-  const attachGoogle = import_react9.default.useCallback(
+  const googleMapsAttachedRef = import_react10.default.useRef(false);
+  const attachGoogle = import_react10.default.useCallback(
     (map, google, options2) => {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
         platform: "google",
@@ -1593,8 +1634,8 @@ function useMapFirst(options) {
     },
     []
   );
-  const mapboxAttachedRef = import_react9.default.useRef(false);
-  const attachMapbox = import_react9.default.useCallback(
+  const mapboxAttachedRef = import_react10.default.useRef(false);
+  const attachMapbox = import_react10.default.useCallback(
     (map, mapboxgl, options2) => {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {
         platform: "mapbox",
@@ -1605,8 +1646,8 @@ function useMapFirst(options) {
     },
     []
   );
-  const leafletAttachedRef = import_react9.default.useRef(false);
-  const attachLeaflet = import_react9.default.useCallback(
+  const leafletAttachedRef = import_react10.default.useRef(false);
+  const attachLeaflet = import_react10.default.useCallback(
     (map, leaflet, options2) => {
       if (!instanceRef.current || !map || leafletAttachedRef.current) return;
       const adapter = new import_core.LeafletAdapter(map);

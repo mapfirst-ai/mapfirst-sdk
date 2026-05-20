@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { useCustomTranslationsContext } from "../context/TranslationContext";
 
 export type Locale = "en" | "es" | "de" | "fr" | "it" | "pt";
 
@@ -15,8 +16,8 @@ const defaultTranslations: Record<string, string> = {
   "smartFilter.nav.next": "Next filters",
   "smartFilter.toast.locationRequired": "Please select a location first",
   "smartFilter.clearAll": "Clear all",
-  "smartFilter.minRating.suffix": "+",
-  "smartFilter.minRating.label": "{{value}}+",
+  "smartFilter.minRating.suffix": "& up",
+  "smartFilter.minRating.label": "{{value}} & up",
   "smartFilter.minRating.remove": "Remove rating filter",
   "smartFilter.minRating.setTo": "Set rating to {{rating}}",
   "smartFilter.priceRange.label": "Price Range",
@@ -52,10 +53,13 @@ export const useTranslation = (
   customTranslations?: Record<string, string>,
   customFormatCurrency?: FormatCurrencyFunction
 ) => {
+  const contextTranslations = useCustomTranslationsContext();
+  // Explicit prop takes priority; fall back to context (provided by SmartFilter)
+  const merged = customTranslations ?? contextTranslations;
   const [locale, setLocale] = useState<Locale>("en");
   const translations = useMemo(
-    () => ({ ...defaultTranslations, ...customTranslations }),
-    [customTranslations]
+    () => ({ ...defaultTranslations, ...merged }),
+    [merged]
   );
 
   const t: TranslationFunction = useCallback(

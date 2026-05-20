@@ -29,11 +29,12 @@ export interface RestaurantPriceLevelChipProps {
   values: PriceLevel[];
   onChange: (values: PriceLevel[]) => void;
   onRemove: () => void;
+  style?: CSSProperties;
 }
 
 export const RestaurantPriceLevelChip: FunctionComponent<
   RestaurantPriceLevelChipProps
-> = ({ values, onChange, onRemove }) => {
+> = ({ values, onChange, onRemove, style }) => {
   const { t } = useTranslation();
 
   const label = t("smartFilter.restaurantPriceLevel.label");
@@ -56,7 +57,7 @@ export const RestaurantPriceLevelChip: FunctionComponent<
   };
 
   return (
-    <div style={chipStyles}>
+    <div style={{ ...chipStyles, ...style }}>
       <div
         style={{
           display: "flex",

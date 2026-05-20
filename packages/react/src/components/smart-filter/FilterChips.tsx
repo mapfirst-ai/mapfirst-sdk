@@ -1,4 +1,4 @@
-import React, { FunctionComponent, CSSProperties } from "react";
+import React, { FunctionComponent, CSSProperties, ReactNode } from "react";
 import { Chip } from "./Chip";
 import { MinRatingFilterChip } from "./MinRatingFilterChip";
 import { PriceRangeFilterChip } from "./PriceRangeFilterChip";
@@ -7,6 +7,7 @@ import { TransformedQueryChip } from "./TransformedQueryChip";
 import { NextIcon } from "../Icons";
 import { useFilterScroll } from "../../hooks/useFilterScroll";
 import type { Filter } from "./types";
+import type { SmartFilterStyles } from "../SmartFilter";
 
 export interface FilterChipsProps {
   filters: Filter[];
@@ -22,6 +23,10 @@ export interface FilterChipsProps {
   ) => void | Promise<void>;
   onResetFilters: () => void;
   onClearAll: () => void;
+  /** Rendered as the first item in the scroll row, before any chips. */
+  beforeContent?: ReactNode;
+  /** Style overrides forwarded from SmartFilter. */
+  styles?: SmartFilterStyles;
 }
 
 const containerStyles: CSSProperties = {
@@ -74,6 +79,8 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   onFilterChange,
   onResetFilters: _onResetFilters,
   onClearAll,
+  beforeContent,
+  styles,
 }) => {
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
     filters.length,
@@ -104,6 +111,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
           ...scrollContainerBase,
           padding: "8px",
           WebkitOverflowScrolling: "touch",
+          ...styles?.scrollContainer,
         }}
       >
         <style>
@@ -113,6 +121,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             }
           `}
         </style>
+        {beforeContent}
         {filters.map((filter) => {
           const renderStandardChip = () => (
             <Chip
@@ -120,6 +129,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
               label={filter.label}
               icon={filter.icon}
               remove={() => removeFilter(filter.id)}
+              style={styles?.chip}
             />
           );
 
@@ -141,6 +151,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                   });
                 }}
                 onRemove={() => removeFilter(filter.id)}
+                style={styles?.minRatingChip}
               />
             );
           }
@@ -155,6 +166,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                   patchFilter(filter.id, { priceRange: nextRange });
                 }}
                 onRemove={() => removeFilter(filter.id)}
+                style={styles?.priceRangeChip}
               />
             );
           }
@@ -168,6 +180,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                   patchFilter(filter.id, { value: nextValue });
                 }}
                 onRemove={() => removeFilter(filter.id)}
+                style={styles?.transformedQueryChip}
               />
             );
           }
@@ -181,6 +194,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
                   patchFilter(filter.id, { priceLevels: nextLevels });
                 }}
                 onRemove={() => removeFilter(filter.id)}
+                style={styles?.restaurantPriceLevelChip}
               />
             );
           }
@@ -198,6 +212,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             backgroundColor: clearHover ? "#e5e5e5" : "transparent",
             color: "black",
             border: "none",
+            ...styles?.clearAllButton,
           }}
           onClick={onClearAll}
           onMouseEnter={() => setClearHover(true)}
@@ -238,6 +253,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             left: "4px",
             transform: "translateY(-50%) rotate(180deg)",
             backgroundColor: navHover === "prev" ? "#e5e5e5" : "white",
+            ...styles?.navButton,
           }}
           onClick={() => scrollByDir("prev")}
           onMouseEnter={() => setNavHover("prev")}
@@ -255,6 +271,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
             ...navButtonStyles,
             right: "4px",
             backgroundColor: navHover === "next" ? "#e5e5e5" : "white",
+            ...styles?.navButton,
           }}
           onClick={() => scrollByDir("next")}
           onMouseEnter={() => setNavHover("next")}

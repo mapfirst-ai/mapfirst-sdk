@@ -55,7 +55,8 @@ export const MinRatingFilterChip: FunctionComponent<{
   rating: number;
   onChange: (rating: number) => void;
   onRemove: () => void;
-}> = ({ rating, onChange, onRemove, star = false }) => {
+  style?: CSSProperties;
+}> = ({ rating, onChange, onRemove, star = false, style }) => {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const { t } = useTranslation();
 
@@ -100,7 +101,7 @@ export const MinRatingFilterChip: FunctionComponent<{
   };
 
   return (
-    <div style={chipContainerStyles} data-min-rating-chip>
+    <div style={{ ...chipContainerStyles, ...style }} data-min-rating-chip>
       <div
         style={{ display: "flex", alignItems: "center", gap: "4px" }}
         onMouseLeave={() => setHoverRating(null)}
