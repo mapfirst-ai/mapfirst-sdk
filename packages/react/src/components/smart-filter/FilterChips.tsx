@@ -202,6 +202,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
           return renderStandardChip();
         })}
         <button
+          className="mapfirst-clear-all-button"
           style={{
             flexShrink: 0,
             padding: "4px 16px",
