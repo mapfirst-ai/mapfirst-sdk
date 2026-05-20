@@ -7,18 +7,17 @@ export interface IconProps {
 
 export const SearchIcon: React.FC<IconProps> = ({ className, style }) => (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    aria-hidden="true"
+    fill="currentColor"
     className={className}
     style={{ width: "1em", height: "1em", ...style }}
   >
-    <circle cx="11" cy="11" r="8" />
-    <path d="m21 21-4.35-4.35" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M10.12 4.14a5.99 5.99 0 1 0 0 11.98 5.99 5.99 0 0 0 0-11.98m-7.49 5.99a7.49 7.49 0 1 1 13.299 4.728L21.37 20.3l-1.06 1.061-5.44-5.44A7.49 7.49 0 0 1 2.63 10.13"
+    />
   </svg>
 );
 
@@ -41,18 +40,16 @@ export const CloseIcon: React.FC<IconProps> = ({ className, style }) => (
 
 export const EditIcon: React.FC<IconProps> = ({ className, style }) => (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
     className={className}
     style={{ width: "1em", height: "1em", ...style }}
   >
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    <rect width="24" height="24" fill="none" />
+    <path
+      d="M.75,17.5A.751.751,0,0,1,0,16.75V12.569a.755.755,0,0,1,.22-.53L11.461.8a2.72,2.72,0,0,1,3.848,0L16.7,2.191a2.72,2.72,0,0,1,0,3.848L5.462,17.28a.747.747,0,0,1-.531.22ZM1.5,12.879V16h3.12l7.91-7.91L9.41,4.97ZM13.591,7.03l2.051-2.051a1.223,1.223,0,0,0,0-1.727L14.249,1.858a1.222,1.222,0,0,0-1.727,0L10.47,3.91Z"
+      transform="translate(3.25 3.25)"
+      fill="currentColor"
+    />
   </svg>
 );
 
