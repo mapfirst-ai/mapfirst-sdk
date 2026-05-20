@@ -79,7 +79,7 @@ export type PropertyAwardImage = { key: string; url: string };
 export type PropertyAward = {
   name: string;
   image: PropertyAwardImage;
-  type: "0" | "1";
+  type: string;
 };
 
 export type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";

@@ -66,7 +66,7 @@ type PropertyAwardImage = {
 type PropertyAward = {
     name: string;
     image: PropertyAwardImage;
-    type: "0" | "1";
+    type: string;
 };
 type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
 type PropertyUrls = {

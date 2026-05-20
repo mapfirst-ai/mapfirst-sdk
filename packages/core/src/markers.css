@@ -28,7 +28,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: transform 0.2s;
+  transition: scale 0.2s;
   transform-origin: center bottom;
 }
 
@@ -57,11 +57,11 @@
   background: #ffffff;
   border-color: #03852e;
   color: #03852e;
-  transform: scale(1.2);
+  scale: 1.2;
 }
 
 .mapfirst-marker-pill-active:hover {
-  transform: scale(1.2);
+  scale: 1.2;
 }
 
 /* Speech-bubble downward tail — only when showTail option is enabled */

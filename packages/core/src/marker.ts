@@ -491,7 +491,13 @@ export function createPrimaryMarkerElement(
         backLayer.innerHTML = AWARD_BACK_SVG;
 
         const colorDot = document.createElement("div");
-        colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${marker.awards[0].type}`;
+        const awardTypeVal = String(marker.awards[0].type ?? "");
+        const awardTypeKey =
+          awardTypeVal === "1" ||
+          awardTypeVal.toLowerCase().includes("best of the best")
+            ? "1"
+            : "0";
+        colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${awardTypeKey}`;
 
         const frontLayer = document.createElement("div");
         frontLayer.className = "mapfirst-marker-award-front";
