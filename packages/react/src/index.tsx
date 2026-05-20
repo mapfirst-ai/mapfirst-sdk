@@ -33,6 +33,7 @@ export type {
   MapStateCallbacks,
   MapStateUpdate,
   MapLibreNamespace,
+  LeafletNamespace,
   GoogleMapsNamespace,
   MapboxNamespace,
   Environment,
@@ -85,6 +86,10 @@ type SmartFilter = {
   type:
     | "amenity"
     | "hotelStyle"
+    | "features"
+    | "goodFor"
+    | "meals"
+    | "specialDiets"
     | "priceRange"
     | "minRating"
     | "starRating"

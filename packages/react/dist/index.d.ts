@@ -1,6 +1,6 @@
 import * as _mapfirst_ai_core from '@mapfirst.ai/core';
 import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, MarkerOptions, GoogleMapsNamespace, MapboxNamespace, LeafletNamespace } from '@mapfirst.ai/core';
-export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, LeafletAdapter, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, isWebGLSupported, processApiFilters } from '@mapfirst.ai/core';
+export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, LeafletAdapter, LeafletNamespace, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, isWebGLSupported, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
 import React__default, { CSSProperties, FunctionComponent, ReactNode } from 'react';
 
@@ -200,7 +200,7 @@ type InitialRequestBody = {
 type SmartFilter = {
     id: string;
     label: string;
-    type: "amenity" | "hotelStyle" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
+    type: "amenity" | "hotelStyle" | "features" | "goodFor" | "meals" | "specialDiets" | "priceRange" | "minRating" | "starRating" | "primary_type" | "transformed_query" | "selected_restaurant_price_levels";
     value: string;
     numericValue?: number;
     priceRange?: {
