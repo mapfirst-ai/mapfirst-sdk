@@ -5,7 +5,7 @@ export type Locale = "en" | "es" | "de" | "fr" | "it" | "pt";
 
 type TranslationFunction = (
   key: string,
-  params?: Record<string, any>
+  params?: Record<string, any>,
 ) => string;
 type FormatCurrencyFunction = (value: number, currency?: string) => string;
 
@@ -35,7 +35,7 @@ const defaultTranslations: Record<string, string> = {
 
 const formatCurrencyDefault: FormatCurrencyFunction = (
   value,
-  currency = "USD"
+  currency = "USD",
 ) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -51,7 +51,7 @@ const formatCurrencyDefault: FormatCurrencyFunction = (
  */
 export const useTranslation = (
   customTranslations?: Record<string, string>,
-  customFormatCurrency?: FormatCurrencyFunction
+  customFormatCurrency?: FormatCurrencyFunction,
 ) => {
   const contextTranslations = useCustomTranslationsContext();
   // Explicit prop takes priority; fall back to context (provided by SmartFilter)
@@ -59,7 +59,7 @@ export const useTranslation = (
   const [locale, setLocale] = useState<Locale>("en");
   const translations = useMemo(
     () => ({ ...defaultTranslations, ...merged }),
-    [merged]
+    [merged],
   );
 
   const t: TranslationFunction = useCallback(
@@ -70,14 +70,14 @@ export const useTranslation = (
         Object.keys(params).forEach((paramKey) => {
           translation = translation.replace(
             new RegExp(`{{${paramKey}}}`, "g"),
-            String(params[paramKey])
+            String(params[paramKey]),
           );
         });
       }
 
       return translation;
     },
-    [translations]
+    [translations],
   );
 
   const formatCurrency = useCallback(
@@ -87,7 +87,7 @@ export const useTranslation = (
       }
       return formatCurrencyDefault(value, currency);
     },
-    [customFormatCurrency]
+    [customFormatCurrency],
   );
 
   return {
