@@ -2,7 +2,23 @@ import * as _mapfirst_ai_core from '@mapfirst.ai/core';
 import { PropertyType, PriceLevel, BaseMapFirstOptions, MapFirstCore, MapState, Property, MapLibreNamespace, MarkerOptions, GoogleMapsNamespace, MapboxNamespace, LeafletNamespace } from '@mapfirst.ai/core';
 export { ActiveLocation, ApiFiltersResponse, BaseMapFirstOptions, Environment, FilterSchema, FilterState, GoogleMapsNamespace, LeafletAdapter, MapBounds, MapFirstCore, MapFirstOptions, MapLibreNamespace, MapState, MapStateCallbacks, MapStateUpdate, MapboxNamespace, Price, PriceLevel, PropertiesFetchError, Property, PropertyType, TripAdvisorImage, TripAdvisorImageResponse, ViewState, convertToApiFilters, fetchImages, fetchProperties, isWebGLSupported, processApiFilters } from '@mapfirst.ai/core';
 import * as React$1 from 'react';
-import React__default, { FunctionComponent, ReactNode, CSSProperties } from 'react';
+import React__default, { CSSProperties, FunctionComponent, ReactNode } from 'react';
+
+interface IconProps$1 {
+    className?: string;
+    style?: CSSProperties;
+}
+interface IconsContextValue {
+    CloseIcon: React__default.FC<IconProps$1>;
+    EditIcon: React__default.FC<IconProps$1>;
+    NextIcon: React__default.FC<IconProps$1>;
+    SearchIcon: React__default.FC<IconProps$1>;
+}
+declare const IconsProvider: React__default.FC<{
+    value?: Partial<IconsContextValue>;
+    children: React__default.ReactNode;
+}>;
+declare const useIcons: () => IconsContextValue;
 
 type Filter = {
     id: string;
@@ -55,6 +71,8 @@ interface SmartFilterProps {
     beforeContent?: ReactNode;
     /** Fine-grained style overrides for every visual part of the component. */
     styles?: SmartFilterStyles;
+    /** Custom icon components to replace the SDK defaults. */
+    customIcons?: Partial<IconsContextValue>;
     /** @deprecated Use `styles.container` instead. */
     style?: CSSProperties;
     /** @deprecated Use `styles.container` instead. */
@@ -310,4 +328,4 @@ declare function useMapFirst(options: BaseMapFirstOptions): {
     }) => void;
 };
 
-export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps, type Locale, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, type SmartFilterStyles, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useMapFirst, useTranslation };
+export { Chip, type ChipProps, CloseIcon, EditIcon, type Filter, FilterChips, type FilterChipsProps, type IconProps$1 as IconProps, type IconsContextValue, IconsProvider, type Locale, MinRatingFilterChip, NextIcon, PriceRangeFilterChip, type PriceRangeValue, RestaurantPriceLevelChip, type RestaurantPriceLevelChipProps, SearchIcon, SmartFilter$1 as SmartFilter, type SmartFilterProps, type SmartFilterStyles, StarIcon, TransformedQueryChip, type TransformedQueryChipProps, createMinRatingFilterLabel, createPriceRangeFilterLabel, formatRatingValue, renderStars, useFilterScroll, useIcons, useMapFirst, useTranslation };

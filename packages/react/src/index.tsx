@@ -58,6 +58,10 @@ export * from "./components";
 // Export all hooks
 export * from "./hooks";
 
+// Export icon context
+export { IconsProvider, useIcons } from "./context/IconsContext";
+export type { IconsContextValue, IconProps } from "./context/IconsContext";
+
 // Import additional types for search functionality
 type InitialRequestBody = {
   initial?: boolean;

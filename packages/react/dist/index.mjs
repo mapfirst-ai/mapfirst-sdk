@@ -1,5 +1,5 @@
 // src/index.tsx
-import React7 from "react";
+import React8 from "react";
 import {
   MapFirstCore,
   LeafletAdapter
@@ -21,29 +21,32 @@ import {
 } from "react";
 
 // src/components/smart-filter/FilterChips.tsx
-import React6 from "react";
+import React7 from "react";
 
 // src/components/smart-filter/CloseButton.tsx
+import React2 from "react";
+
+// src/context/IconsContext.tsx
 import React from "react";
 
 // src/components/Icons.tsx
 import { jsx, jsxs } from "react/jsx-runtime";
-var SearchIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
+var SearchIcon = ({ className, style }) => /* @__PURE__ */ jsx(
   "svg",
   {
-    xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
+    "aria-hidden": "true",
+    fill: "currentColor",
     className,
     style: { width: "1em", height: "1em", ...style },
-    children: [
-      /* @__PURE__ */ jsx("circle", { cx: "11", cy: "11", r: "8" }),
-      /* @__PURE__ */ jsx("path", { d: "m21 21-4.35-4.35" })
-    ]
+    children: /* @__PURE__ */ jsx(
+      "path",
+      {
+        fillRule: "evenodd",
+        clipRule: "evenodd",
+        d: "M10.12 4.14a5.99 5.99 0 1 0 0 11.98 5.99 5.99 0 0 0 0-11.98m-7.49 5.99a7.49 7.49 0 1 1 13.299 4.728L21.37 20.3l-1.06 1.061-5.44-5.44A7.49 7.49 0 0 1 2.63 10.13"
+      }
+    )
   }
 );
 var CloseIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
@@ -67,18 +70,19 @@ var CloseIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
 var EditIcon = ({ className, style }) => /* @__PURE__ */ jsxs(
   "svg",
   {
-    xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
     className,
     style: { width: "1em", height: "1em", ...style },
     children: [
-      /* @__PURE__ */ jsx("path", { d: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }),
-      /* @__PURE__ */ jsx("path", { d: "M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" })
+      /* @__PURE__ */ jsx("rect", { width: "24", height: "24", fill: "none" }),
+      /* @__PURE__ */ jsx(
+        "path",
+        {
+          d: "M.75,17.5A.751.751,0,0,1,0,16.75V12.569a.755.755,0,0,1,.22-.53L11.461.8a2.72,2.72,0,0,1,3.848,0L16.7,2.191a2.72,2.72,0,0,1,0,3.848L5.462,17.28a.747.747,0,0,1-.531.22ZM1.5,12.879V16h3.12l7.91-7.91L9.41,4.97ZM13.591,7.03l2.051-2.051a1.223,1.223,0,0,0,0-1.727L14.249,1.858a1.222,1.222,0,0,0-1.727,0L10.47,3.91Z",
+          transform: "translate(3.25 3.25)",
+          fill: "#141124"
+        }
+      )
     ]
   }
 );
@@ -117,8 +121,20 @@ var StarIcon = ({
   }
 );
 
-// src/components/smart-filter/CloseButton.tsx
+// src/context/IconsContext.tsx
 import { jsx as jsx2 } from "react/jsx-runtime";
+var defaultIcons = {
+  CloseIcon,
+  EditIcon,
+  NextIcon,
+  SearchIcon
+};
+var IconsContext = React.createContext(defaultIcons);
+var IconsProvider = ({ value, children }) => /* @__PURE__ */ jsx2(IconsContext.Provider, { value: value ? { ...defaultIcons, ...value } : defaultIcons, children });
+var useIcons = () => React.useContext(IconsContext);
+
+// src/components/smart-filter/CloseButton.tsx
+import { jsx as jsx3 } from "react/jsx-runtime";
 var closeButtonStyles = {
   position: "absolute",
   top: "-8px",
@@ -138,8 +154,9 @@ var iconStyles = {
   height: "17px"
 };
 var CloseButton = ({ onClick, style }) => {
-  const [isHovering, setIsHovering] = React.useState(false);
-  return /* @__PURE__ */ jsx2(
+  const [isHovering, setIsHovering] = React2.useState(false);
+  const { CloseIcon: CloseIcon2 } = useIcons();
+  return /* @__PURE__ */ jsx3(
     "button",
     {
       style: {
@@ -151,13 +168,13 @@ var CloseButton = ({ onClick, style }) => {
       onMouseEnter: () => setIsHovering(true),
       onMouseLeave: () => setIsHovering(false),
       "aria-label": "Remove filter",
-      children: /* @__PURE__ */ jsx2(CloseIcon, { style: iconStyles })
+      children: /* @__PURE__ */ jsx3(CloseIcon2, { style: iconStyles })
     }
   );
 };
 
 // src/components/smart-filter/Chip.tsx
-import { jsx as jsx3, jsxs as jsxs2 } from "react/jsx-runtime";
+import { jsx as jsx4, jsxs as jsxs2 } from "react/jsx-runtime";
 var chipStyles = {
   position: "relative",
   backgroundColor: "white",
@@ -175,9 +192,9 @@ var chipStyles = {
 };
 var Chip = ({ label, icon, remove, style }) => {
   return /* @__PURE__ */ jsxs2("div", { style: { ...chipStyles, ...style }, children: [
-    icon && /* @__PURE__ */ jsx3("span", { style: { display: "flex", alignItems: "center" }, children: icon }),
-    /* @__PURE__ */ jsx3("span", { style: { whiteSpace: "nowrap" }, children: label }),
-    /* @__PURE__ */ jsx3(CloseButton, { onClick: remove })
+    icon && /* @__PURE__ */ jsx4("span", { style: { display: "flex", alignItems: "center" }, children: icon }),
+    /* @__PURE__ */ jsx4("span", { style: { whiteSpace: "nowrap" }, children: label }),
+    /* @__PURE__ */ jsx4(CloseButton, { onClick: remove })
   ] });
 };
 
@@ -190,11 +207,11 @@ import {
 import { useCallback, useMemo, useState } from "react";
 
 // src/context/TranslationContext.tsx
-import React2 from "react";
-import { jsx as jsx4 } from "react/jsx-runtime";
-var TranslationContext = React2.createContext(void 0);
-var TranslationProvider = ({ value, children }) => /* @__PURE__ */ jsx4(TranslationContext.Provider, { value, children });
-var useCustomTranslationsContext = () => React2.useContext(TranslationContext);
+import React3 from "react";
+import { jsx as jsx5 } from "react/jsx-runtime";
+var TranslationContext = React3.createContext(void 0);
+var TranslationProvider = ({ value, children }) => /* @__PURE__ */ jsx5(TranslationContext.Provider, { value, children });
+var useCustomTranslationsContext = () => React3.useContext(TranslationContext);
 
 // src/hooks/useTranslation.ts
 var defaultTranslations = {
@@ -268,7 +285,7 @@ var useTranslation = (customTranslations, customFormatCurrency) => {
 };
 
 // src/components/smart-filter/utils.tsx
-import { jsx as jsx5, jsxs as jsxs3 } from "react/jsx-runtime";
+import { jsx as jsx6, jsxs as jsxs3 } from "react/jsx-runtime";
 var STAR_BASE_STYLES = {
   display: "block",
   width: "12px",
@@ -300,19 +317,19 @@ var renderStars = (rating) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   for (let i = 0; i < fullStars; i += 1) {
-    stars.push(/* @__PURE__ */ jsx5("span", { style: STAR_FULL_STYLES }, `full-${i}`));
+    stars.push(/* @__PURE__ */ jsx6("span", { style: STAR_FULL_STYLES }, `full-${i}`));
   }
   if (hasHalfStar) {
-    stars.push(/* @__PURE__ */ jsx5("span", { style: STAR_HALF_STYLES }, "half"));
+    stars.push(/* @__PURE__ */ jsx6("span", { style: STAR_HALF_STYLES }, "half"));
   }
   const remainingStars = Math.max(0, 5 - Math.ceil(rating));
   for (let i = 0; i < remainingStars; i += 1) {
-    stars.push(/* @__PURE__ */ jsx5("span", { style: STAR_BASE_STYLES }, `empty-${i}`));
+    stars.push(/* @__PURE__ */ jsx6("span", { style: STAR_BASE_STYLES }, `empty-${i}`));
   }
   return stars;
 };
 var createMinRatingFilterLabel = (rating, suffix) => /* @__PURE__ */ jsxs3("span", { style: MIN_RATING_LABEL_STYLES, children: [
-  /* @__PURE__ */ jsx5("span", { style: MIN_RATING_STARS_WRAPPER_STYLES, children: renderStars(rating) }),
+  /* @__PURE__ */ jsx6("span", { style: MIN_RATING_STARS_WRAPPER_STYLES, children: renderStars(rating) }),
   " ",
   suffix
 ] });
@@ -323,7 +340,7 @@ var createPriceRangeFilterLabel = (min, max, currency, formatCurrencyFn) => `${f
 )}`;
 
 // src/components/smart-filter/MinRatingFilterChip.tsx
-import { jsx as jsx6, jsxs as jsxs4 } from "react/jsx-runtime";
+import { jsx as jsx7, jsxs as jsxs4 } from "react/jsx-runtime";
 var chipContainerStyles = {
   position: "relative",
   backgroundColor: "white",
@@ -400,7 +417,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
         style: { display: "flex", alignItems: "center", gap: "4px" },
         onMouseLeave: () => setHoverRating(null),
         children: [
-          /* @__PURE__ */ jsx6("div", { style: starContainerStyles, children: Array.from({ length: 5 }).map((_, index) => {
+          /* @__PURE__ */ jsx7("div", { style: starContainerStyles, children: Array.from({ length: 5 }).map((_, index) => {
             const fillState = getFillForStar(index);
             const starNumber = index + 1;
             const halfValue = starNumber - 0.5;
@@ -425,15 +442,15 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
                         },
                         xmlns: "http://www.w3.org/2000/svg",
                         children: [
-                          /* @__PURE__ */ jsx6("defs", { children: /* @__PURE__ */ jsxs4("linearGradient", { id: `star-gradient-${index}`, children: [
-                            /* @__PURE__ */ jsx6(
+                          /* @__PURE__ */ jsx7("defs", { children: /* @__PURE__ */ jsxs4("linearGradient", { id: `star-gradient-${index}`, children: [
+                            /* @__PURE__ */ jsx7(
                               "stop",
                               {
                                 offset: fillState === "half" ? "50%" : "0%",
                                 stopColor: "#03852e"
                               }
                             ),
-                            /* @__PURE__ */ jsx6(
+                            /* @__PURE__ */ jsx7(
                               "stop",
                               {
                                 offset: fillState === "half" ? "50%" : "0%",
@@ -441,7 +458,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
                               }
                             )
                           ] }) }),
-                          /* @__PURE__ */ jsx6(
+                          /* @__PURE__ */ jsx7(
                             "path",
                             {
                               d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
@@ -453,7 +470,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
                         ]
                       }
                     ),
-                    /* @__PURE__ */ jsx6(
+                    /* @__PURE__ */ jsx7(
                       "button",
                       {
                         type: "button",
@@ -471,7 +488,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
                         title: formatLabel(halfValue)
                       }
                     ),
-                    /* @__PURE__ */ jsx6(
+                    /* @__PURE__ */ jsx7(
                       "button",
                       {
                         type: "button",
@@ -504,13 +521,13 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
               {
                 style: { position: "relative", width: "12px", height: "12px" },
                 children: [
-                  /* @__PURE__ */ jsx6(
+                  /* @__PURE__ */ jsx7(
                     "span",
                     {
                       style: fillState === "half" ? halfCircleStyles : circleStyles
                     }
                   ),
-                  /* @__PURE__ */ jsx6(
+                  /* @__PURE__ */ jsx7(
                     "button",
                     {
                       type: "button",
@@ -530,7 +547,7 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
                       title: formatLabel(halfValue)
                     }
                   ),
-                  /* @__PURE__ */ jsx6(
+                  /* @__PURE__ */ jsx7(
                     "button",
                     {
                       type: "button",
@@ -555,11 +572,11 @@ var MinRatingFilterChip = ({ rating, onChange, onRemove, star = false, style }) 
               index
             );
           }) }),
-          /* @__PURE__ */ jsx6("span", { style: { whiteSpace: "nowrap" }, children: formatLabel(displayRating) })
+          /* @__PURE__ */ jsx7("span", { style: { whiteSpace: "nowrap" }, children: formatLabel(displayRating) })
         ]
       }
     ),
-    /* @__PURE__ */ jsx6(CloseButton, { onClick: onRemove })
+    /* @__PURE__ */ jsx7(CloseButton, { onClick: onRemove })
   ] });
 };
 
@@ -568,7 +585,7 @@ import {
   useEffect,
   useState as useState3
 } from "react";
-import { Fragment, jsx as jsx7, jsxs as jsxs5 } from "react/jsx-runtime";
+import { Fragment, jsx as jsx8, jsxs as jsxs5 } from "react/jsx-runtime";
 var chipStyles2 = {
   position: "relative",
   backgroundColor: "white",
@@ -677,7 +694,7 @@ var PriceBoundaryChip = ({
     }
   };
   return /* @__PURE__ */ jsxs5("div", { style: { ...chipStyles2, ...style }, children: [
-    /* @__PURE__ */ jsx7(
+    /* @__PURE__ */ jsx8(
       "span",
       {
         style: {
@@ -689,7 +706,7 @@ var PriceBoundaryChip = ({
         children: label
       }
     ),
-    isEditing ? /* @__PURE__ */ jsx7(
+    isEditing ? /* @__PURE__ */ jsx8(
       "input",
       {
         value: draft,
@@ -706,13 +723,13 @@ var PriceBoundaryChip = ({
         style: inputStyles,
         autoFocus: true
       }
-    ) : hasValue ? /* @__PURE__ */ jsx7(
+    ) : hasValue ? /* @__PURE__ */ jsx8(
       "span",
       {
         style: { fontSize: "16px", fontWeight: 600, textAlign: "center" },
         children: value
       }
-    ) : showAddWhenEmpty ? /* @__PURE__ */ jsx7(
+    ) : showAddWhenEmpty ? /* @__PURE__ */ jsx8(
       "button",
       {
         type: "button",
@@ -728,8 +745,8 @@ var PriceBoundaryChip = ({
         "aria-label": editLabel,
         children: "+"
       }
-    ) : /* @__PURE__ */ jsx7("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
-    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ jsx7(
+    ) : /* @__PURE__ */ jsx8("span", { style: { fontSize: "16px", color: "#737373" }, children: "-" }),
+    (!showAddWhenEmpty || showAddWhenEmpty && isEditing) && /* @__PURE__ */ jsx8(
       "span",
       {
         style: {
@@ -741,7 +758,7 @@ var PriceBoundaryChip = ({
         children: currency
       }
     ),
-    !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ jsx7(
+    !isEditing && (!showAddWhenEmpty || hasValue) && /* @__PURE__ */ jsx8(
       "button",
       {
         type: "button",
@@ -754,10 +771,10 @@ var PriceBoundaryChip = ({
         onClick: () => setIsEditing(true),
         onMouseEnter: () => setEditHover(true),
         onMouseLeave: () => setEditHover(false),
-        children: /* @__PURE__ */ jsx7(EditIcon, {})
+        children: /* @__PURE__ */ jsx8(EditIcon, {})
       }
     ),
-    showRemoveButton && /* @__PURE__ */ jsx7(CloseButton, { onClick: onRemove })
+    showRemoveButton && /* @__PURE__ */ jsx8(CloseButton, { onClick: onRemove })
   ] });
 };
 var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove, style }) => {
@@ -786,7 +803,7 @@ var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove, style })
     }
   };
   return /* @__PURE__ */ jsxs5(Fragment, { children: [
-    /* @__PURE__ */ jsx7(
+    /* @__PURE__ */ jsx8(
       PriceBoundaryChip,
       {
         label: minLabel,
@@ -799,7 +816,7 @@ var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove, style })
         style
       }
     ),
-    /* @__PURE__ */ jsx7(
+    /* @__PURE__ */ jsx8(
       PriceBoundaryChip,
       {
         label: maxChipLabel,
@@ -818,7 +835,7 @@ var PriceRangeFilterChip = ({ priceRange, currency, onChange, onRemove, style })
 };
 
 // src/components/smart-filter/RestaurantPriceLevelChip.tsx
-import { jsx as jsx8, jsxs as jsxs6 } from "react/jsx-runtime";
+import { jsx as jsx9, jsxs as jsxs6 } from "react/jsx-runtime";
 var chipStyles3 = {
   position: "relative",
   backgroundColor: "white",
@@ -869,7 +886,7 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove, style }) => {
           flexWrap: "wrap"
         },
         children: [
-          /* @__PURE__ */ jsx8(
+          /* @__PURE__ */ jsx9(
             "span",
             {
               style: {
@@ -899,7 +916,7 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove, style }) => {
                     cursor: "pointer"
                   },
                   children: [
-                    /* @__PURE__ */ jsx8(
+                    /* @__PURE__ */ jsx9(
                       "input",
                       {
                         id: checkboxId,
@@ -910,18 +927,18 @@ var RestaurantPriceLevelChip = ({ values, onChange, onRemove, style }) => {
                         style: { accentColor: "#03852e", cursor: "pointer" }
                       }
                     ),
-                    /* @__PURE__ */ jsx8("span", { children: optionLabel })
+                    /* @__PURE__ */ jsx9("span", { children: optionLabel })
                   ]
                 },
                 option.value
               );
             }),
-            values.length === 0 && /* @__PURE__ */ jsx8("span", { style: { fontSize: "12px", color: "#737373" }, children: noneSelectedLabel })
+            values.length === 0 && /* @__PURE__ */ jsx9("span", { style: { fontSize: "12px", color: "#737373" }, children: noneSelectedLabel })
           ] })
         ]
       }
     ),
-    /* @__PURE__ */ jsx8(CloseButton, { onClick: onRemove })
+    /* @__PURE__ */ jsx9(CloseButton, { onClick: onRemove })
   ] });
 };
 
@@ -931,7 +948,7 @@ import {
   useRef,
   useState as useState4
 } from "react";
-import { jsx as jsx9, jsxs as jsxs7 } from "react/jsx-runtime";
+import { jsx as jsx10, jsxs as jsxs7 } from "react/jsx-runtime";
 var chipStyles4 = {
   position: "relative",
   backgroundColor: "white",
@@ -975,6 +992,7 @@ var TransformedQueryChip = ({ value, onChange, onRemove, style }) => {
   const [isEditing, setIsEditing] = useState4(false);
   const [editHover, setEditHover] = useState4(false);
   const { t } = useTranslation();
+  const { SearchIcon: SearchIcon2, EditIcon: EditIcon2 } = useIcons();
   const removeLabel = t("smartFilter.transformedQuery.remove");
   const editLabel = t("smartFilter.transformedQuery.edit");
   useEffect2(() => {
@@ -1009,8 +1027,8 @@ var TransformedQueryChip = ({ value, onChange, onRemove, style }) => {
     }
   };
   return /* @__PURE__ */ jsxs7("div", { style: { ...chipStyles4, ...style }, children: [
-    /* @__PURE__ */ jsx9(SearchIcon, { style: { width: "16px", height: "16px", color: "#03852e" } }),
-    isEditing ? /* @__PURE__ */ jsx9(
+    /* @__PURE__ */ jsx10(SearchIcon2, { style: { width: "16px", height: "16px", color: "#03852e" } }),
+    isEditing ? /* @__PURE__ */ jsx10(
       "input",
       {
         ref: inputRef,
@@ -1025,8 +1043,8 @@ var TransformedQueryChip = ({ value, onChange, onRemove, style }) => {
         style: inputStyles2,
         autoFocus: true
       }
-    ) : /* @__PURE__ */ jsx9("span", { style: { fontSize: "16px" }, children: value }),
-    !isEditing && /* @__PURE__ */ jsx9(
+    ) : /* @__PURE__ */ jsx10("span", { style: { fontSize: "16px" }, children: value }),
+    !isEditing && /* @__PURE__ */ jsx10(
       "button",
       {
         type: "button",
@@ -1039,10 +1057,10 @@ var TransformedQueryChip = ({ value, onChange, onRemove, style }) => {
         onClick: () => setIsEditing(true),
         onMouseEnter: () => setEditHover(true),
         onMouseLeave: () => setEditHover(false),
-        children: /* @__PURE__ */ jsx9(EditIcon, {})
+        children: /* @__PURE__ */ jsx10(EditIcon2, {})
       }
     ),
-    /* @__PURE__ */ jsx9(CloseButton, { onClick: onRemove })
+    /* @__PURE__ */ jsx10(CloseButton, { onClick: onRemove })
   ] });
 };
 
@@ -1097,7 +1115,7 @@ var useFilterScroll = (dependency) => {
 };
 
 // src/components/smart-filter/FilterChips.tsx
-import { jsx as jsx10, jsxs as jsxs8 } from "react/jsx-runtime";
+import { jsx as jsx11, jsxs as jsxs8 } from "react/jsx-runtime";
 var containerStyles = {
   position: "relative",
   width: "100%"
@@ -1150,15 +1168,16 @@ var FilterChips = ({
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
     filters.length
   );
-  const [navHover, setNavHover] = React6.useState(null);
-  const [clearHover, setClearHover] = React6.useState(false);
-  const removeFilter = React6.useCallback(
+  const { NextIcon: NextIcon2 } = useIcons();
+  const [navHover, setNavHover] = React7.useState(null);
+  const [clearHover, setClearHover] = React7.useState(false);
+  const removeFilter = React7.useCallback(
     (filterId) => {
       void onFilterChange(filters.filter((f) => f.id !== filterId));
     },
     [filters, onFilterChange]
   );
-  const patchFilter = React6.useCallback(
+  const patchFilter = React7.useCallback(
     (filterId, patch) => {
       const nextFilters = filters.map(
         (f) => f.id === filterId ? { ...f, ...patch } : f
@@ -1179,7 +1198,7 @@ var FilterChips = ({
           ...styles == null ? void 0 : styles.scrollContainer
         },
         children: [
-          /* @__PURE__ */ jsx10("style", { children: `
+          /* @__PURE__ */ jsx11("style", { children: `
             div::-webkit-scrollbar {
               display: none;
             }
@@ -1187,7 +1206,7 @@ var FilterChips = ({
           beforeContent,
           filters.map((filter) => {
             var _a, _b;
-            const renderStandardChip = () => /* @__PURE__ */ jsx10(
+            const renderStandardChip = () => /* @__PURE__ */ jsx11(
               Chip,
               {
                 label: filter.label,
@@ -1202,7 +1221,7 @@ var FilterChips = ({
               if (!Number.isFinite(currentRating)) {
                 return renderStandardChip();
               }
-              return /* @__PURE__ */ jsx10(
+              return /* @__PURE__ */ jsx11(
                 MinRatingFilterChip,
                 {
                   star: filter.type === "starRating",
@@ -1220,7 +1239,7 @@ var FilterChips = ({
               );
             }
             if (filter.type === "priceRange" && filter.priceRange) {
-              return /* @__PURE__ */ jsx10(
+              return /* @__PURE__ */ jsx11(
                 PriceRangeFilterChip,
                 {
                   priceRange: filter.priceRange,
@@ -1235,7 +1254,7 @@ var FilterChips = ({
               );
             }
             if (filter.type === "transformed_query") {
-              return /* @__PURE__ */ jsx10(
+              return /* @__PURE__ */ jsx11(
                 TransformedQueryChip,
                 {
                   value: filter.value,
@@ -1249,7 +1268,7 @@ var FilterChips = ({
               );
             }
             if (filter.type === "selected_restaurant_price_levels") {
-              return /* @__PURE__ */ jsx10(
+              return /* @__PURE__ */ jsx11(
                 RestaurantPriceLevelChip,
                 {
                   values: (_b = filter.priceLevels) != null ? _b : [],
@@ -1264,9 +1283,10 @@ var FilterChips = ({
             }
             return renderStandardChip();
           }),
-          /* @__PURE__ */ jsx10(
+          /* @__PURE__ */ jsx11(
             "button",
             {
+              className: "mapfirst-clear-all-button",
               style: {
                 flexShrink: 0,
                 padding: "4px 16px",
@@ -1288,7 +1308,7 @@ var FilterChips = ({
         ]
       }
     ),
-    !atStart && /* @__PURE__ */ jsx10(
+    !atStart && /* @__PURE__ */ jsx11(
       "div",
       {
         "aria-hidden": "true",
@@ -1299,7 +1319,7 @@ var FilterChips = ({
         }
       }
     ),
-    !atEnd && /* @__PURE__ */ jsx10(
+    !atEnd && /* @__PURE__ */ jsx11(
       "div",
       {
         "aria-hidden": "true",
@@ -1310,7 +1330,7 @@ var FilterChips = ({
         }
       }
     ),
-    !atStart && /* @__PURE__ */ jsx10(
+    !atStart && /* @__PURE__ */ jsx11(
       "button",
       {
         type: "button",
@@ -1325,10 +1345,10 @@ var FilterChips = ({
         onClick: () => scrollByDir("prev"),
         onMouseEnter: () => setNavHover("prev"),
         onMouseLeave: () => setNavHover(null),
-        children: /* @__PURE__ */ jsx10(NextIcon, { style: { width: "20px", height: "20px" } })
+        children: /* @__PURE__ */ jsx11(NextIcon2, { style: { width: "20px", height: "20px" } })
       }
     ),
-    !atEnd && /* @__PURE__ */ jsx10(
+    !atEnd && /* @__PURE__ */ jsx11(
       "button",
       {
         type: "button",
@@ -1342,14 +1362,14 @@ var FilterChips = ({
         onClick: () => scrollByDir("next"),
         onMouseEnter: () => setNavHover("next"),
         onMouseLeave: () => setNavHover(null),
-        children: /* @__PURE__ */ jsx10(NextIcon, { style: { width: "20px", height: "20px" } })
+        children: /* @__PURE__ */ jsx11(NextIcon2, { style: { width: "20px", height: "20px" } })
       }
     )
   ] });
 };
 
 // src/components/SmartFilter.tsx
-import { jsx as jsx11 } from "react/jsx-runtime";
+import { jsx as jsx12 } from "react/jsx-runtime";
 var containerStyles2 = {
   position: "relative",
   display: "flex",
@@ -1365,6 +1385,7 @@ var SmartFilter = ({
   currency = "USD",
   beforeContent,
   styles,
+  customIcons,
   containerStyle,
   style
 }) => {
@@ -1392,7 +1413,7 @@ var SmartFilter = ({
   const clearAllFilters = useCallback3(() => {
     void handleFilterChange([], true);
   }, [handleFilterChange]);
-  return /* @__PURE__ */ jsx11(TranslationProvider, { value: customTranslations, children: /* @__PURE__ */ jsx11(
+  return /* @__PURE__ */ jsx12(IconsProvider, { value: customIcons, children: /* @__PURE__ */ jsx12(TranslationProvider, { value: customTranslations, children: /* @__PURE__ */ jsx12(
     "div",
     {
       style: {
@@ -1401,7 +1422,7 @@ var SmartFilter = ({
         ...containerStyle,
         ...style
       },
-      children: filters.length > 0 && /* @__PURE__ */ jsx11(
+      children: filters.length > 0 && /* @__PURE__ */ jsx12(
         FilterChips,
         {
           filters,
@@ -1419,7 +1440,7 @@ var SmartFilter = ({
         }
       )
     }
-  ) });
+  ) }) });
 };
 
 // src/index.tsx
@@ -1436,12 +1457,12 @@ function attachMapOnce(instanceRef, attachedRef, map, config) {
   attachedRef.current = true;
 }
 function useMapFirst(options) {
-  const optionsRef = React7.useRef(options);
-  React7.useEffect(() => {
+  const optionsRef = React8.useRef(options);
+  React8.useEffect(() => {
     optionsRef.current = options;
   });
-  const callbacksRef = React7.useRef({});
-  const instanceRef = React7.useRef(null);
+  const callbacksRef = React8.useRef({});
+  const instanceRef = React8.useRef(null);
   if (instanceRef.current === null) {
     instanceRef.current = new MapFirstCore({
       adapter: null,
@@ -1449,10 +1470,10 @@ function useMapFirst(options) {
       callbacks: callbacksRef.current
     });
   }
-  const [state, setState] = React7.useState(
+  const [state, setState] = React8.useState(
     () => instanceRef.current.getState()
   );
-  React7.useEffect(() => {
+  React8.useEffect(() => {
     if (!instanceRef.current) {
       callbacksRef.current = {};
       instanceRef.current = new MapFirstCore({
@@ -1531,17 +1552,17 @@ function useMapFirst(options) {
       instanceRef.current = null;
     };
   }, []);
-  const setPrimaryType = React7.useCallback((type) => {
+  const setPrimaryType = React8.useCallback((type) => {
     if (instanceRef.current) {
       instanceRef.current.setPrimaryType(type);
     }
   }, []);
-  const setSelectedMarker = React7.useCallback((id) => {
+  const setSelectedMarker = React8.useCallback((id) => {
     if (instanceRef.current) {
       instanceRef.current.setSelectedMarker(id);
     }
   }, []);
-  const setUseApi = React7.useCallback(
+  const setUseApi = React8.useCallback(
     (useApi, autoLoad = true) => {
       if (instanceRef.current) {
         instanceRef.current.setUseApi(useApi, autoLoad);
@@ -1549,7 +1570,7 @@ function useMapFirst(options) {
     },
     []
   );
-  const propertiesSearch = React7.useCallback(
+  const propertiesSearch = React8.useCallback(
     async (options2) => {
       if (!instanceRef.current) {
         throw new Error("MapFirst instance not available");
@@ -1558,7 +1579,7 @@ function useMapFirst(options) {
     },
     []
   );
-  const smartFilterSearch = React7.useCallback(
+  const smartFilterSearch = React8.useCallback(
     async (options2) => {
       if (!instanceRef.current) {
         throw new Error("MapFirst instance not available");
@@ -1567,14 +1588,14 @@ function useMapFirst(options) {
     },
     []
   );
-  const boundsSearch = React7.useCallback(async () => {
+  const boundsSearch = React8.useCallback(async () => {
     if (!instanceRef.current) {
       return null;
     }
     return await instanceRef.current.performBoundsSearch();
   }, []);
-  const mapLibreAttachedRef = React7.useRef(false);
-  const attachMapLibre = React7.useCallback(
+  const mapLibreAttachedRef = React8.useRef(false);
+  const attachMapLibre = React8.useCallback(
     (map, maplibregl, options2) => {
       attachMapOnce(instanceRef, mapLibreAttachedRef, map, {
         platform: "maplibre",
@@ -1585,8 +1606,8 @@ function useMapFirst(options) {
     },
     []
   );
-  const googleMapsAttachedRef = React7.useRef(false);
-  const attachGoogle = React7.useCallback(
+  const googleMapsAttachedRef = React8.useRef(false);
+  const attachGoogle = React8.useCallback(
     (map, google, options2) => {
       attachMapOnce(instanceRef, googleMapsAttachedRef, map, {
         platform: "google",
@@ -1597,8 +1618,8 @@ function useMapFirst(options) {
     },
     []
   );
-  const mapboxAttachedRef = React7.useRef(false);
-  const attachMapbox = React7.useCallback(
+  const mapboxAttachedRef = React8.useRef(false);
+  const attachMapbox = React8.useCallback(
     (map, mapboxgl, options2) => {
       attachMapOnce(instanceRef, mapboxAttachedRef, map, {
         platform: "mapbox",
@@ -1609,8 +1630,8 @@ function useMapFirst(options) {
     },
     []
   );
-  const leafletAttachedRef = React7.useRef(false);
-  const attachLeaflet = React7.useCallback(
+  const leafletAttachedRef = React8.useRef(false);
+  const attachLeaflet = React8.useCallback(
     (map, leaflet, options2) => {
       if (!instanceRef.current || !map || leafletAttachedRef.current) return;
       const adapter = new LeafletAdapter(map);
@@ -1671,6 +1692,7 @@ export {
   CloseIcon,
   EditIcon,
   FilterChips,
+  IconsProvider,
   LeafletAdapter2 as LeafletAdapter,
   MapFirstCore2 as MapFirstCore,
   MinRatingFilterChip,
@@ -1692,6 +1714,7 @@ export {
   processApiFilters,
   renderStars,
   useFilterScroll,
+  useIcons,
   useMapFirst,
   useTranslation
 };

@@ -7,6 +7,7 @@ import {
 import { FilterChips } from "./smart-filter/FilterChips";
 import { useTranslation } from "../hooks/useTranslation";
 import { TranslationProvider } from "../context/TranslationContext";
+import { IconsProvider, type IconsContextValue } from "../context/IconsContext";
 import type { Filter } from "./smart-filter/types";
 
 /** Per-element style overrides for the SmartFilter component tree. */
@@ -45,6 +46,8 @@ export interface SmartFilterProps {
   beforeContent?: ReactNode;
   /** Fine-grained style overrides for every visual part of the component. */
   styles?: SmartFilterStyles;
+  /** Custom icon components to replace the SDK defaults. */
+  customIcons?: Partial<IconsContextValue>;
   /** @deprecated Use `styles.container` instead. */
   style?: CSSProperties;
   /** @deprecated Use `styles.container` instead. */
@@ -67,6 +70,7 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
   currency = "USD",
   beforeContent,
   styles,
+  customIcons,
   containerStyle,
   style,
 }) => {
@@ -100,6 +104,7 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
   }, [handleFilterChange]);
 
   return (
+    <IconsProvider value={customIcons}>
     <TranslationProvider value={customTranslations}>
       <div
         style={{
@@ -127,5 +132,6 @@ export const SmartFilter: FunctionComponent<SmartFilterProps> = ({
         )}
       </div>
     </TranslationProvider>
+    </IconsProvider>
   );
 };

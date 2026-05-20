@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { CloseIcon } from "../Icons";
+import { useIcons } from "../../context/IconsContext";
 
 export interface CloseButtonProps {
   onClick: () => void;
@@ -28,6 +28,7 @@ const iconStyles: CSSProperties = {
 
 export const CloseButton: React.FC<CloseButtonProps> = ({ onClick, style }) => {
   const [isHovering, setIsHovering] = React.useState(false);
+  const { CloseIcon } = useIcons();
 
   return (
     <button

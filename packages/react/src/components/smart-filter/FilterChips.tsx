@@ -4,8 +4,8 @@ import { MinRatingFilterChip } from "./MinRatingFilterChip";
 import { PriceRangeFilterChip } from "./PriceRangeFilterChip";
 import { RestaurantPriceLevelChip } from "./RestaurantPriceLevelChip";
 import { TransformedQueryChip } from "./TransformedQueryChip";
-import { NextIcon } from "../Icons";
 import { useFilterScroll } from "../../hooks/useFilterScroll";
+import { useIcons } from "../../context/IconsContext";
 import type { Filter } from "./types";
 import type { SmartFilterStyles } from "../SmartFilter";
 
@@ -85,6 +85,7 @@ export const FilterChips: FunctionComponent<FilterChipsProps> = ({
   const { scrollerRef, atStart, atEnd, scrollByDir } = useFilterScroll(
     filters.length,
   );
+  const { NextIcon } = useIcons();
   const [navHover, setNavHover] = React.useState<"prev" | "next" | null>(null);
   const [clearHover, setClearHover] = React.useState(false);
   const removeFilter = React.useCallback(

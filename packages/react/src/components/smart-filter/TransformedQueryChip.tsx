@@ -7,9 +7,9 @@ import React, {
   useState,
   CSSProperties,
 } from "react";
-import { EditIcon, SearchIcon } from "../Icons";
 import { CloseButton } from "./CloseButton";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useIcons } from "../../context/IconsContext";
 
 const chipStyles: CSSProperties = {
   position: "relative",
@@ -67,6 +67,7 @@ export const TransformedQueryChip: FunctionComponent<
   const [editHover, setEditHover] = useState(false);
   const { t } = useTranslation();
 
+  const { SearchIcon, EditIcon } = useIcons();
   const removeLabel = t("smartFilter.transformedQuery.remove");
   const editLabel = t("smartFilter.transformedQuery.edit");
 
