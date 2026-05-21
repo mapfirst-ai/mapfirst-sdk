@@ -78,8 +78,10 @@ export type PropertyAwardImage = { key: string; url: string };
 
 export type PropertyAward = {
   name: string;
+  geo: string;
   image: PropertyAwardImage;
-  type: string;
+  type: "Certificate of Excellence" | "Travelers' Choice";
+  year: number;
 };
 
 export type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";

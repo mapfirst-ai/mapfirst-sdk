@@ -422,6 +422,16 @@ export function createPrimaryMarkerElement(
   const isAccommodation = marker.type === "Accommodation";
   const hasPrice = marker.pricing?.offer?.displayPrice;
   const isPending = isAccommodation && !hasPrice;
+  const selectedAward = marker.awards?.length
+    ? [...marker.awards].sort((a, b) => {
+        if ((b.year ?? 0) !== (a.year ?? 0)) {
+          return (b.year ?? 0) - (a.year ?? 0);
+        }
+        const aIsCertificate = a.type === "Certificate of Excellence" ? 0 : 1;
+        const bIsCertificate = b.type === "Certificate of Excellence" ? 0 : 1;
+        return aIsCertificate - bIsCertificate;
+      })[0]
+    : undefined;
 
   // Rating
   const ratingLabel = (() => {
@@ -482,7 +492,7 @@ export function createPrimaryMarkerElement(
         badge.style.opacity = "0.2";
       }
 
-      if (marker.awards?.length && marker.awards[0].type) {
+      if (selectedAward?.type) {
         const awardContainer = document.createElement("div");
         awardContainer.className = "mapfirst-marker-award-container";
 
@@ -491,12 +501,8 @@ export function createPrimaryMarkerElement(
         backLayer.innerHTML = AWARD_BACK_SVG;
 
         const colorDot = document.createElement("div");
-        const awardTypeVal = String(marker.awards[0].type ?? "");
         const awardTypeKey =
-          awardTypeVal === "1" ||
-          awardTypeVal.toLowerCase().includes("best of the best")
-            ? "1"
-            : "0";
+          selectedAward.type === "Certificate of Excellence" ? "1" : "0";
         colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${awardTypeKey}`;
 
         const frontLayer = document.createElement("div");
