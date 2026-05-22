@@ -1785,8 +1785,12 @@ export class MapFirstCore {
       return null;
     }
 
-    // Build filter payload from smart filters if provided
-    let filterPayload = this.getFilters();
+    // Build filter payload from smart filters if provided.
+    // Strip primary_type from the base state — it should only enter the request
+    // body if explicitly included as a SmartFilter, not leaked from instance state.
+    const { primary_type: _basePrimaryType, ...baseFilterPayload } =
+      this.getFilters();
+    let filterPayload = baseFilterPayload as ReturnType<typeof this.getFilters>;
     const state = this.getState();
 
     if (filters && filters.length > 0) {
