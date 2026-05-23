@@ -502,7 +502,7 @@ export function createPrimaryMarkerElement(
 
         const colorDot = document.createElement("div");
         const awardTypeKey =
-          selectedAward.type === "Certificate of Excellence" ? "1" : "0";
+          selectedAward.type === "Certificate of Excellence" ? "0" : "1";
         colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${awardTypeKey}`;
 
         const frontLayer = document.createElement("div");
