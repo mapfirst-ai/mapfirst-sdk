@@ -2128,45 +2128,46 @@ var MapFirstCore = (() => {
       this.isMapAttached = false;
       this.stopLocationPermissionListener = null;
       this.locationWatchId = null;
-      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A;
+      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B;
       this.properties = [...(_a = options.properties) != null ? _a : []];
       this.primaryType = options.primaryType;
       this.selectedMarkerId = (_b = options.selectedMarkerId) != null ? _b : null;
       this.useApi = (_c = options.useApi) != null ? _c : true;
       this.environment = (_d = options.environment) != null ? _d : "prod";
       this.apiUrl = (_e = options.apiUrl) != null ? _e : API_URLS[this.environment];
+      this.streaming = (_f = options.streaming) != null ? _f : false;
       this.apiKey = options.apiKey;
       this.requestBody = options.requestBody;
       this.currentPlatform = options.platform;
-      this.includeUrls = (_f = options.include_urls) != null ? _f : false;
-      this.includeRankings = (_g = options.include_rankings) != null ? _g : false;
-      this.includePhoneNumbers = (_h = options.include_phone_numbers) != null ? _h : false;
-      this.includeAddress = (_i = options.include_address) != null ? _i : false;
-      this.includeOpeningHours = (_j = options.include_opening_hours) != null ? _j : false;
-      this.includeStarRating = (_k = options.include_star_rating) != null ? _k : false;
+      this.includeUrls = (_g = options.include_urls) != null ? _g : false;
+      this.includeRankings = (_h = options.include_rankings) != null ? _h : false;
+      this.includePhoneNumbers = (_i = options.include_phone_numbers) != null ? _i : false;
+      this.includeAddress = (_j = options.include_address) != null ? _j : false;
+      this.includeOpeningHours = (_k = options.include_opening_hours) != null ? _k : false;
+      this.includeStarRating = (_l = options.include_star_rating) != null ? _l : false;
       this.restrictLocationId = options.restrict_location_id;
       this.restrictBounds = options.restrict_bounds;
       this.chain = options.chain;
       this.assertPlatformSupportForNoApi(options.platform, "throw");
       const isGoogleMaps = isGoogleMapsOptions(options);
       this.fitBoundsPadding = {
-        top: (_m = (_l = options.fitBoundsPadding) == null ? void 0 : _l.top) != null ? _m : isGoogleMaps ? 0 : 50,
-        bottom: (_o = (_n = options.fitBoundsPadding) == null ? void 0 : _n.bottom) != null ? _o : isGoogleMaps ? 0 : 160,
-        left: (_q = (_p = options.fitBoundsPadding) == null ? void 0 : _p.left) != null ? _q : isGoogleMaps ? 0 : 50,
-        right: (_s = (_r = options.fitBoundsPadding) == null ? void 0 : _r.right) != null ? _s : isGoogleMaps ? 0 : 50
+        top: (_n = (_m = options.fitBoundsPadding) == null ? void 0 : _m.top) != null ? _n : isGoogleMaps ? 0 : 50,
+        bottom: (_p = (_o = options.fitBoundsPadding) == null ? void 0 : _o.bottom) != null ? _p : isGoogleMaps ? 0 : 160,
+        left: (_r = (_q = options.fitBoundsPadding) == null ? void 0 : _q.left) != null ? _r : isGoogleMaps ? 0 : 50,
+        right: (_t = (_s = options.fitBoundsPadding) == null ? void 0 : _s.right) != null ? _t : isGoogleMaps ? 0 : 50
       };
       const defaultDates = getDefaultDates();
       this.state = {
-        center: ((_t = options.initialLocationData) == null ? void 0 : _t.latitude) && options.initialLocationData.longitude ? [
+        center: ((_u = options.initialLocationData) == null ? void 0 : _u.latitude) && options.initialLocationData.longitude ? [
           options.initialLocationData.latitude,
           options.initialLocationData.longitude
         ] : [0, 0],
-        zoom: (_v = (_u = options.initialLocationData) == null ? void 0 : _u.zoom) != null ? _v : 0,
-        bounds: (_x = (_w = options.initialLocationData) == null ? void 0 : _w.bounds) != null ? _x : null,
+        zoom: (_w = (_v = options.initialLocationData) == null ? void 0 : _v.zoom) != null ? _w : 0,
+        bounds: (_y = (_x = options.initialLocationData) == null ? void 0 : _x.bounds) != null ? _y : null,
         pendingBounds: null,
         tempBounds: null,
         properties: this.properties,
-        primary: (_y = this.primaryType) != null ? _y : DEFAULT_PRIMARY_TYPE,
+        primary: (_z = this.primaryType) != null ? _z : DEFAULT_PRIMARY_TYPE,
         selectedPropertyId: this.selectedMarkerId,
         initialLoading: true,
         isSearching: false,
@@ -2176,7 +2177,7 @@ var MapFirstCore = (() => {
           checkOut: defaultDates.checkOut,
           numAdults: 2,
           numRooms: 1,
-          ...((_z = options.initialLocationData) == null ? void 0 : _z.currency) && {
+          ...((_A = options.initialLocationData) == null ? void 0 : _A.currency) && {
             currency: options.initialLocationData.currency
           }
         },
@@ -2190,7 +2191,7 @@ var MapFirstCore = (() => {
         isFlyToAnimating: false,
         ...options.state
       };
-      this.callbacks = (_A = options.callbacks) != null ? _A : {};
+      this.callbacks = (_B = options.callbacks) != null ? _B : {};
       if (this.hasMapInstance(options)) {
         this.adapter = this.createAdapter(options);
         this.isMapAttached = true;
@@ -3194,7 +3195,19 @@ var MapFirstCore = (() => {
         }
         this.setState({ firstCallDone: true });
         if (data.isComplete === false && data.pollingLink) {
-          const { completed, pollData } = await this.pollForPricing({
+          let streamed = null;
+          if (this.streaming) {
+            streamed = await this.streamPricing({
+              ...price && { price },
+              ...limit && { limit },
+              requestBody: enrichedBody
+            });
+            if (streamed.unsupported) {
+              this.streaming = false;
+              streamed = null;
+            }
+          }
+          const { completed, pollData } = streamed ? { completed: streamed.completed, pollData: void 0 } : await this.pollForPricing({
             pollingLink: data.pollingLink,
             ...price && { price },
             ...limit && { limit },

@@ -630,6 +630,14 @@ type BaseMapFirstOptions = {
         right?: number;
     };
     apiUrl?: string;
+    /**
+     * Refine pricing over SSE (one server-driven connection) instead of the
+     * browser polling loop. Requires a backend exposing POST /properties/stream
+     * (mapfirst-backend); api.mapfirst.ai does not. Defaults to false — if the
+     * endpoint is missing the SDK falls back to polling automatically and stops
+     * retrying it for the session.
+     */
+    streaming?: boolean;
     currentLocationMarker?: boolean;
     include_urls?: boolean;
     include_rankings?: boolean;
@@ -698,6 +706,8 @@ declare class MapFirstCore {
     private useApi;
     private readonly environment;
     private readonly apiUrl;
+    /** Not readonly: cleared permanently if the backend has no stream endpoint. */
+    private streaming;
     private apiKey?;
     private currentPlatform;
     private requestBody?;

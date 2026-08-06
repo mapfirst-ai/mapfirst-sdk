@@ -270,6 +270,14 @@ export type BaseMapFirstOptions = {
     right?: number;
   };
   apiUrl?: string;
+  /**
+   * Refine pricing over SSE (one server-driven connection) instead of the
+   * browser polling loop. Requires a backend exposing POST /properties/stream
+   * (mapfirst-backend); api.mapfirst.ai does not. Defaults to false — if the
+   * endpoint is missing the SDK falls back to polling automatically and stops
+   * retrying it for the session.
+   */
+  streaming?: boolean;
   // Current location marker option
   currentLocationMarker?: boolean;
   // Request-level options (not filters, sent at body level)
@@ -361,6 +369,8 @@ export class MapFirstCore {
   private useApi: boolean;
   private readonly environment: Environment;
   private readonly apiUrl: string;
+  /** Not readonly: cleared permanently if the backend has no stream endpoint. */
+  private streaming: boolean;
   private apiKey?: string;
   private currentPlatform:
     | "google"
@@ -399,6 +409,7 @@ export class MapFirstCore {
     this.useApi = options.useApi ?? true;
     this.environment = options.environment ?? "prod";
     this.apiUrl = options.apiUrl ?? API_URLS[this.environment];
+    this.streaming = options.streaming ?? false;
     this.apiKey = options.apiKey;
     this.requestBody = options.requestBody;
     this.currentPlatform = options.platform;
@@ -1751,9 +1762,29 @@ export class MapFirstCore {
 
       this.setState({ firstCallDone: true });
 
-      // Check if we need to poll for pricing
+      // Pricing refinement. Prefer the SSE stream — one connection, server-driven
+      // — and fall back to the polling loop when `streaming` is off or the
+      // backend has no /properties/stream (older deployments answer 404/405).
+      // Both paths share applyPricingBatch, so the merged result is identical.
       if (data.isComplete === false && data.pollingLink) {
-        const { completed, pollData } = await this.pollForPricing({
+        let streamed: { completed: boolean; unsupported?: boolean } | null = null;
+        if (this.streaming) {
+          streamed = await this.streamPricing({
+            ...(price && { price }),
+            ...(limit && { limit }),
+            requestBody: enrichedBody,
+          });
+          if (streamed.unsupported) {
+            // Endpoint absent → this deployment cannot stream. Do not retry it
+            // for the rest of the session; every search would pay the failed
+            // request first.
+            this.streaming = false;
+            streamed = null;
+          }
+        }
+        const { completed, pollData } = streamed
+          ? { completed: streamed.completed, pollData: undefined }
+          : await this.pollForPricing({
           pollingLink: data.pollingLink,
           ...(price && { price }),
           ...(limit && { limit }),
