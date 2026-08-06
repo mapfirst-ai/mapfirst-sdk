@@ -1355,6 +1355,171 @@ export class MapFirstCore {
     };
   }
 
+  /**
+   * Merge ONE batch of priced results into `this.properties`.
+   *
+   * Shared by the polling loop and the SSE stream deliberately: two copies of
+   * this drifted apart is exactly how a streamed result ends up ranked or
+   * filtered differently from a polled one, for the same data.
+   */
+  /**
+   * Stream pricing over SSE instead of polling from the browser.
+   *
+   * `pollForPricing` makes one request per attempt (up to maxAttempts), each
+   * paying full round-trip latency and each independently throttleable. Here the
+   * SERVER drives the TripAdvisor poll loop and pushes refinements down ONE
+   * connection (POST /properties/stream):
+   *
+   *     event: properties  {…search result}       immediately
+   *     event: pricing     {results, isComplete}  0..N as prices arrive
+   *     event: complete    {isComplete}           always last
+   *
+   * EventSource cannot POST, so this reads the fetch body stream directly and
+   * parses frames itself. Requires a backend exposing /properties/stream
+   * (mapfirst-backend); returns { completed: false, unsupported: true } if the
+   * endpoint is absent so the caller can fall back to pollForPricing.
+   *
+   * Each `pricing` frame goes through applyPricingBatch — the SAME merge the
+   * polling path uses — so streamed and polled results cannot diverge.
+   */
+  async streamPricing({
+    isCancelled,
+    price,
+    limit,
+    requestBody,
+  }: Omit<PollOptions, "pollingLink" | "maxAttempts" | "delayMs">): Promise<{
+    completed: boolean;
+    unsupported?: boolean;
+  }> {
+    this.ensureAlive();
+    if (!this.ensureApiEnabled("streamPricing")) return { completed: false };
+
+    const filters = this.getFilters();
+    if (limit) filters.limit = limit;
+    const body = {
+      ...requestBody,
+      filters,
+      ...this.getRequestLevelOptions(),
+    };
+
+    const controller = new AbortController();
+    let completed = false;
+    try {
+      const resp = await fetch(`${this.apiUrl}/properties/stream`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: createSdkHeaders(this.apiKey, getDocumentReferrer()),
+        signal: controller.signal,
+      });
+      // 404/405 means this deployment predates the stream — the caller falls
+      // back to polling rather than losing pricing entirely.
+      if (resp.status === 404 || resp.status === 405) {
+        return { completed: false, unsupported: true };
+      }
+      if (!resp.ok || !resp.body) {
+        throw new PropertiesFetchError({
+          message: `Stream failed: ${resp.status}`,
+          status: resp.status,
+        });
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (isCancelled?.()) {
+          controller.abort();
+          return { completed };
+        }
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // Frames are separated by a blank line. Keep the trailing partial in
+        // the buffer — a chunk boundary can land mid-frame.
+        let sep: number;
+        while ((sep = buffer.indexOf("\n\n")) !== -1) {
+          const raw = buffer.slice(0, sep);
+          buffer = buffer.slice(sep + 2);
+          if (raw.startsWith(":")) continue; // heartbeat
+          const eventMatch = /^event: (.*)$/m.exec(raw);
+          const dataMatch = /^data: (.*)$/m.exec(raw);
+          if (!eventMatch || !dataMatch) continue;
+          let payload: any;
+          try {
+            payload = JSON.parse(dataMatch[1]!);
+          } catch {
+            continue; // a malformed frame must not kill the stream
+          }
+          switch (eventMatch[1]) {
+            case "pricing":
+              this.applyPricingBatch(payload, price);
+              break;
+            case "complete":
+              completed = payload?.isComplete === true;
+              break;
+            case "error":
+              throw new PropertiesFetchError({
+                message: String(payload?.message ?? "stream error"),
+                status: 500,
+              });
+            default:
+              break; // "properties" — the caller already rendered these
+          }
+        }
+      }
+      return { completed };
+    } catch (error) {
+      if (isCancelled?.()) return { completed };
+      this.callbacks.onPropertiesLoadError?.(error as Error);
+      return { completed };
+    } finally {
+      controller.abort();
+    }
+  }
+
+  private applyPricingBatch(
+    success: HotelPricingAPIResponse["success"] | undefined,
+    price?: { min: number; max: number },
+  ): void {
+    const results = success?.results ?? [];
+    const unsupportedIds = new Set(success?.invalidHotelIds?.map(Number) ?? []);
+    const unsupportedIds2 = new Set(
+      success?.unsupportedHotelIds?.map(Number) ?? [],
+    );
+
+    if (results.length > 0 || unsupportedIds.size > 0) {
+      this.setProperties((prev) => {
+        const updatedProperties = prev.filter(
+          (property) =>
+            !unsupportedIds.has(property.tripadvisor_id) &&
+            !unsupportedIds2.has(property.tripadvisor_id),
+        );
+        results.forEach((property) => {
+          if (!property.location) return;
+          if (
+            property.pricing?.offer?.price &&
+            price &&
+            (property.pricing?.offer?.price < price?.min ||
+              property.pricing?.offer?.price > price?.max)
+          ) {
+            property.pricing.availability = "unavailable";
+          }
+          const existingIndex = updatedProperties.findIndex(
+            (h) => h.tripadvisor_id === property.tripadvisor_id,
+          );
+          if (existingIndex >= 0) {
+            updatedProperties[existingIndex] = property;
+          } else {
+            updatedProperties.push(property);
+          }
+        });
+        return updatedProperties;
+      });
+    }
+  }
+
   async pollForPricing({
     pollingLink,
     maxAttempts = 15,
@@ -1421,45 +1586,7 @@ export class MapFirstCore {
           return { completed, pollData };
         }
 
-        const results = pollData?.success?.results ?? [];
-        const unsupportedIds = new Set(
-          pollData?.success?.invalidHotelIds?.map(Number) ?? [],
-        );
-        const unsupportedIds2 = new Set(
-          pollData?.success?.unsupportedHotelIds?.map(Number) ?? [],
-        );
-
-        if (results.length > 0 || unsupportedIds.size > 0) {
-          this.setProperties((prev) => {
-            const updatedProperties = prev.filter(
-              (property) =>
-                !unsupportedIds.has(property.tripadvisor_id) &&
-                !unsupportedIds2.has(property.tripadvisor_id),
-            );
-
-            results.forEach((property) => {
-              if (!property.location) return;
-              if (
-                property.pricing?.offer?.price &&
-                price &&
-                (property.pricing?.offer?.price < price?.min ||
-                  property.pricing?.offer?.price > price?.max)
-              ) {
-                property.pricing.availability = "unavailable";
-              }
-              const existingIndex = updatedProperties.findIndex(
-                (h) => h.tripadvisor_id === property.tripadvisor_id,
-              );
-              if (existingIndex >= 0) {
-                updatedProperties[existingIndex] = property;
-              } else {
-                updatedProperties.push(property);
-              }
-            });
-
-            return updatedProperties;
-          });
-        }
+        this.applyPricingBatch(pollData?.success, price);
 
         // When isComplete, always remove hotels without a valid offer/availability,
         // regardless of whether this final response contained any results.

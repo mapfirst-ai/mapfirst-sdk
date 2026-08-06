@@ -57,7 +57,7 @@ var MapFirstCore = (() => {
   }
 
   // src/markers.css
-  styleInject('.mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-root.mapfirst-marker-has-tail {\n  padding-bottom: 10px;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: transform 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n  will-change: transform;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-marker-pill-active.mapfirst-marker-tail::after {\n  content: "";\n  position: absolute;\n  bottom: -10px;\n  left: 50%;\n  transform: translateX(-50%);\n  width: 0;\n  height: 0;\n  border-left: 8px solid transparent;\n  border-right: 8px solid transparent;\n  border-top: 10px solid #012b11;\n  pointer-events: none;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-tail.mapfirst-marker-selected::after {\n  border-top-color: #ffffff;\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-badge-img {\n  display: block;\n  width: 26px;\n  height: 26px;\n  object-fit: contain;\n  border-radius: 50%;\n  box-shadow: 0 0 10px -5px black;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffef0e;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-spinner {\n  width: 16px;\n  height: 16px;\n  display: block;\n  border: 2px solid rgba(0, 0, 0, 0.15);\n  border-top-color: #555;\n  border-radius: 50%;\n  animation: mapfirst-spin 0.8s linear infinite;\n}\n@keyframes mapfirst-spin {\n  to {\n    transform: rotate(360deg);\n  }\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: transform 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  transform: scale(1.2);\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n.mapfirst-marker-label {\n  position: absolute;\n  left: 100%;\n  top: 50%;\n  transform: translateY(-50%);\n  margin-left: 8px;\n  width: 150px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  pointer-events: none;\n  text-align: left;\n}\n.mapfirst-marker-label-name {\n  font-size: 14px;\n  font-weight: 700;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  color: #ffffff;\n  max-width: 150px;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);\n  line-height: 1.3;\n}\n.mapfirst-marker-label-rating {\n  font-size: 13px;\n  color: rgba(255, 255, 255, 0.8);\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);\n  margin-top: 2px;\n  line-height: 1.2;\n}\n.mapfirst-user-location-marker-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n  z-index: 1000;\n}\n.mapfirst-user-location-dot {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));\n}\n.mapfirst-user-location-dot svg {\n  animation: mapfirst-location-pulse 2s infinite;\n}\n@keyframes mapfirst-location-pulse {\n  0% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4));\n  }\n  70% {\n    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));\n  }\n  100% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));\n  }\n}\n');
+  styleInject('.mapfirst-marker-root {\n  display: flex;\n  z-index: 20;\n  flex-direction: column;\n  align-items: center;\n  pointer-events: auto;\n}\n.mapfirst-marker-root.mapfirst-marker-has-tail {\n  padding-bottom: 10px;\n}\n.mapfirst-marker-pill {\n  border: 2px solid;\n  border-radius: 999px;\n  padding: 8px 8px;\n  font-size: 16px;\n  font-weight: 600;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  box-shadow: 0 4px 6px rgba(107, 114, 128, 0.5);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  transition: scale 0.2s;\n  transform-origin: center bottom;\n}\n.mapfirst-marker-pill-pending {\n  background: rgba(255, 255, 255, 0.5);\n  backdrop-filter: blur(4px);\n  border-color: transparent;\n  cursor: default;\n}\n.mapfirst-marker-pill-active {\n  background: #012b11;\n  border-color: #ffffff;\n  color: #ffffff;\n  cursor: pointer;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.5);\n  color: rgba(3, 133, 46, 0.5);\n  padding: 4px;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n  color: #03852e;\n  scale: 1.2;\n}\n.mapfirst-marker-pill-active:hover {\n  scale: 1.2;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-tail::after {\n  content: "";\n  position: absolute;\n  bottom: -10px;\n  left: 50%;\n  transform: translateX(-50%);\n  width: 0;\n  height: 0;\n  border-left: 8px solid transparent;\n  border-right: 8px solid transparent;\n  border-top: 10px solid #012b11;\n  pointer-events: none;\n}\n.mapfirst-marker-pill-active.mapfirst-marker-tail.mapfirst-marker-selected::after {\n  border-top-color: #ffffff;\n}\n.mapfirst-marker-badge {\n  position: absolute;\n  top: -12px;\n  right: -20px;\n}\n.mapfirst-marker-badge-img {\n  display: block;\n  width: 26px;\n  height: 26px;\n  object-fit: contain;\n  border-radius: 50%;\n  box-shadow: 0 0 10px -5px black;\n}\n.mapfirst-marker-award-container {\n  position: relative;\n  width: 32px;\n  height: 32px;\n}\n.mapfirst-marker-award-back {\n  position: absolute;\n  stroke: #f5f5f5;\n  stroke-width: 2px;\n}\n.mapfirst-marker-award-dot {\n  position: absolute;\n  top: 6.2px;\n  left: 6.3px;\n  width: 18.5px;\n  height: 18.5px;\n  border-radius: 50%;\n  z-index: 1;\n}\n.mapfirst-marker-award-dot-type-0 {\n  background: #ffc56f;\n}\n.mapfirst-marker-award-dot-type-1 {\n  background: #01ea5b;\n}\n.mapfirst-marker-award-front {\n  position: relative;\n  z-index: 2;\n  color: #012b11;\n}\n.mapfirst-marker-rating-badge {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 999px;\n  background: #03852e;\n  color: #ffffff;\n  font-size: 12px;\n  line-height: 1;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n  padding: 2px 6px;\n  border: 2px solid #ffffff;\n  font-weight: 400;\n}\n.mapfirst-marker-content {\n  display: flex;\n  align-items: center;\n}\n.mapfirst-marker-loading-spinner {\n  width: 16px;\n  height: 16px;\n  display: block;\n  border: 2px solid rgba(0, 0, 0, 0.15);\n  border-top-color: #555;\n  border-radius: 50%;\n  animation: mapfirst-spin 0.8s linear infinite;\n}\n@keyframes mapfirst-spin {\n  to {\n    transform: rotate(360deg);\n  }\n}\n.mapfirst-dot-marker-container {\n  display: flex;\n  z-index: 10;\n  align-items: center;\n  justify-content: center;\n  pointer-events: auto;\n}\n.mapfirst-dot-marker-button {\n  width: 20px;\n  height: 20px;\n  border-radius: 999px;\n  border: 2px solid #ffffff;\n  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.4);\n  transition: scale 0.2s;\n  outline: none;\n  transform-origin: center center;\n}\n.mapfirst-dot-marker-button-active {\n  background: #012b11;\n  cursor: pointer;\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-non-primary {\n  background: rgba(255, 255, 255, 0.7);\n  border-color: rgba(3, 133, 46, 0.2);\n}\n.mapfirst-dot-marker-button-active.mapfirst-dot-marker-selected {\n  background: #ffffff;\n  border-color: #03852e;\n}\n.mapfirst-dot-marker-button-active:hover {\n  scale: 1.2;\n}\n.mapfirst-dot-marker-button-active:focus {\n  outline: 2px solid #ffffff;\n  outline-offset: 2px;\n}\n.mapfirst-dot-marker-button-pending {\n  background: #012b11;\n  animation: loading-pulse 1.5s infinite;\n}\n@keyframes loading-pulse {\n  50% {\n    opacity: 0.5;\n  }\n}\n.mapfirst-property-hover-card {\n  position: absolute;\n  width: 270px;\n  background: #ffffff;\n  border-radius: 8px;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n  overflow: hidden;\n  display: flex;\n  pointer-events: auto;\n  z-index: 9999;\n  transition: opacity 0.2s;\n  height: 120px;\n  text-decoration: none;\n  color: inherit;\n}\n.mapfirst-property-hover-card img {\n  width: 120px;\n  height: 120px;\n  object-fit: cover;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image {\n  width: 120px;\n  height: 120px;\n  flex-shrink: 0;\n}\n.mapfirst-property-hover-image-placeholder {\n  background-color: #e5e7eb;\n}\n.mapfirst-property-hover-details {\n  display: flex;\n  flex-direction: column;\n  padding: 8px 12px;\n  flex: 1;\n  gap: 4px;\n}\n.mapfirst-property-hover-name {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1a1a1a;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  line-height: 1.3;\n}\n.mapfirst-property-hover-rating {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 12px;\n}\n.mapfirst-property-hover-rating .rating-value {\n  font-weight: 600;\n  color: #1a1a1a;\n}\n.mapfirst-property-hover-rating .stars {\n  display: flex;\n  gap: 1px;\n  font-size: 10px;\n  line-height: 1;\n  align-items: center;\n}\n.mapfirst-property-hover-rating .reviews {\n  color: #666;\n  font-size: 11px;\n}\n.mapfirst-property-hover-price {\n  font-size: 12px;\n  color: #666;\n  margin-top: 2px;\n}\n.mapfirst-property-hover-price strong {\n  color: #1a1a1a;\n  font-weight: 600;\n}\n.mapfirst-property-hover-learn-more {\n  font-size: 12px;\n  color: #03852e;\n  text-decoration: none;\n  font-weight: 500;\n  margin-top: auto;\n  pointer-events: auto;\n  display: inline-block;\n}\n.mapfirst-property-hover-learn-more:hover {\n  text-decoration: underline;\n}\n.mapfirst-marker-label {\n  position: absolute;\n  left: 100%;\n  top: 50%;\n  transform: translateY(-50%);\n  margin-left: 8px;\n  width: 150px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  pointer-events: none;\n  text-align: left;\n}\n.mapfirst-marker-label-name {\n  font-size: 14px;\n  font-weight: 700;\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  color: #ffffff;\n  max-width: 150px;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);\n  line-height: 1.3;\n}\n.mapfirst-marker-label-rating {\n  font-size: 13px;\n  color: rgba(255, 255, 255, 0.8);\n  font-family:\n    system-ui,\n    -apple-system,\n    sans-serif;\n  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);\n  margin-top: 2px;\n  line-height: 1.2;\n}\n.mapfirst-user-location-marker-container {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  pointer-events: none;\n  z-index: 1000;\n}\n.mapfirst-user-location-dot {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));\n}\n.mapfirst-user-location-dot svg {\n  animation: mapfirst-location-pulse 2s infinite;\n}\n@keyframes mapfirst-location-pulse {\n  0% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0.4));\n  }\n  70% {\n    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));\n  }\n  100% {\n    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));\n  }\n}\n');
 
   // src/marker-style-utils.ts
   var PRIMARY_Z_INDEX = {
@@ -374,7 +374,7 @@ var MapFirstCore = (() => {
     card.style.top = `${top}px`;
   }
   function createPrimaryMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick, markerOptions) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     if (typeof document === "undefined") {
       return null;
     }
@@ -384,6 +384,15 @@ var MapFirstCore = (() => {
     const isAccommodation = marker.type === "Accommodation";
     const hasPrice = (_b = (_a = marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.displayPrice;
     const isPending = isAccommodation && !hasPrice;
+    const selectedAward = ((_c = marker.awards) == null ? void 0 : _c.length) ? [...marker.awards].sort((a, b) => {
+      var _a2, _b2, _c2, _d2;
+      if (((_a2 = b.year) != null ? _a2 : 0) !== ((_b2 = a.year) != null ? _b2 : 0)) {
+        return ((_c2 = b.year) != null ? _c2 : 0) - ((_d2 = a.year) != null ? _d2 : 0);
+      }
+      const aIsCertificate = a.type === "Certificate of Excellence" ? 0 : 1;
+      const bIsCertificate = b.type === "Certificate of Excellence" ? 0 : 1;
+      return aIsCertificate - bIsCertificate;
+    })[0] : void 0;
     const ratingLabel = (() => {
       if (marker.rating === void 0 || marker.rating === null) return null;
       const numeric = typeof marker.rating === "number" ? marker.rating : Number(marker.rating);
@@ -396,7 +405,7 @@ var MapFirstCore = (() => {
       root.classList.add("mapfirst-marker-has-tail");
     }
     root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
-    const markerUrl = (markerOptions == null ? void 0 : markerOptions.disableHoverCard) ? void 0 : (_e = (_d = (_c = marker.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.clickUrl) != null ? _e : marker.url;
+    const markerUrl = (markerOptions == null ? void 0 : markerOptions.disableHoverCard) ? void 0 : (_f = (_e = (_d = marker.pricing) == null ? void 0 : _d.offer) == null ? void 0 : _e.clickUrl) != null ? _f : marker.url;
     const pill = document.createElement(markerUrl ? "a" : "div");
     if (markerUrl) {
       pill.href = markerUrl;
@@ -408,7 +417,7 @@ var MapFirstCore = (() => {
       isPrimaryType,
       isSelected
     );
-    pill.dataset.type = (_f = marker.type) != null ? _f : "";
+    pill.dataset.type = (_g = marker.type) != null ? _g : "";
     if ((markerOptions == null ? void 0 : markerOptions.showTail) && isPrimaryType && !isPending) {
       pill.classList.add("mapfirst-marker-tail");
     }
@@ -425,21 +434,20 @@ var MapFirstCore = (() => {
         img.className = "mapfirst-marker-badge-img";
         badge.appendChild(img);
         pill.appendChild(badge);
-      } else if (((_g = marker.awards) == null ? void 0 : _g.length) || ratingLabel) {
+      } else if (((_h = marker.awards) == null ? void 0 : _h.length) || ratingLabel) {
         const badge = document.createElement("div");
         badge.className = "mapfirst-marker-badge";
         if (!isPrimaryType) {
           badge.style.opacity = "0.2";
         }
-        if (((_h = marker.awards) == null ? void 0 : _h.length) && marker.awards[0].type) {
+        if (selectedAward == null ? void 0 : selectedAward.type) {
           const awardContainer = document.createElement("div");
           awardContainer.className = "mapfirst-marker-award-container";
           const backLayer = document.createElement("div");
           backLayer.className = "mapfirst-marker-award-back";
           backLayer.innerHTML = AWARD_BACK_SVG;
           const colorDot = document.createElement("div");
-          const awardTypeVal = String((_i = marker.awards[0].type) != null ? _i : "");
-          const awardTypeKey = awardTypeVal === "1" || awardTypeVal.toLowerCase().includes("best of the best") ? "1" : "0";
+          const awardTypeKey = selectedAward.type === "Certificate of Excellence" ? "0" : "1";
           colorDot.className = `mapfirst-marker-award-dot mapfirst-marker-award-dot-type-${awardTypeKey}`;
           const frontLayer = document.createElement("div");
           frontLayer.className = "mapfirst-marker-award-front";
@@ -458,7 +466,7 @@ var MapFirstCore = (() => {
     const content = document.createElement("span");
     content.className = "mapfirst-marker-content";
     if (isAccommodation) {
-      if ((_k = (_j = marker.pricing) == null ? void 0 : _j.offer) == null ? void 0 : _k.displayPrice) {
+      if ((_j = (_i = marker.pricing) == null ? void 0 : _i.offer) == null ? void 0 : _j.displayPrice) {
         content.innerHTML = marker.pricing.offer.displayPrice;
         content.dataset.price = marker.pricing.offer.displayPrice;
       } else {
@@ -486,7 +494,7 @@ var MapFirstCore = (() => {
       label.className = "mapfirst-marker-label";
       const nameLine = document.createElement("div");
       nameLine.className = "mapfirst-marker-label-name";
-      nameLine.textContent = (_l = marker.name) != null ? _l : "";
+      nameLine.textContent = (_k = marker.name) != null ? _k : "";
       label.appendChild(nameLine);
       if (ratingLabel) {
         const ratingLine = document.createElement("div");
@@ -501,7 +509,7 @@ var MapFirstCore = (() => {
   }
 
   // src/dotmarker.ts
-  function createDotMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick) {
+  function createDotMarkerElement(item, primaryType, selectedMarkerId, onMarkerClick, markerOptions) {
     var _a, _b, _c;
     if (typeof document === "undefined") {
       return null;
@@ -513,7 +521,9 @@ var MapFirstCore = (() => {
     const isPending = isAccommodation && ((_b = (_a = marker.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.availability) !== "available";
     const container = document.createElement("div");
     container.className = "mapfirst-dot-marker-container";
-    container.style.zIndex = String(getDotMarkerZIndex(isPrimaryType, isSelected));
+    container.style.zIndex = String(
+      getDotMarkerZIndex(isPrimaryType, isSelected)
+    );
     const button = document.createElement("div");
     button.className = getDotMarkerButtonClass(
       isPending,
@@ -528,7 +538,7 @@ var MapFirstCore = (() => {
       }
     });
     container.appendChild(button);
-    if (!isPending) {
+    if (!isPending && !(markerOptions == null ? void 0 : markerOptions.disableHoverCard)) {
       setupHoverCard(container, button, marker, isSelected);
     }
     return container;
@@ -772,7 +782,8 @@ var MapFirstCore = (() => {
         item,
         this.primaryType,
         this.selectedMarkerId,
-        this.onMarkerClick
+        this.onMarkerClick,
+        this.getEffectiveMarkerOptions()
       );
       if (!element) return;
       const displayState = this.getDisplayState(item);
@@ -2868,6 +2879,149 @@ var MapFirstCore = (() => {
         }
       };
     }
+    /**
+     * Merge ONE batch of priced results into `this.properties`.
+     *
+     * Shared by the polling loop and the SSE stream deliberately: two copies of
+     * this drifted apart is exactly how a streamed result ends up ranked or
+     * filtered differently from a polled one, for the same data.
+     */
+    /**
+     * Stream pricing over SSE instead of polling from the browser.
+     *
+     * `pollForPricing` makes one request per attempt (up to maxAttempts), each
+     * paying full round-trip latency and each independently throttleable. Here the
+     * SERVER drives the TripAdvisor poll loop and pushes refinements down ONE
+     * connection (POST /properties/stream):
+     *
+     *     event: properties  {…search result}       immediately
+     *     event: pricing     {results, isComplete}  0..N as prices arrive
+     *     event: complete    {isComplete}           always last
+     *
+     * EventSource cannot POST, so this reads the fetch body stream directly and
+     * parses frames itself. Requires a backend exposing /properties/stream
+     * (mapfirst-backend); returns { completed: false, unsupported: true } if the
+     * endpoint is absent so the caller can fall back to pollForPricing.
+     *
+     * Each `pricing` frame goes through applyPricingBatch — the SAME merge the
+     * polling path uses — so streamed and polled results cannot diverge.
+     */
+    async streamPricing({
+      isCancelled,
+      price,
+      limit,
+      requestBody
+    }) {
+      var _a, _b, _c;
+      this.ensureAlive();
+      if (!this.ensureApiEnabled("streamPricing")) return { completed: false };
+      const filters = this.getFilters();
+      if (limit) filters.limit = limit;
+      const body = {
+        ...requestBody,
+        filters,
+        ...this.getRequestLevelOptions()
+      };
+      const controller = new AbortController();
+      let completed = false;
+      try {
+        const resp = await fetch(`${this.apiUrl}/properties/stream`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: createSdkHeaders(this.apiKey, getDocumentReferrer()),
+          signal: controller.signal
+        });
+        if (resp.status === 404 || resp.status === 405) {
+          return { completed: false, unsupported: true };
+        }
+        if (!resp.ok || !resp.body) {
+          throw new PropertiesFetchError({
+            message: `Stream failed: ${resp.status}`,
+            status: resp.status
+          });
+        }
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          if (isCancelled == null ? void 0 : isCancelled()) {
+            controller.abort();
+            return { completed };
+          }
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let sep;
+          while ((sep = buffer.indexOf("\n\n")) !== -1) {
+            const raw = buffer.slice(0, sep);
+            buffer = buffer.slice(sep + 2);
+            if (raw.startsWith(":")) continue;
+            const eventMatch = /^event: (.*)$/m.exec(raw);
+            const dataMatch = /^data: (.*)$/m.exec(raw);
+            if (!eventMatch || !dataMatch) continue;
+            let payload;
+            try {
+              payload = JSON.parse(dataMatch[1]);
+            } catch {
+              continue;
+            }
+            switch (eventMatch[1]) {
+              case "pricing":
+                this.applyPricingBatch(payload, price);
+                break;
+              case "complete":
+                completed = (payload == null ? void 0 : payload.isComplete) === true;
+                break;
+              case "error":
+                throw new PropertiesFetchError({
+                  message: String((_a = payload == null ? void 0 : payload.message) != null ? _a : "stream error"),
+                  status: 500
+                });
+              default:
+                break;
+            }
+          }
+        }
+        return { completed };
+      } catch (error) {
+        if (isCancelled == null ? void 0 : isCancelled()) return { completed };
+        (_c = (_b = this.callbacks).onPropertiesLoadError) == null ? void 0 : _c.call(_b, error);
+        return { completed };
+      } finally {
+        controller.abort();
+      }
+    }
+    applyPricingBatch(success, price) {
+      var _a, _b, _c, _d, _e;
+      const results = (_a = success == null ? void 0 : success.results) != null ? _a : [];
+      const unsupportedIds = new Set((_c = (_b = success == null ? void 0 : success.invalidHotelIds) == null ? void 0 : _b.map(Number)) != null ? _c : []);
+      const unsupportedIds2 = new Set(
+        (_e = (_d = success == null ? void 0 : success.unsupportedHotelIds) == null ? void 0 : _d.map(Number)) != null ? _e : []
+      );
+      if (results.length > 0 || unsupportedIds.size > 0) {
+        this.setProperties((prev) => {
+          const updatedProperties = prev.filter(
+            (property) => !unsupportedIds.has(property.tripadvisor_id) && !unsupportedIds2.has(property.tripadvisor_id)
+          );
+          results.forEach((property) => {
+            var _a2, _b2, _c2, _d2, _e2, _f;
+            if (!property.location) return;
+            if (((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.price) && price && (((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.price) < (price == null ? void 0 : price.min) || ((_f = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f.price) > (price == null ? void 0 : price.max))) {
+              property.pricing.availability = "unavailable";
+            }
+            const existingIndex = updatedProperties.findIndex(
+              (h) => h.tripadvisor_id === property.tripadvisor_id
+            );
+            if (existingIndex >= 0) {
+              updatedProperties[existingIndex] = property;
+            } else {
+              updatedProperties.push(property);
+            }
+          });
+          return updatedProperties;
+        });
+      }
+    }
     async pollForPricing({
       pollingLink,
       maxAttempts = 15,
@@ -2877,7 +3031,7 @@ var MapFirstCore = (() => {
       limit,
       requestBody
     }) {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+      var _a, _b, _c;
       this.ensureAlive();
       if (!this.ensureApiEnabled("pollForPricing")) {
         return { completed: false };
@@ -2921,42 +3075,13 @@ var MapFirstCore = (() => {
           if (isCancelled == null ? void 0 : isCancelled()) {
             return { completed, pollData };
           }
-          const results = (_b = (_a = pollData == null ? void 0 : pollData.success) == null ? void 0 : _a.results) != null ? _b : [];
-          const unsupportedIds = new Set(
-            (_e = (_d = (_c = pollData == null ? void 0 : pollData.success) == null ? void 0 : _c.invalidHotelIds) == null ? void 0 : _d.map(Number)) != null ? _e : []
-          );
-          const unsupportedIds2 = new Set(
-            (_h = (_g = (_f = pollData == null ? void 0 : pollData.success) == null ? void 0 : _f.unsupportedHotelIds) == null ? void 0 : _g.map(Number)) != null ? _h : []
-          );
-          if (results.length > 0 || unsupportedIds.size > 0) {
-            this.setProperties((prev) => {
-              const updatedProperties = prev.filter(
-                (property) => !unsupportedIds.has(property.tripadvisor_id) && !unsupportedIds2.has(property.tripadvisor_id)
-              );
-              results.forEach((property) => {
-                var _a2, _b2, _c2, _d2, _e2, _f2;
-                if (!property.location) return;
-                if (((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.price) && price && (((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.price) < (price == null ? void 0 : price.min) || ((_f2 = (_e2 = property.pricing) == null ? void 0 : _e2.offer) == null ? void 0 : _f2.price) > (price == null ? void 0 : price.max))) {
-                  property.pricing.availability = "unavailable";
-                }
-                const existingIndex = updatedProperties.findIndex(
-                  (h) => h.tripadvisor_id === property.tripadvisor_id
-                );
-                if (existingIndex >= 0) {
-                  updatedProperties[existingIndex] = property;
-                } else {
-                  updatedProperties.push(property);
-                }
-              });
-              return updatedProperties;
-            });
-          }
-          if ((_i = pollData == null ? void 0 : pollData.success) == null ? void 0 : _i.isComplete) {
+          this.applyPricingBatch(pollData == null ? void 0 : pollData.success, price);
+          if ((_a = pollData == null ? void 0 : pollData.success) == null ? void 0 : _a.isComplete) {
             this.setProperties(
               (prev) => prev.filter(
                 (property) => {
-                  var _a2, _b2, _c2, _d2;
-                  return property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" && ((_d2 = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d2.displayPrice);
+                  var _a2, _b2, _c2, _d;
+                  return property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" && ((_d = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d.displayPrice);
                 }
               )
             );
@@ -2966,7 +3091,7 @@ var MapFirstCore = (() => {
           }
         } catch (error) {
           this.handleError(error, "pollForPricing");
-          (_k = (_j = this.callbacks).onPropertiesLoadError) == null ? void 0 : _k.call(_j, error);
+          (_c = (_b = this.callbacks).onPropertiesLoadError) == null ? void 0 : _c.call(_b, error);
           break;
         }
         if (attempt < maxAttempts - 1) {
@@ -3173,7 +3298,8 @@ var MapFirstCore = (() => {
       if (!this.ensureApiEnabled("runSmartFilterSearch", onError)) {
         return null;
       }
-      let filterPayload = this.getFilters();
+      const { primary_type: _basePrimaryType, ...baseFilterPayload } = this.getFilters();
+      let filterPayload = baseFilterPayload;
       const state = this.getState();
       if (filters && filters.length > 0) {
         const amenities = /* @__PURE__ */ new Set();

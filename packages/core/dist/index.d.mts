@@ -65,8 +65,10 @@ type PropertyAwardImage = {
 };
 type PropertyAward = {
     name: string;
+    geo: string;
     image: PropertyAwardImage;
-    type: string;
+    type: "Certificate of Excellence" | "Travelers' Choice";
+    year: number;
 };
 type PropertyType = "Accommodation" | "Eat & Drink" | "Attraction";
 type PropertyUrls = {
@@ -788,6 +790,38 @@ declare class MapFirstCore {
     }[], type?: PropertyType, animate?: boolean): void;
     getFilters(): FilterSchema;
     private getRequestLevelOptions;
+    /**
+     * Merge ONE batch of priced results into `this.properties`.
+     *
+     * Shared by the polling loop and the SSE stream deliberately: two copies of
+     * this drifted apart is exactly how a streamed result ends up ranked or
+     * filtered differently from a polled one, for the same data.
+     */
+    /**
+     * Stream pricing over SSE instead of polling from the browser.
+     *
+     * `pollForPricing` makes one request per attempt (up to maxAttempts), each
+     * paying full round-trip latency and each independently throttleable. Here the
+     * SERVER drives the TripAdvisor poll loop and pushes refinements down ONE
+     * connection (POST /properties/stream):
+     *
+     *     event: properties  {…search result}       immediately
+     *     event: pricing     {results, isComplete}  0..N as prices arrive
+     *     event: complete    {isComplete}           always last
+     *
+     * EventSource cannot POST, so this reads the fetch body stream directly and
+     * parses frames itself. Requires a backend exposing /properties/stream
+     * (mapfirst-backend); returns { completed: false, unsupported: true } if the
+     * endpoint is absent so the caller can fall back to pollForPricing.
+     *
+     * Each `pricing` frame goes through applyPricingBatch — the SAME merge the
+     * polling path uses — so streamed and polled results cannot diverge.
+     */
+    streamPricing({ isCancelled, price, limit, requestBody, }: Omit<PollOptions, "pollingLink" | "maxAttempts" | "delayMs">): Promise<{
+        completed: boolean;
+        unsupported?: boolean;
+    }>;
+    private applyPricingBatch;
     pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, requestBody, }: PollOptions): Promise<{
         completed: boolean;
         pollData?: HotelPricingAPIResponse;
