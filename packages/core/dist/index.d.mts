@@ -832,6 +832,24 @@ declare class MapFirstCore {
         unsupported?: boolean;
     }>;
     /**
+     * Run the search AND its pricing refinement over one POST /properties/stream.
+     *
+     * Resolves as soon as the `properties` frame arrives, so the caller renders
+     * at the same moment it used to — the difference is that no second request is
+     * needed, because pricing keeps flowing on the connection already open. This
+     * is what removes the `properties` + `stream` pair from the network panel.
+     *
+     * Pricing frames that arrive before begin() is called are BUFFERED, not
+     * applied. The caller only knows `price`/`limit` after beforeApplyProperties
+     * has run, and a frame that beat that would merge without the price filter —
+     * today the server's poll delay hides the race, which is exactly the kind of
+     * thing that breaks when a cache makes the first poll instant.
+     *
+     * Returns { unsupported: true } on 404/405 so the caller can fall back to
+     * POST /properties rather than losing the search.
+     */
+    private openSearchStream;
+    /**
      * The end-of-pricing step, shared by the polling and streaming paths.
      *
      * Drops accommodations that never got a bookable offer, then clears the

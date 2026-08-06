@@ -111,6 +111,18 @@ function createSdkHeaders(apiKey?: string, referrer?: string) {
   };
 }
 
+/**
+ * Pricing refinements still flowing on a search stream that is already open
+ * (see openSearchStream). Handed to the caller with the search envelope so it
+ * can decide WHEN merging starts — frames are buffered until then.
+ */
+interface StreamedPricing {
+  begin(opts: {
+    price?: Price;
+    limit?: number;
+  }): Promise<{ completed: boolean }>;
+}
+
 // Properties fetch error class
 export class PropertiesFetchError extends Error {
   status: number;
@@ -1498,6 +1510,154 @@ export class MapFirstCore {
   }
 
   /**
+   * Run the search AND its pricing refinement over one POST /properties/stream.
+   *
+   * Resolves as soon as the `properties` frame arrives, so the caller renders
+   * at the same moment it used to — the difference is that no second request is
+   * needed, because pricing keeps flowing on the connection already open. This
+   * is what removes the `properties` + `stream` pair from the network panel.
+   *
+   * Pricing frames that arrive before begin() is called are BUFFERED, not
+   * applied. The caller only knows `price`/`limit` after beforeApplyProperties
+   * has run, and a frame that beat that would merge without the price filter —
+   * today the server's poll delay hides the race, which is exactly the kind of
+   * thing that breaks when a cache makes the first poll instant.
+   *
+   * Returns { unsupported: true } on 404/405 so the caller can fall back to
+   * POST /properties rather than losing the search.
+   */
+  private async openSearchStream(
+    body: unknown,
+  ): Promise<{
+    unsupported?: boolean;
+    data?: APIResponse;
+    pricing?: StreamedPricing;
+  }> {
+    this.ensureAlive();
+    const controller = new AbortController();
+    let resp: Response;
+    try {
+      resp = await fetch(`${this.apiUrl}/properties/stream`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: createSdkHeaders(this.apiKey, getDocumentReferrer()),
+        signal: controller.signal,
+      });
+    } catch (error) {
+      controller.abort();
+      throw error;
+    }
+    // A deployment predating the stream, or one where the search itself failed.
+    // Both fall back to POST /properties: a 5xx here is a real error status
+    // precisely because the server runs the search BEFORE hijacking the reply.
+    if (!resp.ok || !resp.body) {
+      controller.abort();
+      if (resp.status === 404 || resp.status === 405) return { unsupported: true };
+      throw new PropertiesFetchError({
+        message: `Stream failed: ${resp.status}`,
+        status: resp.status,
+      });
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let settled = false;
+    let completed = false;
+    /** Frames seen before begin(); replayed in order once options are known. */
+    const buffered: unknown[] = [];
+    let apply: ((payload: unknown) => void) | null = null;
+
+    return await new Promise((resolveOpen, rejectOpen) => {
+      // Drives the connection for its whole life. The caller's promise settles
+      // early (on the properties frame); this keeps running for pricing.
+      const pump = (async (): Promise<{ completed: boolean }> => {
+        try {
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            let sep: number;
+            while ((sep = buffer.indexOf("\n\n")) !== -1) {
+              const raw = buffer.slice(0, sep);
+              buffer = buffer.slice(sep + 2);
+              if (raw.startsWith(":")) continue; // heartbeat
+              const eventMatch = /^event: (.*)$/m.exec(raw);
+              const dataMatch = /^data: (.*)$/m.exec(raw);
+              if (!eventMatch || !dataMatch) continue;
+              let payload: any;
+              try {
+                payload = JSON.parse(dataMatch[1]!);
+              } catch {
+                continue; // a malformed frame must not kill the stream
+              }
+              switch (eventMatch[1]) {
+                case "properties":
+                  if (!settled) {
+                    settled = true;
+                    resolveOpen({
+                      data: payload as APIResponse,
+                      pricing: {
+                        begin: (opts) => {
+                          apply = (p) => this.applyPricingBatch(p as never, opts.price);
+                          for (const p of buffered.splice(0)) apply(p);
+                          return pump;
+                        },
+                      },
+                    });
+                  }
+                  break;
+                case "pricing":
+                  if (apply) apply(payload);
+                  else buffered.push(payload);
+                  break;
+                case "complete":
+                  completed = payload?.isComplete === true;
+                  if (completed) {
+                    // Flush anything still held: a stream can complete before
+                    // begin() when the search needed no refinement.
+                    if (apply) for (const p of buffered.splice(0)) apply(p);
+                    this.finalizePricing();
+                  }
+                  break;
+                case "error":
+                  throw new PropertiesFetchError({
+                    message: String(payload?.message ?? "stream error"),
+                    status: 500,
+                  });
+                default:
+                  break;
+              }
+            }
+          }
+          return { completed };
+        } finally {
+          controller.abort();
+        }
+      })();
+
+      // A stream that ends without ever sending `properties` is a failed
+      // search, not an empty one — surface it so the caller can fall back
+      // instead of rendering nothing.
+      pump.then(
+        () => {
+          if (!settled) {
+            settled = true;
+            resolveOpen({ unsupported: true });
+          }
+        },
+        (error) => {
+          if (!settled) {
+            settled = true;
+            rejectOpen(error);
+          }
+        },
+      );
+    });
+  }
+
+  /**
    * The end-of-pricing step, shared by the polling and streaming paths.
    *
    * Drops accommodations that never got a bookable offer, then clears the
@@ -1694,11 +1854,34 @@ export class MapFirstCore {
 
     try {
       const enrichedBody = { ...body, ...this.getRequestLevelOptions() };
-      const data = await fetchProperties<InitialRequestBody, APIResponse>(
-        `${this.apiUrl}/properties`,
-        enrichedBody,
-        this.apiKey,
-      );
+
+      // ONE request when streaming: /properties/stream runs the search itself
+      // and pushes pricing down the SAME connection, so the browser no longer
+      // shows `properties` and `stream` back to back. openSearchStream resolves
+      // the moment the `properties` frame lands — everything below is unchanged
+      // and still runs against a fully-formed search envelope.
+      let data: APIResponse;
+      let pricing: StreamedPricing | null = null;
+      const streamed = this.streaming
+        ? await this.openSearchStream(enrichedBody)
+        : null;
+      if (streamed && !streamed.unsupported) {
+        data = streamed.data!;
+        pricing = streamed.pricing!;
+      } else {
+        if (streamed?.unsupported) {
+          // Endpoint absent → this deployment cannot stream. Do not retry it
+          // for the rest of the session; every search would pay the failed
+          // request first. Property fetching still works: we fall back to the
+          // plain POST below rather than losing the search entirely.
+          this.streaming = false;
+        }
+        data = await fetchProperties<InitialRequestBody, APIResponse>(
+          `${this.apiUrl}/properties`,
+          enrichedBody,
+          this.apiKey,
+        );
+      }
 
       this.updateActiveLocationFromResponse(data);
 
@@ -1786,24 +1969,33 @@ export class MapFirstCore {
       // backend has no /properties/stream (older deployments answer 404/405).
       // Both paths share applyPricingBatch, so the merged result is identical.
       if (data.isComplete === false && data.pollingLink) {
-        let streamed: { completed: boolean; unsupported?: boolean } | null = null;
-        if (this.streaming) {
-          streamed = await this.streamPricing({
+        let refined: { completed: boolean; unsupported?: boolean } | null = null;
+        if (pricing) {
+          // Refinements are already flowing on the open connection. Release the
+          // frames buffered since the properties frame — they are held rather
+          // than applied on arrival because `price`/`limit` are only known once
+          // beforeApplyProperties has run above, and a frame that beat it would
+          // merge without the price filter.
+          refined = await pricing.begin({
+            ...(price && { price }),
+            ...(limit && { limit }),
+          });
+        } else if (this.streaming) {
+          // No open stream (the search came from the plain POST) — refine over
+          // a resume-mode stream, which skips its own search.
+          refined = await this.streamPricing({
             pollingLink: data.pollingLink,
             ...(price && { price }),
             ...(limit && { limit }),
             requestBody: enrichedBody,
           });
-          if (streamed.unsupported) {
-            // Endpoint absent → this deployment cannot stream. Do not retry it
-            // for the rest of the session; every search would pay the failed
-            // request first.
+          if (refined.unsupported) {
             this.streaming = false;
-            streamed = null;
+            refined = null;
           }
         }
-        const { completed, pollData } = streamed
-          ? { completed: streamed.completed, pollData: undefined }
+        const { completed, pollData } = refined
+          ? { completed: refined.completed, pollData: undefined }
           : await this.pollForPricing({
           pollingLink: data.pollingLink,
           ...(price && { price }),
@@ -1835,6 +2027,10 @@ export class MapFirstCore {
           this.refresh();
         }
       } else if (data.isComplete === true) {
+        // Already priced. The server emits `complete` and ends without polling,
+        // so drain the connection rather than leaving it dangling — begin()
+        // resolves on the terminator.
+        if (pricing) await pricing.begin({});
         // If the initial response is complete, set searching to false now
         this.setSearching(false);
       }

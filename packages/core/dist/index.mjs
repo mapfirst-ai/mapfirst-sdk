@@ -2964,6 +2964,133 @@ var MapFirstCore = class {
     }
   }
   /**
+   * Run the search AND its pricing refinement over one POST /properties/stream.
+   *
+   * Resolves as soon as the `properties` frame arrives, so the caller renders
+   * at the same moment it used to — the difference is that no second request is
+   * needed, because pricing keeps flowing on the connection already open. This
+   * is what removes the `properties` + `stream` pair from the network panel.
+   *
+   * Pricing frames that arrive before begin() is called are BUFFERED, not
+   * applied. The caller only knows `price`/`limit` after beforeApplyProperties
+   * has run, and a frame that beat that would merge without the price filter —
+   * today the server's poll delay hides the race, which is exactly the kind of
+   * thing that breaks when a cache makes the first poll instant.
+   *
+   * Returns { unsupported: true } on 404/405 so the caller can fall back to
+   * POST /properties rather than losing the search.
+   */
+  async openSearchStream(body) {
+    this.ensureAlive();
+    const controller = new AbortController();
+    let resp;
+    try {
+      resp = await fetch(`${this.apiUrl}/properties/stream`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: createSdkHeaders(this.apiKey, getDocumentReferrer()),
+        signal: controller.signal
+      });
+    } catch (error) {
+      controller.abort();
+      throw error;
+    }
+    if (!resp.ok || !resp.body) {
+      controller.abort();
+      if (resp.status === 404 || resp.status === 405) return { unsupported: true };
+      throw new PropertiesFetchError({
+        message: `Stream failed: ${resp.status}`,
+        status: resp.status
+      });
+    }
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let settled = false;
+    let completed = false;
+    const buffered = [];
+    let apply = null;
+    return await new Promise((resolveOpen, rejectOpen) => {
+      const pump = (async () => {
+        var _a;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            let sep;
+            while ((sep = buffer.indexOf("\n\n")) !== -1) {
+              const raw = buffer.slice(0, sep);
+              buffer = buffer.slice(sep + 2);
+              if (raw.startsWith(":")) continue;
+              const eventMatch = /^event: (.*)$/m.exec(raw);
+              const dataMatch = /^data: (.*)$/m.exec(raw);
+              if (!eventMatch || !dataMatch) continue;
+              let payload;
+              try {
+                payload = JSON.parse(dataMatch[1]);
+              } catch {
+                continue;
+              }
+              switch (eventMatch[1]) {
+                case "properties":
+                  if (!settled) {
+                    settled = true;
+                    resolveOpen({
+                      data: payload,
+                      pricing: {
+                        begin: (opts) => {
+                          apply = (p) => this.applyPricingBatch(p, opts.price);
+                          for (const p of buffered.splice(0)) apply(p);
+                          return pump;
+                        }
+                      }
+                    });
+                  }
+                  break;
+                case "pricing":
+                  if (apply) apply(payload);
+                  else buffered.push(payload);
+                  break;
+                case "complete":
+                  completed = (payload == null ? void 0 : payload.isComplete) === true;
+                  if (completed) {
+                    if (apply) for (const p of buffered.splice(0)) apply(p);
+                    this.finalizePricing();
+                  }
+                  break;
+                case "error":
+                  throw new PropertiesFetchError({
+                    message: String((_a = payload == null ? void 0 : payload.message) != null ? _a : "stream error"),
+                    status: 500
+                  });
+                default:
+                  break;
+              }
+            }
+          }
+          return { completed };
+        } finally {
+          controller.abort();
+        }
+      })();
+      pump.then(
+        () => {
+          if (!settled) {
+            settled = true;
+            resolveOpen({ unsupported: true });
+          }
+        },
+        (error) => {
+          if (!settled) {
+            settled = true;
+            rejectOpen(error);
+          }
+        }
+      );
+    });
+  }
+  /**
    * The end-of-pricing step, shared by the polling and streaming paths.
    *
    * Drops accommodations that never got a bookable offer, then clears the
@@ -3115,11 +3242,22 @@ var MapFirstCore = class {
     this.clearProperties();
     try {
       const enrichedBody = { ...body, ...this.getRequestLevelOptions() };
-      const data = await fetchProperties(
-        `${this.apiUrl}/properties`,
-        enrichedBody,
-        this.apiKey
-      );
+      let data;
+      let pricing = null;
+      const streamed = this.streaming ? await this.openSearchStream(enrichedBody) : null;
+      if (streamed && !streamed.unsupported) {
+        data = streamed.data;
+        pricing = streamed.pricing;
+      } else {
+        if (streamed == null ? void 0 : streamed.unsupported) {
+          this.streaming = false;
+        }
+        data = await fetchProperties(
+          `${this.apiUrl}/properties`,
+          enrichedBody,
+          this.apiKey
+        );
+      }
       this.updateActiveLocationFromResponse(data);
       let price = null;
       let limit = 30;
@@ -3177,20 +3315,25 @@ var MapFirstCore = class {
       }
       this.setState({ firstCallDone: true });
       if (data.isComplete === false && data.pollingLink) {
-        let streamed = null;
-        if (this.streaming) {
-          streamed = await this.streamPricing({
+        let refined = null;
+        if (pricing) {
+          refined = await pricing.begin({
+            ...price && { price },
+            ...limit && { limit }
+          });
+        } else if (this.streaming) {
+          refined = await this.streamPricing({
             pollingLink: data.pollingLink,
             ...price && { price },
             ...limit && { limit },
             requestBody: enrichedBody
           });
-          if (streamed.unsupported) {
+          if (refined.unsupported) {
             this.streaming = false;
-            streamed = null;
+            refined = null;
           }
         }
-        const { completed, pollData } = streamed ? { completed: streamed.completed, pollData: void 0 } : await this.pollForPricing({
+        const { completed, pollData } = refined ? { completed: refined.completed, pollData: void 0 } : await this.pollForPricing({
           pollingLink: data.pollingLink,
           ...price && { price },
           ...limit && { limit },
@@ -3211,6 +3354,7 @@ var MapFirstCore = class {
           this.refresh();
         }
       } else if (data.isComplete === true) {
+        if (pricing) await pricing.begin({});
         this.setSearching(false);
       }
       if (!flown) {
