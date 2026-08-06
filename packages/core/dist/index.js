@@ -2908,6 +2908,7 @@ var MapFirstCore = class {
    * polling path uses — so streamed and polled results cannot diverge.
    */
   async streamPricing({
+    pollingLink,
     isCancelled,
     price,
     limit,
@@ -2921,6 +2922,11 @@ var MapFirstCore = class {
     const body = {
       ...requestBody,
       filters,
+      // Sending the pollingLink puts the endpoint in RESUME mode: it skips its
+      // own search and streams only pricing refinements. Without it the server
+      // re-runs the same query the caller just ran via POST /properties — two
+      // identical searches per user search.
+      ...pollingLink && { pollingLink },
       ...this.getRequestLevelOptions()
     };
     const controller = new AbortController();
@@ -2972,6 +2978,7 @@ var MapFirstCore = class {
               break;
             case "complete":
               completed = (payload == null ? void 0 : payload.isComplete) === true;
+              if (completed) this.finalizePricing();
               break;
             case "error":
               throw new PropertiesFetchError({
@@ -2991,6 +2998,25 @@ var MapFirstCore = class {
     } finally {
       controller.abort();
     }
+  }
+  /**
+   * The end-of-pricing step, shared by the polling and streaming paths.
+   *
+   * Drops accommodations that never got a bookable offer, then clears the
+   * searching flag. streamPricing originally only set its local `completed`
+   * and skipped BOTH of these — so the spinner span forever and sold-out
+   * hotels stayed on the map even though the stream had emitted `complete`.
+   */
+  finalizePricing() {
+    this.setProperties(
+      (prev) => prev.filter(
+        (property) => {
+          var _a, _b, _c, _d;
+          return property.type !== "Accommodation" || ((_b = (_a = property.pricing) == null ? void 0 : _a.offer) == null ? void 0 : _b.availability) === "available" && ((_d = (_c = property.pricing) == null ? void 0 : _c.offer) == null ? void 0 : _d.displayPrice);
+        }
+      )
+    );
+    this.setSearching(false);
   }
   applyPricingBatch(success, price) {
     var _a, _b, _c, _d, _e;
@@ -3078,16 +3104,8 @@ var MapFirstCore = class {
         }
         this.applyPricingBatch(pollData == null ? void 0 : pollData.success, price);
         if ((_a = pollData == null ? void 0 : pollData.success) == null ? void 0 : _a.isComplete) {
-          this.setProperties(
-            (prev) => prev.filter(
-              (property) => {
-                var _a2, _b2, _c2, _d;
-                return property.type !== "Accommodation" || ((_b2 = (_a2 = property.pricing) == null ? void 0 : _a2.offer) == null ? void 0 : _b2.availability) === "available" && ((_d = (_c2 = property.pricing) == null ? void 0 : _c2.offer) == null ? void 0 : _d.displayPrice);
-              }
-            )
-          );
+          this.finalizePricing();
           completed = true;
-          this.setSearching(false);
           break;
         }
       } catch (error) {
@@ -3198,6 +3216,7 @@ var MapFirstCore = class {
         let streamed = null;
         if (this.streaming) {
           streamed = await this.streamPricing({
+            pollingLink: data.pollingLink,
             ...price && { price },
             ...limit && { limit },
             requestBody: enrichedBody

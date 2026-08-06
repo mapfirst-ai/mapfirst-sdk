@@ -1394,11 +1394,12 @@ export class MapFirstCore {
    * polling path uses — so streamed and polled results cannot diverge.
    */
   async streamPricing({
+    pollingLink,
     isCancelled,
     price,
     limit,
     requestBody,
-  }: Omit<PollOptions, "pollingLink" | "maxAttempts" | "delayMs">): Promise<{
+  }: Omit<PollOptions, "maxAttempts" | "delayMs">): Promise<{
     completed: boolean;
     unsupported?: boolean;
   }> {
@@ -1410,6 +1411,11 @@ export class MapFirstCore {
     const body = {
       ...requestBody,
       filters,
+      // Sending the pollingLink puts the endpoint in RESUME mode: it skips its
+      // own search and streams only pricing refinements. Without it the server
+      // re-runs the same query the caller just ran via POST /properties — two
+      // identical searches per user search.
+      ...(pollingLink && { pollingLink }),
       ...this.getRequestLevelOptions(),
     };
 
@@ -1469,6 +1475,7 @@ export class MapFirstCore {
               break;
             case "complete":
               completed = payload?.isComplete === true;
+              if (completed) this.finalizePricing();
               break;
             case "error":
               throw new PropertiesFetchError({
@@ -1488,6 +1495,26 @@ export class MapFirstCore {
     } finally {
       controller.abort();
     }
+  }
+
+  /**
+   * The end-of-pricing step, shared by the polling and streaming paths.
+   *
+   * Drops accommodations that never got a bookable offer, then clears the
+   * searching flag. streamPricing originally only set its local `completed`
+   * and skipped BOTH of these — so the spinner span forever and sold-out
+   * hotels stayed on the map even though the stream had emitted `complete`.
+   */
+  private finalizePricing(): void {
+    this.setProperties((prev) =>
+      prev.filter(
+        (property) =>
+          property.type !== "Accommodation" ||
+          (property.pricing?.offer?.availability === "available" &&
+            property.pricing?.offer?.displayPrice),
+      ),
+    );
+    this.setSearching(false);
   }
 
   private applyPricingBatch(
@@ -1602,16 +1629,8 @@ export class MapFirstCore {
         // When isComplete, always remove hotels without a valid offer/availability,
         // regardless of whether this final response contained any results.
         if (pollData?.success?.isComplete) {
-          this.setProperties((prev) =>
-            prev.filter(
-              (property) =>
-                property.type !== "Accommodation" ||
-                (property.pricing?.offer?.availability === "available" &&
-                  property.pricing?.offer?.displayPrice),
-            ),
-          );
+          this.finalizePricing();
           completed = true;
-          this.setSearching(false);
           break;
         }
       } catch (error) {
@@ -1770,6 +1789,7 @@ export class MapFirstCore {
         let streamed: { completed: boolean; unsupported?: boolean } | null = null;
         if (this.streaming) {
           streamed = await this.streamPricing({
+            pollingLink: data.pollingLink,
             ...(price && { price }),
             ...(limit && { limit }),
             requestBody: enrichedBody,

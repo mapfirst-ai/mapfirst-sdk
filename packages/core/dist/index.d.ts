@@ -827,10 +827,19 @@ declare class MapFirstCore {
      * Each `pricing` frame goes through applyPricingBatch — the SAME merge the
      * polling path uses — so streamed and polled results cannot diverge.
      */
-    streamPricing({ isCancelled, price, limit, requestBody, }: Omit<PollOptions, "pollingLink" | "maxAttempts" | "delayMs">): Promise<{
+    streamPricing({ pollingLink, isCancelled, price, limit, requestBody, }: Omit<PollOptions, "maxAttempts" | "delayMs">): Promise<{
         completed: boolean;
         unsupported?: boolean;
     }>;
+    /**
+     * The end-of-pricing step, shared by the polling and streaming paths.
+     *
+     * Drops accommodations that never got a bookable offer, then clears the
+     * searching flag. streamPricing originally only set its local `completed`
+     * and skipped BOTH of these — so the spinner span forever and sold-out
+     * hotels stayed on the map even though the stream had emitted `complete`.
+     */
+    private finalizePricing;
     private applyPricingBatch;
     pollForPricing({ pollingLink, maxAttempts, delayMs, isCancelled, price, limit, requestBody, }: PollOptions): Promise<{
         completed: boolean;
