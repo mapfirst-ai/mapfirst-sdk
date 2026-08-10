@@ -499,6 +499,9 @@ export function createPrimaryMarkerElement(
       img.src = markerOptions.promoBadgeImageUrl;
       img.alt = marker.promo?.provider ?? "Offer";
       img.className = "mapfirst-marker-badge-img mapfirst-marker-promo-badge-img";
+      // The promo badge URL is passed without a load probe (unlike
+      // badgeImageUrl) — drop the badge rather than render a broken image.
+      img.onerror = () => badge.remove();
       badge.appendChild(img);
       pill.appendChild(badge);
     } else if (markerOptions?.badgeImageUrl && isAccommodation) {

@@ -98,16 +98,6 @@
   box-shadow: 0 0 10px -5px black;
 }
 
-/* Partner promo badge (e.g. Visa): white disc behind the logo so wide
-   wordmarks survive the circular crop, and a border so it reads as a badge
-   against any basemap. */
-.mapfirst-marker-promo-badge-img {
-  background: #ffffff;
-  padding: 3px;
-  border: 1.5px solid rgba(0, 0, 0, 0.12);
-  box-sizing: border-box;
-}
-
 .mapfirst-marker-award-container {
   position: relative;
   width: 32px;
