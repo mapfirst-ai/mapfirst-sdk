@@ -403,7 +403,20 @@ export type MarkerOptions = {
   disableHoverCard?: boolean;
   /** URL of a custom badge image to show on Accommodation markers (takes priority over awards/rating). */
   badgeImageUrl?: string;
+  /**
+   * Badge image for properties carrying a `promo` (partner offers, e.g. a
+   * Visa logo). Applies to EVERY property type and takes priority over
+   * badgeImageUrl/awards/rating — a promo marker shows the partner mark, not
+   * the TA award or rating.
+   */
+  promoBadgeImageUrl?: string;
 };
+
+/** Short pill text for a promo accommodation that has no price to show. */
+function promoContentLabel(promo: NonNullable<Property["promo"]>): string {
+  if (promo.discount_percent != null) return `${promo.discount_percent}% off`;
+  return promo.promotion_text ?? "Offer";
+}
 
 export function createPrimaryMarkerElement(
   item: Extract<ClusterDisplayItem, { kind: "primary" }>,
@@ -421,7 +434,10 @@ export function createPrimaryMarkerElement(
   const isSelected = selectedMarkerId === marker.tripadvisor_id;
   const isAccommodation = marker.type === "Accommodation";
   const hasPrice = marker.pricing?.offer?.displayPrice;
-  const isPending = isAccommodation && !hasPrice;
+  // Promo properties never price and never poll — they must not render (or
+  // stay stuck) as pending, badge-less and unclickable.
+  const isPromo = !!marker.promo;
+  const isPending = isAccommodation && !hasPrice && !isPromo;
   const selectedAward = marker.awards?.length
     ? [...marker.awards].sort((a, b) => {
         if ((b.year ?? 0) !== (a.year ?? 0)) {
@@ -449,10 +465,10 @@ export function createPrimaryMarkerElement(
   }
   root.style.zIndex = String(getPrimaryMarkerZIndex(isPrimaryType, isSelected));
 
-  // Get URL for the marker
+  // Get URL for the marker — a promo deep link outranks the booking/TA link
   const markerUrl = markerOptions?.disableHoverCard
     ? undefined
-    : (marker.pricing?.offer?.clickUrl ?? marker.url);
+    : (marker.promo?.url ?? marker.pricing?.offer?.clickUrl ?? marker.url);
 
   const pill = document.createElement(markerUrl ? "a" : "div");
   if (markerUrl) {
@@ -471,9 +487,21 @@ export function createPrimaryMarkerElement(
   }
   // pill.title = marker.name ?? String(marker.tripadvisor_id);
 
-  // Badge: custom image > awards > rating
+  // Badge: promo (partner mark) > custom image > awards > rating
   if (!isPending && !markerOptions?.hideBadge) {
-    if (markerOptions?.badgeImageUrl && isAccommodation) {
+    if (isPromo && markerOptions?.promoBadgeImageUrl) {
+      const badge = document.createElement("div");
+      badge.className = "mapfirst-marker-badge mapfirst-marker-promo-badge";
+      if (!isPrimaryType) {
+        badge.style.opacity = "0.2";
+      }
+      const img = document.createElement("img");
+      img.src = markerOptions.promoBadgeImageUrl;
+      img.alt = marker.promo?.provider ?? "Offer";
+      img.className = "mapfirst-marker-badge-img mapfirst-marker-promo-badge-img";
+      badge.appendChild(img);
+      pill.appendChild(badge);
+    } else if (markerOptions?.badgeImageUrl && isAccommodation) {
       const badge = document.createElement("div");
       badge.className = "mapfirst-marker-badge";
       if (!isPrimaryType) {
@@ -529,6 +557,10 @@ export function createPrimaryMarkerElement(
     if (marker.pricing?.offer?.displayPrice) {
       content.innerHTML = marker.pricing.offer.displayPrice;
       content.dataset.price = marker.pricing.offer.displayPrice;
+    } else if (isPromo && marker.promo) {
+      // No price and none coming: the promo IS the content.
+      content.textContent = promoContentLabel(marker.promo);
+      content.dataset.price = "";
     } else {
       content.innerHTML = LOADING_SPINNER_HTML;
       content.dataset.price = "";

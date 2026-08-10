@@ -124,6 +124,19 @@ export type OpeningHours = {
   periods?: OpeningHoursPeriod[];
 };
 
+/**
+ * Partner promotion riding on a property (server-injected, e.g. Visa offers).
+ * Promo properties show the promo (discount/text) instead of pricing, never
+ * poll for prices, and render a partner badge on their marker.
+ */
+export type PropertyPromo = {
+  provider: string;
+  discount_percent?: number;
+  promotion_text?: string;
+  url?: string;
+  highlights?: string[];
+};
+
 export type Property = {
   tripadvisor_id: number;
   name: string;
@@ -133,6 +146,7 @@ export type Property = {
   type: PropertyType;
   awards?: PropertyAward[];
   pricing?: HotelPricingAPIResults;
+  promo?: PropertyPromo;
   url?: string;
   urls?: PropertyUrls;
   rankings?: Ranking[];

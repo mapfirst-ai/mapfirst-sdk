@@ -104,6 +104,18 @@ type OpeningHours = {
     timezone?: string;
     periods?: OpeningHoursPeriod[];
 };
+/**
+ * Partner promotion riding on a property (server-injected, e.g. Visa offers).
+ * Promo properties show the promo (discount/text) instead of pricing, never
+ * poll for prices, and render a partner badge on their marker.
+ */
+type PropertyPromo = {
+    provider: string;
+    discount_percent?: number;
+    promotion_text?: string;
+    url?: string;
+    highlights?: string[];
+};
 type Property = {
     tripadvisor_id: number;
     name: string;
@@ -116,6 +128,7 @@ type Property = {
     type: PropertyType;
     awards?: PropertyAward[];
     pricing?: HotelPricingAPIResults;
+    promo?: PropertyPromo;
     url?: string;
     urls?: PropertyUrls;
     rankings?: Ranking[];
@@ -229,6 +242,13 @@ type MarkerOptions = {
     disableHoverCard?: boolean;
     /** URL of a custom badge image to show on Accommodation markers (takes priority over awards/rating). */
     badgeImageUrl?: string;
+    /**
+     * Badge image for properties carrying a `promo` (partner offers, e.g. a
+     * Visa logo). Applies to EVERY property type and takes priority over
+     * badgeImageUrl/awards/rating — a promo marker shows the partner mark, not
+     * the TA award or rating.
+     */
+    promoBadgeImageUrl?: string;
 };
 
 type MarkerEntry<T = any> = {

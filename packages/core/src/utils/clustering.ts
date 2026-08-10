@@ -273,6 +273,13 @@ function resolveDotCollisionThreshold(zoom: number) {
 }
 
 function compareMarkers(a: Property, b: Property, primaryType: PropertyType) {
+  // Partner promo properties win cluster collisions outright — an offer must
+  // stay visible even when a primary-type marker lands on top of it.
+  const aIsPromo = !!a.promo;
+  const bIsPromo = !!b.promo;
+  if (aIsPromo && !bIsPromo) return 1;
+  if (!aIsPromo && bIsPromo) return -1;
+
   const aIsPrimary = a.type === primaryType;
   const bIsPrimary = b.type === primaryType;
   if (aIsPrimary && !bIsPrimary) return 1;

@@ -58,8 +58,10 @@ export function updatePrimaryMarkerElement(
     }
   }
 
-  // Update content (price) if marker data is provided
-  if (marker && marker.type === "Accommodation") {
+  // Update content (price) if marker data is provided. Promo properties
+  // without a price keep their promo label — never swap it for a spinner
+  // (no price is ever coming for them).
+  if (marker && marker.type === "Accommodation" && !(marker.promo && !marker.pricing?.offer?.displayPrice)) {
     const content = root.querySelector(".mapfirst-marker-content");
     if (content instanceof HTMLElement) {
       const displayPrice = marker.pricing?.offer?.displayPrice;

@@ -1666,10 +1666,13 @@ export class MapFirstCore {
    * hotels stayed on the map even though the stream had emitted `complete`.
    */
   private finalizePricing(): void {
+    // Promo properties are exempt: they never price, so "no bookable offer"
+    // is their permanent — and correct — state.
     this.setProperties((prev) =>
       prev.filter(
         (property) =>
           property.type !== "Accommodation" ||
+          !!property.promo ||
           (property.pricing?.offer?.availability === "available" &&
             property.pricing?.offer?.displayPrice),
       ),
@@ -1708,7 +1711,12 @@ export class MapFirstCore {
             (h) => h.tripadvisor_id === property.tripadvisor_id,
           );
           if (existingIndex >= 0) {
-            updatedProperties[existingIndex] = property;
+            // Pricing frames replace the row wholesale; carry `promo` over so
+            // a server-injected offer can't be wiped by a price arriving.
+            const prevPromo = updatedProperties[existingIndex].promo;
+            updatedProperties[existingIndex] = prevPromo
+              ? { ...property, promo: property.promo ?? prevPromo }
+              : property;
           } else {
             updatedProperties.push(property);
           }
@@ -1890,9 +1898,12 @@ export class MapFirstCore {
       let primary_type: PropertyType | undefined = data.filters.primary_type;
 
       if (data.isComplete) {
+        // Same promo exemption as finalizePricing — a server-injected offer
+        // property must survive an already-complete response.
         data.properties = data.properties.filter(
           (property) =>
             property.type !== "Accommodation" ||
+            !!property.promo ||
             (property.pricing?.offer?.availability === "available" &&
               property.pricing?.offer?.displayPrice),
         );

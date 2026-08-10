@@ -217,7 +217,10 @@ export abstract class BaseMarkerManager<TMarker = any> {
   private getDisplayState(item: ClusterDisplayItem): MarkerDisplayState {
     const isPrimaryType = item.marker.type === this.primaryType;
     const isSelected = this.selectedMarkerId === item.marker.tripadvisor_id;
-    const isAccommodation = item.marker.type === "Accommodation";
+    // Promo properties never price — they are never "pending" (which would
+    // grey them out, drop their badge and make them unclickable forever).
+    const isAccommodation =
+      item.marker.type === "Accommodation" && !item.marker.promo;
     const isPending =
       item.kind === "primary"
         ? isAccommodation && !item.marker.pricing?.offer?.displayPrice
