@@ -814,6 +814,35 @@ declare class MapFirstCore {
     handleMapMoveEnd(bounds: MapBounds): void;
     flyMapTo(longitude: number, latitude: number, zoom?: number | null, animation?: boolean): void;
     private extractPoiPoints;
+    /**
+     * The map's drawing area in CSS pixels, or null when it cannot be determined.
+     * Every renderer exposes this differently and none is guaranteed to be
+     * present, so each lookup is optional and failure is non-fatal.
+     */
+    private getMapPixelSize;
+    /**
+     * Fit padding the map can actually honour.
+     *
+     * `fitBoundsPadding` is fixed at construction (default 50 top / 160 bottom =
+     * 210px vertical). On a short map that exceeds the drawing area, and MapLibre
+     * then refuses to move the camera AT ALL — cameraForBounds works out the space
+     * left after padding and gives up when it goes negative:
+     *
+     *     b = (height - (top + bottom + offset)) / v.y
+     *     if (b < 0 || x < 0) return void warnOnce();
+     *
+     * The only symptom is a console warning ("Map cannot fit within canvas with
+     * the given bounds, padding, and/or offset"), so fitBounds silently does
+     * nothing and the map never reframes. A real case: the widget embedded at
+     * 315x250 leaves a 313x197 canvas, where 210px of vertical padding cannot fit,
+     * so switching the primary type updated the markers but never the framing.
+     *
+     * Clamping to a fraction of the map box gives a small map a tighter fit
+     * instead of no fit, while anything with room keeps the configured values
+     * exactly. The ratio between opposing sides is preserved, so the intent of a
+     * larger bottom gutter (room for a card carousel) survives the scaling.
+     */
+    private resolveFitPadding;
     flyToPOIs(pois?: {
         lat: number;
         lng: number;

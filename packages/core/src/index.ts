@@ -350,6 +350,18 @@ export type MapFirstOptions =
 
 const DEFAULT_PRIMARY_TYPE: PropertyType = "Accommodation";
 
+/**
+ * Most of the map box that fit padding is ever allowed to consume.
+ *
+ * The renderers differ in how they fail when padding does not fit, and all the
+ * failures are bad: MapLibre/Mapbox abandon the camera move entirely (see
+ * resolveFitPadding), while Leaflet will happily solve for a negative viewport
+ * and fly somewhere meaningless. Reserving 40% of each axis for actual map
+ * keeps a fit possible at any size. It only ever binds on small maps —
+ * the defaults (210px vertical) sit under it from roughly 525px of height up.
+ */
+const MAX_FIT_PADDING_FRACTION = 0.6;
+
 // Helper function to calculate default check-in/check-out dates
 function getDefaultDates(): { checkIn: Date; checkOut: Date } {
   const dayMs = 24 * 60 * 60 * 1000;
@@ -1247,6 +1259,90 @@ export class MapFirstCore {
       }));
   }
 
+  /**
+   * The map's drawing area in CSS pixels, or null when it cannot be determined.
+   * Every renderer exposes this differently and none is guaranteed to be
+   * present, so each lookup is optional and failure is non-fatal.
+   */
+  private getMapPixelSize(
+    mapInstance: any,
+  ): { width: number; height: number } | null {
+    try {
+      const usable = (w: unknown, h: unknown) =>
+        typeof w === "number" &&
+        typeof h === "number" &&
+        Number.isFinite(w) &&
+        Number.isFinite(h) &&
+        w > 0 &&
+        h > 0
+          ? { width: w, height: h }
+          : null;
+
+      if (this.currentPlatform === "google") {
+        const div = mapInstance?.getDiv?.();
+        return usable(div?.offsetWidth, div?.offsetHeight);
+      }
+      if (this.currentPlatform === "leaflet") {
+        const size = mapInstance?.getSize?.();
+        return usable(size?.x, size?.y);
+      }
+      // MapLibre / Mapbox
+      const canvas = mapInstance?.getCanvas?.();
+      const fromCanvas = usable(canvas?.clientWidth, canvas?.clientHeight);
+      if (fromCanvas) return fromCanvas;
+      const container = mapInstance?.getContainer?.();
+      return usable(container?.clientWidth, container?.clientHeight);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Fit padding the map can actually honour.
+   *
+   * `fitBoundsPadding` is fixed at construction (default 50 top / 160 bottom =
+   * 210px vertical). On a short map that exceeds the drawing area, and MapLibre
+   * then refuses to move the camera AT ALL — cameraForBounds works out the space
+   * left after padding and gives up when it goes negative:
+   *
+   *     b = (height - (top + bottom + offset)) / v.y
+   *     if (b < 0 || x < 0) return void warnOnce();
+   *
+   * The only symptom is a console warning ("Map cannot fit within canvas with
+   * the given bounds, padding, and/or offset"), so fitBounds silently does
+   * nothing and the map never reframes. A real case: the widget embedded at
+   * 315x250 leaves a 313x197 canvas, where 210px of vertical padding cannot fit,
+   * so switching the primary type updated the markers but never the framing.
+   *
+   * Clamping to a fraction of the map box gives a small map a tighter fit
+   * instead of no fit, while anything with room keeps the configured values
+   * exactly. The ratio between opposing sides is preserved, so the intent of a
+   * larger bottom gutter (room for a card carousel) survives the scaling.
+   */
+  private resolveFitPadding(mapInstance: any): {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  } {
+    const padding = this.fitBoundsPadding;
+    const size = this.getMapPixelSize(mapInstance);
+    // Unknown size: leave the configured values untouched rather than guess.
+    if (!size) return padding;
+
+    const clamp = (a: number, b: number, extent: number): [number, number] => {
+      const total = a + b;
+      const max = extent * MAX_FIT_PADDING_FRACTION;
+      if (total <= max || total <= 0) return [a, b];
+      const scale = max / total;
+      return [Math.floor(a * scale), Math.floor(b * scale)];
+    };
+
+    const [top, bottom] = clamp(padding.top, padding.bottom, size.height);
+    const [left, right] = clamp(padding.left, padding.right, size.width);
+    return { top, bottom, left, right };
+  }
+
   flyToPOIs(
     pois?: { lat: number; lng: number }[],
     type?: PropertyType,
@@ -1298,7 +1394,7 @@ export class MapFirstCore {
           if (animate) {
             this.setFlyToAnimating(true);
           }
-          mapInstance.fitBounds(bounds, this.fitBoundsPadding);
+          mapInstance.fitBounds(bounds, this.resolveFitPadding(mapInstance));
         }
       } else if (this.currentPlatform === "leaflet" && mapInstance.fitBounds) {
         // Leaflet: fitBounds uses [[lat, lng], [lat, lng]]
@@ -1313,8 +1409,19 @@ export class MapFirstCore {
         if (animate) {
           this.setFlyToAnimating(true);
         }
+        // Leaflet padding is [x, y] and applies to BOTH sides of each axis,
+        // so 40 costs 80px of width and 80px of height — more than a very short
+        // map has. Clamp it the same way the other renderers are clamped.
+        const leafletSize = this.getMapPixelSize(mapInstance);
+        const leafletPad = (extent: number | undefined): number =>
+          extent && extent > 0
+            ? Math.min(40, Math.floor((extent * MAX_FIT_PADDING_FRACTION) / 2))
+            : 40;
         mapInstance.fitBounds([sw, ne], {
-          padding: [40, 40] as [number, number],
+          padding: [
+            leafletPad(leafletSize?.width),
+            leafletPad(leafletSize?.height),
+          ] as [number, number],
           animate,
         });
       } else if (mapInstance.fitBounds) {
@@ -1335,7 +1442,7 @@ export class MapFirstCore {
           this.setFlyToAnimating(true);
         }
         mapInstance.fitBounds(bounds, {
-          padding: this.fitBoundsPadding,
+          padding: this.resolveFitPadding(mapInstance),
           animate,
         });
       }
